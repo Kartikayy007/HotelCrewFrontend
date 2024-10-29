@@ -1,83 +1,54 @@
 import { useRef, useState, useEffect } from "react";
-import ArrowButton from '../assets/ArrowButton.svg';
-import axios from "axios";
+import arrow from '../assets/arrow.svg';
+import { useDispatch, useSelector } from "react-redux";
+import { registerUser } from "../redux/slices/UserSlice"
 import Frame from '../assets/Frame.svg'
 import eye from '../assets/eye.svg';
-import { Link } from "react-router-dom";
 
-const userRegex = /^[A-z][A-z0-9-_]{3,23}$/;
-const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,12}$/;
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const REGISTER_URL = '/register';
+
 
 const SignUp = () => {
     const userRef = useRef();
-    const errRef = useRef();
-
+    const dispatch = useDispatch();
+    const { loading, error } = useSelector((state) => state.user);
     const [user, setUser] = useState('');
-    const [validName, setValidName] = useState(false);
+   
     const [userFocus, setUserFocus] = useState(false);
 
     const [email, setEmail] = useState('');
-    const [validEmail, setValidEmail] = useState(false);
     const [emailFocus, setEmailFocus] = useState(false);
 
     const [pwd, setPwd] = useState('');
-    const [showPassword,setShowPassword]=useState(false)
-    const [validPwd, setValidPwd] = useState(false);
+    const [showPassword, setShowPassword] = useState(false)
     const [pwdFocus, setPwdFocus] = useState(false);
 
     const [matchPwd, setMatchPwd] = useState('');
-    const [showMatchPassword,setShowMatchPassword]=useState(false)
-    const [validMatch, setValidMatch] = useState(false);
+    const [showMatchPassword, setShowMatchPassword] = useState(false)
     const [matchFocus, setMatchFocus] = useState(false);
 
-    const [errMsg, setErrMsg] = useState('');
-    const [success, setSuccess] = useState(false);
+    const [showError, setShowError] = useState(false);
 
     useEffect(() => {
         userRef.current.focus();
     }, [])
 
-    useEffect(() => {
-        setValidName(userRegex.test(user));
-    }, [user])
-
-    useEffect(() => {
-        setValidEmail(emailRegex.test(email));
-    }, [email])
-
-    useEffect(() => {
-        setValidPwd(pwdRegex.test(pwd));
-        setValidMatch(pwd === matchPwd);
-    }, [pwd, matchPwd])
-
-    useEffect(() => {
-        setErrMsg('');
-    }, [user, email, pwd, matchPwd])
-
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const response = await axios.post(
-                "https://jsonplaceholder.typicode.com/posts",
-                {
-                    user: user,
-                    email: email,
-                    password: pwd,
-                }
-            );
-
-            console.log(response);
-            console.log(response.data);
-
-            setEmail("");
-            setPassword("");
-        } catch (error) {
-            console.log(error);
-            setError("Login failed");
+        const userCredentials = {
+            email: email,
+            password: pwd,
+            confirm_password: matchPwd
         }
+        dispatch(registerUser(userCredentials)).then((result) => {
+            if (registerUser.fulfilled.match(result)) {
+                setEmail("");
+                setPwd("");
 
+                console.log('registered');
+               
+            }
+        });
     }
 
     return (
@@ -85,142 +56,123 @@ const SignUp = () => {
             <div className="flex flex-col items-start w-full max-w-[303px] ">
                 <h1 className="w-[176px] h-[49px] absolute top-[93px]  opacity-100 
               text-[40px] font-bold  text-left 
-              sm:text-[36px] md:text-[32px] lg:text-[40px]">
+              ">
                     Register
                 </h1>
-                <form onSubmit={handleSubmit} className=" w-[303px] h-[220px] absolute top-[201px]  gap-1 flex flex-col p-1 ">
-                <div className={`relative w-full ${userFocus ? 'shift-up' : ''}`}>
-                    <label htmlFor="username" className={`transform -translate-y-1/2 transition-opacity duration-200 ${userFocus ? 'opacity-100' : 'opacity-0'
-                        } text-24 font-medium text-500`}
-                        style={{
-                            fontSize: '24px',
-                            lineHeight: '26.26px',
-                            textAlign: 'left',
-                            
-                        }}
-                    >
-                        Name
-                    </label>
-                    <input
-                        type="text"
-                        id="username"
-                        placeholder={userFocus ? "" : "Name"}
-                        ref={userRef}
-                        autoComplete="off"
-                        onChange={(e) => setUser(e.target.value)}
-                        aria-invalid={validName ? "false" : "true"}
-                        aria-describedby="uidnote"
-                        value={user}
-                        required
-                        onFocus={() => setUserFocus(true)}
-                        onBlur={() => setUserFocus(false)}
-                        className={`w-full border-b-2 transition duration-200 
+                <form onSubmit={handleSubmit} className=" w-[303px] h-[220px] absolute top-[201px]  gap-2 flex flex-col p-1 ">
+                    <div className={`relative w-full ${userFocus ? 'shift-up' : ''}`}>
+                        <label htmlFor="username" className={`transform -translate-y-1/2 transition-opacity duration-200 ${userFocus ? 'opacity-100' : 'opacity-0'
+                            } text-[24px] font-medium text-left`}
+                        >
+                            Name
+                        </label>
+                        <input
+                            type="text"
+                            id="username"
+                            placeholder={userFocus ? "" : "Name"}
+                            ref={userRef}
+                            autoComplete="off"
+                            onChange={(e) => setUser(e.target.value)}
+                            value={user}
+                            required
+                            onFocus={() => setUserFocus(true)}
+                            onBlur={() => setUserFocus(false)}
+                            className={`w-full border-b-2 transition duration-200 
                          focus:outline-none focus:ring-0 
                         ${userFocus ? 'pb-2' : 'pb-0'}  
                     `}
-                    />
+                        />
                     </div>
                     <div className={`relative w-full ${emailFocus ? 'shift-up' : ''}`}>
-                    <label htmlFor="email" className={`transform -translate-y-1/2 transition-opacity duration-200 ${emailFocus ? 'opacity-100' : 'opacity-0'
-                        } text-24 font-medium text-500`}
-                        style={{
-                            fontSize: '24px',
-                            lineHeight: '26.26px',
-                            textAlign: 'left',
-                        }}
-                    >
-                        Email
-                    </label>
-                    <input
-                        type="email"
-                        id="email"
-                        autoComplete="off"
-                        placeholder={emailFocus ? "" : "Email"}
-                        onChange={(e) => setEmail(e.target.value)}
-                        aria-invalid={validEmail ? "false" : "true"}
-                        // aria-describedby="uidnote"
-                        value={email}
-                        required
-                        onFocus={() => setEmailFocus(true)}
-                        onBlur={() => setEmailFocus(false)}
-                        className={`w-full border-b-2 transition duration-200 
+                        <label htmlFor="email" className={`transform -translate-y-1/2 transition-opacity duration-200 ${emailFocus ? 'opacity-100' : 'opacity-0'
+                            } text-[24px] font-medium text-left`}
+                     
+                        >
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            autoComplete="off"
+                            placeholder={emailFocus ? "" : "Email"}
+                            onChange={(e) => setEmail(e.target.value)}
+                            value={email}
+                            required
+                            onFocus={() => setEmailFocus(true)}
+                            onBlur={() => setEmailFocus(false)}
+                            className={`w-full border-b-2 transition duration-200 
                          focus:outline-none focus:ring-0 
                         ${emailFocus ? 'pb-2 mt-4' : 'pb-0 mt-0'}   
                     `}
-                    />
+                        />
                     </div>
                     <div className={`relative w-full ${pwdFocus ? 'shift-up' : ''}`}>
-                    <label htmlFor="pwd" className={`transform -translate-y-1/2 transition-opacity duration-200 ${pwdFocus ? 'opacity-100' : 'opacity-0'
-                        } text-24 font-medium text-500`}
-                        style={{
-                            fontSize: '24px',
-                            lineHeight: '26.26px',
-                            textAlign: 'left',
-                        }}
-                    >
-                        Password
-                    </label>
-                    <div className="relative w-full">
-                    <input
-                        type={showPassword ? "text" : "password"}
-                        id="pwd"
-                        placeholder={pwdFocus ? "" : "Password"}
-                        onChange={(e) => setPwd(e.target.value)}
-                        value={pwd}
-                        required
-                        aria-invalid={validPwd ? "false" : "true"}
-                        aria-describedby="pwdnote"
-                        onFocus={() => setPwdFocus(true)}
-                        onBlur={() => setPwdFocus(false)}
-                        className={`w-full border-b-2 transition duration-200 
+                        <label htmlFor="pwd" className={`transform -translate-y-1/2 transition-opacity duration-200 ${pwdFocus ? 'opacity-100' : 'opacity-0'
+                            } text-[24px] font-medium text-left`}
+
+                        >
+                            Password
+                        </label>
+                        <div className="relative w-full">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                id="pwd"
+                                placeholder={pwdFocus ? "" : "Password"}
+                                onChange={(e) => setPwd(e.target.value)}
+                                value={pwd}
+                                required
+                                onFocus={() => setPwdFocus(true)}
+                                onBlur={() => setPwdFocus(false)}
+                                className={`w-full border-b-2 transition duration-200 
                         focus:outline-none focus:ring-0 
                         ${pwdFocus ? 'pb-2' : 'pb-0'}  
                     `}
-                    />
-                    <span
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-0 top-1/3 transform -translate-y-1/2 cursor-pointer pr-2">
-                        <img src={eye} alt="Toggle Password Visibility" />
-                    </span>
-                    </div>
+                            />
+                            <span
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-0 top-1/3 transform -translate-y-1/2 cursor-pointer pr-2">
+                                <img src={eye} alt="Toggle Password Visibility" />
+                            </span>
+                        </div>
                     </div>
                     <div className={`relative w-full ${matchFocus ? 'shift-up' : ''}`}>
-                    <label htmlFor="confirm_pwd" className={`transform -translate-y-1/2 transition-opacity duration-200 ${matchFocus ? 'opacity-100' : 'opacity-0'
-                        } text-24 font-medium text-500 `}
-                        style={{
-                            fontSize: '24px',
-                            lineHeight: '26.26px',
-                            textAlign: 'left',
-                        }}>
-                        Confirm Password
-                    </label>
-                    <div className="relative w-full">
-                    <input
-                        type={showMatchPassword ? "text" : "password"}
-                        id="confirm_pwd"
-                        placeholder={matchFocus ? "" : "Confirm Password"}
-                        onChange={(e) => setMatchPwd(e.target.value)}
-                        value={matchPwd}
-                        required
-                        aria-invalid={validMatch ? "false" : "true"}
-                        aria-describedby="confirmnote"
-                        onFocus={() => setMatchFocus(true)}
-                        onBlur={() => setMatchFocus(false)}
-                        className={`w-full border-b-2 transition duration-200 
+                        <label htmlFor="confirm_pwd" className={`transform -translate-y-1/2 transition-opacity duration-200 ${matchFocus ? 'opacity-100' : 'opacity-0'
+                            } text-[24px] text-left font-medium  `}
+                            >
+                            Confirm Password
+                        </label>
+                        <div className="relative w-full">
+                            <input
+                                type={showMatchPassword ? "text" : "password"}
+                                id="confirm_pwd"
+                                placeholder={matchFocus ? "" : "Confirm Password"}
+                                onChange={(e) => setMatchPwd(e.target.value)}
+                                value={matchPwd}
+                                required
+                                onFocus={() => setMatchFocus(true)}
+                                onBlur={() => setMatchFocus(false)}
+                                className={`w-full border-b-2 transition duration-200 
                        focus:outline-none focus:ring-0 
                         ${matchFocus ? 'pb-2' : 'pb-0'}  
                     `}
-                    />
-                    <span
-                        onClick={() => setShowMatchPassword(!showMatchPassword)}
-                        className="absolute right-0 top-1/3 transform -translate-y-1/2 cursor-pointer pr-2">
-                        <img src={eye} alt="Toggle Password Visibility" />
-                    </span>
+                            />
+                            <span
+                                onClick={() => setShowMatchPassword(!showMatchPassword)}
+                                className="absolute right-0 top-1/3 transform -translate-y-1/2 cursor-pointer pr-2">
+                                <img src={eye} alt="Toggle Password Visibility" />
+                            </span>
+                        </div>
                     </div>
-                    </div>
-                    <button disabled={!validName || !validEmail || !validPwd || !validMatch ? true : false}
-                        className="flex justify-end mt-20 ">
-                        <img src={ArrowButton} alt="arrow button" />
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full lg:w-[88px] h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors ml-[215px] top-10 relative"
+                    >
+                        {loading ? (
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+                        ) : (
+                            <img src={arrow} alt="Submit" />
+                        )}
                     </button>
                 </form>
             </div>
