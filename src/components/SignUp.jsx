@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import ArrowButton from '../assets/ArrowButton.svg';
 import axios from "axios";
-import bg from '../assets/bg.svg'
+import Frame from '../assets/Frame.svg'
 import eye from '../assets/eye.svg';
 import { Link } from "react-router-dom";
 
@@ -89,12 +89,14 @@ const SignUp = () => {
                     Register
                 </h1>
                 <form onSubmit={handleSubmit} className=" w-[303px] h-[220px] absolute top-[201px]  gap-1 flex flex-col p-1 ">
+                <div className={`relative w-full ${userFocus ? 'shift-up' : ''}`}>
                     <label htmlFor="username" className={`transform -translate-y-1/2 transition-opacity duration-200 ${userFocus ? 'opacity-100' : 'opacity-0'
                         } text-24 font-medium text-500`}
                         style={{
                             fontSize: '24px',
                             lineHeight: '26.26px',
                             textAlign: 'left',
+                            
                         }}
                     >
                         Name
@@ -117,6 +119,8 @@ const SignUp = () => {
                         ${userFocus ? 'pb-2' : 'pb-0'}  
                     `}
                     />
+                    </div>
+                    <div className={`relative w-full ${emailFocus ? 'shift-up' : ''}`}>
                     <label htmlFor="email" className={`transform -translate-y-1/2 transition-opacity duration-200 ${emailFocus ? 'opacity-100' : 'opacity-0'
                         } text-24 font-medium text-500`}
                         style={{
@@ -141,10 +145,11 @@ const SignUp = () => {
                         onBlur={() => setEmailFocus(false)}
                         className={`w-full border-b-2 transition duration-200 
                          focus:outline-none focus:ring-0 
-                        ${emailFocus ? 'pb-2' : 'pb-0'}  
+                        ${emailFocus ? 'pb-2 mt-4' : 'pb-0 mt-0'}   
                     `}
                     />
-                    
+                    </div>
+                    <div className={`relative w-full ${pwdFocus ? 'shift-up' : ''}`}>
                     <label htmlFor="pwd" className={`transform -translate-y-1/2 transition-opacity duration-200 ${pwdFocus ? 'opacity-100' : 'opacity-0'
                         } text-24 font-medium text-500`}
                         style={{
@@ -174,12 +179,14 @@ const SignUp = () => {
                     />
                     <span
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-0 top-1/2 transform -translate-y-1/2 cursor-pointer pr-2">
+                        className="absolute right-0 top-1/3 transform -translate-y-1/2 cursor-pointer pr-2">
                         <img src={eye} alt="Toggle Password Visibility" />
                     </span>
                     </div>
-                    <label htmlFor="confirm_pwd" className={`flex justify-between transform -translate-y-1/2 transition-opacity duration-200 ${matchFocus ? 'opacity-100' : 'opacity-0'
-                        } text-24 font-medium text-500`}
+                    </div>
+                    <div className={`relative w-full ${matchFocus ? 'shift-up' : ''}`}>
+                    <label htmlFor="confirm_pwd" className={`transform -translate-y-1/2 transition-opacity duration-200 ${matchFocus ? 'opacity-100' : 'opacity-0'
+                        } text-24 font-medium text-500 `}
                         style={{
                             fontSize: '24px',
                             lineHeight: '26.26px',
@@ -206,9 +213,10 @@ const SignUp = () => {
                     />
                     <span
                         onClick={() => setShowMatchPassword(!showMatchPassword)}
-                        className="absolute right-0 top-1/2 transform -translate-y-1/2 cursor-pointer pr-2">
+                        className="absolute right-0 top-1/3 transform -translate-y-1/2 cursor-pointer pr-2">
                         <img src={eye} alt="Toggle Password Visibility" />
                     </span>
+                    </div>
                     </div>
                     <button disabled={!validName || !validEmail || !validPwd || !validMatch ? true : false}
                         className="flex justify-end mt-20 ">
@@ -217,7 +225,7 @@ const SignUp = () => {
                 </form>
             </div>
             <div className="w-[65.5vw] h-full bg-right bg-cover fixed top-0 right-0 ">
-                <img src={bg} alt="bg" className="w-full h-full object-cover" />
+                <img src={Frame} alt="bg" className="w-full h-full object-cover" />
             </div>
         </div>
     )
