@@ -6,8 +6,6 @@ import Frame from '../assets/Frame.svg'
 import eye from '../assets/eye.svg';
 import eyeClosed from '../assets/eyeClosed.svg';
 
-// const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,12}$/;
-// const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const SignUp = () => {
 
@@ -17,66 +15,39 @@ const SignUp = () => {
     const [user, setUser] = useState('');
 
     const [email, setEmail] = useState('');
-    // const [validEmail, setValidEmail] = useState(false);
+
 
     const [pwd, setPwd] = useState('');
     const [showPwd, setShowPwd] = useState(false)
-    // const [validPwd, setValidPwd] = useState(false);
+
 
     const [matchPwd, setMatchPwd] = useState('');
     const [showMatchPwd, setShowMatchPwd] = useState(false)
-    // const [validMatch, setValidMatch] = useState(false);
 
     const [errorMsg, setErrorMsg] = useState('');
 
     const handleInputChange = (set) => (e) => {
         set(e.target.value);
-        setErrorMsg(""); // Clear the error message on input change
+        setErrorMsg(""); 
     };
 
-    // useEffect(() => {
-    //     setValidEmail(emailRegex.test(email));
-    // }, [email])
-
-    // useEffect(() => {
-    //     setValidPwd(pwdRegex.test(pwd));
-    //     setValidMatch(pwd === matchPwd);
-    // }, [pwd, matchPwd])
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // if (!validEmail) {
-        //     setErrorMsg("Invalid Email");
-        //     return;
-        // }
-        // if (!validPwd) {
-        //     setErrorMsg("Password must be 8 character long");
-        //     return;
-        // }
-        // if (!validMatch) {
-        //     setErrorMsg("Passwords do not match");
-        //     return;
-        // }
+
         if (!user || !email || !pwd || !matchPwd) {
             setErrorMsg("Enter all fields");
             return;
         }
 
-        // Email format validation
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             setErrorMsg("Invalid email");
             return;
         }
 
-        // Password length validation
-        // if (pwd.length < 6) {
-        //     setErrorMsg("Password must be 6 characters long");
-        //     return;
-        // }
-
-        // Password match validation
         if (!(pwd === matchPwd)) {
             setErrorMsg("Passwords do not match");
             return;
@@ -116,7 +87,6 @@ const SignUp = () => {
                             id="username"
                             placeholder={(errorMsg === "Enter all fields" && !user) ? "Enter Name" : "Name"}
                             autoComplete="off"
-                            // onChange={(e) => setUser(e.target.value)}
                             onChange={handleInputChange(setUser)}
                             value={user}
                             className={`w-full border-b transition duration-200 
@@ -130,7 +100,6 @@ const SignUp = () => {
                             id="email"
                             autoComplete="off"
                             placeholder={(errorMsg === "Enter all fields" && !email) ? "Enter E-mail" : "E-mail"}
-                            // onChange={(e) => setEmail(e.target.value)}
                             onChange={handleInputChange(setEmail)}
                             value={email}
                             className={`w-full border-b transition duration-200 
@@ -143,7 +112,6 @@ const SignUp = () => {
                             type={showPwd ? "text" : "password"}
                             id="pwd"
                             placeholder={(errorMsg === "Enter all fields" && !pwd) ? "Enter Password" : "Password"}
-                            // onChange={(e) => setPwd(e.target.value)}
                             onChange={handleInputChange(setPwd)}
                             value={pwd}
                             maxLength={12}
@@ -164,7 +132,6 @@ const SignUp = () => {
                             type={showMatchPwd ? "text" : "password"}
                             id="confirm_pwd"
                             placeholder="Confirm Password"
-                            // onChange={(e) => setMatchPwd(e.target.value)}
                             onChange={handleInputChange(setMatchPwd)}
                             value={matchPwd}
                             maxLength={12}
@@ -187,7 +154,7 @@ const SignUp = () => {
                         className="w-[88px] h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors ml-[215px] top-0.2 relative"
                     >
                         {loading ? (
-                            <div className="animate-spin rounded-full h-20 w-20 border-b-2 border-white" />
+                            <div className="animate-spin rounded-full h-21 w-21 border-b-2 border-white" />
                         ) : (
                             <img src={arrow} alt="Submit" />
                         )}
