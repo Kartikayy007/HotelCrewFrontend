@@ -60,7 +60,11 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400"
                 >
-                  <img src="src/assets/eye.svg" alt="Toggle Password Visibility" />
+                  {showPassword ? (
+                    <img src="src/assets/eye-closed.svg" alt="Hide Password" />
+                  ) : (
+                    <img src="src/assets/eye-open.svg" alt="Show Password" />
+                  )}
                 </button>
               </div>
             </div>
@@ -84,11 +88,13 @@ const Login = () => {
           </form>
         </div>
       </div>
+      <div className="flex items-center justify-center w-full max-w-[945px] h-auto bg-[#8094D4]">
       <img
-        src="src/assets/login-hero.png"
-        className="w-full max-w-[945px] h-auto"
+      className="h-auto"
+        src="src/assets/web2 1.svg"
         alt="Login Hero"
       />
+      </div>
     </div>
   );
 };
