@@ -83,6 +83,9 @@ const Hoteldetails = () => {
               ))}
             </div>
 
+              <img className="relative top-36 left-[43.7%]" src="src/assets/Line.svg" alt="" />
+              <img className="relative top-[80%] left-[43.7%]" src="src/assets/Line.svg" alt="" />
+
             <div className="flex flex-col items-center justify-center h-full space-y-4 ">
               <img 
                 src="src/assets/hotel.svg" 
