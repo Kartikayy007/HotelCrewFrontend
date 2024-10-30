@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react'
 
-const Hoteldetails = () => {
+function ContactInfo() {
   return (
-    <section className="min-h-screen bg-[#FFFFFF] flex items-center">
+    <section className="min-h-screen bg-[#FFFFFF] flex items-center ">
       <div className="flex justify-center items-center gap-9 ml-[5.1rem]">
         <form className="space-y-7">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-[550]">Hotel Information</h1>
+            <h1 className="text-[32px] font-[550]">Contact & Location</h1>
             
           </div>
 
@@ -15,7 +15,7 @@ const Hoteldetails = () => {
               htmlFor="hotel-name"
               className="block text-sm font-sans font-[450]"
             >
-              Hotel Name
+              Complete Address
             </label>
             <input
               type="text"
@@ -28,25 +28,21 @@ const Hoteldetails = () => {
               htmlFor="legal-business-name"
               className="block text-sm font-sans font-[450] text-gray-700 mb-1"
             >
-              Legal Business Name (optional)
+              Phone Number
             </label>
-            <input
-              type="text"
-              className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
-            />
-          </div>
 
-          <div>
-            <label
-              htmlFor="year-established"
-              className="block text-sm font-sans font-[450] mb-1"
-            >
-              Year Established
-            </label>
             <input
               type="text"
-              className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 w-[299px] mr-6 py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              placeholder='Main number'
             />
+
+            <input
+              type="text"
+              className="h-8 w-[299px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              placeholder='Emergency number'
+            />
+
           </div>
 
           <div>
@@ -54,7 +50,7 @@ const Hoteldetails = () => {
               htmlFor="license-number"
               className="block text-sm font-sans font-[450] mb-1"
             >
-              License Number
+              Hotel E-mail
             </label>
             <input
               type="text"
@@ -75,7 +71,7 @@ const Hoteldetails = () => {
                 <div
                   key={num}
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                    num === 1 ? 'border-[#5C69F8] text-black' : 'text-black bg-white'
+                    num === 2 ? 'border-[#5C69F8] text-black' : 'text-black bg-white'
                   }`}
                 >
                   {num}
@@ -88,11 +84,11 @@ const Hoteldetails = () => {
 
             <div className="flex flex-col items-center justify-center h-full space-y-4 ">
               <img 
-                src="src/assets/hotel.svg" 
+                src="src/assets/contact.svg" 
                 alt="Hotel Icon" 
                 className=" h-[96] mb-4 text-[#5663AC]"
               />
-              <h2 className="text-[24px] font-[450] font-Montserrat">Hotel Information</h2>
+              <h2 className="text-[24px] font-[450] font-Montserrat">Contact & Location</h2>
               <p className="text-gray-600 font-sans font-[300] text-center">
                 Fill out the form on the left.
                 <br />
@@ -105,7 +101,7 @@ const Hoteldetails = () => {
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default Hoteldetails;
+export default ContactInfo

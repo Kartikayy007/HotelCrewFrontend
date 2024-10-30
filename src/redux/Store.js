@@ -4,6 +4,7 @@ import UserReducer from './slices/UserSlice'
 export const store = configureStore({
   reducer: {
     user: UserReducer,
+    // form: formReducer,
   },
 })
 

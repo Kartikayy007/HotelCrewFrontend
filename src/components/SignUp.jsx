@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import arrow from '../assets/arrow.svg';
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "../redux/slices/UserSlice";
+import { loginUser } from "../Redux/slices/UserSlice";
 import Frame from '../assets/Frame.svg'
 import eye from '../assets/eye.svg';
 import eyeClosed from '../assets/eyeClosed.svg';
@@ -59,8 +59,8 @@ const SignUp = () => {
             password: pwd,
             confirm_password: matchPwd
         }
-        dispatch(registerUser(userCredentials)).then((result) => {
-            if (registerUser.fulfilled.match(result)) {
+        dispatch(loginUser(userCredentials)).then((result) => {
+            if (loginUser.fulfilled.match(result)) {
                 setEmail("");
                 setUser("");
                 setPwd("");
