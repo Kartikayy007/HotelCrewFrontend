@@ -1,8 +1,10 @@
 import React from 'react'
 
-const Home = () => {
+function Home() {
   return (
-    <div>You are successfully registered</div>
+    <div>
+      <h1>HI</h1>
+    </div>
   )
 }
 
