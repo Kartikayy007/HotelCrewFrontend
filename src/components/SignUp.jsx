@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import arrow from '../assets/arrow.svg';
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "../redux/slices/UserSlice"
+import { registerUser } from "../redux/slices/UserSlice";
 import Frame from '../assets/Frame.svg'
 import eye from '../assets/eye.svg';
 import eyeClosed from '../assets/eyeClosed.svg';
