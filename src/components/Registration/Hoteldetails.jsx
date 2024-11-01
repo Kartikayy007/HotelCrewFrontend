@@ -1,14 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-const Hoteldetails = () => {
-  
+const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
+  const [hotelName, setHotelName] = useState('');
+  const [legalName, setLegalName] = useState('');
+  const [yearEstablished, setYearEstablished] = useState('');
+  const [licenseNumber, setLicenseNumber] = useState('');
+
+  useEffect(() => {
+    if (initialData) {
+      setHotelName(initialData.hotelName || '');
+      setLegalName(initialData.legalName || '');
+      setYearEstablished(initialData.yearEstablished || '');
+      setLicenseNumber(initialData.licenseNumber || '');
+    }
+  }, [initialData]);
+
+  const handleNextClick = (e) => {
+    e.preventDefault();
+    const formData = {
+      hotelName,
+      legalName,
+      yearEstablished,
+      licenseNumber
+    };
+    
+    updateFormData(formData);
+    onNext();
+  };
+
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center">
       <div className="flex justify-center items-center gap-9 ml-[5.1rem]">
         <form className="space-y-7">
           <div className="flex justify-between items-center">
             <h1 className="text-[32px] font-[550]">Hotel Information</h1>
-            
           </div>
 
           <div>
@@ -20,6 +45,9 @@ const Hoteldetails = () => {
             </label>
             <input
               type="text"
+              id="hotel-name"
+              value={hotelName}
+              onChange={(e) => setHotelName(e.target.value)}
               className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
             />
           </div>
@@ -33,6 +61,9 @@ const Hoteldetails = () => {
             </label>
             <input
               type="text"
+              id="legal-business-name"
+              value={legalName}
+              onChange={(e) => setLegalName(e.target.value)}
               className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
             />
           </div>
@@ -46,6 +77,9 @@ const Hoteldetails = () => {
             </label>
             <input
               type="text"
+              id="year-established"
+              value={yearEstablished}
+              onChange={(e) => setYearEstablished(e.target.value)}
               className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
             />
           </div>
@@ -59,20 +93,25 @@ const Hoteldetails = () => {
             </label>
             <input
               type="text"
+              id="license-number"
+              value={licenseNumber}
+              onChange={(e) => setLicenseNumber(e.target.value)}
               className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
             />
           </div>
 
-          <button className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white relative top-10 ml-[32rem]">
+          <div className='relative top-[0.89rem]'>
+          <button onClick={handleNextClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white relative top-10 ml-[32rem]">
             <span>Next </span>
             <span>➔</span>
           </button>
+          </div>
         </form>
 
         <div>
           <div className="w-[515px] relative left-[35%] h-[100vh] bg-white shadow-2xl border-none rounded-lg">
             <div className="flex gap-5 text-2xl">
-            {[1, 2, 3, 4, 5, 6].map((num) => (
+              {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
@@ -84,8 +123,8 @@ const Hoteldetails = () => {
               ))}
             </div>
 
-              <img className="relative top-36 left-[43.7%]" src="src/assets/Line.svg" alt="" />
-              <img className="relative top-[80%] left-[43.7%]" src="src/assets/Line.svg" alt="" />
+            <img className="relative top-36 left-[43.7%]" src="src/assets/Line.svg" alt="" />
+            <img className="relative top-[80%] left-[43.7%]" src="src/assets/Line.svg" alt="" />
 
             <div className="flex flex-col items-center justify-center h-full space-y-4 ">
               <img 

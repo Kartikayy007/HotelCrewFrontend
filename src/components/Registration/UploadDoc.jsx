@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
-function UploadDoc() {
+function UploadDoc({ onSubmit, onBack, updateFormData }) {
   const [dragActive, setDragActive] = useState(false);
-  
+  const [files, setFiles] = useState([]);
+
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -17,7 +18,14 @@ function UploadDoc() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    // havve to handle the files lofic here
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    setFiles(droppedFiles);
+    updateFormData(droppedFiles);
+  };
+
+  const handleSubmitClick = (e) => {
+    e.preventDefault();
+    onSubmit();
   };
 
   return (
@@ -38,7 +46,7 @@ function UploadDoc() {
           >
             <div className="text-center">
               <p className="text-gray-600 mb-2">Drag Documents from computer or upload from drive</p>
-              <img className='relative left-[43%] mb-5' src="src/assets/docupload.svg"/>
+              <img className='relative left-[43%] mb-5' src="src/assets/docupload.svg" alt="Upload Icon"/>
               <button 
                 type="button"
                 className="bg-[#5663AC] text-white px-6 py-2 rounded-lg hover:bg-[#4B579D] transition-colors"
@@ -48,10 +56,18 @@ function UploadDoc() {
             </div>
           </div>
 
-          <button className="h-9 w-28 bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white relative top-10 ml-[32rem]">
-            <span>Next </span>
-            <span>➔</span>
-          </button>
+          <div className='relative top-[7rem]'>   
+          <div className="flex justify-between">
+            <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">
+              <span>Back </span>
+               
+            </button>
+            <button onClick={handleSubmitClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white">
+              <span>Submit </span>
+              <span>➔</span>
+            </button>
+          </div>
+          </div> 
         </form>
 
         <div>
@@ -76,6 +92,7 @@ function UploadDoc() {
               <img
                 src="src/assets/documentupload.svg"
                 className="h-24 mb-4 text-[#5663AC]"
+                alt="Document Upload Icon"
               />
               <h2 className="text-[24px] font-[450] font-Montserrat">Upload Documents</h2>
               <p className="text-gray-600 font-sans font-[300] text-center">

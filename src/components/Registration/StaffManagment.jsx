@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 
-function StaffManagement() {
+function StaffManagement({ onNext, onBack, updateFormData }) {
   const [departments, setDepartments] = useState(['Housekeeping', 'Security']);
 
   const handleAddDepartment = () => {
@@ -17,6 +17,12 @@ function StaffManagement() {
   const handleDeleteDepartment = (index) => {
     const newDepartments = departments.filter((_, i) => i !== index);
     setDepartments(newDepartments);
+  };
+
+  const handleNextClick = (e) => {
+    e.preventDefault();
+    updateFormData({ departments });
+    onNext();
   };
 
   return (
@@ -54,11 +60,18 @@ function StaffManagement() {
                 </button>
               </div>
             ))}
-          </div>
-          <button className="h-9 w-28 bg-[#5663AC] font-medium rounded-lg text-white relative top-10 ml-[32rem]">
+          </div> 
+          
+          <div className='relative top-[5.6rem] '>
+          <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] fixed rounded-lg  text-white">
+              <span>Back </span>
+               
+            </button>
+          <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] rounded-lg text-white font-[700] top-10 ml-[32rem]">
             <span>Next </span>
             <span>➔</span>
           </button>
+          </div>
         </form>
         <div>
           <div className="w-[515px] relative left-[35%] h-screen bg-white shadow-2xl border-none rounded-lg">
@@ -67,7 +80,7 @@ function StaffManagement() {
                 <div
                   key={num}
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                    num === 4 ? 'border-[#5C69F8] text-black' : 'text-black bg-white'
+                    num === 3 ? 'border-[#5C69F8] text-black' : 'text-black bg-white'
                   }`}
                 >
                   {num}

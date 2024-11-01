@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 
-const Property = () => {
+const Property = ({ onNext, onBack, updateFormData }) => {
   const [roomTypes, setRoomTypes] = useState([
     { type: '', count: '' },
     { type: '', count: '' },
     { type: '', count: '' }
   ]);
+
+  const [numberOfRooms, setNumberOfRooms] = useState('');
+  const [numberOfFloors, setNumberOfFloors] = useState('');
+  const [parkingCapacity, setParkingCapacity] = useState('');
 
   const handleAddRoomType = () => {
     setRoomTypes([...roomTypes, { type: '', count: '' }]);
@@ -23,6 +27,19 @@ const Property = () => {
     setRoomTypes(newRoomTypes);
   };
 
+  const handleNextClick = (e) => {
+    e.preventDefault();
+    const formData = {
+      numberOfRooms,
+      roomTypes,
+      numberOfFloors,
+      parkingCapacity
+    };
+    
+    updateFormData(formData);
+    onNext();
+  };
+
   return (
     <section className="min-h-screen bg-white flex items-center">
       <div className="flex justify-center items-center gap-9 ml-20">
@@ -33,13 +50,16 @@ const Property = () => {
 
           <div>
             <label
-              htmlFor="hotel-name"
+              htmlFor="number-of-rooms"
               className="block text-sm font-sans font-[450]"
             >
               Number of Rooms
             </label>
             <input
               type="text"
+              id="number-of-rooms"
+              value={numberOfRooms}
+              onChange={(e) => setNumberOfRooms(e.target.value)}
               className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
             />
           </div>
@@ -47,7 +67,7 @@ const Property = () => {
           <div className="h-40"> 
             <div className="flex justify-between mb-2">
               <label
-                htmlFor="legal-business-name"
+                htmlFor="types-of-rooms"
                 className="block text-sm font-sans font-[450] text-gray-700"
               >
                 Types of Rooms
@@ -91,34 +111,46 @@ const Property = () => {
 
           <div>
             <label
-              htmlFor="license-number"
+              htmlFor="number-of-floors"
               className="block text-sm font-sans font-[450] mb-1"
             >
               Number of Floors
             </label>
             <input
               type="text"
+              id="number-of-floors"
+              value={numberOfFloors}
+              onChange={(e) => setNumberOfFloors(e.target.value)}
               className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
             />
           </div>
 
           <div>
             <label
-              htmlFor="license-number"
+              htmlFor="parking-capacity"
               className="block text-sm font-sans font-[450] mb-1"
             >
               Parking Capacity
             </label>
             <input
               type="text"
+              id="parking-capacity"
+              value={parkingCapacity}
+              onChange={(e) => setParkingCapacity(e.target.value)}
               className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
             />
           </div>
 
-          <button className="h-9 w-28 bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white relative top-10 ml-[32rem]">
-            <span>Next </span>
-            <span>➔</span>
-          </button>
+          <div className="flex justify-between">
+            <button type="button" onClick={onBack} className="h-9 w-28 bg-gray-400 font-[700] rounded-lg text-white ">
+               
+              <span>Back </span>
+            </button>
+            <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] font-[700] rounded-lg text-white">
+              <span>Next </span>
+              <span>➔</span>
+            </button>
+          </div>
         </form>
 
         <div>
@@ -128,17 +160,15 @@ const Property = () => {
                 <div
                   key={num}
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                    num === 5 ? 'border-[#5C69F8] text-black' : 'text-black bg-white'
+                    num === 4 ? 'border-[#5C69F8] text-black' : 'text-black bg-white'
                   }`}
                 >
                   {num}
                 </div>
               ))}
             </div>
-
             <img className="relative top-36 left-[43.7%]" src="src/assets/Line.svg" alt="" />
             <img className="relative top-[80%] left-[43.7%]" src="src/assets/Line.svg" alt="" />
-
             <div className="flex flex-col items-center justify-center h-full space-y-4">
               <img
                 src="src/assets/property.svg"

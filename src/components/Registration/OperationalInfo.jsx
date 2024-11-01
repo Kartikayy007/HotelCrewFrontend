@@ -1,18 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react';
 
-function OperationalInfo() {
+function OperationalInfo({ onNext, onBack, updateFormData }) {
+  const [checkInTime, setCheckInTime] = useState('');
+  const [checkOutTime, setCheckOutTime] = useState('');
+  const [paymentMethods, setPaymentMethods] = useState('');
+
+  const handleNextClick = (e) => {
+    e.preventDefault();
+    const formData = {
+      checkInTime,
+      checkOutTime,
+      paymentMethods
+    };
+    
+    updateFormData(formData);
+    onNext();
+  };
+
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center ">
       <div className="flex justify-center items-center gap-9 ml-[5.1rem]">
         <form className="space-y-7">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-[550]">Operational Information  </h1>
-            
+            <h1 className="text-[32px] font-[550]">Operational Information</h1>
           </div>
 
           <div>
             <label
-              htmlFor="legal-business-name"
+              htmlFor="check-in-check-out"
               className="block text-sm font-sans font-[450] text-gray-700 mb-1"
             >
               Check-in & Check outs 
@@ -20,44 +35,55 @@ function OperationalInfo() {
 
             <input
               type="text"
+              value={checkInTime}
+              onChange={(e) => setCheckInTime(e.target.value)}
               className="h-8 w-[299px] mr-6 py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
               placeholder='Check-in timings'
             />
 
             <input
               type="text"
+              value={checkOutTime}
+              onChange={(e) => setCheckOutTime(e.target.value)}
               className="h-8 w-[299px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
               placeholder='Check-out timings'
             />
-
           </div>
 
           <div>
             <label
-              htmlFor="Payment Methods"
+              htmlFor="payment-methods"
               className="block text-sm font-sans font-[450] mb-1"
             >
               Payment Methods
             </label>
-          <input
+            <input
               type="text"
+              value={paymentMethods}
+              onChange={(e) => setPaymentMethods(e.target.value)}
               className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
               placeholder='Add Methods'
-              />
+            />
+          </div>
 
-              </div>
-
-
-          <button className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white relative top-10 ml-[32rem]">
-            <span>Next </span>
-            <span>➔</span>
-          </button>
+          <div className='relative top-[8.5rem]'>
+          <div className="flex justify-between">
+            <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">
+              <span>Back </span>
+               
+            </button>
+            <button onClick={handleNextClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white">
+              <span>Next </span>
+              <span>➔</span>
+            </button>
+          </div>
+          </div>
         </form>
 
         <div>
           <div className="w-[515px] relative left-[35%] h-[100vh] bg-white shadow-2xl border-none rounded-lg">
             <div className="flex gap-5 text-2xl">
-            {[1, 2, 3, 4, 5, 6].map((num) => (
+              {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
@@ -69,8 +95,8 @@ function OperationalInfo() {
               ))}
             </div>
 
-              <img className="relative top-36 left-[43.7%]" src="src/assets/Line.svg" alt="" />
-              <img className="relative top-[80%] left-[43.7%]" src="src/assets/Line.svg" alt="" />
+            <img className="relative top-36 left-[43.7%]" src="src/assets/Line.svg" alt="" />
+            <img className="relative top-[80%] left-[43.7%]" src="src/assets/Line.svg" alt="" />
 
             <div className="flex flex-col items-center justify-center h-full space-y-4 ">
               <img 
@@ -91,7 +117,7 @@ function OperationalInfo() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-export default OperationalInfo
+export default OperationalInfo;
