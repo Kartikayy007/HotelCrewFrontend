@@ -21,7 +21,7 @@ function App() {
     </Router> */}
     {/* <Hoteldetails /> */}
     {/* <ContactInfo /> */}
-    <Login />
+    <MultiStepForm />
     </>
   )
 }

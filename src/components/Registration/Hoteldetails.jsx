@@ -5,6 +5,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
   const [legalName, setLegalName] = useState('');
   const [yearEstablished, setYearEstablished] = useState('');
   const [licenseNumber, setLicenseNumber] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (initialData) {
@@ -17,6 +18,10 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
 
   const handleNextClick = (e) => {
     e.preventDefault();
+    if (!hotelName || !yearEstablished || !licenseNumber) {
+      setError('Please fill out all required fields.');
+      return;
+    }
     const formData = {
       hotelName,
       legalName,
@@ -28,8 +33,15 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
     onNext();
   };
 
+  const handleNumberInput = (e, setter) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setter(value);
+    }
+  };
+
   return (
-    <section className="min-h-screen bg-[#FFFFFF] flex items-center">
+    <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
       <div className="flex justify-center items-center gap-9 ml-[5.1rem]">
         <form className="space-y-7">
           <div className="flex justify-between items-center">
@@ -79,7 +91,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               type="text"
               id="year-established"
               value={yearEstablished}
-              onChange={(e) => setYearEstablished(e.target.value)}
+              onChange={(e) => handleNumberInput(e, setYearEstablished)}
               className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
             />
           </div>
@@ -95,16 +107,18 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               type="text"
               id="license-number"
               value={licenseNumber}
-              onChange={(e) => setLicenseNumber(e.target.value)}
+              onChange={(e) => handleNumberInput(e, setLicenseNumber)}
               className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
             />
           </div>
 
+          {error && <p className="text-red-500 fixed">{error}</p>}
+
           <div className='relative top-[0.89rem]'>
-          <button onClick={handleNextClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white relative top-10 ml-[32rem]">
-            <span>Next </span>
-            <span>➔</span>
-          </button>
+            <button onClick={handleNextClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white relative top-10 ml-[32rem]">
+              <span>Next </span>
+              <span>➔</span>
+            </button>
           </div>
         </form>
 

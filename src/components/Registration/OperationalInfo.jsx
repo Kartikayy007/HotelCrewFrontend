@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-function OperationalInfo({ onNext, onBack, updateFormData }) {
-  const [checkInTime, setCheckInTime] = useState('');
-  const [checkOutTime, setCheckOutTime] = useState('');
-  const [paymentMethods, setPaymentMethods] = useState('');
+function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
+  const [checkInTime, setCheckInTime] = useState(initialData.checkInTime || '');
+  const [checkOutTime, setCheckOutTime] = useState(initialData.checkOutTime || '');
+  const [paymentMethods, setPaymentMethods] = useState(initialData.paymentMethods || '');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (initialData) {
+      setCheckInTime(initialData.checkInTime || '');
+      setCheckOutTime(initialData.checkOutTime || '');
+      setPaymentMethods(initialData.paymentMethods || '');
+    }
+  }, [initialData]);
 
   const handleNextClick = (e) => {
     e.preventDefault();
+    if (!checkInTime || !checkOutTime || !paymentMethods) {
+      setError('Please fill out all required fields.');
+      return;
+    }
     const formData = {
       checkInTime,
       checkOutTime,
@@ -18,7 +31,7 @@ function OperationalInfo({ onNext, onBack, updateFormData }) {
   };
 
   return (
-    <section className="min-h-screen bg-[#FFFFFF] flex items-center ">
+    <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
       <div className="flex justify-center items-center gap-9 ml-[5.1rem]">
         <form className="space-y-7">
           <div className="flex justify-between items-center">
@@ -27,26 +40,33 @@ function OperationalInfo({ onNext, onBack, updateFormData }) {
 
           <div>
             <label
-              htmlFor="check-in-check-out"
+              htmlFor="check-in-time"
               className="block text-sm font-sans font-[450] text-gray-700 mb-1"
             >
-              Check-in & Check outs 
+              Check-in Time
             </label>
-
             <input
-              type="text"
+              type="time"
+              id="check-in-time"
               value={checkInTime}
               onChange={(e) => setCheckInTime(e.target.value)}
               className="h-8 w-[299px] mr-6 py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
-              placeholder='Check-in timings'
             />
+          </div>
 
+          <div>
+            <label
+              htmlFor="check-out-time"
+              className="block text-sm font-sans font-[450] text-gray-700 mb-1"
+            >
+              Check-out Time
+            </label>
             <input
-              type="text"
+              type="time"
+              id="check-out-time"
               value={checkOutTime}
               onChange={(e) => setCheckOutTime(e.target.value)}
               className="h-8 w-[299px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
-              placeholder='Check-out timings'
             />
           </div>
 
@@ -59,6 +79,7 @@ function OperationalInfo({ onNext, onBack, updateFormData }) {
             </label>
             <input
               type="text"
+              id="payment-methods"
               value={paymentMethods}
               onChange={(e) => setPaymentMethods(e.target.value)}
               className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
@@ -66,22 +87,23 @@ function OperationalInfo({ onNext, onBack, updateFormData }) {
             />
           </div>
 
-          <div className='relative top-[8.5rem]'>
-          <div className="flex justify-between">
-            <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">
-              <span>Back </span>
-               
-            </button>
-            <button onClick={handleNextClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white">
-              <span>Next </span>
-              <span>➔</span>
-            </button>
-          </div>
+          {error && <p className="text-red-500 fixed">{error}</p>}
+
+          <div className='relative top-[5rem]'>
+            <div className="flex justify-between">
+              <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">
+                <span>Back </span>
+              </button>
+              <button onClick={handleNextClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white">
+                <span>Next </span>
+                <span>➔</span>
+              </button>
+            </div>
           </div>
         </form>
 
         <div>
-          <div className="w-[515px] relative left-[35%] h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+          <div className="w-[515px] relative left-[35%] h-[100vh] bg-white shadow-2xl border-none rounded-lg overflow-hidden">
             <div className="flex gap-5 text-2xl">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div

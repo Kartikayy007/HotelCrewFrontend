@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
 
-function StaffManagement({ onNext, onBack, updateFormData }) {
-  const [departments, setDepartments] = useState(['Housekeeping', 'Security']);
+function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
+  const [departments, setDepartments] = useState(initialData.departments || ['Housekeeping', 'Security']);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (initialData.departments) {
+      setDepartments(initialData.departments);
+    }
+  }, [initialData]);
 
   const handleAddDepartment = () => {
     setDepartments([...departments, '']);
@@ -21,12 +28,16 @@ function StaffManagement({ onNext, onBack, updateFormData }) {
 
   const handleNextClick = (e) => {
     e.preventDefault();
+    if (departments.some(department => department === '')) {
+      setError('Please fill out all required fields.');
+      return;
+    }
     updateFormData({ departments });
     onNext();
   };
 
   return (
-    <section className="min-h-screen bg-white flex items-center">
+    <section className="min-h-screen bg-white flex items-center overflow-hidden">
       <div className="flex justify-center items-center gap-9 ml-20">
         <form className="space-y-7">
           <div className="flex justify-between items-center">
@@ -62,19 +73,20 @@ function StaffManagement({ onNext, onBack, updateFormData }) {
             ))}
           </div> 
           
+          {error && <p className="text-red-500 fixed">{error}</p>}
+
           <div className='relative top-[5.6rem] '>
-          <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] fixed rounded-lg  text-white">
+            <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] fixed rounded-lg  text-white">
               <span>Back </span>
-               
             </button>
-          <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] rounded-lg text-white font-[700] top-10 ml-[32rem]">
-            <span>Next </span>
-            <span>➔</span>
-          </button>
+            <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] rounded-lg text-white font-[700] top-10 ml-[32rem]">
+              <span>Next </span>
+              <span>➔</span>
+            </button>
           </div>
         </form>
         <div>
-          <div className="w-[515px] relative left-[35%] h-screen bg-white shadow-2xl border-none rounded-lg">
+          <div className="w-[515px] relative left-[35%] h-screen bg-white shadow-2xl border-none rounded-lg overflow-hidden">
             <div className="flex gap-5 text-2xl">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
