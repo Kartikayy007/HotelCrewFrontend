@@ -2,8 +2,8 @@
 import { useNavigate } from "react-router-dom";
 
 const Onboarding = () => {
-
-    const navigate = useNavigate();
+ 
+    // const navigate = useNavigate();
     return (
         <div className="flex justify-between h-screen overflow-hidden items-center">
             <div className="flex justify-center items-center flex-col w-[411px] h-[322px] mx-auto gap-[72px]">

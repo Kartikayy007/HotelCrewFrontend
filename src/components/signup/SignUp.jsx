@@ -34,7 +34,7 @@ const SignUp = () => {
         setErrorMsg("");
     };  
 
-    useEffect(() => {
+    useEffect(() => { 
         if (timeLeft > 0) {
             const timerId = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
             return () => clearInterval(timerId);
