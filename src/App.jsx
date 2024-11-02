@@ -3,9 +3,9 @@ import './App.css'
 import Login from './components/Login/Login'
 // import Home from './components/Home'
 // import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import SignUp from './components/SignUp'
 import MultiStepForm from './components/Registration/MultiStepForm'
 import Verify from './components/Login/Verify'
+import SignUp from './components/signup/SignUp'
 
 function App() {
 
@@ -21,7 +21,7 @@ function App() {
     </Router> */}
     {/* <Hoteldetails /> */}
     {/* <ContactInfo /> */}
-    <Login />
+    <SignUp />
     </>
   )
 }

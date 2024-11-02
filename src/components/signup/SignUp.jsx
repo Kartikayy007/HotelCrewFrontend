@@ -1,37 +1,25 @@
 import { useState, useEffect } from "react";
-import arrow from '../assets/arrow.svg';
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../Redux/slices/UserSlice";
-import Frame from '../assets/Frame.svg'
-import eye from '../assets/eye.svg';
-import eyeClosed from '../assets/eyeClosed.svg';
-
+import { registerUser } from "../../Redux/slices/UserSlice";
+import eye from '../../assets/eye.svg';
+import eyeClosed from '../../assets/eyeClosed.svg';
 
 const SignUp = () => {
-
     const dispatch = useDispatch();
     const { loading, error } = useSelector((state) => state.user);
 
     const [user, setUser] = useState('');
-
     const [email, setEmail] = useState('');
-
-
     const [pwd, setPwd] = useState('');
-    const [showPwd, setShowPwd] = useState(false)
-
-
+    const [showPwd, setShowPwd] = useState(false);
     const [matchPwd, setMatchPwd] = useState('');
-    const [showMatchPwd, setShowMatchPwd] = useState(false)
-
+    const [showMatchPwd, setShowMatchPwd] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
 
     const handleInputChange = (set) => (e) => {
         set(e.target.value);
         setErrorMsg(""); 
     };
-
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -41,10 +29,15 @@ const SignUp = () => {
             return;
         }
 
-
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             setErrorMsg("Invalid email");
+            return;
+        }
+
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+        if (!passwordRegex.test(pwd)) {
+            setErrorMsg("Password must be at least 8 characters long and include at least one letter, one number, and one special character");
             return;
         }
 
@@ -55,21 +48,23 @@ const SignUp = () => {
 
         setErrorMsg("");
         const userCredentials = {
+            user_name: user,
             email: email,
             password: pwd,
             confirm_password: matchPwd
-        }
-        dispatch(loginUser(userCredentials)).then((result) => {
-            if (loginUser.fulfilled.match(result)) {
+        };
+        dispatch(registerUser(userCredentials)).then((result) => {
+            if (registerUser.fulfilled.match(result)) {
                 setEmail("");
                 setUser("");
                 setPwd("");
                 setMatchPwd("");
                 console.log('registered');
-
+            } else if (registerUser.rejected.match(result)) {
+                setErrorMsg(result.payload.message || 'Registration failed');
             }
         });
-    }
+    };
 
     return (
         <div className="min-h-screen w-[34.5vw] flex flex-col items-center justify-center">
@@ -81,7 +76,6 @@ const SignUp = () => {
                 </h1>
                 <form onSubmit={handleSubmit} className=" w-[303px] h-[220px] absolute top-[201px]  gap-9 flex flex-col p-1 mb-0">
                     <div className={`relative w-full`}>
-
                         <input
                             type="text"
                             id="username"
@@ -94,7 +88,6 @@ const SignUp = () => {
                         />
                     </div>
                     <div className={`relative w-full`}>
-
                         <input
                             type="email"
                             id="email"
@@ -106,7 +99,6 @@ const SignUp = () => {
                          focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2  ${(errorMsg === "Invalid email" && !email) || (errorMsg === "Enter all fields" && !email) ? 'border-red-500  placeholder-red-500' : 'border-gray-500  placeholder-gray-500'}`}
                         />
                     </div>
-
                     <div className="relative w-full">
                         <input
                             type={showPwd ? "text" : "password"}
@@ -124,10 +116,7 @@ const SignUp = () => {
                             <img src={showPwd ? eye : eyeClosed} alt="Toggle Password Visibility" />
                         </span>
                     </div>
-
                     <div className={`relative w-full `}>
-
-
                         <input
                             type={showMatchPwd ? "text" : "password"}
                             id="confirm_pwd"
@@ -143,7 +132,6 @@ const SignUp = () => {
                             className="absolute right-0 top-1/3 transform -translate-y-1/2 cursor-pointer pr-2 ">
                             <img src={showMatchPwd ? eye : eyeClosed} alt="Toggle Password Visibility" />
                         </span>
-
                     </div>
                     <div className={`h-[1px] `}>
                         {errorMsg && <div className="text-red-500 text-sm">{errorMsg}</div>}
@@ -156,16 +144,16 @@ const SignUp = () => {
                         {loading ? (
                             <div className="animate-spin rounded-full h-21 w-21 border-b-2 border-white" />
                         ) : (
-                            <img src={arrow} alt="Submit" />
+                            <img src="src/assets/arrow.svg" alt="Submit" />
                         )}
                     </button>
                 </form>
             </div>
             <div className="w-[65.5vw] h-full bg-right bg-cover fixed top-0 right-0 ">
-                <img src={Frame} alt="bg" className="w-full h-full object-cover" />
+                <img src='src/assets/Frame.svg' alt="bg" className="w-full h-full object-cover" />
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default SignUp;
