@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-// import { verifyOtp } from './OtpSlice';
 
 export const registerUser=createAsyncThunk(
     'user/registerUser',
@@ -8,7 +7,7 @@ export const registerUser=createAsyncThunk(
         try{
             console.log("user Credentials :",userCredentials);
             const response = await axios.post(
-                "https://hotelcrew-1.onrender.com/api/auth/register/",
+                "https://hotelcrew-1.onrender.com/api/auth/registrationOTP/",
                 userCredentials,
                 {
                   headers: {
@@ -16,12 +15,8 @@ export const registerUser=createAsyncThunk(
                   }
                 }
               );
-              // const response = await request.data;
               console.log(response.data);
-              const { tokens } = response.data;
-      localStorage.setItem('accessToken', tokens.access);
-      localStorage.setItem('refreshToken', tokens.refresh);
-      // dispatch(verifyOtp(userCredentials.email));
+
       return response.data;
         }
         catch (error) {
@@ -34,7 +29,7 @@ const userSlice = createSlice({
     name: 'user',
   
     initialState: {
-
+      message: null, 
       email: null,
       error: null,
       loading: false,
@@ -43,6 +38,9 @@ const userSlice = createSlice({
     reducers: {
       clearError: (state) => {
         state.error = null;
+      },
+      clearMessage: (state) => {
+        state.message = null;
       }
     },
   
@@ -51,16 +49,16 @@ const userSlice = createSlice({
         .addCase(registerUser.pending, (state) => {
           state.loading = true;
           state.error = null;
+          state.message = null;
         })
         .addCase(registerUser.fulfilled, (state, action) => {
           state.loading = false;
-          state.email = action.payload.user.email;
+          state.message = action.payload.message;
           state.error = null;
-          // dispatch(verifyOtp(action.payload.email));
         })
         .addCase(registerUser.rejected, (state, action) => {
           state.loading = false;
-          state.email = null;
+          state.message = null;
           state.error = action.payload;
         });
     },
