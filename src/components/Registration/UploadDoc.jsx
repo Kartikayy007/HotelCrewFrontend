@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 function UploadDoc({ onSubmit, onBack, updateFormData }) {
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState([]);
+  const fileInputRef = useRef(null);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -19,13 +20,27 @@ function UploadDoc({ onSubmit, onBack, updateFormData }) {
     e.stopPropagation();
     setDragActive(false);
     const droppedFiles = Array.from(e.dataTransfer.files);
-    setFiles(droppedFiles);
-    updateFormData(droppedFiles);
+    handleFiles(droppedFiles);
+  };
+
+  const handleFileInput = (e) => {
+    const inputFiles = Array.from(e.target.files);
+    handleFiles(inputFiles);
+  };
+
+  const handleFiles = (fileList) => {
+    setFiles(fileList);
+    updateFormData(fileList);
   };
 
   const handleSubmitClick = (e) => {
     e.preventDefault();
-    onSubmit();
+      onSubmit();
+     
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
   };
 
   return (
@@ -35,6 +50,14 @@ function UploadDoc({ onSubmit, onBack, updateFormData }) {
           <div className="flex justify-between items-center">
             <h1 className="text-[32px] font-[550]">Upload Documents</h1>
           </div>
+
+          <input 
+            type="file" 
+            ref={fileInputRef}
+            onChange={handleFileInput}
+            multiple 
+            className="hidden" 
+          />
 
           <div 
             className={`w-[623px] h-[200px] border-2 border-solid rounded-lg flex flex-col items-center justify-center cursor-pointer
@@ -49,6 +72,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData }) {
               <img className='relative left-[43%] mb-5' src="src/assets/docupload.svg" alt="Upload Icon"/>
               <button 
                 type="button"
+                onClick={triggerFileInput}
                 className="bg-[#5663AC] text-white px-6 py-2 rounded-lg hover:bg-[#4B579D] transition-colors"
               >
                 Upload
@@ -56,11 +80,21 @@ function UploadDoc({ onSubmit, onBack, updateFormData }) {
             </div>
           </div>
 
+          {files.length > 0 && (
+            <div className="mt-4 fixed">
+              <h3 className="text-lg  font-semibold mb-2">Uploaded Files:</h3>
+              <ul className="list-disc pl-5">
+                {files.map((file, index) => (
+                  <li key={index}>{file.name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className='relative top-[7rem]'>   
           <div className="flex justify-between">
             <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">
               <span>Back </span>
-               
             </button>
             <button onClick={handleSubmitClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white">
               <span>Submit </span>

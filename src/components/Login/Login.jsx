@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../Redux/slices/UserSlice";
+import { loginUser } from "../../Redux/slices/UserSlice";
+import axios from "axios";
 // import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -9,6 +10,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   // const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -29,7 +32,7 @@ const Login = () => {
       setErrorMsg("Invalid Email");
       return;
     }
-    
+
     const userCredentials = { email, password };
     dispatch(loginUser(userCredentials)).then((result) => {
       if (loginUser.fulfilled.match(result)) {
@@ -39,23 +42,38 @@ const Login = () => {
         console.log("loggedin");
         // navigate("/");
       } else {
-        setErrorMsg("Incorrect password"); 
+        setErrorMsg("Incorrect password");
       }
     });
   };
 
   const resetMail = async () => {
+    if (!email) {
+      setErrorMsg("Enter your email");
+      return;
+    }
 
     if (!validateEmail(email)) {
       setErrorMsg("Invalid Email");
       return;
     }
+
+    setResetLoading(true);
+    setResetSuccess(false);
+    setErrorMsg("");
+
     try {
-      const response = await axios.post("", { email });
+      console.log("Sending request with email:", email);
+      const response = await axios.post("https://hotelcrew-1.onrender.com/api/auth/forgetpassword/", { email });
+      console.log("Response:", response);
+      setResetSuccess(true);
+      setErrorMsg("Password reset email sent successfully.");
 
-
+      // navigate("/");
     } catch (error) {
       setErrorMsg("Something went wrong. Try again later.");
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -73,7 +91,7 @@ const Login = () => {
                 className={`w-full p-2 text-xs pl-4 border-b ${errorMsg ? 'border-red-500' : 'border-gray-700'} focus:outline-none font-normal font-[open sans]`}
                 placeholder="Enter your email to reset password"
               />
-              {errorMsg && <div className="text-red-500 text-sm">{errorMsg}</div>}
+              {errorMsg && <div className={`text-sm ${resetSuccess ? 'text-green-500' : 'text-red-500'}`}>{errorMsg}</div>}
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(false)}
@@ -86,9 +104,12 @@ const Login = () => {
                 onClick={resetMail}
                 className="w-full lg:w-[88px] h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors ml-[215px] top-[6.3rem] relative"
               >
-                <img src="src/assets/mingcute_arrow-up-fill.svg" alt="Submit" />
+                {resetLoading ? (
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+                ) : (
+                  <img src="src/assets/mingcute_arrow-up-fill.svg" alt="Submit" />
+                )}
               </button>
-              
             </form>
           </div>
         </div>
@@ -121,10 +142,11 @@ const Login = () => {
                     <img src={showPassword ? "src/assets/eye-closed.svg" : "src/assets/eye-open.svg"} alt="Toggle Password Visibility" />
                   </button>
                 </div>
+                
               </div>
 
               {errorMsg && <div className="text-red-500 text-sm">{errorMsg}</div>}
-              
+
               <div className="text-right">
                 <a href="#" onClick={() => setShowForgotPassword(true)} className="text-xs  relative right-3 top-[-1em] text-gray-500">Forgot password?</a>
               </div>

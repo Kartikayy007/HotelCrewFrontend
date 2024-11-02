@@ -15,7 +15,7 @@ const MultiStepForm = () => {
     staffInfo: {},
     propertyDetails: {},
     operationalInfo: {},
-    documents: []
+    documents: [] 
   });
 
   const handleNext = () => {
@@ -30,25 +30,32 @@ const MultiStepForm = () => {
     try {
       console.log('Final form data:', formData);
 
-      // Replace with your API endpoint
-      const response = await axios.post('https://jsonplaceholder.typicode.com/posts', formData, {
+      const formDataToSend = new FormData();
+      formDataToSend.append('hotelInfo', JSON.stringify(formData.hotelInfo));
+      formDataToSend.append('contactInfo', JSON.stringify(formData.contactInfo));
+      formDataToSend.append('staffInfo', JSON.stringify(formData.staffInfo));
+      formDataToSend.append('propertyDetails', JSON.stringify(formData.propertyDetails));
+      formDataToSend.append('operationalInfo', JSON.stringify(formData.operationalInfo));
+
+      formData.documents.forEach((file, index) => {
+        formDataToSend.append(`documents[${index}]`, file);
+      });
+
+      const response = await axios.post('http://localhost:8000/api/hoteldetails/register/', formDataToSend, {
         headers: {
           'Content-Type': 'application/json',
         }
       });
 
-      console.log('Form data:', formData);
+      console.log('Response:', response);
       
       if (response.status !== 201) {
         throw new Error('Submission failed');
       }
       
-      // Handle successful submission
-      alert('Form submitted successfully!');
       
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Failed to submit form. Please try again.');
     }
   };
 

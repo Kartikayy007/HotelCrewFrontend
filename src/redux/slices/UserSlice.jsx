@@ -4,7 +4,7 @@ import axios from 'axios';
 export const loginUser = createAsyncThunk(
   'user/loginUser',
   async (userCredentials, { rejectWithValue }) => {
-    try {
+    try { 
       console.log(userCredentials);
       const request = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/login/",
