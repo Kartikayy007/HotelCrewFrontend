@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import Hoteldetails from './HotelDetails';
+import Hoteldetails from './Hoteldetails';
 import ContactInfo from './ContactInfo';
 import StaffManagement from './StaffManagment';
 import Property from './Property';

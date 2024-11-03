@@ -18,17 +18,48 @@ function OperationalInfo({ onNext, onBack, updateFormData }) {
   };
 
   return (
-    <section className="min-h-screen bg-[#FFFFFF] flex items-center ">
-      <div className="flex justify-center items-center gap-9 ml-[5.1rem]">
+    <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-9 lg:ml-[5.1rem] mx-auto">
+      <div className="flex lg:hidden font-medium gap-3 mb-4">
+          {[1, 2, 3, 4, 5, 6].map((num) => (
+            <div
+              key={num}
+              className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
+                num === 5 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
+              }`}
+            >
+              {num}
+            </div>
+          ))}
+        </div>
+
+        {/* Mobile Content Block */}
+        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
+          <img
+            src="src/assets/operational.svg"
+            alt="Hotel Icon"
+            className="h-[96] mb-4 text-[#5663AC]"
+          />
+          <h2 className="text-[24px] font-[500] font-Montserrat ">
+            Operational Information
+          </h2>
+          <p className="font-sans font-[400] text-center">
+            Fill out the form below.
+            <br />
+            You can always edit the data in the
+            <br />
+            settings menu.
+          </p>
+        </div>
         <form className="space-y-7">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-[550]">Operational Information</h1>
+            <h1 className="text-[32px] font-[600] lg:block hidden">Operational Information</h1>
           </div>
 
           <div>
             <label
               htmlFor="check-in-check-out"
-              className="block text-sm font-sans font-[450] text-gray-700 mb-1"
+              className="block text-sm font-sans font-[600] text-neutral-950 mb-1"
             >
               Check-in & Check outs 
             </label>
@@ -37,7 +68,7 @@ function OperationalInfo({ onNext, onBack, updateFormData }) {
               type="text"
               value={checkInTime}
               onChange={(e) => setCheckInTime(e.target.value)}
-              className="h-8 w-[299px] mr-6 py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 w-[182px] lg:w-[299px] mr-6 py-2 px-4 border border-[#BDBDBD] rounded-[4px] text-xs focus:outline-none"
               placeholder='Check-in timings'
             />
 
@@ -45,7 +76,7 @@ function OperationalInfo({ onNext, onBack, updateFormData }) {
               type="text"
               value={checkOutTime}
               onChange={(e) => setCheckOutTime(e.target.value)}
-              className="h-8 w-[299px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8  w-[182px] lg:w-[299px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] text-xs focus:outline-none"
               placeholder='Check-out timings'
             />
           </div>
@@ -53,7 +84,7 @@ function OperationalInfo({ onNext, onBack, updateFormData }) {
           <div>
             <label
               htmlFor="payment-methods"
-              className="block text-sm font-sans font-[450] mb-1"
+              className="block text-sm font-sans font-[600] mb-1"
             >
               Payment Methods
             </label>
@@ -61,7 +92,7 @@ function OperationalInfo({ onNext, onBack, updateFormData }) {
               type="text"
               value={paymentMethods}
               onChange={(e) => setPaymentMethods(e.target.value)}
-              className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 w-[380px] lg:w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] text-xs focus:outline-none"
               placeholder='Add Methods'
             />
           </div>
@@ -81,13 +112,13 @@ function OperationalInfo({ onNext, onBack, updateFormData }) {
         </form>
 
         <div>
-          <div className="w-[515px] relative left-[35%] h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+          <div className="w-[515px] font-medium hidden lg:block relative left-[26%] h-[100vh] bg-white shadow-2xl border-none rounded-lg">
             <div className="flex gap-5 text-2xl">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                    num === 5 ? 'border-[#5C69F8] text-black' : 'text-black bg-white'
+                    num === 5 ? 'border-[#5C69F8] text-black' : 'text-black bg-white border-none'
                   }`}
                 >
                   {num}
@@ -104,13 +135,13 @@ function OperationalInfo({ onNext, onBack, updateFormData }) {
                 alt="Hotel Icon" 
                 className=" h-[96] mb-4 text-[#5663AC]"
               />
-              <h2 className="text-[24px] font-[450] font-Montserrat">Operational Information</h2>
-              <p className="text-gray-600 font-sans font-[300] text-center">
+              <h2 className="text-[24px] font-[500] font-Montserrat">Operational Information</h2>
+              <p className="font-sans font-[400] text-[16px] text-center">
                 Fill out the form on the left.
                 <br />
-                <span className="font-sans font-[300]"> You can always edit the data in the </span>
+                <span > You can always edit the data in the </span>
                 <br />
-                <span className="font-sans font-[300]"> setting menu.</span>
+                <span> setting menu.</span>
               </p>
             </div>
           </div>

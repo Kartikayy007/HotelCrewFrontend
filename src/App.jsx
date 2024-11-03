@@ -6,6 +6,11 @@ import Login from './components/Login/Login'
 import MultiStepForm from './components/Registration/MultiStepForm'
 import Verify from './components/Login/Verify'
 import SignUp from './components/signup/SignUp'
+import Hoteldetails from './components/Registration/Hoteldetails'
+import StaffManagement from './components/Registration/StaffManagment'
+import Property from './components/Registration/Property'
+import OperationalInfo from './components/Registration/OperationalInfo'
+import UploadDoc from './components/Registration/UploadDoc'
 
 function App() {
 
@@ -21,7 +26,9 @@ function App() {
     </Router> */}
     {/* <Hoteldetails /> */}
     {/* <ContactInfo /> */}
-    <SignUp />
+    {/* <StaffManagement /> */}
+      {/* <OperationalInfo /> */}
+      <UploadDoc />
     </>
   )
 }
