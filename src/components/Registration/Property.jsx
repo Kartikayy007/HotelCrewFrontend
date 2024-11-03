@@ -1,16 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
 
-const Property = ({ onNext, onBack, updateFormData }) => {
-  const [roomTypes, setRoomTypes] = useState([
+const Property = ({ onNext, onBack, updateFormData, initialData }) => {
+  const [roomTypes, setRoomTypes] = useState(initialData.roomTypes || [
     { type: '', count: '' },
     { type: '', count: '' },
     { type: '', count: '' }
   ]);
+  const [numberOfRooms, setNumberOfRooms] = useState(initialData.numberOfRooms || '');
+  const [numberOfFloors, setNumberOfFloors] = useState(initialData.numberOfFloors || '');
+  const [parkingCapacity, setParkingCapacity] = useState(initialData.parkingCapacity || '');
+  const [error, setError] = useState('');
 
-  const [numberOfRooms, setNumberOfRooms] = useState('');
-  const [numberOfFloors, setNumberOfFloors] = useState('');
-  const [parkingCapacity, setParkingCapacity] = useState('');
+  useEffect(() => {
+    if (initialData) {
+      setRoomTypes(initialData.roomTypes || [
+        { type: '', count: '' },
+        { type: '', count: '' },
+        { type: '', count: '' }
+      ]);
+      setNumberOfRooms(initialData.numberOfRooms || '');
+      setNumberOfFloors(initialData.numberOfFloors || '');
+      setParkingCapacity(initialData.parkingCapacity || '');
+    }
+  }, [initialData]);
 
   const handleAddRoomType = () => {
     setRoomTypes([...roomTypes, { type: '', count: '' }]);
@@ -27,8 +40,19 @@ const Property = ({ onNext, onBack, updateFormData }) => {
     setRoomTypes(newRoomTypes);
   };
 
+  const handleNumberInput = (e, setter) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setter(value);
+    }
+  };
+
   const handleNextClick = (e) => {
     e.preventDefault();
+    if (!numberOfRooms || !numberOfFloors || !parkingCapacity) {
+      setError('Please fill out all required fields.');
+      return;
+    }
     const formData = {
       numberOfRooms,
       roomTypes,
@@ -90,7 +114,7 @@ const Property = ({ onNext, onBack, updateFormData }) => {
               type="text"
               id="number-of-rooms"
               value={numberOfRooms}
-              onChange={(e) => setNumberOfRooms(e.target.value)}
+              onChange={(e) => handleNumberInput(e, setNumberOfRooms)}
               className="h-8 text-xs w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
@@ -124,7 +148,7 @@ const Property = ({ onNext, onBack, updateFormData }) => {
                       className="h-8 w-[260px] py-2 px-4 text-xs border border-[#BDBDBD] rounded-[4px] focus:outline-none"
                       placeholder="Number of Rooms"
                       value={room.count}
-                      onChange={(e) => handleRoomTypeChange(index, 'count', e.target.value)}
+                      onChange={(e) => handleNumberInput(e, (value) => handleRoomTypeChange(index, 'count', value))}
                     />
                     <button
                       type="button"
@@ -151,7 +175,7 @@ const Property = ({ onNext, onBack, updateFormData }) => {
               type="text"
               id="number-of-floors"
               value={numberOfFloors}
-              onChange={(e) => setNumberOfFloors(e.target.value)}
+              onChange={(e) => handleNumberInput(e, setNumberOfFloors)}
               className="h-8 w-[623px] py-2 text-xs px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
@@ -167,14 +191,15 @@ const Property = ({ onNext, onBack, updateFormData }) => {
               type="text"
               id="parking-capacity"
               value={parkingCapacity}
-              onChange={(e) => setParkingCapacity(e.target.value)}
+              onChange={(e) => handleNumberInput(e, setParkingCapacity)}
               className="h-8 w-[623px] text-xs py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
 
-          <div className="flex justify-between">
+          {error && <p className="text-red-500 fixed bottom-[16%]">{error}</p>}
+
+          <div className="flex justify-between relative top-5">
             <button type="button" onClick={onBack} className="h-9 w-28 bg-gray-400 font-[700] rounded-lg text-white ">
-               
               <span>Back </span>
             </button>
             <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] font-[700] rounded-lg text-white">

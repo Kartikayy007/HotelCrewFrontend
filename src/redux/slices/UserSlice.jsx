@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 export const loginUser = createAsyncThunk(
-  'user/loginUser',
+  'user/loginUser', 
   async (userCredentials, { rejectWithValue }) => {
     try { 
       console.log(userCredentials);
@@ -47,10 +47,11 @@ export const registerUser = createAsyncThunk(
       const response = await request.data;
 
       console.log(response);
-
       return response;
+      
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'Registration failed' });
+      console.log(error);
+      return rejectWithValue({ message: 'User with this E-mail alreay exists' });
     }
   }
 );

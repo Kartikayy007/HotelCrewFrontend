@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 
-function UploadDoc({ onSubmit, onBack, updateFormData }) {
+function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
   const [dragActive, setDragActive] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState(initialData || []);
   const fileInputRef = useRef(null);
 
   const handleDrag = (e) => {
@@ -29,14 +29,20 @@ function UploadDoc({ onSubmit, onBack, updateFormData }) {
   };
 
   const handleFiles = (fileList) => {
-    setFiles(fileList);
-    updateFormData(fileList);
+    const excelFiles = fileList.filter(file => file.name.endsWith('.xls') || file.name.endsWith('.xlsx'));
+    setFiles(excelFiles);
+    updateFormData(excelFiles);
+  };
+
+  const handleRemoveFile = (index) => {
+    const newFiles = files.filter((_, i) => i !== index);
+    setFiles(newFiles);
+    updateFormData(newFiles);
   };
 
   const handleSubmitClick = (e) => {
     e.preventDefault();
-      onSubmit();
-     
+    onSubmit();
   };
 
   const triggerFileInput = () => {
@@ -87,6 +93,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData }) {
             ref={fileInputRef}
             onChange={handleFileInput}
             multiple 
+            accept=".xls,.xlsx"
             className="hidden" 
           />
 
@@ -113,30 +120,39 @@ function UploadDoc({ onSubmit, onBack, updateFormData }) {
 
           {files.length > 0 && (
             <div className="mt-4 fixed">
-              <h3 className="text-lg  font-semibold mb-2">Uploaded Files:</h3>
+              <h3 className="text-lg font-semibold mb-2">Uploaded Files:</h3>
               <ul className="list-disc pl-5">
                 {files.map((file, index) => (
-                  <li key={index}>{file.name}</li>
+                  <li key={index} className="flex justify-between items-center">
+                    {file.name}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFile(index)}
+                      className="ml-4 text-red-500 hover:text-red-700 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </li>
                 ))}
               </ul>
             </div>
           )}
 
           <div className='relative top-[7rem]'>   
-          <div className="flex justify-between">
-            <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">
-              <span>Back </span>
-            </button>
-            <button onClick={handleSubmitClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white">
-              <span>Submit </span>
-              <span>➔</span>
-            </button>
-          </div>
+            <div className="flex justify-between">
+              <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">
+                <span>Back </span>
+              </button>
+              <button onClick={handleSubmitClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white">
+                <span>Submit </span>
+                <span>➔</span>
+              </button>
+            </div>
           </div> 
         </form>
 
         <div>
-          <div className="lg:block hidden w-[515px] font-medium relative left-[26%] h-screen bg-white shadow-2xl border-none rounded-lg">
+          <div className="lg:block hidden w-[515px] font-medium relative left-[26%] h-screen bg-white shadow-2xl border-none rounded-lg overflow-hidden">
             <div className="flex gap-5 text-2xl">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div

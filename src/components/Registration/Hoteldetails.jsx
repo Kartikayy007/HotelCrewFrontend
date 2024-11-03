@@ -5,6 +5,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
   const [legalName, setLegalName] = useState('');
   const [yearEstablished, setYearEstablished] = useState('');
   const [licenseNumber, setLicenseNumber] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (initialData) {
@@ -17,6 +18,10 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
 
   const handleNextClick = (e) => {
     e.preventDefault();
+    if (!hotelName || !yearEstablished || !licenseNumber) {
+      setError('Please fill out all required fields.');
+      return;
+    }
     const formData = {
       hotelName,
       legalName,
@@ -26,6 +31,13 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
 
     updateFormData(formData);
     onNext();
+  };
+
+  const handleNumberInput = (e, setter) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setter(value);
+    }
   };
 
   return (
@@ -111,7 +123,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               type="text"
               id="year-established"
               value={yearEstablished}
-              onChange={(e) => setYearEstablished(e.target.value)}
+              onChange={(e) => handleNumberInput(e, setYearEstablished)}
               className="h-8 w-[380px] lg:w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
@@ -127,10 +139,12 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               type="text"
               id="license-number"
               value={licenseNumber}
-              onChange={(e) => setLicenseNumber(e.target.value)}
+              onChange={(e) => handleNumberInput(e, setLicenseNumber)}
               className="h-8 w-[380px] lg:w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
+
+          {error && <p className="text-red-500 fixed">{error}</p>}
 
           <div className='lg:relative top-[0.89rem] flex justify-center'>
             <button onClick={handleNextClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white lg:relative top-10 lg:ml-[32rem]">

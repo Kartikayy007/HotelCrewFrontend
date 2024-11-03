@@ -5,6 +5,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
   const [mainPhone, setMainPhone] = useState("");
   const [emergencyPhone, setEmergencyPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (initialData) {
@@ -17,6 +18,10 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
 
   const handleNextClick = (e) => {
     e.preventDefault();
+    if (!address || !mainPhone || !emergencyPhone || !email) {
+      setError('Please fill out all required fields.');
+      return;
+    }
     const formData = {
       address,
       mainPhone,
@@ -26,6 +31,13 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
 
     updateFormData(formData);
     onNext();
+  };
+
+  const handleNumberInput = (e, setter) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setter(value);
+    }
   };
 
   return (
@@ -97,7 +109,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               type="text"
               id="main-phone"
               value={mainPhone}
-              onChange={(e) => setMainPhone(e.target.value)}
+              onChange={(e) => handleNumberInput(e, setMainPhone)}
               className="h-8 lg:w-[299px] w-[178px] mr-6 py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none text-xs"
               placeholder="Main number"
             />
@@ -106,7 +118,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               type="text"
               id="emergency-phone"
               value={emergencyPhone}
-              onChange={(e) => setEmergencyPhone(e.target.value)}
+              onChange={(e) => handleNumberInput(e, setEmergencyPhone)}
               className="h-8 lg:w-[299px] w-[178px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none text-xs"
               placeholder="Emergency number"
             />
@@ -117,16 +129,18 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               htmlFor="hotel-email"
               className="block text-sm font-sans font-[600] mb-1"
             >
-              Hotel E-mail
+              Hotel E-mail 
             </label>
             <input
-              type="text"
+              type="email"
               id="hotel-email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="h-8 lg:w-[623px] w-[380px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none text-xs"
             />
           </div>
+
+          {error && <p className="text-red-500 fixed">{error}</p>}
 
           <div className="relative top-24">
             <div className="flex justify-between">

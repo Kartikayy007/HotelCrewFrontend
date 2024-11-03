@@ -4,13 +4,8 @@ import Login from './components/Login/Login'
 // import Home from './components/Home'
 // import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import MultiStepForm from './components/Registration/MultiStepForm'
-import Verify from './components/Login/Verify'
 import SignUp from './components/signup/SignUp'
-import Hoteldetails from './components/Registration/Hoteldetails'
-import StaffManagement from './components/Registration/StaffManagment'
-import Property from './components/Registration/Property'
-import OperationalInfo from './components/Registration/OperationalInfo'
-import UploadDoc from './components/Registration/UploadDoc'
+import Onboarding from './components/Onboarding'
 
 function App() {
 
@@ -26,9 +21,7 @@ function App() {
     </Router> */}
     {/* <Hoteldetails /> */}
     {/* <ContactInfo /> */}
-    {/* <StaffManagement /> */}
-      {/* <OperationalInfo /> */}
-      <UploadDoc />
+    <MultiStepForm />
     </>
   )
 }
