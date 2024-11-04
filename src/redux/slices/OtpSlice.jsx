@@ -1,61 +1,79 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import axios from "axios";
 
 export const verifyOtp = createAsyncThunk(
-  'otp/verifyOtp',
-  async ({ email, otp }, { rejectWithValue }) => {
+  "otp/verifyOtp",
+  async ({email, otp}, {rejectWithValue}) => {
     try {
       const payload = {
         email: email,
-        otp: otp.toString() 
+        otp: otp.toString(),
       };
-      
-      console.log('Sending payload:', payload);
-      
+
+      console.log("Sending payload:", payload);
+
       const response = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/register/",
         payload,
         {
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
-      
-      console.log('Response:', response.data);
+
+      console.log("Response:", response.data);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'Invalid OTP' });
+      if (!error.response) {
+        return rejectWithValue({
+          message:
+            "Network error. Please check your internet connection and try again.",
+        });
+      } else {
+        return rejectWithValue(
+          error.response?.data || {message: "Invalid OTP"}
+        );
+      }
     }
   }
 );
 
 export const resendOtp = createAsyncThunk(
-  'otp/resendOtp',
-  async (userCredentials, { rejectWithValue }) => {
+  "otp/resendOtp",
+  async (userCredentials, {rejectWithValue}) => {
     try {
-      console.log('Sending payload:', userCredentials);
-      
+      console.log("Sending payload:", userCredentials);
+
       const response = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/registrationOTP/",
         userCredentials,
         {
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
-      
-      console.log('Response:', response.data);
+
+      console.log("Response:", response.data);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'Failed to resend OTP' });
+      if (!error.response) {
+        return rejectWithValue({
+          message:
+            "Network error. Please check your internet connection and try again.",
+        });
+      } else {
+        return rejectWithValue(
+          error.response?.data || {message: "Failed to resend OTP"}
+        );
+      }
     }
   }
 );
 
 const otpSlice = createSlice({
-  name: 'otp',
+  name: "otp",
   initialState: {
     loading: false,
     error: null,
@@ -79,7 +97,7 @@ const otpSlice = createSlice({
       })
       .addCase(verifyOtp.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Invalid OTP';
+        state.error = action.payload?.message || "Invalid OTP";
       })
       .addCase(resendOtp.pending, (state) => {
         state.loading = true;
@@ -92,7 +110,7 @@ const otpSlice = createSlice({
       })
       .addCase(resendOtp.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Failed to resend OTP';
+        state.error = action.payload?.message || "Failed to resend OTP";
       });
   },
 });

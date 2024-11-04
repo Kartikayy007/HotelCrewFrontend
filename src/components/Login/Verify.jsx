@@ -68,7 +68,11 @@ const Verify = ({ email }) => {
       console.log("OTP verified:", response);
       setShowOtpInput(false);
     } catch (err) {
-      setErrorMessage("Invalid OTP. Please try again.");
+      if (!err.response) {
+        setErrorMessage("Network error. Please check your internet connection and try again.");
+      } else {
+        setErrorMessage("Invalid OTP. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -84,7 +88,11 @@ const Verify = ({ email }) => {
       setTimeLeft(30);
       setIsResendDisabled(true);
     } catch (err) {
-      setErrorMessage("Failed to resend OTP. Please try again.");
+      if (!err.response) {
+        setErrorMessage("Network error. Please check your internet connection and try again.");
+      } else {
+        setErrorMessage("Failed to resend OTP. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -108,7 +116,11 @@ const Verify = ({ email }) => {
       console.log("Response:", response);
       window.location.reload();
     } catch (err) {
-      setErrorMessage("An error occurred. Please try again.");
+      if (!err.response) {
+        setErrorMessage("Network error. Please check your internet connection and try again.");
+      } else {
+        setErrorMessage("An error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
