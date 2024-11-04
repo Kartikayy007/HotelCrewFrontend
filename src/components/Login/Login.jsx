@@ -160,10 +160,8 @@ const Login = () => {
       setErrorMsg("Request timed out. Please try again.");
       } else if (error.response?.status === 429) {
       setErrorMsg("Too many requests. Please try again later.");
-      } else if (error.response?.status === 404) {
-      setErrorMsg("User not found. Please check your email address.");
       } else if (error.response?.status === 400) {
-      setErrorMsg("Invalid request. Please check your input.");
+      setErrorMsg("User not found. Please check your email address");
       } else {
       setErrorMsg(error.message || "Failed to send reset email. Please try again later.");
       }
@@ -258,7 +256,7 @@ const Login = () => {
                     value={password}
                     onChange={handleInputChange(setPassword)}
                     className={`w-full p-2 pl-4 text-xs border-b ${
-                      errorMsg ? 'border-red-500' : 'border-gray-700'
+                      errorMsg ? "border-red-500 placeholder-red-500" : "border-gray-500 placeholder-gray-500"
                     } focus:outline-none`}
                     placeholder="Password"
                     autoComplete="current-password"
