@@ -70,7 +70,6 @@ const Login = () => {
         setEmail("");
         setPassword("");
         setErrorMsg("");
-
         navigate('/dashboard');
       } else {
         loginAttempts.count += 1;
@@ -81,8 +80,38 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      setErrorMsg("Invalid credentials");
-      
+      console.log(error.response?.status)
+      if (error.response?.status === "ERR_INTERNET_DISCONNECTED") {
+        setErrorMsg("No internet connection. Please try again later");
+    }  if (error.message === "Network Error") {
+        setErrorMsg("Network error. Please check your connection and try again.");
+    }
+      if (error.name === 'Error' && error.message === 'Invalid credentials') {
+        setErrorMsg("Invalid email or password");
+        setFieldErrors({
+            email: true,
+            password: true
+        });
+    }  if (error.response?.status === 401) {
+        setErrorMsg("Invalid email or password");
+        setFieldErrors({
+            email: true,
+            password: true
+        });
+    }  if (error.response?.status === 429) {
+        setErrorMsg("Too many login attempts. Please try again later");
+    }  if (error.response?.status === 404) {
+        setErrorMsg("Account not found. Please check your email");
+        setFieldErrors(prev => ({
+            ...prev,
+            email: true
+        }));
+    }
+     
+    else {
+        setErrorMsg("An error occurred during login. Please try again");
+    }
+
       setPassword("");
     }
   };
@@ -128,11 +157,15 @@ const Login = () => {
     } catch (error) {
       console.error("Reset password error:", error);
       if (error.code === 'ECONNABORTED') {
-        setErrorMsg("Request timed out. Please try again.");
+      setErrorMsg("Request timed out. Please try again.");
       } else if (error.response?.status === 429) {
-        setErrorMsg("Too many requests. Please try again later.");
+      setErrorMsg("Too many requests. Please try again later.");
+      } else if (error.response?.status === 404) {
+      setErrorMsg("User not found. Please check your email address.");
+      } else if (error.response?.status === 400) {
+      setErrorMsg("Invalid request. Please check your input.");
       } else {
-        setErrorMsg(error.response?.data?.message || "Failed to send reset email. Please try again later.");
+      setErrorMsg(error.message || "Failed to send reset email. Please try again later.");
       }
     } finally {
       setResetLoading(false);
@@ -164,13 +197,15 @@ const Login = () => {
                 type="email"
                 value={email}
                 onChange={handleInputChange(setEmail)}
-                className={`w-full p-2 text-xs pl-4 border-b ${errorMsg ? 'border-red-500' : 'border-gray-700'} focus:outline-none font-normal font-[open sans]`}
+                className={`w-full p-2 text-xs pl-4 border-b  focus:outline-none font-normal font-[open sans] ${
+                  errorMsg ? "border-red-500 placeholder-red-500" : "border-gray-500 placeholder-gray-500"
+                }`}
                 placeholder="Enter your email to reset password"
                 autoComplete="email"
               />
               {errorMsg && (
                 <div 
-                  className={`text-sm ${resetSuccess ? 'text-green-500' : 'text-red-500'}`}
+                  className={`text-sm ${resetSuccess ? 'text-green-700' : 'text-red-500'}`}
                   role="alert"
                 >
                   {errorMsg}
@@ -178,7 +213,10 @@ const Login = () => {
               )}
               <button
                 type="button"
-                onClick={() => setShowForgotPassword(false)}
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setErrorMsg("");
+                }}
                 className="relative left-56 text-xs text-gray-500"
               >
                 Back to Login
@@ -209,9 +247,7 @@ const Login = () => {
                   value={email}
                   onChange={handleInputChange(setEmail)}
                   className={`w-full p-2 text-xs pl-4 border-b ${
-                    errorMsg === "Invalid Email" || errorMsg === "Enter all fields" 
-                      ? 'border-red-500' 
-                      : 'border-gray-700'
+                    errorMsg ? "border-red-500 placeholder-red-500" : "border-gray-500 placeholder-gray-500"
                   } focus:outline-none font-normal font-[open sans]`}
                   placeholder="E-mail"
                   autoComplete="email"
@@ -222,9 +258,7 @@ const Login = () => {
                     value={password}
                     onChange={handleInputChange(setPassword)}
                     className={`w-full p-2 pl-4 text-xs border-b ${
-                      errorMsg === "Enter all fields" || errorMsg === "Incorrect password" 
-                        ? 'border-red-500' 
-                        : 'border-gray-700'
+                      errorMsg ? 'border-red-500' : 'border-gray-700'
                     } focus:outline-none`}
                     placeholder="Password"
                     autoComplete="current-password"
@@ -253,7 +287,10 @@ const Login = () => {
               <div className="text-right">
                 <button
                   type="button"
-                  onClick={() => setShowForgotPassword(true)}
+                  onClick={() => {
+                    setShowForgotPassword(true);
+                    setErrorMsg("");
+                  }}
                   className="text-xs relative right-3 top-[-1em] text-gray-500"
                 >
                   Forgot password?
@@ -287,7 +324,7 @@ const Login = () => {
         </div>
       )}
       <div className="hidden lg:flex w-full lg:w-[95vw] items-center justify-center h-[380px] lg:h-auto bg-[#8094D4]">
-        <img className="h-auto w-full lg:h-full" src="src/assets/web2 1.svg" alt="Login Hero" />
+        <img className="h-auto lg:h-full" src="src/assets/web2 1.svg" alt="Login Hero" />
       </div>
     </div>
   );

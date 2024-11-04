@@ -38,7 +38,7 @@ const PublicRoute = ({ children }) => {
   const accessToken = localStorage.getItem('accessToken');
   const user = useSelector((state) => state.user);
 
-  if (accessToken && user.email) {
+  if (accessToken && user.email && location.pathname === '/login') {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -89,13 +89,12 @@ const App = () => {
           }
         />
         <Route
-          path="/onboarding"
+          path="/"
           element={<Onboarding />}
         />
 
-        <Route path="/" element={<Navigate to="/onboarding" replace />} />
         
-        <Route path="*" element={<Navigate to="/onboarding" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
