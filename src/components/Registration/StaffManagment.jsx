@@ -125,7 +125,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
           </div>
         </form>
         <div>
-          <div className="hidden lg:block lg:w-[512px] font-medium relative left-[26%] lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+          <div className="hidden lg:block lg:w-[512px] font-medium relative left-[13%] lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
           <div className="flex gap-5 text-2xl">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
