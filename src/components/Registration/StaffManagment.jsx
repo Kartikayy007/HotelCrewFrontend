@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
+import staffIcon from '../../assets/staff.svg';
+import plus from '../../assets/tabler_plus.svg';
+import lineIcon from '../../assets/Line.svg';
 
 function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
   const [departments, setDepartments] = useState(['', '', '']);
@@ -42,17 +45,49 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
-      <div className="flex justify-center items-center gap-9 ml-20">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-24 ml-20">
+      <div className="flex lg:hidden gap-2 mb-4">
+          {[1, 2, 3, 4, 5, 6].map((num) => (
+            <div
+              key={num}
+              className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
+                num === 2 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
+              }`}
+            >
+              {num}
+            </div>
+          ))}
+        </div>
+        
+
+        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
+          <img
+            src={staffIcon}
+            alt="staff"
+            className="h-[96] mb-4 text-[#5663AC]"
+          />
+          <h2 className="text-[24px] font-[500] font-Montserrat">
+            Staff Management
+          </h2>
+          <p className="font-sans font-[400] text-center">
+            Fill out the form below.
+            <br />
+            You can always edit the data in the
+            <br />
+            settings menu.
+          </p>
+        </div>
+
         <form className="space-y-7">
           <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-medium">Staff Management</h1>
+            <h1 className="text-[32px] font-[600] lg:block hidden">Staff Management</h1>
           </div>
           <div className="flex justify-between">
-            <label htmlFor="hotel-name" className="block text-sm font-sans font-medium">
+            <label htmlFor="hotel-name" className="block text-sm font-sans font-[600] text-neutral-950">
               Departments
             </label>
             <button type="button" onClick={handleAddDepartment}>
-              <img src="src/assets/tabler_plus.svg" alt="Add department" />
+              <img src={plus} alt="Add department" />
             </button>
           </div>
           <div className="h-48 overflow-y-auto">
@@ -60,7 +95,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
               <div key={index} className="mb-2 flex items-center gap-2">
                 <input
                   type="text"
-                  className="h-8 w-full py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+                  className="h-8  py-2 px-4 border text-xs border-[#BDBDBD] rounded-[4px] focus:outline-none w-full"
                   placeholder={`Department ${index + 1}`}
                   value={department}
                   onChange={(e) => handleDepartmentChange(index, e.target.value)}
@@ -90,34 +125,36 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
           </div>
         </form>
         <div>
-          <div className="w-[515px] relative left-[35%] h-screen bg-white shadow-2xl border-none rounded-lg overflow-hidden">
-            <div className="flex gap-5 text-2xl">
+          <div className="hidden lg:block lg:w-[512px] font-medium relative left-[26%] lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+          <div className="flex gap-5 text-2xl">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                    num === 3 ? 'border-[#5C69F8] text-black' : 'text-black bg-white'
+                    num === 3
+                      ? "border-[#5C69F8] text-black"
+                      : "text-black bg-white border-none"
                   }`}
                 >
                   {num}
                 </div>
               ))}
             </div>
-            <img className="relative top-36 left-[43.7%]" src="src/assets/Line.svg" alt="" />
-            <img className="relative top-[80%] left-[43.7%]" src="src/assets/Line.svg" alt="" />
+            <img className="relative hidden lg:block top-36 left-[43.7%]" src={lineIcon} alt="" />
+            <img className="relative hidden lg:block top-[80%] left-[43.7%]" src={lineIcon} alt="" />
             <div className="flex flex-col items-center justify-center h-full space-y-4">
               <img
-                src="src/assets/staff.svg"
+                src={staffIcon}
                 alt="Hotel Icon"
                 className="h-24 mb-4 text-[#5663AC]"
               />
               <h2 className="text-2xl font-medium">Staff Management</h2>
-              <p className="text-gray-600 font-light text-center">
+              <p className="font-[400] text-[14px] text-center">
                 Fill out the form on the left.
                 <br />
-                <span className="font-light">You can always edit the data in the</span>
+                <span className="font-[400] text-[14px]">You can always edit the data in the</span>
                 <br />
-                <span className="font-light">setting menu.</span>
+                <span className="font-[400] text-[14px]">setting menu.</span>
               </p>
             </div>
           </div>

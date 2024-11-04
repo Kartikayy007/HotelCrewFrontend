@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import contactIcon from "../../assets/contact.svg";
+import lineIcon from '../../assets/line.svg';
+
 
 function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
   const [completeAddress, setCompleteAddress] = useState("");
@@ -30,7 +33,6 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
       return;
     }
 
-    // Format data to match API structure
     const formData = {
       complete_address: completeAddress,
       main_phone_number: mainPhoneNumber,
@@ -44,24 +46,55 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
 
   const handleNumberInput = (e, setter) => {
     const value = e.target.value;
-    // Allow only numbers and limit to 10 digits
     if (/^\d*$/.test(value) && value.length <= 10) {
       setter(value);
     }
   };
 
   return (
-    <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex justify-center items-center gap-9 ml-[5.1rem]">
+    <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden ">
+      <div className="flex flex-col lg:flex-row  justify-center items-center gap-24 lg:ml-[5.1rem]">
+      <div className="flex lg:hidden gap-2 mb-4">
+          {[1, 2, 3, 4, 5, 6].map((num) => (
+            <div
+              key={num}
+              className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
+                num === 2 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
+              }`}
+            >
+              {num}
+            </div>
+          ))}
+        </div>
+
+        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
+          <img
+            src={contactIcon}
+            alt="Hotel Icon"
+            className="h-[96] mb-4 text-[#5663AC]"
+          />
+          <h2 className="text-[24px] font-[500] font-Montserrat">
+            Contact & Location
+          </h2>
+          <p className="font-sans font-[400] text-center">
+            Fill out the form below.
+            <br />
+            You can always edit the data in the
+            <br />
+            settings menu.
+          </p>
+        </div>
+
+      
         <form className="space-y-7">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-[550]">Contact & Location</h1>
+            <h1 className="text-[32px] font-medium hidden lg:block">Contact & Location</h1>
           </div>
 
           <div>
             <label
               htmlFor="complete-address"
-              className="block text-sm font-sans font-[450]"
+              className="block text-sm font-sans font-[600]"
             >
               Complete Address*
             </label>
@@ -70,7 +103,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="complete-address"
               value={completeAddress}
               onChange={(e) => setCompleteAddress(e.target.value)}
-              className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 lg:w-[623px] w-[380px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none text-xs"
               placeholder="Enter full address"
             />
           </div>
@@ -78,7 +111,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
           <div>
             <label
               htmlFor="phone-number"
-              className="block text-sm font-sans font-[450] text-gray-700 mb-1"
+              className="block text-sm font-sans font-[600]  mb-1"
             >
               Phone Numbers*
             </label>
@@ -88,7 +121,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="main-phone"
               value={mainPhoneNumber}
               onChange={(e) => handleNumberInput(e, setMainPhoneNumber)}
-              className="h-8 w-[299px] mr-6 py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 lg:w-[299px] w-[178px] mr-6 py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none text-xs"
               placeholder="Main number"
               maxLength={10}
             />
@@ -98,7 +131,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="emergency-phone"
               value={emergencyPhoneNumber}
               onChange={(e) => handleNumberInput(e, setEmergencyPhoneNumber)}
-              className="h-8 w-[299px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 lg:w-[299px] w-[178px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none text-xs"
               placeholder="Emergency number"
               maxLength={10}
             />
@@ -107,7 +140,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
           <div>
             <label
               htmlFor="hotel-email"
-              className="block text-sm font-sans font-[450] mb-1"
+              className="block text-sm font-sans font-[600] mb-1"
             >
               Hotel Email*
             </label>
@@ -116,7 +149,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="hotel-email"
               value={emailAddress}
               onChange={(e) => setEmailAddress(e.target.value)}
-              className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 lg:w-[623px] w-[380px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none text-xs"
               placeholder="hotel@example.com"
             />
           </div>
@@ -152,16 +185,16 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
           </div>
         </form>
 
-        <div>
-          <div className="w-[515px] relative left-[35%] h-[100vh] bg-white shadow-2xl border-none rounded-lg overflow-hidden">
-            <div className="flex gap-5 text-2xl">
+        <div >
+          <div className="hidden lg:block lg:w-[515px] w-full relative font-medium left-[26%] h-[40vh] lg:h-[100vh] bg-white lg:shadow-2xl border-none rounded-lg ">
+          <div className="flex gap-5 text-2xl">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
                     num === 2
                       ? "border-[#5C69F8] text-black"
-                      : "text-black bg-white"
+                      : "text-black bg-white border-none"
                   }`}
                 >
                   {num}
@@ -170,30 +203,31 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
             </div>
 
             <img
-              className="relative top-36 left-[43.7%]"
-              src="src/assets/Line.svg"
+              className="hidden lg:block relative top-36 left-[43.7%]"
+              src={lineIcon}
               alt=""
             />
             <img
-              className="relative top-[80%] left-[43.7%]"
+              className="hidden lg:block relative top-[80%] left-[43.7%]"
               src="src/assets/Line.svg"
               alt=""
             />
 
             <div className="flex flex-col items-center justify-center h-full space-y-4">
               <img
-                src="src/assets/contact.svg"
+                src={contactIcon}
                 alt="Hotel Icon"
                 className="h-[96] mb-4 text-[#5663AC]"
               />
-              <h2 className="text-[24px] font-[450] font-Montserrat">
+              <h2 className="text-[24px] font-[500] font-Montserrat">
                 Contact & Location
               </h2>
-              <p className="text-gray-600 font-sans font-[300] text-center">
+              <p className=" font-sans font-[400] text-center">
                 Fill out the form on the left.
                 <br />
                 <span className="font-sans font-[300]">
-                  You can always edit the data in the
+                  {" "}
+                  You can always edit the data in the{" "}
                 </span>
                 <br />
                 <span className="font-sans font-[300]">setting menu.</span>

@@ -115,10 +115,9 @@ const userSlice = createSlice({
         state.email = null;
         state.error = action.payload?.message || 'Registration failed';
       })
-      // MultiStep form cases
-      .addCase(completeMultiStepForm.fulfilled, (state) => {
-        state.registrationStep = 'completed';
-      });
+      // .addCase(completeMultiStepForm.fulfilled, (state) => {
+      //   state.registrationStep = 'completed';
+      // });
   },
 });
 

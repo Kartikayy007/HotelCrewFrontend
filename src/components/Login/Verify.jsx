@@ -116,9 +116,13 @@ const Verify = ({ email }) => {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen font-Montserrat">
+      <div className="flex lg:hidden items-center justify-center h-[45vh] bg-[#8094D4] w-100vw">
+      {/* Mobile Layout for Image Above Form */}
+      <img className="w-full h-full object-fill" src="src/assets/web2 1.svg" alt="Login Hero" />
+    </div>
       {showOtpInput ? (
         <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 mt-28 p-16">
+          <div className="w-full max-w-md space-y-14 lg:mt-28 p-4 lg:p-16">
             <h2 className="text-[40px] font-bold text-center">Verify OTP</h2>
             <form className="w-[311px] relative bottom-4 text-center space-y-5" onSubmit={handleVerifyOtp}>
               <div className="flex space-x-4">
@@ -178,15 +182,16 @@ const Verify = ({ email }) => {
       ) : (
         <div className="w-full lg:w-1/2 flex items-center justify-center">
           <div className="w-full max-w-md space-y-14 mt-21 p-16">
-            <h1 className="text-[40px] font-bold">Reset Password</h1>
-            <form className="w-[311px] relative bottom-4 space-y-5" onSubmit={handleSubmit}>
+            <h1 className="text-[40px] font-bold text-center lg:text-left">Reset Password</h1>
+            <form className="w-full lg:w-[311px] relative bottom-4 space-y-5" onSubmit={handleSubmit}>
               <div className="space-y-8">
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    className="w-full p-2 text-xs pl-4 border-b border-gray-700 focus:outline-none"
+                    className="w-full p-3 p-2 text-xs pl-4 border-b border-gray-700 focus:outline-none"
                     placeholder="New Password"
                     value={password}
+                  maxLength={20}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <button
@@ -203,9 +208,10 @@ const Verify = ({ email }) => {
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
-                    className="w-full p-2 text-xs pl-4 border-b border-gray-700 focus:outline-none"
+                    className="w-full p-3 p-2 text-xs pl-4 border-b border-gray-700 focus:outline-none"
                     placeholder="Confirm Password"
                     value={confirmPassword}
+                  maxLength={20}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                   <button
@@ -223,7 +229,7 @@ const Verify = ({ email }) => {
               {errorMessage && <p className="text-red-500">{errorMessage}</p>}
               <button
                 type="submit"
-                className="w-full lg:w-[88px] h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors ml-[215px] top-10 relative disabled:cursor-not-allowed"
+                className="lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors lg:ml-[215px] top-10 relative w-[180px] h-[58px] m-auto  disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 {loading ? (
@@ -237,7 +243,7 @@ const Verify = ({ email }) => {
         </div>
       )}
 
-      <div className="flex items-center justify-center w-full max-w-[945px] h-auto bg-[#8094D4]">
+      <div className="hidden lg:flex items-center justify-center w-full max-w-[945px] h-auto bg-[#8094D4]">
         <img className="h-auto" src="src/assets/web2 1.svg" alt="Login Hero" />
       </div>
     </div>

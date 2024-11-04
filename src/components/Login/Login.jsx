@@ -25,8 +25,6 @@ const Login = () => {
     return emailRegex.test(String(email).toLowerCase());
   }, []);
 
-
-
   const handleInputChange = useCallback((set) => (e) => {
     try {
       const sanitizedValue = validator.escape(e.target.value.trim());
@@ -52,7 +50,6 @@ const Login = () => {
         return;
       }
 
-  
       const loginAttempts = JSON.parse(localStorage.getItem('loginAttempts') || '{"count": 0, "timestamp": 0}');
       const now = Date.now();
       
@@ -152,11 +149,14 @@ const Login = () => {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen font-Montserrat">
+    <div className="flex flex-col lg:flex-row min-h-screen font-Montserrat overflow-hidden">
+      <div className="flex lg:hidden items-center justify-center h-[45vh] bg-[#8094D4] w-100vw">
+        <img className="w-full h-full object-fill" src="src/assets/web2 1.svg" alt="Login Hero" />
+      </div>
       {showForgotPassword ? (
         <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 mt- p-16">
-            <h1 className="text-[40px] font-bold">Forgot Password</h1>
+          <div className="w-full max-w-md space-y-14 lg:mt-28 mt-8 lg:p-16">
+            <h1 className="text-[40px] font-bold text-center lg:text-left">Forgot Password</h1>
             <form className="w-[311px] relative bottom-4 space-y-5" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="email"
@@ -198,9 +198,9 @@ const Login = () => {
         </div>
       ) : (
         <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 mt-21 p-16">
-            <h1 className="text-[40px] font-bold">LogIn</h1>
-            <form className="w-[311px] relative bottom-4 space-y-5" onSubmit={handleSubmit}>
+          <div className="w-full max-w-md space-y-14 lg:mt-21 mt-8 p-4 lg:p-16">
+            <h1 className="text-[40px] font-bold text-center lg:text-left">LogIn</h1>
+            <form className="w-full lg:w-[311px] relative bottom-4 space-y-5" onSubmit={handleSubmit}>
               <div className="space-y-8">
                 <input
                   type="email"
@@ -247,6 +247,7 @@ const Login = () => {
                 </div>
               )}
 
+              
               <div className="text-right">
                 <button
                   type="button"
@@ -256,10 +257,21 @@ const Login = () => {
                   Forgot password?
                 </button>
               </div>
+
+              <div className="text-center mt-4">
+                <span className="text-sm text-gray-500">Need an account? </span>
+                <button
+                  type="button"
+                  onClick={() => navigate('/signup')}
+                  className="text-sm text-[#5663AC] hover:text-[#6773AC] font-medium"
+                >
+                  Sign up
+                </button>
+              </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full lg:w-[88px] h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors ml-[215px] top-10 relative disabled:opacity-50 disabled:cursor-not-allowed"
+                className="lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors lg:ml-[215px] top-10 relative w-[180px] h-[58px] m-auto disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -268,11 +280,12 @@ const Login = () => {
                 )}
               </button>
             </form>
+            
           </div>
         </div>
       )}
-      <div className="flex items-center justify-center w-full max-w-[945px] h-auto bg-[#8094D4]">
-        <img className="h-auto" src="src/assets/web2 1.svg" alt="Login Hero" />
+      <div className="hidden lg:flex w-full lg:w-[95vw] items-center justify-center h-[380px] lg:h-auto bg-[#8094D4]">
+        <img className="h-auto w-full lg:h-full" src="src/assets/web2 1.svg" alt="Login Hero" />
       </div>
     </div>
   );

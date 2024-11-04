@@ -1,11 +1,13 @@
-
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Onboarding = () => {
   
     const navigate = useNavigate();
     return (
+        
         <div className="flex justify-between h-screen overflow-hidden items-center">
+            
             <div className="flex justify-center items-center flex-col w-[411px] h-[322px] mx-auto gap-[72px]">
             <div className="h-[210px] flex flex-col">
                 <h1 className=" text-[24px] font-bold leading-[31.2px] text-center">
@@ -37,4 +39,4 @@ const Onboarding = () => {
         )
 }
 
-export default Onboarding
+export default Onboarding;

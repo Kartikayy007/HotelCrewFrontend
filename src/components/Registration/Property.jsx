@@ -1,5 +1,8 @@
 import React, {useState, useEffect} from "react";
 import {Trash2} from "lucide-react";
+import plus from "../../assets/tabler_plus.svg";
+import hotelIcon from "../../assets/property.svg";
+import line from "../../assets/Line.svg";
 
 const Property = ({onNext, onBack, updateFormData, initialData}) => {
   const [roomTypes, setRoomTypes] = useState([]);
@@ -88,7 +91,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
 
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
-      <div className="flex justify-center items-center gap-9 ml-20">
+      <div className="flex justify-center items-center gap-[5rem] ml-20">
         <form className="space-y-7 bottom-5 relative">
           <div className="flex justify-between items-center">
             <h1 className="text-[32px] font-[550]">Property Details</h1>
@@ -97,7 +100,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
           <div>
             <label
               htmlFor="number-of-rooms"
-              className="block text-sm font-sans font-[450]"
+              className="block text-sm font-sans font-[600]"
             >
               Number of Rooms
             </label>
@@ -106,7 +109,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
               id="number-of-rooms"
               value={numberOfRooms}
               onChange={(e) => handleNumberInput(e, setNumberOfRooms)}
-              className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 text-xs w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
 
@@ -114,7 +117,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
             <div className="flex justify-between mb-2">
               <label
                 htmlFor="types-of-rooms"
-                className="block text-sm font-sans font-[450] text-gray-700"
+                className="block text-sm font-sans font-[600] "
               >
                 Types of Rooms
               </label>
@@ -123,7 +126,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                 className="relative right-16"
                 onClick={handleAddRoomType}
               >
-                <img src="src/assets/tabler_plus.svg" alt="Add room type" />
+                <img src={plus} alt="Add room type" />
               </button>
             </div>
 
@@ -133,7 +136,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                   <div key={index} className="flex items-center gap-4">
                     <input
                       type="text"
-                      className="h-8 w-[240px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+                      className="h-8 w-[299px] py-2 px-4 text-xs border border-[#BDBDBD] rounded-[4px] focus:outline-none"
                       placeholder="Types of Rooms"
                       value={room.type}
                       onChange={(e) =>
@@ -142,7 +145,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                     />
                     <input
                       type="text"
-                      className="h-8 w-[299px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+                      className="h-8 w-[260px] py-2 px-4 text-xs border border-[#BDBDBD] rounded-[4px] focus:outline-none"
                       placeholder="Number of Rooms"
                       value={room.count}
                       onChange={(e) =>
@@ -168,7 +171,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
           <div>
             <label
               htmlFor="number-of-floors"
-              className="block text-sm font-sans font-[450] mb-1"
+              className="block text-sm font-sans font-[600] mb-1"
             >
               Number of Floors
             </label>
@@ -177,7 +180,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
               id="number-of-floors"
               value={numberOfFloors}
               onChange={(e) => handleNumberInput(e, setNumberOfFloors)}
-              className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 w-[623px] py-2 text-xs px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
 
@@ -224,7 +227,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
 
           {error && <p className="text-red-500 fixed bottom-[16%]">{error}</p>}
 
-          <div className="flex justify-between relative top-5">
+          <div className="flex justify-between relative top-[3.5rem]">
             <button
               type="button"
               onClick={handleBackClick}
@@ -243,7 +246,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
         </form>
 
         <div>
-          <div className="w-[515px] relative left-[35%] h-screen bg-white shadow-2xl border-none rounded-lg overflow-hidden">
+          <div className="w-[515px] lg:block hidden relative font-medium left-[26%] h-screen bg-white shadow-2xl border-none rounded-lg">
             <div className="flex gap-5 text-2xl">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
@@ -251,26 +254,29 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
                     num === 4
                       ? "border-[#5C69F8] text-black"
-                      : "text-black bg-white"
+                      : "text-black bg-white border-none"
                   }`}
                 >
                   {num}
                 </div>
               ))}
             </div>
+
+
+
             <img
               className="relative top-36 left-[43.7%]"
-              src="src/assets/Line.svg"
+              src={line}
               alt=""
             />
             <img
               className="relative top-[80%] left-[43.7%]"
-              src="src/assets/Line.svg"
+              src={line}
               alt=""
             />
             <div className="flex flex-col items-center justify-center h-full space-y-4">
               <img
-                src="src/assets/property.svg"
+                src={hotelIcon}
                 alt="Hotel Icon"
                 className="h-24 mb-4 text-[#5663AC]"
               />
@@ -284,7 +290,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                   You can always edit the data in the
                 </span>
                 <br />
-                <span className="font-sans font-[300]">setting menu.</span>
+                <span >setting menu.</span>
               </p>
             </div>
           </div>
