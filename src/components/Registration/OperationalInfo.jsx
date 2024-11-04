@@ -82,7 +82,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-in-time"
               value={checkInTime}
               onChange={(e) => setCheckInTime(e.target.value)}
-              className="h-8 w-[299px] mr-6 py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 w-[182px] lg:w-[299px] mr-6 py-2 px-4 border border-[#BDBDBD] text-xs rounded-[4px]] focus:outline-none"
             />
           </div>
 

@@ -53,7 +53,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden ">
-      <div className="flex flex-col lg:flex-row  justify-center items-center gap-24 lg:ml-[5.1rem]">
+      <div className="flex flex-col lg:flex-row  justify-center items-center gap-24 lg:ml-[5.1rem] m-auto">
       <div className="flex lg:hidden gap-2 mb-4">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
@@ -86,9 +86,9 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
         </div>
 
       
-        <form className="space-y-7">
+        <form className="space-y-7 ">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-medium hidden lg:block">Contact & Location</h1>
+            <h1 className="text-[32px] font-[600] hidden lg:block">Contact & Location</h1>
           </div>
 
           <div>

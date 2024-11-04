@@ -91,10 +91,40 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
 
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
-      <div className="flex justify-center items-center gap-[5rem] ml-20">
-        <form className="space-y-7 bottom-5 relative">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-24 ml-20">
+      <div className="flex lg:hidden gap-2 mb-4">
+          {[1, 2, 3, 4, 5, 6].map((num) => (
+            <div
+              key={num}
+              className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
+                num === 4 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
+              }`}
+            >
+              {num}
+            </div>
+          ))}
+        </div>
+
+        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
+          <img
+            src={hotelIcon}
+            alt="Hotel Icon"
+            className="h-[96] mb-4 text-[#5663AC]"
+          />
+          <h2 className="text-[24px] font-[500] font-Montserrat">
+            Property Details
+          </h2>
+          <p className="font-sans font-[400] text-center">
+            Fill out the form below.
+            <br />
+            You can always edit the data in the
+            <br />
+            settings menu.
+          </p>
+        </div>
+        <form className="space-y-7 bottom-5 relative  ">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-[550]">Property Details</h1>
+            <h1 className="text-[32px] font-[550] lg:block hidden">Property Details</h1>
           </div>
 
           <div>
@@ -109,7 +139,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
               id="number-of-rooms"
               value={numberOfRooms}
               onChange={(e) => handleNumberInput(e, setNumberOfRooms)}
-              className="h-8 text-xs w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
+              className="h-8 text-xs w-[380px] lg:w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
 
@@ -136,7 +166,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                   <div key={index} className="flex items-center gap-4">
                     <input
                       type="text"
-                      className="h-8 w-[299px] py-2 px-4 text-xs border border-[#BDBDBD] rounded-[4px] focus:outline-none"
+                      className="h-8 w-[172px] lg:w-[299px] py-2 px-4 text-xs border border-[#BDBDBD] rounded-[4px] focus:outline-none"
                       placeholder="Types of Rooms"
                       value={room.type}
                       onChange={(e) =>
@@ -145,7 +175,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                     />
                     <input
                       type="text"
-                      className="h-8 w-[260px] py-2 px-4 text-xs border border-[#BDBDBD] rounded-[4px] focus:outline-none"
+                      className="h-8 w-[142px] lg:w-[260px] py-2 px-4 text-xs border border-[#BDBDBD] rounded-[4px] focus:outline-none"
                       placeholder="Number of Rooms"
                       value={room.count}
                       onChange={(e) =>
@@ -180,7 +210,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
               id="number-of-floors"
               value={numberOfFloors}
               onChange={(e) => handleNumberInput(e, setNumberOfFloors)}
-              className="h-8 w-[623px] py-2 text-xs px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
+              className="h-8 w-[380px] lg:w-[623px] py-2 text-xs px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
 
@@ -219,14 +249,14 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                   id="parking-capacity"
                   value={parkingCapacity}
                   onChange={(e) => handleNumberInput(e, setParkingCapacity)}
-                  className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+                  className="h-8 w-[380px] lg:w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
                 />
               </div>
             )}
           </div>
-
-          {error && <p className="text-red-500 fixed bottom-[16%]">{error}</p>}
-
+            <div className="h-0">
+          {error && <p className="text-red-500 relative bottom-[16%]">{error}</p>}
+          </div>
           <div className="flex justify-between relative top-[2rem]">
             <button
               type="button"

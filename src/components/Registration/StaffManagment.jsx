@@ -44,7 +44,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
   };
 
   return (
-    <section className="min-h-screen bg-white flex items-center overflow-hidden">
+    <section className="min-h-screen bg-white flex items-center overflow-hidden justify-center">
       <div className="flex flex-col lg:flex-row justify-center items-center gap-24 ml-20">
       <div className="flex lg:hidden gap-2 mb-4">
           {[1, 2, 3, 4, 5, 6].map((num) => (
@@ -78,11 +78,11 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
           </p>
         </div>
 
-        <form className="space-y-7">
+        <form className="space-y-7  relative ">
           <div className="flex justify-between items-center">
             <h1 className="text-[32px] font-[600] lg:block hidden">Staff Management</h1>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between lg:w-[570px] w-[380px] m-auto">
             <label htmlFor="hotel-name" className="block text-sm font-sans font-[600] text-neutral-950">
               Departments
             </label>
@@ -95,7 +95,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
               <div key={index} className="mb-2 flex items-center gap-2">
                 <input
                   type="text"
-                  className="h-8  py-2 px-4 border text-xs border-[#BDBDBD] rounded-[4px] focus:outline-none w-full"
+                  className="h-8 w-[380px] m-auto py-2 px-4 border text-xs border-[#BDBDBD] rounded-[4px] focus:outline-none lg:w-full"
                   placeholder={`Department ${index + 1}`}
                   value={department}
                   onChange={(e) => handleDepartmentChange(index, e.target.value)}
@@ -111,14 +111,14 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
               </div>
             ))}
           </div> 
-          
+          <div className='h-2'>
           {error && <p className="text-red-500 fixed">{error}</p>}
-
-          <div className='relative top-[5.6rem] '>
+          </div>
+          <div className='lg:relative top-[5.6rem] '>
             <button type="button" onClick={() => { updateFormData({ department_names: departments }); onBack(); }} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] fixed rounded-lg  text-white">
               <span>Back </span>
             </button>
-            <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] rounded-lg text-white font-[700] top-10 ml-[32rem]">
+            <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] rounded-lg text-white font-[700] top-10 ml-[19rem] lg:ml-[32rem]">
               <span>Next </span>
               <span>➔</span>
             </button>

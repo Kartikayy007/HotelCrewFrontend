@@ -7,6 +7,7 @@ import arrow from "../../assets/arrow.svg";
 import eye from "../../assets/eye.svg";
 import eyeClosed from "../../assets/eyeClosed.svg";
 import Frame from "../../assets/Frame.svg";
+import Frame2 from "../../assets/Frame2.svg";
 import {useNavigate} from "react-router-dom";
 
 const SignUp = () => {
@@ -92,10 +93,10 @@ const SignUp = () => {
       return;
     }
 
-    const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
+    const pwdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
     if (!pwdRegex.test(pwd)) {
       setErrorMsg(
-        "The password must include a digit, a lowercase and uppercase character, and a special character"
+        'The password must be at least 8 \ncharacters and include a digit,\na letter and a special character'
       );
       return;
     }
@@ -154,14 +155,21 @@ const SignUp = () => {
 
   return (
     <div>
+      <div className="flex lg:hidden items-center justify-center h-[45vh] w-100vw">
+        <img
+          src={Frame2 }
+          alt="bg"
+          className="w-full h-full object-cover "
+        />
+      </div>
       {showOtpInput ? (
         <div className="flex flex-col items-center justify-center space-y-6 p-8 max-w-[323px]">
-          <h2 className="absolute top-[109px] left-[144px] w-[209px] h-[39px] text-[32px] font-semibold leading-[39px] text-left">
+          <h2 className="lg:absolute top-[109px] left-[144px] w-[209px] h-[39px] text-[32px] font-semibold leading-[39px] lg:text-left text-center mb-5">
             Verify E-mail
           </h2>
 
           <form
-            className="absolute top-[208px] left-[84px] w-[323px] h-[118px] flex flex-col justify-center items-center gap-6"
+            className="w-[323px] h-[118px] flex flex-col justify-center items-center gap-4 lg:gap-6 mt-12 lg:mt-0 lg:absolute lg:top-[208px] lg:left-[84px]"
             onSubmit={handleVerifyOtp}
           >
             <div className="flex space-x-4">
@@ -203,8 +211,8 @@ const SignUp = () => {
             <button
               type="submit"
               disabled={otpLoading}
-              className="w-[88px] h-[88px] rounded-lg flex items-center justify-center
-                        bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 absolute right-2 top-[300px] disabled:cursor-not-allowed"
+              className="lg:w-[88px] lg:h-[88px] w-[180px] h-[58px] rounded-lg flex items-center justify-center
+                        bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 lg:absolute right-2 top-[330px]"
             >
               {otpLoading ? (
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -221,15 +229,15 @@ const SignUp = () => {
           </form>
         </div>
       ) : (
-        <div className="w-[34.5vw] flex flex-col items-center justify-center">
-          <div className="flex flex-col items-start w-full max-w-[303px]">
-            <h1 className="w-[176px] h-[49px] absolute top-[93px] opacity-100 text-[40px] font-bold text-left">
+        <div className="w-[34.5vw] flex flex-col lg:items-center lg:justify-center ">
+          <div className="flex flex-col  w-full lg:max-w-[303px] ">
+            <h1 className="w-[176px] h-[49px] lg:absolute top-[93px]  mt-10 mb-10 text-[40px] font-bold text-center lg:text-left">
               Register
             </h1>
 
             <form
               onSubmit={handleSubmit}
-              className="w-[303px] h-[220px] absolute top-[201px] gap-9 flex flex-col p-1 mb-0"
+              className="w-full lg:w-[303px] h-[220px] lg:absolute top-[201px] gap-9 flex flex-col p-1 mb-0 "
             >
               <div className="relative w-full">
                 <input
@@ -256,6 +264,7 @@ const SignUp = () => {
                   type="text"
                   id="email"
                   autoComplete="off"
+                  maxLength={100}
                   placeholder={
                     errorMsg === "Enter all fields" && !email
                       ? "Enter E-mail"
@@ -284,7 +293,7 @@ const SignUp = () => {
                   }
                   onChange={handleInputChange(setPwd)}
                   value={pwd}
-                  maxLength={12}
+                  maxLength={24}
                   className={`w-full border-b transition duration-200 
                         focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2 ${
                           (errorMsg === "Enter all fields" && !pwd) ||
@@ -312,7 +321,7 @@ const SignUp = () => {
                   placeholder="Confirm Password"
                   onChange={handleInputChange(setMatchPwd)}
                   value={matchPwd}
-                  maxLength={12}
+                  maxLength={24}
                   className={`w-full border-b transition duration-200 
                        focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2 ${
                          (errorMsg === "Passwords do not match" &&
@@ -332,12 +341,8 @@ const SignUp = () => {
                   />
                 </span>
               </div>
-              <div className="absolute top-[270px]">
-                {errorMsg && (
-                  <div className="text-red-500 w-[14%] text-sm fixed top-[490px]">{errorMsg}</div>
-                )}
-              </div>
-              <div className="text-center absolute  top-[250px] w-full">
+              
+              <div className="text-center lg:absolute  top-[250px] w-full">
                 <span className="text-sm text-gray-500">
                   Already have an account?{" "}
                 </span>
@@ -349,12 +354,17 @@ const SignUp = () => {
                   Log in
                 </button>
               </div>
+              <div className="h-2 lg:absolute top-[270px]">
+                {errorMsg && (
+                  <div className="text-red-500 w-[14%] text-sm lg:fixed top-[490px] whitespace-pre-wrap">{errorMsg}</div>
+                )}
+              </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-[88px] h-[88px] rounded-lg flex items-center justify-center
-                        bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 absolute right-2 top-[330px]"
+                className="lg:w-[88px] lg:h-[88px] w-[180px] h-[58px] rounded-lg flex items-center justify-center
+                        bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 lg:absolute right-2 top-[330px]"
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -366,7 +376,7 @@ const SignUp = () => {
           </div>
         </div>
       )}
-      <div className="lg:w-[65.5vw] w-full h-72 lg:h-full bg-right bg-cover lg:fixed lg:top-0 lg:right-0 mt-4 lg:mt-0">
+      <div className="hidden lg:block lg:w-[65.5vw] w-full h-72 lg:h-full bg-right bg-cover lg:fixed lg:top-0 lg:right-0 mt-4 lg:mt-0">
         <img
           src={Frame}
           alt="bg"
