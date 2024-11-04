@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import hotelIcon from '../../assets/hotel.svg';
-import lineIcon from '../../assets/line.svg';
+import lineIcon from '../../assets/Line.svg';
 
 const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
   const [hotelName, setHotelName] = useState('');

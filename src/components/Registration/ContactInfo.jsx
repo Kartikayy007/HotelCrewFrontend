@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import contactIcon from "../../assets/contact.svg";
-import lineIcon from '../../assets/line.svg';
+import lineIcon from '../../assets/Line.svg';
 
 
 function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
@@ -26,7 +26,6 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
       return;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailAddress)) {
       setError('Please enter a valid email address.');
