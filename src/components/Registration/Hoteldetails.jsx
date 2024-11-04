@@ -77,9 +77,9 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           </p>
         </div>
 
-        <form className="space-y-7">
+        <form className="space-y-7 ">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-[600] hidden lg:block">Hotel Information</h1>
+            <h1 className="text-[32px] font-[600] hidden lg:block lg:text-left">Hotel Information</h1>
           </div>
 
           <div>
@@ -94,7 +94,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               id="hotel-name"
               value={hotelName}
               onChange={(e) => setHotelName(e.target.value)}
-              className="h-8 lg:w-[623px] w-[380px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
+              className="h-8 lg:w-[623px] w-[380px] py-2 px-4 text-xs border border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
 
@@ -110,7 +110,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               id="legal-business-name"
               value={legalBusinessName}
               onChange={(e) => setLegalBusinessName(e.target.value)}
-              className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 w-[380px] lg:w-[623px] py-2 px-4 border text-xs border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
 
@@ -128,14 +128,14 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               onChange={handleYearInput}
               placeholder="YYYY"
               maxLength={4}
-              className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 w-[380px] lg:w-[623px] py-2 px-4 border text-xs border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
 
           <div>
             <label
               htmlFor="license-registration-numbers"
-              className="block text-sm font-sans font-[450] mb-1"
+              className="block text-sm font-sans font-[600] mb-1"
             >
               License/Registration Numbers*
             </label>
@@ -144,16 +144,16 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               id="license-registration-numbers"
               value={licenseRegistrationNumbers}
               onChange={(e) => setLicenseRegistrationNumbers(e.target.value)}
-              className="h-8 w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+              className="h-8 w-[380px] lg:w-[623px] py-2 px-4 border text-xs border-[#BDBDBD] rounded-[4px] focus:outline-none"
             />
           </div>
 
           {error && <p className="text-red-500 fixed">{error}</p>}
 
-          <div className='relative top-[0.89rem]'>
+          <div className=' relative top-[0.89rem]'>
             <button 
               onClick={handleNextClick} 
-              className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white relative top-10 ml-[32rem]"
+              className="lg:absolute lg:bottom-[0px] h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white  relative top-0 mx-auto lg:ml-[32rem]"
             >
               <span>Next </span>
               <span>➔</span>

@@ -304,13 +304,13 @@ const Login = () => {
                   onClick={() => navigate('/signup')}
                   className="text-sm text-[#5663AC] hover:text-[#6773AC] font-medium"
                 >
-                  Sign up
+                  Register
                 </button>
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors lg:ml-[215px] top-10 relative w-[180px] h-[58px] m-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                className="lg:w-[88px]  h- lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors lg:ml-[215px] top-10 relative w-[180px] h-[58px] m-auto disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
