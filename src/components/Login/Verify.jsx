@@ -117,7 +117,6 @@ const Verify = ({ email }) => {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen font-Montserrat">
       <div className="flex lg:hidden items-center justify-center h-[45vh] bg-[#8094D4] w-100vw">
-      {/* Mobile Layout for Image Above Form */}
       <img className="w-full h-full object-fill" src="src/assets/web2 1.svg" alt="Login Hero" />
     </div>
       {showOtpInput ? (
@@ -243,8 +242,8 @@ const Verify = ({ email }) => {
         </div>
       )}
 
-      <div className="hidden lg:flex items-center justify-center w-full max-w-[945px] h-auto bg-[#8094D4]">
-        <img className="h-auto" src="src/assets/web2 1.svg" alt="Login Hero" />
+      <div className=" lg:flex w-full lg:w-[95vw] items-center justify-center h-[380px] lg:h-auto bg-[#8094D4]">
+        <img className="h-full" src="src/assets/web2 1.svg" alt="Login Hero" />
       </div>
     </div>
   );

@@ -1,6 +1,4 @@
-// MultiStepForm.jsx
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import axios from 'axios';
 import Hoteldetails from './Hoteldetails';
 import ContactInfo from './ContactInfo';
@@ -72,12 +70,10 @@ const MultiStepForm = () => {
   };
 
   const transformFormData = () => {
-    // Handle department names
     const departmentNamesArray = Array.isArray(formData.department_names)
       ? formData.department_names
       : formData.department_names.split(',').map(dep => dep.trim());
 
-    // Create base transformed data object
     const transformedData = {
       user: userEmail,
       hotel_name: formData.hotel_name || "",
@@ -117,16 +113,20 @@ const MultiStepForm = () => {
 
       const formDataToSend = new FormData();
 
-      // if (formData.staff_excel_sheet instanceof File) {
-      //   formDataToSend.append('staff_excel_sheet', formData.staff_excel_sheet);
-      //   console.log('Appending Excel file:', formData.staff_excel_sheet.name);
-      // }
+      if (formData.staff_excel_sheet instanceof File) {
+        formDataToSend.append('staff_excel_sheet', formData.staff_excel_sheet);
+        console.log('Appending Excel file:', formData.staff_excel_sheet.name);
+        console.log('File type:', formData.staff_excel_sheet.type);
+        console.log('File size:', formData.staff_excel_sheet.size);
+      }
 
       Object.entries(transformedData).forEach(([key, value]) => {
-        if (key === 'room_types' || key === 'department_names') {
-          formDataToSend.append(key, JSON.stringify(value));
-        } else if (value !== null && value !== undefined) {
-          formDataToSend.append(key, value.toString());
+        if (key !== 'staff_excel_sheet') {
+          if (key === 'room_types' || key === 'department_names') {
+            formDataToSend.append(key, JSON.stringify(value));
+          } else if (value !== null && value !== undefined) {
+            formDataToSend.append(key, value.toString());
+          }
         }
       });
 
@@ -209,7 +209,7 @@ const MultiStepForm = () => {
         case 6:
           return {
             ...newData,
-            staff_excel_sheet: stepData.staff_excel_sheet || null
+            staff_excel_sheet: stepData.staff_excel_sheet 
           };
         default:
           return newData;

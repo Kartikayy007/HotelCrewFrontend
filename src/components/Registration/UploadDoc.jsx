@@ -32,6 +32,10 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     ];
     
+    console.log('Validating file:', file);
+    console.log('File type:', file.type);
+    console.log('File name:', file.name);
+    
     if (!validTypes.includes(file.type) && 
         !file.name.endsWith('.xls') && 
         !file.name.endsWith('.xlsx')) {
@@ -39,8 +43,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
       return false;
     }
 
-    // Check file size (e.g., 5MB limit)
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    const maxSize = 5 * 1024 * 1024; 
     if (file.size > maxSize) {
       setErrorMessage('File size must be less than 5MB');
       return false;
@@ -58,8 +61,12 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
     if (excelFiles.length > 0) {
       const selectedFile = excelFiles[0];
       
+      console.log('Selected file:', selectedFile);
+      console.log('File type:', selectedFile.type);
+      console.log('File size:', selectedFile.size);
+      
       if (validateExcelFile(selectedFile)) {
-        console.log('Selected Excel file:', selectedFile.name);
+        console.log('File validation passed');
         setFiles([selectedFile]);
         updateFormData({ staff_excel_sheet: selectedFile });
       }
@@ -74,13 +81,13 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
     setDragActive(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFiles(Array.from(e.dataTransfer.files));
+      handleFiles(e.dataTransfer.files);
     }
   };
 
   const handleFileInput = (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      handleFiles(Array.from(e.target.files));
+      handleFiles(e.target.files);
     }
   };
 
@@ -99,6 +106,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
       setErrorMessage('Please upload a staff Excel sheet before submitting');
       return;
     }
+    updateFormData({ staff_excel_sheet: files[0] });
     onSubmit();
   };
 

@@ -19,6 +19,7 @@ export const loginUser = createAsyncThunk(
       
       localStorage.setItem('accessToken', tokens.access);
       localStorage.setItem('refreshToken', tokens.refresh);
+      localStorage.setItem('userEmail', userCredentials.email);
       localStorage.removeItem('registrationStarted');
       localStorage.removeItem('multiStepCompleted');
       
