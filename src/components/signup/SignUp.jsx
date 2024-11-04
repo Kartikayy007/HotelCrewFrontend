@@ -289,14 +289,14 @@ const SignUp = () => {
                         focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2 ${
                           (errorMsg === "Enter all fields" && !pwd) ||
                           errorMsg ===
-                            "The password must include a digit, a lowercase and uppercase character, and a special character"
+                            "The password must include a digit, a Lowercase and Uppercase character, and a special character"
                             ? "border-red-500 placeholder-red-500 text-red-500"
                             : "border-gray-500 placeholder-gray-500"
                         }`}
                 />
                 <span
                   onClick={() => setShowPwd(!showPwd)}
-                  className="absolute right-0 top-1/3 transform -translate-y-1/2 cursor-pointer pr-2"
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 cursor-pointer pr-2"
                 >
                   <img
                     src={showPwd ? eye : eyeClosed}
@@ -324,7 +324,7 @@ const SignUp = () => {
                 />
                 <span
                   onClick={() => setShowMatchPwd(!showMatchPwd)}
-                  className="absolute right-0 top-1/3 transform -translate-y-1/2 cursor-pointer pr-2"
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 cursor-pointer pr-2"
                 >
                   <img
                     src={showMatchPwd ? eye : eyeClosed}
@@ -334,7 +334,7 @@ const SignUp = () => {
               </div>
               <div className="absolute top-[270px]">
                 {errorMsg && (
-                  <div className="text-red-500 text-sm fixed top-[490px]">{errorMsg}</div>
+                  <div className="text-red-500 w-[14%] text-sm fixed top-[490px]">{errorMsg}</div>
                 )}
               </div>
               <div className="text-center absolute  top-[250px] w-full">

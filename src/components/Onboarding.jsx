@@ -46,10 +46,10 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const images = [
-    "/src/assets/slide1.svg",
-    "/src/assets/slide2.svg",
-    "/src/assets/slide3.svg",
     "/src/assets/hotelcrewlogo.svg",
+    "/src/assets/slide3.svg",
+    "/src/assets/slide2.svg",
+    "/src/assets/slide1.svg",
   ];
 
   const nextSlide = () => {
@@ -102,7 +102,7 @@ const Onboarding = () => {
           </button>
         </div>
       </div>
-      <div className="relative w-[50vw] h-full">
+      <div className="relative w-[50vw] h-full mr-9">
         <div className="relative h-full w-full">
           {images.map((img, index) => (
             <div
