@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// MultiStepForm.jsx
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import Hoteldetails from './Hoteldetails';
@@ -10,11 +11,11 @@ import UploadDoc from './UploadDoc';
 import { useNavigate } from 'react-router-dom';
 
 const MultiStepForm = () => {
-  const email = useSelector(state => state.user.email);
+  const userEmail = localStorage.getItem('userEmail');
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    user: email,
+    user: userEmail,
     hotel_name: "",
     legal_business_name: "",
     year_established: "",
@@ -32,10 +33,19 @@ const MultiStepForm = () => {
     payment_methods: "",
     room_price: "",
     number_of_departments: "",
-    department_names: [],  
+    department_names: [],
     staff_excel_sheet: null,
     room_types: []
   });
+
+  useEffect(() => {
+    if (userEmail) {
+      setFormData(prev => ({
+        ...prev,
+        user: userEmail
+      }));
+    }
+  }, [userEmail]);
 
   const handleNext = () => {
     setCurrentStep(prev => prev + 1);
@@ -48,9 +58,8 @@ const MultiStepForm = () => {
   const formatTime = (timeStr) => {
     if (!timeStr) return null;
     const parts = timeStr.split(':');
-    return parts.length === 2 ? `${timeStr}:00` : timeStr;  
+    return parts.length === 2 ? `${timeStr}:00` : timeStr;
   };
-  
 
   const safeParseInt = (value) => {
     const parsed = parseInt(value);
@@ -63,12 +72,14 @@ const MultiStepForm = () => {
   };
 
   const transformFormData = () => {
-    const departmentNamesArray = Array.isArray(formData.department_names) 
-      ? formData.department_names 
+    // Handle department names
+    const departmentNamesArray = Array.isArray(formData.department_names)
+      ? formData.department_names
       : formData.department_names.split(',').map(dep => dep.trim());
-  
+
+    // Create base transformed data object
     const transformedData = {
-      user: formData.user || "",
+      user: userEmail,
       hotel_name: formData.hotel_name || "",
       legal_business_name: formData.legal_business_name || "",
       year_established: safeParseInt(formData.year_established),
@@ -80,42 +91,48 @@ const MultiStepForm = () => {
       total_number_of_rooms: safeParseInt(formData.total_number_of_rooms),
       number_of_floors: safeParseInt(formData.number_of_floors),
       valet_parking_available: Boolean(formData.valet_parking_available),
-      valet_parking_capacity: formData.valet_parking_available 
-        ? formData.valet_parking_capacity 
-        : "",
+      valet_parking_capacity: formData.valet_parking_available ? formData.valet_parking_capacity : "",
       check_in_time: formatTime(formData.check_in_time),
       check_out_time: formatTime(formData.check_out_time),
-      payment_methods: formData.payment_methods,
+      payment_methods: formData.payment_methods || "",
       room_price: safeParseFloat(formData.room_price),
       number_of_departments: safeParseInt(formData.number_of_departments),
       department_names: departmentNamesArray,
-      room_types: Array.isArray(formData.room_types) ? formData.room_types.map(type => ({
-        room_type: type.type || "",
-        count: safeParseInt(type.count) || 0
-      })) : []
+      room_types: Array.isArray(formData.room_types) 
+        ? formData.room_types.map(type => ({
+            room_type: type.type || "",
+            count: safeParseInt(type.count) || 0
+          }))
+        : [],
+      staff_excel_sheet: formData.staff_excel_sheet
     };
-  
+
     return transformedData;
   };
 
   const handleSubmit = async () => {
     try {
       const transformedData = transformFormData();
-      console.log('Transformed data:', transformedData);
+      console.log('Preparing to submit form data:', transformedData);
 
       const formDataToSend = new FormData();
 
-      if (formData.staff_excel_sheet instanceof File) {
-        formDataToSend.append('staff_excel_sheet', formData.staff_excel_sheet);
-      }
+      // if (formData.staff_excel_sheet instanceof File) {
+      //   formDataToSend.append('staff_excel_sheet', formData.staff_excel_sheet);
+      //   console.log('Appending Excel file:', formData.staff_excel_sheet.name);
+      // }
 
       Object.entries(transformedData).forEach(([key, value]) => {
         if (key === 'room_types' || key === 'department_names') {
           formDataToSend.append(key, JSON.stringify(value));
-        } else if (key !== 'staff_excel_sheet') {
-          formDataToSend.append(key, value?.toString() || '');
+        } else if (value !== null && value !== undefined) {
+          formDataToSend.append(key, value.toString());
         }
       });
+
+      for (let pair of formDataToSend.entries()) {
+        console.log('FormData entry:', pair[0], pair[1]);
+      }
 
       const response = await axios.post(
         'https://hotelcrew-1.onrender.com/api/hoteldetails/register/',
@@ -131,15 +148,13 @@ const MultiStepForm = () => {
         console.log('Form submitted successfully:', response.data);
         localStorage.setItem('registrationComplete', 'true');
         localStorage.setItem('multiStepCompleted', 'true');
-        alert('Hotel registered!');
+        alert('Hotel registered successfully!');
         navigate('/login');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      const errorData = error.response?.data;
-      if (errorData) {
-        console.error('Validation errors:', errorData);
-      }
+      console.error('Error response:', error.response?.data);
+      alert('Error submitting form. Please check all required fields and try again.');
     }
   };
 
@@ -194,7 +209,7 @@ const MultiStepForm = () => {
         case 6:
           return {
             ...newData,
-            documents: stepData
+            staff_excel_sheet: stepData.staff_excel_sheet || null
           };
         default:
           return newData;

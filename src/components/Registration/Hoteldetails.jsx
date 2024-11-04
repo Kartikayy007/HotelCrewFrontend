@@ -20,7 +20,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
 
   const handleNextClick = (e) => {
     e.preventDefault();
-    if (!hotelName || !yearEstablished || !licenseRegistrationNumbers) {
+    if (!hotelName || !yearEstablished || !licenseRegistrationNumbers || !legalBusinessName) {
       setError('Please fill out all required fields.');
       return;
     }
@@ -103,7 +103,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               htmlFor="legal-business-name"
               className="block text-sm font-sans font-[600] mb-1"
             >
-              Legal Business Name (optional)
+              Legal Business Name 
             </label>
             <input
               type="text"

@@ -113,6 +113,8 @@ const SignUp = () => {
       confirm_password: matchPwd,
     };
 
+    localStorage.setItem('userEmail', email);
+
     dispatch(registerUser(userCredentials)).then((result) => {
       if (registerUser.fulfilled.match(result)) {
         console.log("registered");

@@ -45,6 +45,7 @@ export const registerUser = createAsyncThunk(
       const response = await request.data;
       
       localStorage.setItem('registrationStarted', 'true');
+      localStorage.setItem(email, userCredentials.email);
       
       return response;
     } catch (error) {
