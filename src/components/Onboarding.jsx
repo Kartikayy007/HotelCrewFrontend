@@ -46,10 +46,10 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const images = [
-    "/src/assets/hotelcrewlogo.svg",
-    "/src/assets/slide3.svg",
-    "/src/assets/slide2.svg",
-    "/src/assets/slide1.svg",
+    "/assets/hotelcrewlogo.svg",
+    "/assets/slide3.svg",
+    "/assets/slide2.svg",
+    "/assets/slide1.svg",
   ];
 
   const nextSlide = () => {
