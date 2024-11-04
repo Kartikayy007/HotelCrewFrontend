@@ -186,7 +186,7 @@ const Login = () => {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen font-Montserrat overflow-hidden">
       <div className="flex lg:hidden items-center justify-center h-[45vh] bg-[#8094D4] w-100vw">
-        <img className="w-full h-full object-fill" src="public/web2 1.svg" alt="Login Hero" />
+        <img className="w-full h-full object-fill" src="/web2 1.svg" alt="Login Hero" />
       </div>
       {showForgotPassword ? (
         <div className="w-full lg:w-1/2 flex items-center justify-center">
