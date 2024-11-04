@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../Redux/slices/UserSlice";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Verify from "./Verify";
 import validator from 'validator';
@@ -16,6 +17,7 @@ const Login = () => {
   const [showVerify, setShowVerify] = useState(false);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.user);
 
   const validateEmail = useCallback((email) => {
@@ -71,16 +73,18 @@ const Login = () => {
         setEmail("");
         setPassword("");
         setErrorMsg("");
+
+        navigate('/dashboard');
       } else {
         loginAttempts.count += 1;
         loginAttempts.timestamp = now;
         localStorage.setItem('loginAttempts', JSON.stringify(loginAttempts));
         
-        throw new Error(result.error?.message || "Invalid credentials");
+        throw new Error("Invalid credentials");
       }
     } catch (error) {
       console.error("Login error:", error);
-      setErrorMsg(error.response?.data?.message || "Login failed. Please try again.");
+      setErrorMsg("Invalid credentials");
       
       setPassword("");
     }
@@ -238,7 +242,7 @@ const Login = () => {
               </div>
 
               {errorMsg && (
-                <div className="text-red-500 text-sm" role="alert">
+                <div className="text-red-500 text-sm fixed top-[55%]" role="alert">
                   {errorMsg}
                 </div>
               )}

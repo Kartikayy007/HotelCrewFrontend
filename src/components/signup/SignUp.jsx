@@ -7,9 +7,11 @@ import arrow from "../../assets/arrow.svg";
 import eye from "../../assets/eye.svg";
 import eyeClosed from "../../assets/eyeClosed.svg";
 import Frame from "../../assets/Frame.svg";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { loading, error } = useSelector((state) => state.user);
     const { loading: otpLoading, error: otpError, otpResent } = useSelector((state) => state.otp);
 
@@ -122,6 +124,8 @@ const SignUp = () => {
         dispatch(verifyOtp({ email, otp: otp.join('') })).then((result) => {
             if (verifyOtp.fulfilled.match(result)) {
                 console.log("OTP verified");
+                localStorage.setItem('otpVerified', 'true');
+                navigate('/signup/hoteldetails')
             } else {
                 otpSetErrorMsg(result.payload.message || "OTP verification failed");
             }

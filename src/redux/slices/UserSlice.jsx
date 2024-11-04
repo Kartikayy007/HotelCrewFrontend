@@ -2,10 +2,9 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 export const loginUser = createAsyncThunk(
-  'user/loginUser', 
+  'user/loginUser',
   async (userCredentials, { rejectWithValue }) => {
-    try { 
-      console.log(userCredentials);
+    try {
       const request = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/login/",
         userCredentials,
@@ -14,15 +13,15 @@ export const loginUser = createAsyncThunk(
             'Content-Type': 'application/json'
           }
         }
-      ); 
+      );
       const response = await request.data;
-
       const { tokens } = response;
+      
       localStorage.setItem('accessToken', tokens.access);
       localStorage.setItem('refreshToken', tokens.refresh);
-
-      console.log(response);
-
+      localStorage.removeItem('registrationStarted');
+      localStorage.removeItem('multiStepCompleted');
+      
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Login failed' });
@@ -34,7 +33,6 @@ export const registerUser = createAsyncThunk(
   'user/registerUser',
   async (userCredentials, { rejectWithValue }) => {
     try {
-      console.log(userCredentials);
       const request = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/registrationOTP/",
         userCredentials,
@@ -45,35 +43,49 @@ export const registerUser = createAsyncThunk(
         }
       );
       const response = await request.data;
-
-      console.log(response);
-
+      
+      localStorage.setItem('registrationStarted', 'true');
+      
       return response;
     } catch (error) {
-      console.log(error);
-      return rejectWithValue({ message: 'User with this E-mail alreay exists' });
+      return rejectWithValue({ message: 'User with this E-mail already exists' });
     }
   }
 );
 
+// export const completeMultiStepForm = createAsyncThunk(
+//   'user/completeMultiStepForm',
+//   async (formData, { rejectWithValue }) => {
+//     try {
+//       localStorage.setItem('multiStepCompleted', 'true');
+//       return formData;
+//     } catch (error) {
+//       return rejectWithValue({ message: 'Failed to save hotel details' });
+//     }
+//   }
+// );
+
 const userSlice = createSlice({
   name: 'user',
-
   initialState: {
     email: null,
     error: null,
     loading: false,
+    registrationStep: null,
   },
-
   reducers: {
     clearError: (state) => {
       state.error = null;
-    }
+    },
+    logout: (state) => {
+      state.email = null;
+      state.error = null;
+      localStorage.clear();
+    },
   },
-
   extraReducers: (builder) => {
     builder
-      // Existing loginUser cases
+      // Login cases
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -88,7 +100,7 @@ const userSlice = createSlice({
         state.email = null;
         state.error = action.payload?.message || 'Login failed';
       })
-      // New registerUser cases
+      // Register cases
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -102,8 +114,13 @@ const userSlice = createSlice({
         state.loading = false;
         state.email = null;
         state.error = action.payload?.message || 'Registration failed';
+      })
+      // MultiStep form cases
+      .addCase(completeMultiStepForm.fulfilled, (state) => {
+        state.registrationStep = 'completed';
       });
   },
 });
 
+export const { clearError, logout } = userSlice.actions;
 export default userSlice.reducer;

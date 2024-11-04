@@ -7,9 +7,11 @@ import StaffManagement from './StaffManagment';
 import Property from './Property';
 import OperationalInfo from './OperationalInfo';
 import UploadDoc from './UploadDoc';
+import { useNavigate } from 'react-router-dom';
 
 const MultiStepForm = () => {
   const email = useSelector(state => state.user.email);
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     user: email,
@@ -43,7 +45,6 @@ const MultiStepForm = () => {
     setCurrentStep(prev => prev - 1);
   };
 
-  // Helper function to validate and format time
   const formatTime = (timeStr) => {
     if (!timeStr) return null;
     const parts = timeStr.split(':');
@@ -51,7 +52,6 @@ const MultiStepForm = () => {
   };
   
 
-  // Function to safely parse numbers
   const safeParseInt = (value) => {
     const parsed = parseInt(value);
     return isNaN(parsed) ? null : parsed;
@@ -62,7 +62,6 @@ const MultiStepForm = () => {
     return isNaN(parsed) ? null : parsed;
   };
 
-  // Function to transform form data into API format
   const transformFormData = () => {
     const departmentNamesArray = Array.isArray(formData.department_names) 
       ? formData.department_names 
@@ -106,12 +105,10 @@ const MultiStepForm = () => {
 
       const formDataToSend = new FormData();
 
-      // Handle file upload
       if (formData.staff_excel_sheet instanceof File) {
         formDataToSend.append('staff_excel_sheet', formData.staff_excel_sheet);
       }
 
-      // Add the rest of the data
       Object.entries(transformedData).forEach(([key, value]) => {
         if (key === 'room_types' || key === 'department_names') {
           formDataToSend.append(key, JSON.stringify(value));
@@ -132,14 +129,14 @@ const MultiStepForm = () => {
 
       if (response.status === 201) {
         console.log('Form submitted successfully:', response.data);
-        // Add success handling here (e.g., show success message, redirect)
+        localStorage.setItem('registrationComplete', 'true');
+        localStorage.setItem('multiStepCompleted', 'true');
+        navigate('/login');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
       const errorData = error.response?.data;
-      // Handle validation errors
       if (errorData) {
-        // You can add error handling UI here
         console.error('Validation errors:', errorData);
       }
     }
