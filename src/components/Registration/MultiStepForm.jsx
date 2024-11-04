@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import axios from 'axios';
 import Hoteldetails from './HotelDetails';
 import ContactInfo from './ContactInfo';
@@ -8,14 +9,30 @@ import OperationalInfo from './OperationalInfo';
 import UploadDoc from './UploadDoc';
 
 const MultiStepForm = () => {
+  const email = useSelector(state => state.user.email);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    hotelInfo: {},
-    contactInfo: {},
-    staffInfo: {},
-    propertyDetails: {},
-    operationalInfo: {},
-    documents: [] 
+    user: email,
+    hotel_name: "",
+    legal_business_name: "",
+    year_established: "",
+    license_registration_numbers: "",
+    complete_address: "",
+    main_phone_number: "",
+    emergency_phone_number: "",
+    email_address: "",
+    total_number_of_rooms: "",
+    number_of_floors: "",
+    valet_parking_available: false,
+    valet_parking_capacity: "",
+    check_in_time: "",
+    check_out_time: "",
+    payment_methods: "",
+    room_price: "",
+    number_of_departments: "",
+    department_names: [],  
+    staff_excel_sheet: null,
+    room_types: []
   });
 
   const handleNext = () => {
@@ -26,47 +43,175 @@ const MultiStepForm = () => {
     setCurrentStep(prev => prev - 1);
   };
 
+  // Helper function to validate and format time
+  const formatTime = (timeStr) => {
+    if (!timeStr) return null;
+    const parts = timeStr.split(':');
+    return parts.length === 2 ? `${timeStr}:00` : timeStr;  // Add seconds if missing
+  };
+  
+
+  // Function to safely parse numbers
+  const safeParseInt = (value) => {
+    const parsed = parseInt(value);
+    return isNaN(parsed) ? null : parsed;
+  };
+
+  const safeParseFloat = (value) => {
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? null : parsed;
+  };
+
+  // Function to transform form data into API format
+  const transformFormData = () => {
+    const departmentNamesArray = Array.isArray(formData.department_names) 
+      ? formData.department_names 
+      : formData.department_names.split(',').map(dep => dep.trim());
+  
+    const transformedData = {
+      user: formData.user || "",
+      hotel_name: formData.hotel_name || "",
+      legal_business_name: formData.legal_business_name || "",
+      year_established: safeParseInt(formData.year_established),
+      license_registration_numbers: formData.license_registration_numbers || "",
+      complete_address: formData.complete_address || "",
+      main_phone_number: formData.main_phone_number || "",
+      emergency_phone_number: formData.emergency_phone_number || "",
+      email_address: formData.email_address || "",
+      total_number_of_rooms: safeParseInt(formData.total_number_of_rooms),
+      number_of_floors: safeParseInt(formData.number_of_floors),
+      valet_parking_available: Boolean(formData.valet_parking_available),
+      valet_parking_capacity: formData.valet_parking_available 
+        ? formData.valet_parking_capacity 
+        : "",
+      check_in_time: formatTime(formData.check_in_time),
+      check_out_time: formatTime(formData.check_out_time),
+      payment_methods: formData.payment_methods,
+      room_price: safeParseFloat(formData.room_price),
+      number_of_departments: safeParseInt(formData.number_of_departments),
+      department_names: departmentNamesArray,
+      room_types: Array.isArray(formData.room_types) ? formData.room_types.map(type => ({
+        room_type: type.type || "",
+        count: safeParseInt(type.count) || 0
+      })) : []
+    };
+  
+    return transformedData;
+  };
+
   const handleSubmit = async () => {
     try {
-      console.log('Final form data:', formData);
+      const transformedData = transformFormData();
+      console.log('Transformed data:', transformedData);
 
       const formDataToSend = new FormData();
-      formDataToSend.append('hotelInfo', JSON.stringify(formData.hotelInfo));
-      formDataToSend.append('contactInfo', JSON.stringify(formData.contactInfo));
-      formDataToSend.append('staffInfo', JSON.stringify(formData.staffInfo));
-      formDataToSend.append('propertyDetails', JSON.stringify(formData.propertyDetails));
-      formDataToSend.append('operationalInfo', JSON.stringify(formData.operationalInfo));
 
-      formData.documents.forEach((file, index) => {
-        formDataToSend.append(`documents[${index}]`, file);
-      });
+      // Handle file upload
+      if (formData.staff_excel_sheet instanceof File) {
+        formDataToSend.append('staff_excel_sheet', formData.staff_excel_sheet);
+      }
 
-      const response = await axios.post('http://localhost:8000/api/hoteldetails/register/', formDataToSend, {
-        headers: {
-          'Content-Type': 'application/json',
+      // Add the rest of the data
+      Object.entries(transformedData).forEach(([key, value]) => {
+        if (key === 'room_types' || key === 'department_names') {
+          formDataToSend.append(key, JSON.stringify(value));
+        } else if (key !== 'staff_excel_sheet') {
+          formDataToSend.append(key, value?.toString() || '');
         }
       });
 
-      console.log('Response:', response);
-      
-      if (response.status !== 201) {
-        throw new Error('Submission failed');
+      const response = await axios.post(
+        'https://hotelcrew-1.onrender.com/api/hoteldetails/register/',
+        formDataToSend,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      );
+
+      if (response.status === 201) {
+        console.log('Form submitted successfully:', response.data);
+        // Add success handling here (e.g., show success message, redirect)
       }
-      
-      
     } catch (error) {
       console.error('Error submitting form:', error);
+      const errorData = error.response?.data;
+      // Handle validation errors
+      if (errorData) {
+        // You can add error handling UI here
+        console.error('Validation errors:', errorData);
+      }
     }
+  };
+
+  const updateFormData = (stepData, step) => {
+    setFormData(prev => {
+      const newData = { ...prev };
+      
+      switch (step) {
+        case 1:
+          return {
+            ...newData,
+            hotel_name: stepData.hotel_name || "",
+            legal_business_name: stepData.legal_business_name || "",
+            year_established: stepData.year_established || "",
+            license_registration_numbers: stepData.license_registration_numbers || ""
+          };
+        case 2:
+          return {
+            ...newData,
+            complete_address: stepData.complete_address || "",
+            main_phone_number: stepData.main_phone_number || "",
+            emergency_phone_number: stepData.emergency_phone_number || "",
+            email_address: stepData.email_address || ""
+          };
+        case 3:
+          return {
+            ...newData,
+            department_names: Array.isArray(stepData.department_names) 
+              ? stepData.department_names 
+              : stepData.department_names.split(',').map(dep => dep.trim()),
+            number_of_departments: safeParseInt(stepData.number_of_departments),
+            staff_excel_sheet: stepData.staff_excel_sheet || null
+          };
+        case 4:
+          return {
+            ...newData,
+            total_number_of_rooms: stepData.total_number_of_rooms || "",
+            number_of_floors: stepData.number_of_floors || "",
+            room_types: Array.isArray(stepData.room_types) ? stepData.room_types : [],
+            valet_parking_capacity: stepData.valet_parking_capacity || ""
+          };
+        case 5:
+          return {
+            ...newData,
+            valet_parking_available: Boolean(stepData.valet_parking_available),
+            valet_parking_capacity: stepData.valet_parking_capacity || "",
+            check_in_time: formatTime(stepData.check_in_time) || "",
+            check_out_time: formatTime(stepData.check_out_time) || "",
+            payment_methods: stepData.payment_methods || "",
+            room_price: stepData.room_price || ""
+          };
+        case 6:
+          return {
+            ...newData,
+            documents: stepData
+          };
+        default:
+          return newData;
+      }
+    });
   };
 
   const renderStep = () => {
     switch (currentStep) {
       case 1:
         return (
-          <Hoteldetails 
+          <Hoteldetails
             onNext={handleNext}
-            updateFormData={(data) => setFormData(prev => ({ ...prev, hotelInfo: data }))}
-            initialData={formData.hotelInfo}
+            updateFormData={(data) => updateFormData(data, 1)}
+            initialData={formData}
           />
         );
       case 2:
@@ -74,8 +219,8 @@ const MultiStepForm = () => {
           <ContactInfo
             onNext={handleNext}
             onBack={handleBack}
-            updateFormData={(data) => setFormData(prev => ({ ...prev, contactInfo: data }))}
-            initialData={formData.contactInfo}
+            updateFormData={(data) => updateFormData(data, 2)}
+            initialData={formData}
           />
         );
       case 3:
@@ -83,8 +228,8 @@ const MultiStepForm = () => {
           <StaffManagement
             onNext={handleNext}
             onBack={handleBack}
-            updateFormData={(data) => setFormData(prev => ({ ...prev, staffInfo: data }))}
-            initialData={formData.staffInfo}
+            updateFormData={(data) => updateFormData(data, 3)}
+            initialData={formData}
           />
         );
       case 4:
@@ -92,8 +237,8 @@ const MultiStepForm = () => {
           <Property
             onNext={handleNext}
             onBack={handleBack}
-            updateFormData={(data) => setFormData(prev => ({ ...prev, propertyDetails: data }))}
-            initialData={formData.propertyDetails}
+            updateFormData={(data) => updateFormData(data, 4)}
+            initialData={formData}
           />
         );
       case 5:
@@ -101,8 +246,8 @@ const MultiStepForm = () => {
           <OperationalInfo
             onNext={handleNext}
             onBack={handleBack}
-            updateFormData={(data) => setFormData(prev => ({ ...prev, operationalInfo: data }))}
-            initialData={formData.operationalInfo}
+            updateFormData={(data) => updateFormData(data, 5)}
+            initialData={formData}
           />
         );
       case 6:
@@ -110,8 +255,8 @@ const MultiStepForm = () => {
           <UploadDoc
             onSubmit={handleSubmit}
             onBack={handleBack}
-            updateFormData={(data) => setFormData(prev => ({ ...prev, documents: data }))}
-            initialData={formData.documents}
+            updateFormData={(data) => updateFormData(data, 6)}
+            initialData={formData}
           />
         );
       default:

@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyOtp, resendOtp } from "../../redux/slices/OtpSlice";
 import { registerUser } from "../../Redux/slices/UserSlice";
-import CryptoJS from 'crypto-js';
 import validator from 'validator';
 import arrow from "../../assets/arrow.svg";
 import eye from "../../assets/eye.svg";
@@ -99,13 +98,11 @@ const SignUp = () => {
         }
 
         setErrorMsg("");
-        const hashedPwd = CryptoJS.SHA256(pwd).toString();
-        const hashedMatchPwd = CryptoJS.SHA256(matchPwd).toString();
         const userCredentials = {
             user_name: user,
             email: email,
-            password: hashedPwd,
-            confirm_password: hashedMatchPwd
+            password: pwd,
+            confirm_password: matchPwd
         };
 
         dispatch(registerUser(userCredentials)).then((result) => {
@@ -132,13 +129,11 @@ const SignUp = () => {
     };
 
     const handleResendOtp = () => {
-        const hashedPwd = CryptoJS.SHA256(pwd).toString();
-        const hashedMatchPwd = CryptoJS.SHA256(matchPwd).toString();
         const userCredentials = {
             user_name: user,
             email: email,
-            password: hashedPwd,
-            confirm_password: hashedMatchPwd
+            password: pwd,
+            confirm_password: matchPwd
         };
         dispatch(resendOtp(userCredentials));
         setTimeLeft(30);
@@ -190,8 +185,8 @@ const SignUp = () => {
                         <button
                             type="submit"
                             disabled={otpLoading}
-                            className="w-[88px] h-[88px] rounded flex items-center justify-center
-                        bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 absolute right-2 top-[300px]"
+                            className="w-[88px] h-[88px] rounded-lg flex items-center justify-center
+                        bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 absolute right-2 top-[300px] disabled:cursor-not-allowed"
                         >
                             {otpLoading ? (
                                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -277,7 +272,7 @@ const SignUp = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-[88px] h-[88px] rounded flex items-center justify-center
+                                className="w-[88px] h-[88px] rounded-lg flex items-center justify-center
                         bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 absolute right-2 top-[330px]"
                             >
                                 {loading ? (

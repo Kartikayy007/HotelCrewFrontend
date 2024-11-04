@@ -1,32 +1,30 @@
 import React, { useState, useEffect } from 'react';
 
 function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
-  const [checkInTime, setCheckInTime] = useState(initialData.checkInTime || '');
-  const [checkOutTime, setCheckOutTime] = useState(initialData.checkOutTime || '');
-  const [paymentMethods, setPaymentMethods] = useState(initialData.paymentMethods || '');
+  const [checkInTime, setCheckInTime] = useState(initialData.check_in_time || '');
+  const [checkOutTime, setCheckOutTime] = useState(initialData.check_out_time || '');
+  const [paymentMethods, setPaymentMethods] = useState(initialData.payment_methods || '');
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (initialData) {
-      setCheckInTime(initialData.checkInTime || '');
-      setCheckOutTime(initialData.checkOutTime || '');
-      setPaymentMethods(initialData.paymentMethods || '');
+      setCheckInTime(initialData.check_in_time || '');
+      setCheckOutTime(initialData.check_out_time || '');
+      setPaymentMethods(initialData.payment_methods || '');
     }
   }, [initialData]);
 
   const handleNextClick = (e) => {
     e.preventDefault();
+  
     if (!checkInTime || !checkOutTime || !paymentMethods) {
       setError('Please fill out all required fields.');
       return;
     }
-    const formData = {
-      checkInTime,
-      checkOutTime,
-      paymentMethods
-    };
-    
-    updateFormData(formData);
+  
+    const formData = { check_in_time: checkInTime, check_out_time: checkOutTime, payment_methods: paymentMethods };
+    console.log('Updating form data with:', formData); // Log data before sending it up
+    updateFormData(formData, 5); // Send data up to parent with step number
     onNext();
   };
 

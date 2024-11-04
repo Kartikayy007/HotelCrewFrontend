@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
 
 function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
-  const [departments, setDepartments] = useState(initialData.departments || ['Housekeeping', 'Security']);
+  const [departments, setDepartments] = useState(['', '', '']);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (initialData.departments) {
-      setDepartments(initialData.departments);
+    if (initialData.department_names && initialData.department_names.length > 0) {
+      setDepartments(initialData.department_names);
     }
   }, [initialData]);
 
@@ -32,7 +32,11 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
       setError('Please fill out all required fields.');
       return;
     }
-    updateFormData({ departments });
+    const departmentData = {
+      department_names: departments,
+      number_of_departments: departments.length
+    };
+    updateFormData(departmentData); 
     onNext();
   };
 
@@ -76,7 +80,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
           {error && <p className="text-red-500 fixed">{error}</p>}
 
           <div className='relative top-[5.6rem] '>
-            <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] fixed rounded-lg  text-white">
+            <button type="button" onClick={() => { updateFormData({ department_names: departments }); onBack(); }} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] fixed rounded-lg  text-white">
               <span>Back </span>
             </button>
             <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] rounded-lg text-white font-[700] top-10 ml-[32rem]">

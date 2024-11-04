@@ -47,8 +47,8 @@ export const registerUser = createAsyncThunk(
       const response = await request.data;
 
       console.log(response);
+
       return response;
-      
     } catch (error) {
       console.log(error);
       return rejectWithValue({ message: 'User with this E-mail alreay exists' });

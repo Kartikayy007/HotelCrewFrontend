@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 
 function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
   const [dragActive, setDragActive] = useState(false);
-  const [files, setFiles] = useState(initialData || []);
+  const [files, setFiles] = useState(initialData?.staff_excel_sheet ? [initialData.staff_excel_sheet] : []);
   const fileInputRef = useRef(null);
 
   const handleDrag = (e) => {
@@ -29,15 +29,18 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
   };
 
   const handleFiles = (fileList) => {
-    const excelFiles = fileList.filter(file => file.name.endsWith('.xls') || file.name.endsWith('.xlsx'));
-    setFiles(excelFiles);
-    updateFormData(excelFiles);
+    const excelFiles = fileList.filter(file => 
+      file.name.endsWith('.xls') || file.name.endsWith('.xlsx')
+    );
+    if (excelFiles.length > 0) {
+      setFiles([excelFiles[0]]); // Only keep the first Excel file
+      updateFormData({ staff_excel_sheet: excelFiles[0] });
+    }
   };
 
   const handleRemoveFile = (index) => {
-    const newFiles = files.filter((_, i) => i !== index);
-    setFiles(newFiles);
-    updateFormData(newFiles);
+    setFiles([]);
+    updateFormData({ staff_excel_sheet: null });
   };
 
   const handleSubmitClick = (e) => {
@@ -48,7 +51,6 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
-
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
       <div className="flex justify-center items-center gap-9 ml-[5.1rem]">
@@ -109,10 +111,17 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
 
           <div className='relative top-[7rem]'>   
             <div className="flex justify-between">
-              <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">
+              <button 
+                type="button" 
+                onClick={onBack} 
+                className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white"
+              >
                 <span>Back </span>
               </button>
-              <button onClick={handleSubmitClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white">
+              <button 
+                onClick={handleSubmitClick} 
+                className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white"
+              >
                 <span>Submit </span>
                 <span>➔</span>
               </button>
