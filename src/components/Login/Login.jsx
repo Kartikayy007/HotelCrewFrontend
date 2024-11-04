@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../Redux/slices/UserSlice";
+import { loginUser } from "../../redux/slices/UserSlice";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Verify from "./Verify";
