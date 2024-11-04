@@ -1,7 +1,7 @@
 import {useState, useRef, useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {verifyOtp, resendOtp} from "../../redux/slices/OtpSlice";
-import {registerUser} from "../../redux/slices/UserSlice";
+import { registerUser } from "../../redux/slices/UserSlice";
 import validator from "validator";
 import arrow from "../../assets/arrow.svg";
 import eye from "../../assets/eye.svg";
