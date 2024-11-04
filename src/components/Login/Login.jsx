@@ -116,6 +116,8 @@ const Login = () => {
         { timeout: 10000 } 
       );
 
+      console.log(response)
+
       resetAttempts.count += 1;
       resetAttempts.timestamp = now;
       localStorage.setItem('resetAttempts', JSON.stringify(resetAttempts));

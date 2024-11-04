@@ -48,7 +48,7 @@ const MultiStepForm = () => {
   const formatTime = (timeStr) => {
     if (!timeStr) return null;
     const parts = timeStr.split(':');
-    return parts.length === 2 ? `${timeStr}:00` : timeStr;  // Add seconds if missing
+    return parts.length === 2 ? `${timeStr}:00` : timeStr;  
   };
   
 
@@ -131,6 +131,7 @@ const MultiStepForm = () => {
         console.log('Form submitted successfully:', response.data);
         localStorage.setItem('registrationComplete', 'true');
         localStorage.setItem('multiStepCompleted', 'true');
+        alert('Hotel registered!');
         navigate('/login');
       }
     } catch (error) {

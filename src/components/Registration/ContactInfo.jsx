@@ -209,7 +209,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
             />
             <img
               className="hidden lg:block relative top-[80%] left-[43.7%]"
-              src="src/assets/Line.svg"
+              src={lineIcon }
               alt=""
             />
 

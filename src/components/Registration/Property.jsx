@@ -227,7 +227,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
 
           {error && <p className="text-red-500 fixed bottom-[16%]">{error}</p>}
 
-          <div className="flex justify-between relative top-[3.5rem]">
+          <div className="flex justify-between relative top-[2rem]">
             <button
               type="button"
               onClick={handleBackClick}
