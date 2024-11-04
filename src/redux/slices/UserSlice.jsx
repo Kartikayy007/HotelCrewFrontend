@@ -52,10 +52,8 @@ export const registerUser = createAsyncThunk(
     } catch (error) {
       if (!error.response) {
         return rejectWithValue({ message: 'Network error. Please check your internet connection and try again.' });
-      } else if (error.response.status === 409) {
-        return rejectWithValue({ message: 'User with this E-mail already exists' });
       } else {
-        return rejectWithValue({ message: 'An unexpected error occurred. Please try again later.' });
+        return rejectWithValue({ message: 'User with this E-mail already exists.' });
       }
     }
   }
