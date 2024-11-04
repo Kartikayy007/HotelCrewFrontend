@@ -3,11 +3,6 @@ import {useDispatch, useSelector} from "react-redux";
 import {verifyOtp, resendOtp} from "../../redux/slices/OtpSlice";
 import { registerUser } from "../../redux/slices/UserSlice";
 import validator from "validator";
-import arrow from "../../assets/arrow.svg";
-import eye from "../../assets/eye.svg";
-import eyeClosed from "../../assets/eyeClosed.svg";
-import Frame from "../../assets/Frame.svg";
-import Frame2 from "../../assets/Frame2.svg";
 import {useNavigate} from "react-router-dom";
 
 const SignUp = () => {
@@ -157,7 +152,7 @@ const SignUp = () => {
     <div>
       <div className="flex lg:hidden items-center justify-center h-[45vh] w-100vw">
         <img
-          src={Frame2 }
+          src="/Frame2.svg"
           alt="bg"
           className="w-full h-full object-cover "
         />
@@ -217,7 +212,7 @@ const SignUp = () => {
               {otpLoading ? (
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
               ) : (
-                <img src={arrow} alt="Submit" />
+                <img src="/arrow.svg" alt="Submit" />
               )}
             </button>
             {otpErrorMsg && (
@@ -308,7 +303,7 @@ const SignUp = () => {
                   className="absolute right-0 top-1/2 transform -translate-y-1/2 cursor-pointer pr-2"
                 >
                   <img
-                    src={showPwd ? eye : eyeClosed}
+                    src={showPwd ? "/eye.svg" : "/eyeClosed.svg"}
                     alt="Toggle Password Visibility"
                   />
                 </span>
@@ -336,7 +331,7 @@ const SignUp = () => {
                   className="absolute right-0 top-1/2 transform -translate-y-1/2 cursor-pointer pr-2"
                 >
                   <img
-                    src={showMatchPwd ? eye : eyeClosed}
+                    src={showMatchPwd ? "/eye.svg" : "/eyeClosed.svg"}
                     alt="Toggle Password Visibility"
                   />
                 </span>
@@ -369,7 +364,7 @@ const SignUp = () => {
                 {loading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
                 ) : (
-                  <img src={arrow} alt="Submit" />
+                  <img src="/arrow.svg" alt="Submit" />
                 )}
               </button>
             </form>
@@ -378,7 +373,7 @@ const SignUp = () => {
       )}
       <div className="hidden lg:block lg:w-[65.5vw] w-full h-72 lg:h-full bg-right bg-cover lg:fixed lg:top-0 lg:right-0 mt-4 lg:mt-0">
         <img
-          src={Frame}
+          src="/Frame.svg"
           alt="bg"
           className="w-full h-full object-cover object-right lg:object-center"
         />
