@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import HotelIcon from '../../assets/operational.svg';
-import lineIcon from '../../assets/Line.svg';
+import HotelIcon from '/operational.svg';
+import lineIcon from '/Line.svg';
 
 
 function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {

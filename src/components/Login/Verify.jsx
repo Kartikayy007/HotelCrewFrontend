@@ -117,7 +117,7 @@ const Verify = ({ email }) => {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen font-Montserrat">
       <div className="flex lg:hidden items-center justify-center h-[45vh] bg-[#8094D4] w-100vw">
-      <img className="w-full h-full object-fill" src="src/assets/web2 1.svg" alt="Login Hero" />
+      <img className="w-full h-full object-fill" src=" /web2 1.svg" alt="Login Hero" />
     </div>
       {showOtpInput ? (
         <div className="w-full lg:w-1/2 flex items-center justify-center">
@@ -172,7 +172,7 @@ const Verify = ({ email }) => {
                 {loading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
                 ) : (
-                  <img src="src/assets/mingcute_arrow-up-fill.svg" alt="Submit" />
+                  <img src=" /mingcute_arrow-up-fill.svg" alt="Submit" />
                 )}
               </button>
             </form>
@@ -199,7 +199,7 @@ const Verify = ({ email }) => {
                     onClick={togglePasswordVisibility}
                   >
                     <img
-                      src={showPassword ? "src/assets/eye-open.svg" : "src/assets/eyeClosed.svg"}
+                      src={showPassword ? " /eye-open.svg" : " /eyeClosed.svg"}
                       alt="Toggle Password Visibility"
                     />
                   </button>
@@ -219,7 +219,7 @@ const Verify = ({ email }) => {
                     onClick={toggleConfirmPasswordVisibility}
                   >
                     <img
-                      src={showConfirmPassword ? "src/assets/eye-open.svg" : "src/assets/eyeClosed.svg"}
+                      src={showConfirmPassword ? " /eye-open.svg" : " /eyeClosed.svg"}
                       alt="Toggle Password Visibility"
                     />
                   </button>
@@ -234,7 +234,7 @@ const Verify = ({ email }) => {
                 {loading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
                 ) : (
-                  <img src="src/assets/mingcute_arrow-up-fill.svg" alt="Submit" />
+                  <img src="/mingcute_arrow-up-fill.svg" alt="Submit" />
                 )}
               </button>
             </form>
@@ -243,7 +243,7 @@ const Verify = ({ email }) => {
       )}
 
       <div className=" lg:flex w-full lg:w-[95vw] items-center justify-center h-[380px] lg:h-auto bg-[#8094D4]">
-        <img className="h-full" src="src/assets/web2 1.svg" alt="Login Hero" />
+        <img className="h-full" src="/web2 1.svg" alt="Login Hero" />
       </div>
     </div>
   );

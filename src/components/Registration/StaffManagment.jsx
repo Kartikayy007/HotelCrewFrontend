@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
-import staffIcon from '../../assets/staff.svg';
-import plus from '../../assets/tabler_plus.svg';
-import lineIcon from '../../assets/Line.svg';
+import staffIcon from '/staff.svg';
+import plus from '/tabler_plus.svg';
+import lineIcon from '/Line.svg';
 
 function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
   const [departments, setDepartments] = useState(['', '', '']);

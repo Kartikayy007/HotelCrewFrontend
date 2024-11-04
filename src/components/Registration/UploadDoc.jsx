@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import doc from '../../assets/documentupload.svg';
-import lineIcon from '../../assets/Line.svg';
-import docupload from '../../assets/docupload.svg';
-import exampleSheet from '../../assets/example.pdf';
+import doc from '/documentupload.svg';
+import lineIcon from '/Line.svg';
+import docupload from '/docupload.svg';
+import exampleSheet from '/example.pdf';
 
 function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
   const [dragActive, setDragActive] = useState(false);

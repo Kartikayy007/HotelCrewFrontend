@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from "react";
 import {Trash2} from "lucide-react";
-import plus from "../../assets/tabler_plus.svg";
-import hotelIcon from "../../assets/property.svg";
-import line from "../../assets/Line.svg";
+import plus from '/tabler_plus.svg';
+import hotelIcon from '/property.svg';
+import line from '/Line.svg';
 
 const Property = ({onNext, onBack, updateFormData, initialData}) => {
   const [roomTypes, setRoomTypes] = useState([]);

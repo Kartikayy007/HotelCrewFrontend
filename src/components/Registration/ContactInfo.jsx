@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import contactIcon from "../../assets/contact.svg";
-import lineIcon from '../../assets/Line.svg';
+import contactIcon from "/contact.svg";
+import lineIcon from '/Line.svg';
 
 
 function ContactInfo({ onNext, onBack, updateFormData, initialData }) {

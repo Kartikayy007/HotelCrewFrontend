@@ -3,10 +3,10 @@ import {useDispatch, useSelector} from "react-redux";
 import {verifyOtp, resendOtp} from "../../redux/slices/OtpSlice";
 import { registerUser } from "../../redux/slices/UserSlice";
 import validator from "validator";
-import arrow from "../../assets/arrow.svg";
-import eye from "../../assets/eye.svg";
-import eyeClosed from "../../assets/eyeClosed.svg";
-import Frame from "../../assets/Frame.svg";
+import arrow from '/arrow.svg';
+import eye from '/eye.svg';
+import eyeClosed from '/eyeClosed.svg';
+import Frame from '/Frame.svg';
 import {useNavigate} from "react-router-dom";
 
 const SignUp = () => {
