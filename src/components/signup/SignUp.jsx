@@ -149,7 +149,7 @@ const SignUp = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col lg:flex-row min-h-screen font-Montserrat overflow-hidden">
       <div className="flex lg:hidden items-center justify-center h-[45vh] w-100vw">
         <img
           src="/Frame2.svg"
@@ -224,17 +224,16 @@ const SignUp = () => {
           </form>
         </div>
       ) : (
-        <div className="lg:w-[34.5vw] flex flex-col lg:items-center lg:justify-center ">
-          <div className="flex flex-col  w-full lg:max-w-[303px] ">
-
-
-            <form
-              onSubmit={handleSubmit}
-              className="w-full lg:w-[303px] h-[220px] relative lg:top-20 top-10 justify-cecnter gap-9 flex flex-col p-2 mb-0 "
-            >
-              <h1 className="w-[176px] h-[49px] text-[40px] font-bold text-center lg:text-left m-auto">
+        <div className="lg:w-[34.5vw] flex flex-col lg:items-center lg:justify-center overflow:hidden">
+          <div className="flex flex-col  w-full  lg:mt-21 mt-8 p-4 lg:p-16  ">
+          <h1 className="text-[40px] font-bold text-center lg:text-left">
                 Register
               </h1>
+            <form
+              onSubmit={handleSubmit}
+              className="w-full  relative lg:top-8 justify-center gap-9 flex flex-col p-2 mb-0 "
+            >
+              
               <div className="relative w-full">
                 <input
                   type="text"
@@ -346,7 +345,7 @@ const SignUp = () => {
                   Log in
                 </button>
               </div>
-              <div className="h-2 mb-3 text-center lg:text-left">
+              <div className="h-2 mb-0 text-center lg:text-left space-y-4 p-2">
                 {errorMsg && (
                   <div className="text-red-500 text-sm ">{errorMsg}</div>
                 )}
@@ -355,7 +354,7 @@ const SignUp = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="lg:w-[88px] lg:h-[88px] w-[180px] h-[58px] rounded-lg flex items-center justify-center bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 "
+                className="lg:w-[88px] lg:h-[88px] w-[180px] mt-[-55px] h-[58px] rounded-lg flex items-center justify-center bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 "
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />

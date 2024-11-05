@@ -190,7 +190,7 @@ const Login = () => {
         <div className="w-full lg:w-1/2 flex items-center justify-center">
           <div className="w-full max-w-md space-y-14 lg:mt-28 mt-8 lg:p-16">
             <h1 className="text-[40px] font-bold text-center lg:text-left">Forgot Password</h1>
-            <form className="w-[311px] relative bottom-4 space-y-5" onSubmit={(e) => e.preventDefault()}>
+            <form className="w-[311px] relative bottom-4 mx-auto lg:space-y-5" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="email"
                 value={email}
@@ -209,6 +209,7 @@ const Login = () => {
                   {errorMsg}
                 </div>
               )}
+              
               <button
                 type="button"
                 onClick={() => {
@@ -219,11 +220,14 @@ const Login = () => {
               >
                 Back to Login
               </button>
+              <div className="flex justify-center lg:justify-end">
+                
+              
               <button
                 type="button"
                 onClick={resetMail}
                 disabled={resetLoading}
-                className="w-full lg:w-[88px] h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors ml-[215px] top-10 relative disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors lg:ml-[215px] top-10 relative disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {resetLoading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -231,6 +235,7 @@ const Login = () => {
                   <img src="/mingcute_arrow-up-fill.svg" alt="Submit" />
                 )}
               </button>
+              </div>
             </form>
           </div>
         </div>
@@ -276,7 +281,7 @@ const Login = () => {
               </div>
 
               {errorMsg && (
-                <div className="text-red-500 text-sm fixed top-[55%]" role="alert">
+                <div className="text-red-500 text-sm fixed text-center lg:text-left lg:top-[55%]" role="alert">
                   {errorMsg}
                 </div>
               )}
