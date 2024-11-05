@@ -133,7 +133,7 @@ const Verify = ({ email }) => {
     </div>
       {showOtpInput ? (
         <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 lg:mt-28 p-4 lg:p-16">
+          <div className="w-full max-w-md space-y-14 lg:mt-28 p-4 lg:p-16 flex flex-col items-center">
             <h2 className="text-[40px] font-bold text-center">Verify OTP</h2>
             <form className="w-[311px] relative bottom-4 text-center space-y-5" onSubmit={handleVerifyOtp}>
               <div className="flex space-x-4">
@@ -175,11 +175,11 @@ const Verify = ({ email }) => {
               </p>
 
               {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
-              
+              <div className="flex lg:justify-end justify-center">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full lg:w-[88px] h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors ml-[215px] top-10 relative"
+                className="w-[180px] h-[58px] lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors "
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -187,6 +187,7 @@ const Verify = ({ email }) => {
                   <img src=" /mingcute_arrow-up-fill.svg" alt="Submit" />
                 )}
               </button>
+              </div>
             </form>
           </div>
         </div>
@@ -199,7 +200,7 @@ const Verify = ({ email }) => {
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    className="w-full p-3 p-2 text-xs pl-4 border-b border-gray-700 focus:outline-none"
+                    className="w-full p-2 text-xs pl-4 border-b border-gray-700 focus:outline-none"
                     placeholder="New Password"
                     value={password}
                   maxLength={20}
@@ -219,7 +220,7 @@ const Verify = ({ email }) => {
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
-                    className="w-full p-3 p-2 text-xs pl-4 border-b border-gray-700 focus:outline-none"
+                    className="w-full p-2 text-xs pl-4 border-b border-gray-700 focus:outline-none"
                     placeholder="Confirm Password"
                     value={confirmPassword}
                   maxLength={20}
@@ -254,7 +255,7 @@ const Verify = ({ email }) => {
         </div>
       )}
 
-      <div className=" lg:flex w-full lg:w-[95vw] items-center justify-center h-[380px] lg:h-auto bg-[#8094D4]">
+      <div className=" hidden lg:flex w-full lg:w-[95vw] items-center justify-center h-[380px] lg:h-auto bg-[#8094D4]">
         <img className="h-full" src="/web2 1.svg" alt="Login Hero" />
       </div>
     </div>
