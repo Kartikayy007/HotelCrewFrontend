@@ -100,6 +100,13 @@ const Verify = ({ email }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      setErrorMessage("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match.");
       return;

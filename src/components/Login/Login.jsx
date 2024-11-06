@@ -188,7 +188,7 @@ const Login = () => {
       </div>
       {showForgotPassword ? (
         <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 lg:mt-28 mt-8 lg:p-16">
+          <div className="w-full max-w-md space-y-14 mt-8 lg:p-16">
             <h1 className="text-[40px] font-bold text-center lg:text-left">Forgot Password</h1>
             <form className="w-[311px] relative bottom-4 mx-auto lg:space-y-5" onSubmit={(e) => e.preventDefault()}>
               <input
@@ -227,7 +227,7 @@ const Login = () => {
                 type="button"
                 onClick={resetMail}
                 disabled={resetLoading}
-                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors lg:ml-[215px] top-10 relative disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors lg:ml-[215px] lg:fixed lg:bottom-40 lg:left-28 relative disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {resetLoading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -313,7 +313,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="lg:w-[88px]  h- lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors lg:ml-[215px] top-10 relative w-[180px] h-[58px] m-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                className="lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors lg:ml-[240px] top-10 relative w-[180px] h-[58px] m-auto disabled:opacity-50 disabled:cursor-not-allowed "
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
