@@ -262,6 +262,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                   className={`h-8 w-full lg:w-[623px] py-2 px-4 border rounded-lg focus:outline-none ${
                     !parkingCapacity && error ? 'border-red-500' : 'border-[#BDBDBD]'
                   } focus:border-purple-500`}
+                  disabled={!valetParking}
                 />
               </div>
             )}
@@ -269,8 +270,8 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
 
           {error && <p className="text-red-500">{error}</p>}
 
-          <div className="fixed bottom-4 left-0 right-0 px-4 lg:px-0 lg:relative lg:top-2 lg:left-auto lg:right-auto">
-            <div className="flex justify-between w-[39rem]">
+          <div className={`fixed bottom-4 left-0 right-0 px-4 lg:px-0 lg:left-auto lg:right-auto lg:fixed ${valetParking ? 'lg:top-[85vh]' : 'lg:top-[80vh]'}`}>
+            <div className="flex justify-between w-[42rem]">
               <button
                 type="button"
                 onClick={handleBackClick}
@@ -280,7 +281,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               </button>
               <button
                 onClick={handleNextClick}
-                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white"
+                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white lg:fixed lg:left-[41.2vw]"
               >
                 <span>Next </span>
                 <span>➔</span>

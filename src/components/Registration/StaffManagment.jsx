@@ -87,7 +87,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
             <label htmlFor="hotel-name" className="block text-sm font-sans font-semibold text-neutral-950">
               Departments
             </label>
-            <button type="button" onClick={handleAddDepartment} className='fixed left-[47%]'>
+            <button type="button" onClick={handleAddDepartment} className='lg:fixed lg:left-[42.8%]'>
               <img src={plus} alt="Add department" />
             </button>
           </div>
@@ -100,7 +100,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
                   className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
                     !department && error ? 'border-red-500' : 'border-[#BDBDBD]'
                   } focus:border-purple-500`}
-                  placeholder={'Department ${index + 1}'}
+                  placeholder={'Department ' + (index + 1)}
                   value={department}
                   onChange={(e) => handleDepartmentChange(index, e.target.value)}
                 />

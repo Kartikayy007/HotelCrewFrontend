@@ -155,7 +155,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
 
           {error && <p className="text-red-500 fixed">{error}</p>}
 
-          <div className="lg:fixed lg:top-[80vh] ">
+          <div className="lg:fixed lg:top-[80vh] text-center">
             <button 
               onClick={handleNextClick} 
               className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white mx-auto lg:ml-[32rem]"
