@@ -9,7 +9,7 @@ import UploadDoc from './UploadDoc';
 import { useNavigate } from 'react-router-dom';
 
 const MultiStepForm = () => {
-  const userEmail = localStorage.getItem('userEmail');
+  const userEmail = localStorage.getItem('id');
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -140,6 +140,7 @@ const MultiStepForm = () => {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         }
       );

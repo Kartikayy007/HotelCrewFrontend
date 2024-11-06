@@ -21,8 +21,10 @@ export const verifyOtp = createAsyncThunk(
           },
         }
       );
-
+      
       console.log("Response:", response.data);
+      localStorage.setItem("id", response.data.user_id);
+      localStorage.setItem("token", response.data.access_token);
       return response.data;
     } catch (error) {
       if (!error.response) {
