@@ -98,7 +98,7 @@ const SignUp = () => {
     const pwdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
     if (!pwdRegex.test(pwd)) {
       setErrorMsg(
-        'The password must be at least 8 characters including a digit,a letter and a special character'
+        'The password must be at least 8 characters including a digit,\na letter and a special character'
       );
       return;
     }
@@ -224,11 +224,11 @@ const SignUp = () => {
               {otpResent && !otpErrorMsg && (
                 <p className="text-green-500 text-sm">{otpResentMessage || "OTP resent successfully"}</p>
               )}
-              <div className="flex justify-center lg:justify-end">
+              {/* <div className="flex justify-center lg:justify-end"> */}
                 <button
                   type="submit"
                   disabled={otpLoading}
-                  className="lg:w-[88px] lg:h-[88px] w-[180px] h-[58px] rounded-lg flex items-center justify-center bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 "
+                  className="lg:w-[88px] lg:h-[88px] w-[180px] h-[58px] fixed lg:top-[88vh] lg:left-[23vw] top-[92vh] left-[30vw]  rounded-lg flex items-center justify-center bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 "
                 >
                   {otpLoading ? (
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -236,14 +236,14 @@ const SignUp = () => {
                     <img src="/arrow.svg" alt="Submit" />
                   )}
                 </button>
-              </div>
+              {/* </div> */}
 
             </form>
           </div>
         </div>
       ) : (
         <div className="lg:w-[34.5vw]  flex flex-col lg:items-center lg:justify-center overflow:hidden">
-          <div className="flex flex-col lg:max-w-[301px]  w-full  lg:mt-21 mt-8 p-4  ">
+          <div className="flex flex-col lg:max-w-[301px]  w-full  lg:mt-21 p-4  ">
             <h1 className="text-[40px] font-bold text-center lg:text-left">
               Register
             </h1>
@@ -363,16 +363,16 @@ const SignUp = () => {
                   Log in
                 </button>
               </div>
-              <div className="h-2 mb-0 text-center lg:text-left  p-2">
+              <div className="h-1 text-center lg:text-left lg:whitespace-pre-wrap">
                 {errorMsg && (
                   <div className="text-red-500 text-sm ">{errorMsg}</div>
                 )}
               </div>
-              <div className="flex justify-center lg:justify-end">
+              {/* <div className="fixed lg:top-[90vh] lg:left-[22vw] top-[90vh] left-[50vw]"> */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="lg:w-[88px] lg:h-[88px] w-[180px] mt-[-55px] h-[58px] rounded-lg flex items-center justify-center bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 "
+                  className="lg:w-[88px] lg:h-[88px] w-[180px] h-[58px] fixed lg:top-[88vh] lg:left-[23vw] top-[92vh] left-[30vw] rounded-lg flex items-center justify-center bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 "
                 >
                   {loading ? (
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -380,7 +380,7 @@ const SignUp = () => {
                     <img src="/arrow.svg" alt="Submit" />
                   )}
                 </button>
-              </div>
+              {/* </div> */}
             </form>
           </div>
         </div>

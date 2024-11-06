@@ -241,7 +241,7 @@ const Verify = ({ email }) => {
               {errorMessage && <p className="text-red-500">{errorMessage}</p>}
               <button
                 type="submit"
-                className="lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors lg:ml-[215px] top-10 relative w-[180px] h-[58px] m-auto  disabled:cursor-not-allowed"
+                className="lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors  w-[180px] h-[58px] m-auto  disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 {loading ? (
