@@ -66,43 +66,9 @@ const Onboarding = () => {
   }, []);
 
   return (
-    <div className="flex justify-between h-screen overflow-hidden items-center">
-      <div className="flex justify-center items-center flex-col w-[411px] h-[322px] mx-auto gap-[72px]">
-        <div className="h-[210px] flex flex-col">
-          <h1 className="text-[24px] font-bold leading-[31.2px] text-center">
-            <TypewriterText text="Welcome to HotelCrew" speed={70} />
-          </h1>
-          <h2 className="text-[18px] font-semibold leading-[25.2px] text-center text-neutral-950 mb-[48px]">
-            <TypewriterText 
-              text="Streamline Your Hotel Operations Today!" 
-              speed={50}
-              delay={1500} 
-            />
-          </h2>
-          <p className="text-[16px] font-semibold leading-[24px] text-center text-[#5B6C78] p-4">
-            <TypewriterText
-              text="HotelCrew is your all-in-one solution for efficient hotel management. Join us to manage staff, communicate seamlessly, and enhance guest experiences."
-              speed={30}
-              delay={3000}
-            />
-          </p>
-        </div>
-        <div className="flex flex-row justify-between w-[411px]">
-          <button
-            className="w-[195px] h-[40px] px-[24px] py-[10px] font-semibold rounded-[8px] text-white bg-[#5663AC] opacity-100 hover:bg-[#4a5b9b] transition duration-200"
-            onClick={() => navigate("/login")}
-          >
-            Log In
-          </button>
-          <button
-            className="w-[195px] h-[40px] px-[10px] py-[10px] font-semibold rounded-[8px] text-white bg-[#5663AC] opacity-100 hover:bg-[#4a5b9b] transition duration-200 ml-[10px]"
-            onClick={() => navigate("/signUp")}
-          >
-            Register
-          </button>
-        </div>
-      </div>
-      <div className="relative w-[50vw] h-full mr-9">
+    <div className="md:flex md:justify-between md:h-screen overflow-hidden md:items-center">
+      {/* Image slider, responsive for small screens */}
+      <div className="w-full h-[40vh] md:w-[50vw] md:h-full mr-0 md:mr-9 order-1 md:order-2">
         <div className="relative h-full w-full">
           {images.map((img, index) => (
             <div
@@ -121,17 +87,17 @@ const Onboarding = () => {
         </div>
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all"
+          className="fixed lg:top-1/2 lg:left-50 top-[20vh] left-50 transform -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all"
         >
           <ChevronLeft className="w-6 h-6 text-[#5663AC]" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all"
+          className="fixed lg:top-1/2 lg:right-4  top-[20vh] right-4 transform -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg transition-all"
         >
           <ChevronRight className="w-6 h-6 text-[#5663AC]" />
         </button>
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+        <div className="fixed lg:bottom-8 lg:left-[70vw] bottom-[60vh] left-1/2 -translate-x-1/2 flex gap-2">
           {images.map((_, index) => (
             <button
               key={index}
@@ -141,6 +107,43 @@ const Onboarding = () => {
               }`}
             />
           ))}
+        </div>
+      </div>
+
+      {/* Text content */}
+      <div className="flex justify-center mt-8 md:mt-0  items-center flex-col w-full md:w-[411px] h-auto md:h-[322px] mx-auto gap-[72px] order-2 md:order-1">
+        <div className="h-auto md:h-[210px] flex flex-col">
+          <h1 className="text-[24px] font-bold leading-[31.2px] text-center">
+            <TypewriterText text="Welcome to HotelCrew" speed={70} />
+          </h1>
+          <h2 className="text-[18px] font-semibold leading-[25.2px] text-center text-neutral-950 mb-[48px]">
+            <TypewriterText 
+              text="Streamline Your Hotel Operations Today!" 
+              speed={50}
+              delay={1500} 
+            />
+          </h2>
+          <p className="text-[16px] font-semibold leading-[24px] text-center text-[#5B6C78] p-4">
+            <TypewriterText
+              text="HotelCrew is your all-in-one solution for efficient hotel management. Join us to manage staff, communicate seamlessly, and enhance guest experiences."
+              speed={30}
+              delay={3000}
+            />
+          </p>
+        </div>
+        <div className="flex flex-row justify-evenly w-full md:w-[411px]">
+          <button
+            className="w-[45%] md:w-[195px] h-[40px] px-[24px] py-[10px] font-semibold rounded-[8px] text-white bg-[#5663AC] opacity-100 hover:bg-[#4a5b9b] transition duration-200"
+            onClick={() => navigate("/login")}
+          >
+            Log In
+          </button>
+          <button
+            className="w-[45%] md:w-[195px] h-[40px] px-[10px] py-[10px] font-semibold rounded-[8px] text-white bg-[#5663AC] opacity-100 hover:bg-[#4a5b9b] transition duration-200 ml-[10px]"
+            onClick={() => navigate("/signUp")}
+          >
+            Register
+          </button>
         </div>
       </div>
     </div>
