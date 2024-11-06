@@ -219,7 +219,7 @@ const SignUp = () => {
                 )}
               </p>
               {otpErrorMsg  && (
-                <p className="text-red-500 text-sm">{otpErrorMsg}</p>
+                <p className="text-[#99182C] text-sm">{otpErrorMsg}</p>
               )}
               {otpResent && !otpErrorMsg && (
                 <p className="text-green-500 text-sm">{otpResentMessage || "OTP resent successfully"}</p>
@@ -242,14 +242,14 @@ const SignUp = () => {
           </div>
         </div>
       ) : (
-        <div className="lg:w-[34.5vw]  flex flex-col lg:items-center lg:justify-center overflow:hidden">
-          <div className="flex flex-col lg:max-w-[301px]  w-full  lg:mt-21 p-4  ">
+        <div className="lg:w-[28vw] flex flex-col lg:items-center lg:justify-center overflow:hidden">
+          <div className="flex flex-col lg:max-w-[301px] w-full lg:mt-21 p-4 ">
             <h1 className="text-[40px] font-bold text-center lg:text-left">
               Register
             </h1>
             <form
               onSubmit={handleSubmit}
-              className="w-full  relative lg:top-8 justify-center gap-9 flex flex-col p-2 mb-0 "
+              className="w-full relative lg:top-8 justify-center gap-9 flex flex-col p-2 mb-0 "
             >
 
               <div className="relative w-full">
@@ -266,7 +266,7 @@ const SignUp = () => {
                   value={user}
                   className={`w-full border-b transition duration-200 
                          focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2 ${errorMsg === "Enter all fields" && !user
-                      ? "border-red-500 placeholder-red-500"
+                      ? "border-[#99182C] placeholder-[#99182C]"
                       : "border-gray-500 placeholder-gray-500"
                     }`}
                 />
@@ -287,7 +287,7 @@ const SignUp = () => {
                   className={`w-full border-b transition duration-200 
                          focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2 ${errorMsg === "Invalid email" ||
                       (errorMsg === "Enter all fields" && !email)
-                      ? "border-red-500 placeholder-red-500 text-red-500"
+                      ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
                       : "border-gray-500 placeholder-gray-500"
                     }`}
                 />
@@ -309,7 +309,7 @@ const SignUp = () => {
                         focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2 ${(errorMsg === "Enter all fields" && !pwd) ||
                       errorMsg ===
                       "The password must include a digit, a Lowercase and Uppercase character, and a special character"
-                      ? "border-red-500 placeholder-red-500 text-red-500"
+                      ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
                       : "border-gray-500 placeholder-gray-500"
                     }`}
                 />
@@ -336,7 +336,7 @@ const SignUp = () => {
                        focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2 ${(errorMsg === "Passwords do not match" &&
                       pwd !== matchPwd) ||
                       (errorMsg === "Enter all fields" && !matchPwd)
-                      ? "border-red-500 placeholder-red-500 text-red-500"
+                      ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
                       : "border-gray-500 placeholder-gray-500"
                     }`}
                 />
@@ -365,14 +365,14 @@ const SignUp = () => {
               </div>
               <div className="h-2 w-44 mb-0 text-center lg:text-left p-2">
                 {errorMsg && (
-                  <div className="text-red-500 text-sm">{errorMsg}</div>
+                  <div className="text-[#99182C] text-sm">{errorMsg}</div>
                 )}
               </div>
-              {/* <div className="fixed lg:top-[90vh] lg:left-[22vw] top-[90vh] left-[50vw]"> */}
+              <div className="fixed lg:top-[90vh] lg:left-[22vw] top-[90vh] left-[50vw]">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="lg:w-[88px] lg:h-[88px] w-[180px] h-[58px] fixed lg:top-[88vh] lg:left-[23vw] top-[92vh] left-[30vw] rounded-lg flex items-center justify-center bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 "
+                  className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed fixed bottom-14 "
                 >
                   {loading ? (
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -380,7 +380,7 @@ const SignUp = () => {
                     <img src="/arrow.svg" alt="Submit" />
                   )}
                 </button>
-              {/* </div> */}
+              </div>
             </form>
           </div>
         </div>

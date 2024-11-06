@@ -167,7 +167,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
           <div 
             className={`w-[380px] lg:w-[623px] h-[227px] lg:h-[192px] border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer
               ${dragActive ? 'border-[#5663AC] bg-[#F8F9FF]' : 'border-[#BDBDBD] bg-[#EFEFEF]'}
-              ${errorMessage ? 'border-red-500' : ''}`}
+              ${errorMessage ? 'border-[#99182C]' : ''}`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
@@ -195,7 +195,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
           </div>
 
           {errorMessage && (
-            <div className="text-red-500 text-sm fixed">
+            <div className="text-[#99182C] text-sm fixed">
               {errorMessage}
             </div>
           )}
@@ -208,7 +208,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
                 <button
                   type="button"
                   onClick={handleRemoveFile}
-                  className="ml-4 text-red-500 hover:text-red-700 transition-colors"
+                  className="ml-4 text-[#99182C] hover:text-red-700 transition-colors"
                 >
                   Remove
                 </button>

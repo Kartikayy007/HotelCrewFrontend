@@ -98,7 +98,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
                 <input
                   type="text"
                   className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
-                    !department && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                    !department && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                   } focus:border-purple-500`}
                   placeholder={'Department ' + (index + 1)}
                   value={department}
@@ -107,7 +107,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
                 <button
                   type="button"
                   onClick={() => handleDeleteDepartment(index)}
-                  className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                  className="p-2 text-gray-500 hover:text-[#99182C] transition-colors"
                   aria-label="Delete department"
                 >
                   <Trash2 size={20} />
@@ -116,7 +116,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
             ))}
           </div>
 
-          {error && <p className="text-red-500 fixed">{error}</p>}
+          {error && <p className="text-[#99182C] fixed">{error}</p>}
 
           <div className="fixed top-[80vh]">
             <div className="flex justify-between">

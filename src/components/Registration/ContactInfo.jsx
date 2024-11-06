@@ -101,7 +101,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               value={completeAddress}
               onChange={(e) => setCompleteAddress(e.target.value)}
               className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
-                !completeAddress && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                !completeAddress && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder="Enter full address"
             />
@@ -122,7 +122,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
                 value={mainPhoneNumber}
                 onChange={(e) => handleNumberInput(e, setMainPhoneNumber)}
                 className={`h-8 w-full lg:w-[299px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
-                  !mainPhoneNumber && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                  !mainPhoneNumber && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                 } focus:border-purple-500`}
                 placeholder="Main number"
                 maxLength={10}
@@ -134,7 +134,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               value={emergencyPhoneNumber}
               onChange={(e) => handleNumberInput(e, setEmergencyPhoneNumber)}
               className={`h-8 w-1/2 lg:w-[299px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
-                !emergencyPhoneNumber && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                !emergencyPhoneNumber && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500 lg:ml-4`}
               placeholder="Emergency number"
               maxLength={10}
@@ -154,13 +154,13 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               value={emailAddress}
               onChange={(e) => setEmailAddress(e.target.value)}
               className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
-                !emailAddress && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                !emailAddress && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder="hotel@example.com"
             />
           </div>
 
-          {error && <p className="text-red-500 fixed">{error}</p>}
+          {error && <p className="text-[#99182C] fixed">{error}</p>}
 
           <div className="fixed top-[80vh]">
             <div className="flex justify-between">

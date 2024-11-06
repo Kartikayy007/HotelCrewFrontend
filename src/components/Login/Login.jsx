@@ -25,6 +25,11 @@ const Login = () => {
     return emailRegex.test(String(email).toLowerCase());
   }, []);
 
+  const validatePassword = useCallback((password) => {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return passwordRegex.test(password);
+  }, []);
+
   const handleInputChange = useCallback((set) => (e) => {
     try {
       const sanitizedValue = validator.escape(e.target.value.trim());
@@ -47,6 +52,11 @@ const Login = () => {
 
       if (!validateEmail(email)) {
         setErrorMsg("Please enter a valid email address");
+        return;
+      }
+
+      if (!validatePassword(password)) {
+        setErrorMsg("Invalid password format");
         return;
       }
 
@@ -188,22 +198,22 @@ const Login = () => {
       </div>
       {showForgotPassword ? (
         <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 lg:mt-28 mt-4 lg:p-16">
-            <h1 className="text-[40px] font-bold text-center lg:text-left">Forgot Password</h1>
-            <form className="w-[311px] relative bottom-4 mx-auto lg:space-y-5" onSubmit={(e) => e.preventDefault()}>
+          <div className="w-full max-w-md space-y-14 lg:p-16">
+            <h1 className="text-[40px] font-[700] text-center lg:text-left lg:m-0 m-9">Forgot Password</h1>
+            <form className="w-[310px] relative bottom-4 mx-auto lg:space-y-5" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="email"
                 value={email}
                 onChange={handleInputChange(setEmail)}
-                className={`w-full p-2 text-xs pl-4 border-b  focus:outline-none font-normal font-[open sans] ${
-                  errorMsg ? "border-red-500 placeholder-red-500" : "border-gray-500 placeholder-gray-500"
+                className={`w-full p-2 text-xl placeholder:text-xs pl-4 border-b  focus:outline-none font-normal font-[open sans] ${
+                  errorMsg ? "border-[#99182C] placeholder-[#99182C]" : "border-gray-500 placeholder-gray-500"
                 }`}
                 placeholder="Enter your email to reset password"
                 autoComplete="email"
               />
               {errorMsg && (
                 <div 
-                  className={`text-sm ${resetSuccess ? 'text-green-700' : 'text-red-500'}`}
+                  className={`text-sm fixed lg:w-48 w-48 ${resetSuccess ? 'text-green-700' : 'text-[#99182C]'}`}
                   role="alert"
                 >
                   {errorMsg}
@@ -220,14 +230,12 @@ const Login = () => {
               >
                 Back to Login
               </button>
-              <div className="flex justify-center lg:justify-end">
-                
-              
+              <div className="flex justify-center lg:justify-end mt-[41.87%]">
               <button
                 type="button"
                 onClick={resetMail}
                 disabled={resetLoading}
-                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed fixed lg:top-[88vh] lg:left-[23vw] top-[92vh] left-[30vw] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] fixed bottom-14 bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {resetLoading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -243,14 +251,14 @@ const Login = () => {
         <div className="w-full lg:w-1/2 flex items-center justify-center">
           <div className="w-full max-w-md space-y-14 lg:mt-21 p-4 lg:p-16">
             <h1 className="text-[40px] font-bold text-center lg:text-left">LogIn</h1>
-            <form className="w-full lg:w-[311px] relative bottom-4 space-y-5" onSubmit={handleSubmit}>
+            <form className="w-full lg:w-[315px] relative bottom-4 space-y-5" onSubmit={handleSubmit}>
               <div className="space-y-8">
                 <input
                   type="email"
                   value={email}
                   onChange={handleInputChange(setEmail)}
-                  className={`w-full p-2 text-xs pl-4 border-b ${
-                    errorMsg ? "border-red-500 placeholder-red-500" : "border-gray-500 placeholder-gray-500"
+                  className={`w-full p-2 text-xl placeholder:text-xs pl-4 border-b ${
+                    errorMsg ? "border-[#99182C] placeholder-[#99182C]" : "border-gray-500 placeholder-gray-500"
                   } focus:outline-none font-normal font-[open sans]`}
                   placeholder="E-mail"
                   autoComplete="email"
@@ -260,8 +268,8 @@ const Login = () => {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={handleInputChange(setPassword)}
-                    className={`w-full p-2 pl-4 text-xs border-b ${
-                      errorMsg ? "border-red-500 placeholder-red-500" : "border-gray-500 placeholder-gray-500"
+                    className={`w-full p-2 pl-4 text-xl placeholder:text-xs border-b ${
+                      errorMsg ? "border-[#99182C] placeholder-[#99182C]" : "border-gray-500 placeholder-gray-500"
                     } focus:outline-none`}
                     placeholder="Password"
                     autoComplete="current-password"
@@ -281,7 +289,7 @@ const Login = () => {
               </div>
 
               {errorMsg && (
-                <div className="text-red-500 text-sm fixed text-center lg:text-left lg:top-[55%]" role="alert">
+                <div className="text-[#99182C] text-sm fixed text-center lg:text-left lg:top-[55%] top-[72.1%] lg:w-40" role="alert">
                   {errorMsg}
                 </div>
               )}
@@ -310,10 +318,11 @@ const Login = () => {
                   Register
                 </button>
               </div>
+              <div className="flex justify-center lg:justify-end">
               <button
                 type="submit"
                 disabled={loading}
-                className="lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors  w-[180px] h-[58px] lg:fixed fixed lg:top-[85vh] lg:left-[23vw] top-[89.5vh] left-[30vw] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed fixed bottom-14"
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -321,6 +330,7 @@ const Login = () => {
                   <img src="/mingcute_arrow-up-fill.svg" alt="Submit" />
                 )}
               </button>
+              </div>
             </form>
             
           </div>

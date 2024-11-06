@@ -142,7 +142,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               value={numberOfRooms}
               onChange={(e) => handleNumberInput(e, setNumberOfRooms)}
               className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
-                !numberOfRooms && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                !numberOfRooms && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
           </div>
@@ -171,7 +171,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                     <input
                       type="text"
                       className={`h-8 w-[172px] lg:w-[299px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
-                        !room.type && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                        !room.type && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
                       placeholder="Types of Rooms"
                       value={room.type}
@@ -182,7 +182,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                     <input
                       type="text"
                       className={`h-8 w-[142px] lg:w-[260px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
-                        !room.count && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                        !room.count && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
                       placeholder="Number of Rooms"
                       value={room.count}
@@ -195,7 +195,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                     <button
                       type="button"
                       onClick={() => handleDeleteRoomType(index)}
-                      className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                      className="p-2 text-gray-500 hover:text-[#99182C] transition-colors"
                       aria-label="Delete room type"
                     >
                       <Trash2 size={20} />
@@ -219,7 +219,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               value={numberOfFloors}
               onChange={(e) => handleNumberInput(e, setNumberOfFloors)}
               className={`h-8 w-full lg:w-[623px] py-2 text-xs px-4 border rounded-[4px] focus:outline-none ${
-                !numberOfFloors && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                !numberOfFloors && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
           </div>
@@ -260,7 +260,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                   value={parkingCapacity}
                   onChange={(e) => handleNumberInput(e, setParkingCapacity)}
                   className={`h-8 w-full lg:w-[623px] py-2 px-4 border rounded-lg focus:outline-none ${
-                    !parkingCapacity && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                    !parkingCapacity && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                   } focus:border-purple-500`}
                   disabled={!valetParking}
                 />
@@ -268,7 +268,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
             )}
           </div>
 
-          {error && <p className="text-red-500">{error}</p>}
+          {error && <p className="text-[#99182C]">{error}</p>}
 
           <div className={`fixed bottom-4 left-0 right-0 px-4 lg:px-0 lg:left-auto lg:right-auto lg:fixed ${valetParking ? 'lg:top-[85vh]' : 'lg:top-[80vh]'}`}>
             <div className="flex justify-between w-[42rem]">

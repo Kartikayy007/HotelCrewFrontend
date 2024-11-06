@@ -45,7 +45,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
 
   const inputClass = (value) =>
     `h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
-      !value && error ? 'border-red-500' : 'border-[#BDBDBD]'
+      !value && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
     } focus:border-purple-500`;
 
   return (
@@ -153,7 +153,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
             />
           </div>
 
-          {error && <p className="text-red-500 fixed">{error}</p>}
+          {error && <p className="text-[#99182C] fixed">{error}</p>}
 
           <div className="lg:fixed lg:top-[80vh] text-center">
             <button 

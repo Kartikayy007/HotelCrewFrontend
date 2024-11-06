@@ -181,7 +181,7 @@ const Verify = ({ email }) => {
                 )}
               </p>
 
-              {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
+              {errorMessage && <p className="text-[#99182C] text-xs">{errorMessage}</p>}
               <div className="flex lg:justify-end justify-center">
               <button
                 type="submit"
@@ -245,7 +245,7 @@ const Verify = ({ email }) => {
                   </button>
                 </div>
               </div>
-              {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+              {errorMessage && <p className="text-[#99182C]">{errorMessage}</p>}
               <button
                 type="submit"
                 className="lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors  w-[180px] h-[58px] m-auto  disabled:cursor-not-allowed"

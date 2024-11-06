@@ -81,7 +81,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               value={checkInTime}
               onChange={(e) => setCheckInTime(e.target.value)}
               className={`h-8 w-[182px] lg:w-[299px] mr-6 py-2 px-4 border rounded-[4px] text-xs focus:outline-none ${
-                !checkInTime && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                !checkInTime && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
           </div>
@@ -99,7 +99,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               value={checkOutTime}
               onChange={(e) => setCheckOutTime(e.target.value)}
               className={`h-8 w-[182px] lg:w-[299px] py-2 px-4 border rounded-[4px] text-xs focus:outline-none ${
-                !checkOutTime && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                !checkOutTime && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder='Check-out timings'
             />
@@ -118,13 +118,13 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               value={paymentMethods}
               onChange={(e) => setPaymentMethods(e.target.value)}
               className={`h-8 w-[380px] lg:w-[623px] py-2 px-4 border rounded-[4px] text-xs focus:outline-none ${
-                !paymentMethods && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                !paymentMethods && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder='Add Methods'
             />
           </div>
 
-          {error && <p className="text-red-500 fixed">{error}</p>}
+          {error && <p className="text-[#99182C] fixed">{error}</p>}
 
           <div className='fixed top-[80vh]'>
             <div className="flex justify-between">
