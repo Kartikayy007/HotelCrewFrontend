@@ -153,11 +153,11 @@ const SignUp = () => {
     };
     dispatch(resendOtp(userCredentials))
       .then(() => {
-        otpSetErrorMsg(""); // Clear any previous error message
+        otpSetErrorMsg(""); 
         setOtpResentMessage("OTP resent successfully");
       })
       .catch(() => {
-        setOtpResentMessage(""); // Clear success message on failure to resend
+        setOtpResentMessage(""); 
       });
     setTimeLeft(30);
     setIsResendDisabled(true);
@@ -363,9 +363,9 @@ const SignUp = () => {
                   Log in
                 </button>
               </div>
-              <div className="h-1 text-center lg:text-left lg:whitespace-pre-wrap">
+              <div className="h-2 w-44 mb-0 text-center lg:text-left p-2">
                 {errorMsg && (
-                  <div className="text-red-500 text-sm ">{errorMsg}</div>
+                  <div className="text-red-500 text-sm">{errorMsg}</div>
                 )}
               </div>
               {/* <div className="fixed lg:top-[90vh] lg:left-[22vw] top-[90vh] left-[50vw]"> */}

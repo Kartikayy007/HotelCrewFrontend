@@ -19,8 +19,10 @@ export const loginUser = createAsyncThunk(
       localStorage.setItem('accessToken', response.access_token);
       localStorage.setItem('refreshToken', response.refresh_token);
       localStorage.setItem('userEmail', userCredentials.email);
+      localStorage.setItem('role', response.role);
       localStorage.removeItem('registrationStarted');
       localStorage.removeItem('multiStepCompleted');
+      localStorage.removeItem('otpVerified');
       
       return response;
     } catch (error) {
