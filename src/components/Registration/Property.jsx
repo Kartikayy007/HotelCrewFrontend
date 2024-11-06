@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from "react";
-import {Trash2} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Trash2 } from "lucide-react";
 import plus from '/tabler_plus.svg';
 import hotelIcon from '/property.svg';
 import line from '/Line.svg';
 
-const Property = ({onNext, onBack, updateFormData, initialData}) => {
+const Property = ({ onNext, onBack, updateFormData, initialData }) => {
   const [roomTypes, setRoomTypes] = useState([]);
   const [numberOfRooms, setNumberOfRooms] = useState("");
   const [numberOfFloors, setNumberOfFloors] = useState("");
@@ -18,9 +18,9 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
         initialData.room_types && initialData.room_types.length > 0
           ? initialData.room_types
           : [
-              {type: "", count: ""},
-              {type: "", count: ""},
-              {type: "", count: ""},
+              { type: "", count: "" },
+              { type: "", count: "" },
+              { type: "", count: "" },
             ];
       setRoomTypes(initialRoomTypes);
 
@@ -32,7 +32,8 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
   }, [initialData]);
 
   const handleAddRoomType = () => {
-    setRoomTypes([...roomTypes, {type: "", count: ""}]);
+    setRoomTypes([...roomTypes, { type: "", count: "" }]);
+    setError("");
   };
 
   const handleDeleteRoomType = (index) => {
@@ -55,11 +56,11 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
 
   const handleNextClick = (e) => {
     e.preventDefault();
-    if (!numberOfRooms || !numberOfFloors) {
+    if (!numberOfRooms || !numberOfFloors || roomTypes.some(room => !room.type || !room.count)) {
       setError("Please fill out all required fields.");
       return;
     }
-  
+
     updateFormData(
       {
         total_number_of_rooms: numberOfRooms,
@@ -70,10 +71,10 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
       },
       4
     );
-  
+
     onNext();
   };
-  
+
   const handleBackClick = () => {
     updateFormData(
       {
@@ -85,14 +86,14 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
       },
       4
     );
-  
+
     onBack();
   };
 
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-24 ml-20">
-      <div className="flex lg:hidden gap-2 mb-4">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-16 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-52">
+        <div className="flex lg:hidden gap-3 mb-4">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -109,12 +110,12 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
           <img
             src={hotelIcon}
             alt="Hotel Icon"
-            className="h-[96] mb-4 text-[#5663AC]"
+            className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[24px] font-[500] font-Montserrat">
+          <h2 className="text-[32px] font-medium font-Montserrat">
             Property Details
           </h2>
-          <p className="font-sans font-[400] text-center">
+          <p className="font-sans font-normal text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -122,15 +123,16 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
             settings menu.
           </p>
         </div>
-        <form className="space-y-7 bottom-5 relative  ">
+
+        <form className="space-y-7 w-full max-w-lg">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-[550] lg:block hidden">Property Details</h1>
+            <h1 className="text-[32px] font-semibold hidden lg:block lg:text-left">Property Details</h1>
           </div>
 
           <div>
             <label
               htmlFor="number-of-rooms"
-              className="block text-sm font-sans font-[600]"
+              className="block text-sm font-sans font-semibold"
             >
               Number of Rooms
             </label>
@@ -139,7 +141,9 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
               id="number-of-rooms"
               value={numberOfRooms}
               onChange={(e) => handleNumberInput(e, setNumberOfRooms)}
-              className="h-8 text-xs w-[380px] lg:w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
+              className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+                !numberOfRooms && error ? 'border-red-500' : 'border-[#BDBDBD]'
+              } focus:border-purple-500`}
             />
           </div>
 
@@ -147,7 +151,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
             <div className="flex justify-between mb-2">
               <label
                 htmlFor="types-of-rooms"
-                className="block text-sm font-sans font-[600] "
+                className="block text-sm font-sans font-semibold"
               >
                 Types of Rooms
               </label>
@@ -166,7 +170,9 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                   <div key={index} className="flex items-center gap-4">
                     <input
                       type="text"
-                      className="h-8 w-[172px] lg:w-[299px] py-2 px-4 text-xs border border-[#BDBDBD] rounded-[4px] focus:outline-none"
+                      className={`h-8 w-[172px] lg:w-[299px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+                        !room.type && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                      } focus:border-purple-500`}
                       placeholder="Types of Rooms"
                       value={room.type}
                       onChange={(e) =>
@@ -175,7 +181,9 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                     />
                     <input
                       type="text"
-                      className="h-8 w-[142px] lg:w-[260px] py-2 px-4 text-xs border border-[#BDBDBD] rounded-[4px] focus:outline-none"
+                      className={`h-8 w-[142px] lg:w-[260px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+                        !room.count && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                      } focus:border-purple-500`}
                       placeholder="Number of Rooms"
                       value={room.count}
                       onChange={(e) =>
@@ -201,7 +209,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
           <div>
             <label
               htmlFor="number-of-floors"
-              className="block text-sm font-sans font-[600] mb-1"
+              className="block text-sm font-sans font-semibold mb-1"
             >
               Number of Floors
             </label>
@@ -210,7 +218,9 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
               id="number-of-floors"
               value={numberOfFloors}
               onChange={(e) => handleNumberInput(e, setNumberOfFloors)}
-              className="h-8 w-[380px] lg:w-[623px] py-2 text-xs px-4 border border-[#BDBDBD] rounded-[4px] focus:outline-none"
+              className={`h-8 w-full lg:w-[623px] py-2 text-xs px-4 border rounded-[4px] focus:outline-none ${
+                !numberOfFloors && error ? 'border-red-500' : 'border-[#BDBDBD]'
+              } focus:border-purple-500`}
             />
           </div>
 
@@ -230,7 +240,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
               />
               <label
                 htmlFor="valetParking"
-                className="text-sm font-sans font-[450]"
+                className="text-sm font-sans font-semibold"
               >
                 Valet Parking Available
               </label>
@@ -240,7 +250,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
               <div>
                 <label
                   htmlFor="parking-capacity"
-                  className="block text-sm font-sans font-[450] mb-1"
+                  className="block text-sm font-sans font-semibold mb-1"
                 >
                   Parking Capacity
                 </label>
@@ -249,35 +259,39 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                   id="parking-capacity"
                   value={parkingCapacity}
                   onChange={(e) => handleNumberInput(e, setParkingCapacity)}
-                  className="h-8 w-[380px] lg:w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-lg focus:outline-none"
+                  className={`h-8 w-full lg:w-[623px] py-2 px-4 border rounded-lg focus:outline-none ${
+                    !parkingCapacity && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                  } focus:border-purple-500`}
                 />
               </div>
             )}
           </div>
-            <div className="h-0">
-          {error && <p className="text-red-500 relative bottom-[16%]">{error}</p>}
-          </div>
-          <div className="flex justify-between relative top-[2rem]">
-            <button
-              type="button"
-              onClick={handleBackClick}
-              className="h-9 w-28 bg-gray-400 font-[700] rounded-lg text-white"
-            >
-              <span>Back </span>
-            </button>
-            <button
-              onClick={handleNextClick}
-              className="h-9 w-28 bg-[#5663AC] font-[700] rounded-lg text-white"
-            >
-              <span>Next </span>
-              <span>➔</span>
-            </button>
+
+          {error && <p className="text-red-500">{error}</p>}
+
+          <div className="fixed bottom-4 left-0 right-0 px-4 lg:px-0 lg:relative lg:top-2 lg:left-auto lg:right-auto">
+            <div className="flex justify-between w-[39rem]">
+              <button
+                type="button"
+                onClick={handleBackClick}
+                className="h-9 w-28 bg-gray-400 font-Montserrat font-bold rounded-lg text-white"
+              >
+                <span>Back </span>
+              </button>
+              <button
+                onClick={handleNextClick}
+                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white"
+              >
+                <span>Next </span>
+                <span>➔</span>
+              </button>
+            </div>
           </div>
         </form>
 
         <div>
-          <div className="w-[515px] lg:block hidden relative font-medium left-[26%] h-screen bg-white shadow-2xl border-none rounded-lg">
-            <div className="flex gap-5 text-2xl">
+          <div className="hidden lg:block lg:w-[512px] font-medium fixed top-0 right-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+            <div className="flex gap-5 text-[32px]">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}
@@ -292,18 +306,8 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
               ))}
             </div>
 
-
-
-            <img
-              className="relative top-36 left-[43.7%]"
-              src={line}
-              alt=""
-            />
-            <img
-              className="relative top-[80%] left-[43.7%]"
-              src={line}
-              alt=""
-            />
+            <img className="relative hidden lg:block top-36 left-[43.7%]" src={line} alt="" />
+            <img className="relative hidden lg:block top-[80%] left-[43.7%]" src={line} alt="" />
             <div className="flex flex-col items-center justify-center h-full space-y-4">
               <img
                 src={hotelIcon}
@@ -320,7 +324,7 @@ const Property = ({onNext, onBack, updateFormData, initialData}) => {
                   You can always edit the data in the
                 </span>
                 <br />
-                <span >setting menu.</span>
+                <span>setting menu.</span>
               </p>
             </div>
           </div>

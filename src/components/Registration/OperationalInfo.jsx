@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import HotelIcon from '/operational.svg';
 import lineIcon from '/Line.svg';
 
-
 function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
   const [checkInTime, setCheckInTime] = useState(initialData.check_in_time || '');
   const [checkOutTime, setCheckOutTime] = useState(initialData.check_out_time || '');
@@ -34,7 +33,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
       <div className="flex flex-col lg:flex-row justify-center items-center gap-24 lg:ml-[5.1rem] mx-auto">
-      <div className="flex lg:hidden font-medium gap-3 mb-4">
+        <div className="flex lg:hidden font-medium gap-3 mb-4">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -47,14 +46,13 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
           ))}
         </div>
 
-        {/* Mobile Content Block */}
         <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
           <img
             src={HotelIcon}
             alt="Hotel Icon"
             className="h-[96] mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[24px] font-[500] font-Montserrat ">
+          <h2 className="text-[32px] font-[500] font-Montserrat ">
             Operational Information
           </h2>
           <p className="font-sans font-[400] text-center">
@@ -82,7 +80,9 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-in-time"
               value={checkInTime}
               onChange={(e) => setCheckInTime(e.target.value)}
-              className="h-8 w-[182px] lg:w-[299px] mr-6 py-2 px-4 border border-[#BDBDBD] text-xs rounded-[4px]] focus:outline-none"
+              className={`h-8 w-[182px] lg:w-[299px] mr-6 py-2 px-4 border rounded-[4px] text-xs focus:outline-none ${
+                !checkInTime && error ? 'border-red-500' : 'border-[#BDBDBD]'
+              } focus:border-purple-500`}
             />
           </div>
 
@@ -98,7 +98,9 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-out-time"
               value={checkOutTime}
               onChange={(e) => setCheckOutTime(e.target.value)}
-              className="h-8  w-[182px] lg:w-[299px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] text-xs focus:outline-none"
+              className={`h-8 w-[182px] lg:w-[299px] py-2 px-4 border rounded-[4px] text-xs focus:outline-none ${
+                !checkOutTime && error ? 'border-red-500' : 'border-[#BDBDBD]'
+              } focus:border-purple-500`}
               placeholder='Check-out timings'
             />
           </div>
@@ -115,19 +117,21 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="payment-methods"
               value={paymentMethods}
               onChange={(e) => setPaymentMethods(e.target.value)}
-              className="h-8 w-[380px] lg:w-[623px] py-2 px-4 border border-[#BDBDBD] rounded-[4px] text-xs focus:outline-none"
+              className={`h-8 w-[380px] lg:w-[623px] py-2 px-4 border rounded-[4px] text-xs focus:outline-none ${
+                !paymentMethods && error ? 'border-red-500' : 'border-[#BDBDBD]'
+              } focus:border-purple-500`}
               placeholder='Add Methods'
             />
           </div>
 
           {error && <p className="text-red-500 fixed">{error}</p>}
 
-          <div className='relative top-[5rem]'>
+          <div className='fixed top-[80vh]'>
             <div className="flex justify-between">
               <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">
                 <span>Back </span>
               </button>
-              <button onClick={handleNextClick} className="h-9 w-[7rem] bg-[#5663AC] font-Montserrat font-[700] rounded-lg text-white">
+              <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white lg:fixed lg:left-[41.2vw]">
                 <span>Next </span>
                 <span>➔</span>
               </button>
@@ -136,8 +140,8 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
         </form>
 
         <div>
-          <div className="w-[515px] font-medium hidden lg:block relative left-[26%] h-[100vh] bg-white shadow-2xl border-none rounded-lg">
-            <div className="flex gap-5 text-2xl">
+          <div className="hidden lg:block lg:w-[512px] font-medium fixed top-0 right-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+            <div className="flex gap-5 text-[32px]">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}

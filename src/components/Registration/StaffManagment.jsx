@@ -16,6 +16,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
 
   const handleAddDepartment = () => {
     setDepartments([...departments, '']);
+    setError('');
   };
 
   const handleDepartmentChange = (index, value) => {
@@ -44,32 +45,31 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
   };
 
   return (
-    <section className="min-h-screen bg-white flex items-center overflow-hidden justify-center">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-24 ml-20">
-      <div className="flex lg:hidden gap-2 mb-4">
+    <section className="min-h-screen bg-white flex items-center overflow-hidden">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-16 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-52">
+        <div className="flex lg:hidden gap-3 mb-4">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
               className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                num === 2 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
+                num === 3 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
               }`}
             >
               {num}
             </div>
           ))}
         </div>
-        
 
         <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
           <img
             src={staffIcon}
             alt="staff"
-            className="h-[96] mb-4 text-[#5663AC]"
+            className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[24px] font-[500] font-Montserrat">
+          <h2 className="text-[32px] font-medium font-Montserrat">
             Staff Management
           </h2>
-          <p className="font-sans font-[400] text-center">
+          <p className="font-sans font-normal text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -78,25 +78,29 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
           </p>
         </div>
 
-        <form className="space-y-7  relative ">
+        <form className="space-y-7 w-full lg:w-40-">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-[600] lg:block hidden">Staff Management</h1>
+            <h1 className="text-[32px] font-semibold hidden lg:block lg:text-left">Staff Management</h1>
           </div>
-          <div className="flex justify-between lg:w-[570px] w-[380px] m-auto">
-            <label htmlFor="hotel-name" className="block text-sm font-sans font-[600] text-neutral-950">
+
+          <div className="flex justify-between items-end gap-3">
+            <label htmlFor="hotel-name" className="block text-sm font-sans font-semibold text-neutral-950">
               Departments
             </label>
-            <button type="button" onClick={handleAddDepartment}>
+            <button type="button" onClick={handleAddDepartment} className='fixed left-[47%]'>
               <img src={plus} alt="Add department" />
             </button>
           </div>
+
           <div className="h-48 overflow-y-auto">
             {departments.map((department, index) => (
               <div key={index} className="mb-2 flex items-center gap-2">
                 <input
                   type="text"
-                  className="h-8 w-[380px] m-auto py-2 px-4 border text-xs border-[#BDBDBD] rounded-[4px] focus:outline-none lg:w-full"
-                  placeholder={`Department ${index + 1}`}
+                  className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+                    !department && error ? 'border-red-500' : 'border-[#BDBDBD]'
+                  } focus:border-purple-500`}
+                  placeholder={'Department ${index + 1}'}
                   value={department}
                   onChange={(e) => handleDepartmentChange(index, e.target.value)}
                 />
@@ -110,23 +114,33 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
                 </button>
               </div>
             ))}
-          </div> 
-          <div className='h-2'>
-          {error && <p className="text-red-500 fixed">{error}</p>}
           </div>
-          <div className='lg:relative top-[5.6rem] '>
-            <button type="button" onClick={() => { updateFormData({ department_names: departments }); onBack(); }} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] fixed rounded-lg  text-white">
-              <span>Back </span>
-            </button>
-            <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] rounded-lg text-white font-[700] top-10 ml-[19rem] lg:ml-[32rem]">
-              <span>Next </span>
-              <span>➔</span>
-            </button>
+
+          {error && <p className="text-red-500 fixed">{error}</p>}
+
+          <div className="fixed top-[80vh]">
+            <div className="flex justify-between">
+              <button
+                type="button"
+                onClick={() => { updateFormData({ department_names: departments }); onBack(); }}
+                className="h-9 w-28 bg-gray-400 font-Montserrat font-bold rounded-lg text-white"
+              >
+                <span>Back </span>
+              </button>
+              <button
+                onClick={handleNextClick}
+                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white lg:fixed lg:left-[41.2vw]"
+              >
+                <span>Next </span>
+                <span>➔</span>
+              </button>
+            </div>
           </div>
         </form>
+
         <div>
-          <div className="hidden lg:block lg:w-[512px] font-medium relative left-[13%] lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
-          <div className="flex gap-5 text-2xl">
+          <div className="hidden lg:block lg:w-[512px] font-medium lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg fixed top-0 right-0">
+            <div className="flex gap-5 text-[32px]">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}
@@ -148,7 +162,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
                 alt="Hotel Icon"
                 className="h-24 mb-4 text-[#5663AC]"
               />
-              <h2 className="text-2xl font-medium">Staff Management</h2>
+              <h2 className="text-[32px] font-medium">Staff Management</h2>
               <p className="font-[400] text-[14px] text-center">
                 Fill out the form on the left.
                 <br />

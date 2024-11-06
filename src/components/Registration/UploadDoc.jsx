@@ -116,7 +116,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-24 lg:ml-[5.1rem] mx-auto">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-24 lg:ml-[5.1rem] mx-auto ">
         <div className="flex lg:hidden font-medium gap-3 mb-4">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
@@ -195,7 +195,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
           </div>
 
           {errorMessage && (
-            <div className="text-red-500 text-sm mt-2">
+            <div className="text-red-500 text-sm fixed">
               {errorMessage}
             </div>
           )}
@@ -216,7 +216,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
             </div>
           )}
 
-          <div className='relative top-[3rem]'>   
+          <div className='fixed top-[80vh]'>   
             <div className="flex justify-between">
               <button 
                 type="button" 
@@ -227,7 +227,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
               </button>
               <button 
                 onClick={handleSubmitClick}
-                className="h-9 w-[7rem] bg-[#5663AC] hover:bg-[#4B579D] font-Montserrat font-[700] rounded-lg text-white transition-colors"
+                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white lg:fixed lg:left-[41.2vw]"
               >
                 Submit ➔
               </button>
@@ -235,8 +235,8 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
           </div> 
         </form>
 
-        <div className="lg:block hidden w-[515px] font-medium relative left-[11%] h-screen bg-white shadow-2xl border-none rounded-lg overflow-hidden">
-          <div className="flex gap-5 text-2xl">
+        <div className="hidden lg:block lg:w-[512px] font-medium fixed top-0 right-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+          <div className="flex gap-5 text-[32px]">
             {[1, 2, 3, 4, 5, 6].map((num) => (
               <div
                 key={num}
