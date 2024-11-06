@@ -147,7 +147,7 @@ const MultiStepForm = () => {
 
       if (response.status === 201) {
         console.log('Form submitted successfully:', response.data);
-        localStorage.setItem('registrationComplete', 'true');
+        // localStorage.setItem('registrationComplete', 'true');
         localStorage.setItem('multiStepCompleted', 'true');
         alert('Hotel registered successfully!');
         navigate('/login');
@@ -155,7 +155,12 @@ const MultiStepForm = () => {
     } catch (error) {
       console.error('Error submitting form:', error);
       console.error('Error response:', error.response?.data);
-      alert('Error submitting form. Please check all required fields and try again.');
+      if(error.status == 400) {
+        alert("Uploaded EXCEL sheet already exists, Enter a unique EXCEL sheet");
+      }
+      else {
+        alert("Hotel registration failed, please try again");
+      }
     }
   };
 

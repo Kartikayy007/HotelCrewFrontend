@@ -11,11 +11,7 @@ const RegistrationFlowGuard = ({ children }) => {
   const location = useLocation();
   const isRegistrationStarted = localStorage.getItem('registrationStarted');
   const isOtpVerified = localStorage.getItem('otpVerified');
-  const isRegistrationComplete = localStorage.getItem('registrationComplete');
 
-  if (isRegistrationComplete) {
-    return <Navigate to="/login" replace />;
-  }
 
   if (location.pathname === '/signup/hoteldetails' && (!isRegistrationStarted || !isOtpVerified)) {
     return <Navigate to="/signup" replace />;

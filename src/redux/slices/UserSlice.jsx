@@ -14,17 +14,19 @@ export const loginUser = createAsyncThunk(
           }
         }
       );
+      console.log(request);
       const response = await request.data;
-      const { tokens } = response;
-      
-      localStorage.setItem('accessToken', tokens.access);
-      localStorage.setItem('refreshToken', tokens.refresh);
+      localStorage.setItem('accessToken', response.access_token);
+      localStorage.setItem('refreshToken', response.refresh_token);
       localStorage.setItem('userEmail', userCredentials.email);
+      localStorage.setItem('role', response.role);
       localStorage.removeItem('registrationStarted');
       localStorage.removeItem('multiStepCompleted');
+      localStorage.removeItem('otpVerified');
       
       return response;
     } catch (error) {
+      console.log(error)
       return rejectWithValue(error.response?.data || { message: 'Login failed' });
     }
   }
