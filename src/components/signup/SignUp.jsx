@@ -371,7 +371,7 @@ const SignUp = () => {
                     Log in
                   </button>
                 </div>
-                <div className="h-2 w-44 mb-0 text-center lg:text-left p-2">
+                <div className="h-2 w-44 -mt-9 text-center lg:text-left p-2">
                   {errorMsg && (
                     <div className="text-[#99182C] text-sm">{errorMsg}</div>
                   )}

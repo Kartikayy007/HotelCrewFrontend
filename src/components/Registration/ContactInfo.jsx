@@ -31,6 +31,12 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
       return;
     }
 
+    const phoneNumberRegex = /^\d{10}$/;
+    if(!phoneNumberRegex.test(mainPhoneNumber) || !phoneNumberRegex.test(emergencyPhoneNumber)) {
+      setError('Please enter a valid phone number.');
+      return;
+    }
+
     const formData = {
       complete_address: completeAddress,
       main_phone_number: mainPhoneNumber,
@@ -57,7 +63,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
             <div
               key={num}
               className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                num === 1 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
+                num === 2 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
               }`}
             >
               {num}
@@ -126,6 +132,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
                 } focus:border-purple-500`}
                 placeholder="Main number"
                 maxLength={10}
+                minLength={10}
               />
             </div>
             <input
@@ -198,7 +205,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
                 <div
                   key={num}
                   className={`top-20 lg:left-20 left-4 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                    num === 1
+                    num === 2
                       ? "border-[#5C69F8] text-black"
                       : "text-black bg-white border-none"
                   }`}
