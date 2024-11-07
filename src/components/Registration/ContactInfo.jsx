@@ -58,7 +58,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
       <div className="flex flex-col lg:flex-row justify-center items-center gap-12 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-51">
-      <div className="flex lg:hidden gap-3 mb-4 fixed top-9">
+      <div className="flex lg:hidden gap-3 mb-4 fixed lg:top-9 top-1">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -166,8 +166,10 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               placeholder="hotel@example.com"
             />
           </div>
-
-          {error && <p className="text-[#99182C] lg:fixed">{error}</p>}
+              <div className="h-1 lg:h-0">
+              {error && <p className="text-[#99182C] lg:fixed">{error}</p>}
+              </div>
+          
 
           <div className="lg:fixed lg:top-[80vh] ">
             <div className="lg:flex lg:justify-between flex justify-between">

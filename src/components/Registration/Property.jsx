@@ -93,7 +93,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
       <div className="flex flex-col lg:flex-row justify-center items-center gap-0 lg:ml-[5.1rem] m-auto p-0 lg:p-0 lg:gap-52">
-        <div className="flex lg:hidden gap-3 mb-4 fixed top-9">
+        <div className="flex lg:hidden gap-3 mb-4 fixed lg:top-9 top-1">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -124,7 +124,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
           </p>
         </div>
 
-        <form className="space-y-2 lg:w-full max-w-lg">
+        <form className="space-y-2 lg:w-full max-w-[330px]">
           <div className="flex justify-between items-center">
             <h1 className="text-[32px] font-semibold hidden lg:block lg:text-left">Property Details</h1>
           </div>
@@ -141,7 +141,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               id="number-of-rooms"
               value={numberOfRooms}
               onChange={(e) => handleNumberInput(e, setNumberOfRooms)}
-              className={`h-8 w-96 lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+              className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
                 !numberOfRooms && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
@@ -157,20 +157,20 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               </label>
               <button
                 type="button"
-                className="relative right-16"
+                className="lg:relative lg:left-[232px] relative right-12 "
                 onClick={handleAddRoomType}
               >
                 <img src={plus} alt="Add room type" />
               </button>
             </div>
 
-            <div className="h-32 overflow-y-auto pr-2">
+            <div className="h-32 lg:w-[630px] w-[320px]  overflow-y-auto overflow-x-hidden pr-3 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100">
               <div className="space-y-2">
                 {roomTypes.map((room, index) => (
                   <div key={index} className="flex items-center gap-4">
                     <input
                       type="text"
-                      className={`h-8 w-[172px] lg:w-[299px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+                      className={`h-8 w-[142px] lg:w-[299px] py-2 lg:px-4 px-2 text-xs border rounded-[4px] focus:outline-none ${
                         !room.type && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
                       placeholder="Types of Rooms"
@@ -181,7 +181,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                     />
                     <input
                       type="text"
-                      className={`h-8 w-[142px] lg:w-[260px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+                      className={`h-8 w-[120px] lg:w-[260px] py-2 px-2 lg:px-4 text-xs border rounded-[4px] focus:outline-none ${
                         !room.count && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
                       placeholder="Number of Rooms"
@@ -267,9 +267,9 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               </div>
             )}
           </div>
-
+            <div className="h-5 lg:h-0">
           {error && <p className="text-[#99182C]">{error}</p>}
-
+          </div>
           <div className={` px-1 lg:px-0 lg:left-auto lg:right-auto lg:fixed ${valetParking ? 'lg:top-[85vh]' : 'lg:top-[80vh]'}`}>
             <div className="flex justify-between lg:w-[42rem]">
               <button
