@@ -46,8 +46,8 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-16 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-52">
-        <div className="flex lg:hidden gap-3 mb-4">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-12 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-52">
+        <div className="flex lg:hidden gap-3 mb-4 fixed top-9">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -78,7 +78,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
           </p>
         </div>
 
-        <form className="space-y-7 w-full lg:w-40-">
+        <form className="space-y-2 w-full lg:w-40-">
           <div className="flex justify-between items-center">
             <h1 className="text-[32px] font-semibold hidden lg:block lg:text-left">Staff Management</h1>
           </div>
@@ -116,10 +116,10 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
             ))}
           </div>
 
-          {error && <p className="text-[#99182C] fixed">{error}</p>}
+          {error && <p className="text-[#99182C] lg:fixed">{error}</p>}
 
-          <div className="fixed top-[80vh]">
-            <div className="flex justify-between">
+          <div className="lg:fixed lg:top-[80vh]">
+            <div className="lg:flex lg:justify-between flex justify-between">
               <button
                 type="button"
                 onClick={() => { updateFormData({ department_names: departments }); onBack(); }}

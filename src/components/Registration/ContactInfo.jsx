@@ -51,14 +51,14 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-16 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-52 ">
-        <div className="flex lg:hidden gap-3 mb-4">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-12 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-51">
+      <div className="flex lg:hidden gap-3 mb-4 fixed top-9">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
-              className={`w-8 h-8 fixed flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                num === 2 ? "border-[#5C69F8] text-black fixed" : "text-black bg-white border-none fixed"
-               }`}
+              className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
+                num === 1 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
+              }`}
             >
               {num}
             </div>
@@ -160,10 +160,10 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
             />
           </div>
 
-          {error && <p className="text-[#99182C] fixed">{error}</p>}
+          {error && <p className="text-[#99182C] lg:fixed">{error}</p>}
 
-          <div className="fixed top-[80vh]">
-            <div className="flex justify-between">
+          <div className="lg:fixed lg:top-[80vh] ">
+            <div className="lg:flex lg:justify-between flex justify-between">
               <button
                 type="button"
                 onClick={() => {
@@ -172,7 +172,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
                     main_phone_number: mainPhoneNumber,
                     emergency_phone_number: emergencyPhoneNumber,
                     email_address: emailAddress
-                  };
+                  }; 
                   updateFormData(formData);
                   onBack();
                 }}
@@ -192,13 +192,13 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
         </form>
 
         <div>
-          <div className="hidden lg:block lg:w-[512px] font-medium lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg fixed top-0 right-0">
-            <div className="flex gap-5 text-[32px]">
+        <div className="hidden lg:block lg:w-[30.476vw] font-medium fixed right-0 top-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+            <div className="flex lg:gap-5 gap-0 text-[32px]">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}
-                  className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                    num === 2
+                  className={`top-20 lg:left-20 left-4 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
+                    num === 1
                       ? "border-[#5C69F8] text-black"
                       : "text-black bg-white border-none"
                   }`}

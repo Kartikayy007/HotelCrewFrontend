@@ -50,8 +50,8 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-4 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-52">
-        <div className="flex lg:hidden gap-3 mb-4">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-4 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-52 ">
+        <div className="flex lg:hidden gap-3 mb-4 fixed top-9">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -82,7 +82,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           </p>
         </div>
 
-        <form className="space-y-7 w-[90vw] max-w-lg">
+        <form className="lg:space-y-7 space-y-5 w-[90vw] max-w-lg">
           <div className="flex justify-between items-center">
             <h1 className="text-[32px] font-semibold hidden lg:block lg:text-left">Hotel Information</h1>
           </div>
@@ -153,9 +153,9 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
             />
           </div>
 
-          {error && <p className="text-[#99182C] fixed">{error}</p>}
+          {error && <p className="text-[#99182C] lg:fixed">{error}</p>}
 
-          <div className="lg:fixed lg:top-[80vh] text-center">
+          <div className="lg:fixed lg:top-[80vh] lg:left-[4vw] text-center">
             <button 
               onClick={handleNextClick} 
               className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white mx-auto lg:ml-[32rem]"
@@ -167,12 +167,12 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
         </form>
 
         <div>
-          <div className="hidden lg:block lg:w-[512px] font-medium fixed right-0 top-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
-            <div className="flex gap-5 text-[32px]">
+          <div className="hidden lg:block lg:w-[30.476vw] font-medium fixed right-0 top-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+            <div className="flex lg:gap-5 gap-0 text-[32px]">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}
-                  className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
+                  className={`top-20 lg:left-20 left-4 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
                     num === 1
                       ? "border-[#5C69F8] text-black"
                       : "text-black bg-white border-none"

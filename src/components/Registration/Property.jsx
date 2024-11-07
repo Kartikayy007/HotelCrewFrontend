@@ -92,8 +92,8 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
 
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-16 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-52">
-        <div className="flex lg:hidden gap-3 mb-4">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-0 lg:ml-[5.1rem] m-auto p-0 lg:p-0 lg:gap-52">
+        <div className="flex lg:hidden gap-3 mb-4 fixed top-9">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -106,7 +106,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
           ))}
         </div>
 
-        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
+        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-20">
           <img
             src={hotelIcon}
             alt="Hotel Icon"
@@ -124,7 +124,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
           </p>
         </div>
 
-        <form className="space-y-7 w-full max-w-lg">
+        <form className="space-y-2 lg:w-full max-w-lg">
           <div className="flex justify-between items-center">
             <h1 className="text-[32px] font-semibold hidden lg:block lg:text-left">Property Details</h1>
           </div>
@@ -141,13 +141,13 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               id="number-of-rooms"
               value={numberOfRooms}
               onChange={(e) => handleNumberInput(e, setNumberOfRooms)}
-              className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+              className={`h-8 w-96 lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
                 !numberOfRooms && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
           </div>
 
-          <div className="h-40">
+          <div className="h-40 w-96">
             <div className="flex justify-between mb-2">
               <label
                 htmlFor="types-of-rooms"
@@ -270,8 +270,8 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
 
           {error && <p className="text-[#99182C]">{error}</p>}
 
-          <div className={`fixed bottom-4 left-0 right-0 px-4 lg:px-0 lg:left-auto lg:right-auto lg:fixed ${valetParking ? 'lg:top-[85vh]' : 'lg:top-[80vh]'}`}>
-            <div className="flex justify-between w-[42rem]">
+          <div className={` px-1 lg:px-0 lg:left-auto lg:right-auto lg:fixed ${valetParking ? 'lg:top-[85vh]' : 'lg:top-[80vh]'}`}>
+            <div className="flex justify-between lg:w-[42rem]">
               <button
                 type="button"
                 onClick={handleBackClick}
