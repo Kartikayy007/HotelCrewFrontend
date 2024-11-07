@@ -273,6 +273,7 @@ const Login = () => {
                     } focus:outline-none`}
                     placeholder="Password"
                     autoComplete="current-password"
+                    maxLength={24}
                   />
                   <button
                     type="button"

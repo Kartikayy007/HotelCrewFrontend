@@ -103,7 +103,7 @@ const Verify = ({ email }) => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
     if (!passwordRegex.test(password)) {
-      setErrorMessage("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
+      setErrorMessage("Invalid password format");
       return;
     }
 
@@ -153,8 +153,7 @@ const Verify = ({ email }) => {
                     value={digit}
                     onChange={(e) => handleChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-12 h-12 relative left-9 text-lg border-2 border-transparent rounded-lg 
-                             bg-[#D2E0F3] focus:border-[#5663AC] focus:outline-none text-center"
+                    className="w-12 h-12 relative left-9 text-lg border-2 border-transparent rounded-lg bg-[#D2E0F3] focus:border-[#5663AC] focus:outline-none text-center"
                   />
                 ))}
               </div>
@@ -186,7 +185,7 @@ const Verify = ({ email }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-[180px] h-[58px] lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors "
+                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] fixed bottom-14 bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -200,7 +199,7 @@ const Verify = ({ email }) => {
         </div>
       ) : (
         <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 mt-21 p-16">
+          <div className="w-full max-w-md space-y-14 p-16">
             <h1 className="text-[40px] font-bold text-center lg:text-left">Reset Password</h1>
             <form className="w-full lg:w-[311px] relative bottom-4 space-y-5" onSubmit={handleSubmit}>
               <div className="space-y-8">
@@ -246,9 +245,11 @@ const Verify = ({ email }) => {
                 </div>
               </div>
               {errorMessage && <p className="text-[#99182C]">{errorMessage}</p>}
+
+              <div className="flex justify-center lg:justify-end mt-[41.87%]">
               <button
                 type="submit"
-                className="lg:w-[88px] lg:h-[88px] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors  w-[180px] h-[58px] m-auto  disabled:cursor-not-allowed"
+                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] fixed bottom-14 bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 {loading ? (
@@ -257,6 +258,7 @@ const Verify = ({ email }) => {
                   <img src="/mingcute_arrow-up-fill.svg" alt="Submit" />
                 )}
               </button>
+              </div>
             </form>
           </div>
         </div>

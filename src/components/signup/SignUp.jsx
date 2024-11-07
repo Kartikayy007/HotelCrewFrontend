@@ -29,7 +29,7 @@ const SignUp = () => {
   const [isResendDisabled, setIsResendDisabled] = useState(true);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
   const [otpResentMessage, setOtpResentMessage] = useState('');
-
+  const [hasInteractedAfterResend, setHasInteractedAfterResend] = useState(false);
 
   const handleInputChange = (set) => (e) => {
     const sanitizedValue = validator.escape(e.target.value);
@@ -51,11 +51,13 @@ const SignUp = () => {
       setErrorMsg(error);
     }
   }, [error]);
+
   useEffect(() => {
     if (otpResent) {
       otpSetErrorMsg("");
     }
   }, [otpResent]);
+
   useEffect(() => {
     if (otpError) {
       otpSetErrorMsg(otpError);
@@ -74,8 +76,12 @@ const SignUp = () => {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
+    
     otpSetErrorMsg("");
+    setErrorMsg("");
     setOtpResentMessage("");
+    setHasInteractedAfterResend(true);
+    
     if (value !== "" && index < 3) {
       inputRefs[index + 1].current.focus();
     }
@@ -155,6 +161,7 @@ const SignUp = () => {
       .then(() => {
         otpSetErrorMsg(""); 
         setOtpResentMessage("OTP resent successfully");
+        setHasInteractedAfterResend(false);
       })
       .catch(() => {
         setOtpResentMessage(""); 
@@ -174,61 +181,64 @@ const SignUp = () => {
       </div>
       {showOtpInput ? (
         <div className="w-full lg:w-[34.5vw] flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 mt-8 lg:p-16">
+          <div className="w-full max-w-md space-y-5 lg:-mt-32 mt-8 lg:p-16">
             <h2 className="text-[32px] font-semibold text-center mb-2">
               Verify E-mail
             </h2>
 
             <form
-              className="flex flex-col justify-center items-center gap-4 lg:gap-6 lg:mt-12 "
+              className="flex flex-col justify-center gap-4 lg:gap-6 "
               onSubmit={handleVerifyOtp}
             >
-              <div className="flex space-x-4">
-                {otp.map((digit, index) => (
-                  <input
-                    key={index}
-                    ref={inputRefs[index]}
-                    type="text"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleChange(index, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-12 h-12 text-center text-lg border-2 border-transparent rounded-lg 
-                                             bg-[#D2E0F3] focus:border-[#5663AC] focus:outline-none"
-                  />
-                ))}
-              </div>
+              <div className="flex flex-col justify-center items-center gap-4 lg:gap-6">
+                <div className="flex space-x-4">
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      ref={inputRefs[index]}
+                      type="text"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
+                      className="w-12 h-12 text-center text-lg border-2 border-transparent rounded-lg 
+                               bg-[#D2E0F3] focus:border-[#5663AC] focus:outline-none"
+                    />
+                  ))}
+                </div>
 
-              <p className="text-sm font-normal leading-[16.34px] text-left">
-                An OTP has been sent to your E-mail
-              </p>
+                <p className="text-sm font-normal leading-[16.34px] text-left">
+                  An OTP has been sent to your E-mail
+                </p>
 
-              <p className="text-sm">Didn't receive a mail? </p>
-              <p className="text-sm">
-                {isResendDisabled ? (
-                  <span className="text-gray-600">
-                    Resend in {timeLeft} seconds
-                  </span>
-                ) : (
-                  <button
-                    className="text-blue-700 hover:text-blue-900 text-sm"
-                    onClick={handleResendOtp}
-                  >
-                    Resend OTP
-                  </button>
+                <p className="text-sm">Didn't receive a mail? </p>
+                <p className="text-sm">
+                  {isResendDisabled ? (
+                    <span className="text-gray-600">
+                      Resend in {timeLeft} seconds
+                    </span>
+                  ) : (
+                    <button
+                      className="text-blue-700 hover:text-blue-900 text-sm"
+                      onClick={handleResendOtp}
+                    >
+                      Resend OTP
+                    </button>
+                  )}
+                </p>
+                {otpErrorMsg && (
+                  <p className="text-[#99182C] text-sm">{otpErrorMsg}</p>
                 )}
-              </p>
-              {otpErrorMsg  && (
-                <p className="text-[#99182C] text-sm">{otpErrorMsg}</p>
-              )}
-              {otpResent && !otpErrorMsg && (
-                <p className="text-green-500 text-sm">{otpResentMessage || "OTP resent successfully"}</p>
-              )}
-              {/* <div className="flex justify-center lg:justify-end"> */}
+                {otpResent && !hasInteractedAfterResend && !otpErrorMsg && (
+                  <p className="text-[#32b550] text-sm">{otpResentMessage || "OTP resent successfully"}</p>
+                )}
+              </div>
+            
+              <div className="flex justify-center lg:justify-end">
                 <button
                   type="submit"
                   disabled={otpLoading}
-                  className="lg:w-[88px] lg:h-[88px] w-[180px] h-[58px] fixed lg:top-[88vh] lg:left-[23vw] top-[92vh] left-[30vw]  rounded-lg flex items-center justify-center bg-[#5663AC] hover:bg-[#6773AC] text-white transition-opacity duration-300 "
+                  className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] fixed bottom-14 bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {otpLoading ? (
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
@@ -236,22 +246,20 @@ const SignUp = () => {
                     <img src="/arrow.svg" alt="Submit" />
                   )}
                 </button>
-              {/* </div> */}
-
+              </div>
             </form>
           </div>
         </div>
       ) : (
         <div className="lg:w-[28vw] flex flex-col lg:items-center lg:justify-center overflow:hidden">
-          <div className="flex flex-col lg:max-w-[301px] w-full lg:mt-21 p-4 ">
-            <h1 className="text-[40px] font-bold text-center lg:text-left">
+          <div className="flex flex-col lg:max-w-[400px] lg:ml-24 w-full lg:mt-24 p-4 ">
+            <h1 className="text-[40px] font-[700] text-center lg:text-left">
               Register
             </h1>
             <form
               onSubmit={handleSubmit}
-              className="w-full relative lg:top-8 justify-center gap-9 flex flex-col p-2 mb-0 "
+              className="w-full relative lg:top-8 justify-center lg:gap-9 gap-5 flex flex-col p-2 mb-0 "
             >
-
               <div className="relative w-full">
                 <input
                   type="text"
@@ -265,7 +273,7 @@ const SignUp = () => {
                   onChange={handleInputChange(setUser)}
                   value={user}
                   className={`w-full border-b transition duration-200 
-                         focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2 ${errorMsg === "Enter all fields" && !user
+                         focus:outline-none focus:ring-0 text-xl placeholder:text-xs pl-4 pr-4 p-2 ${errorMsg === "Enter all fields" && !user
                       ? "border-[#99182C] placeholder-[#99182C]"
                       : "border-gray-500 placeholder-gray-500"
                     }`}
@@ -285,7 +293,7 @@ const SignUp = () => {
                   onChange={handleInputChange(setEmail)}
                   value={email}
                   className={`w-full border-b transition duration-200 
-                         focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2 ${errorMsg === "Invalid email" ||
+                         focus:outline-none focus:ring-0 text-xl placeholder:text-xs pl-4 pr-4 p-2 ${errorMsg === "Invalid email" ||
                       (errorMsg === "Enter all fields" && !email)
                       ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
                       : "border-gray-500 placeholder-gray-500"
@@ -306,7 +314,7 @@ const SignUp = () => {
                   value={pwd}
                   maxLength={24}
                   className={`w-full border-b transition duration-200 
-                        focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2 ${(errorMsg === "Enter all fields" && !pwd) ||
+                        focus:outline-none focus:ring-0 text-xl placeholder:text-xs pl-4 pr-4 p-2 ${(errorMsg === "Enter all fields" && !pwd) ||
                       errorMsg ===
                       "The password must include a digit, a Lowercase and Uppercase character, and a special character"
                       ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
@@ -333,7 +341,7 @@ const SignUp = () => {
                   value={matchPwd}
                   maxLength={24}
                   className={`w-full border-b transition duration-200 
-                       focus:outline-none focus:ring-0 text-xs pl-4 pr-4 p-2 ${(errorMsg === "Passwords do not match" &&
+                       focus:outline-none focus:ring-0 text-xl placeholder:text-xs pl-4 pr-4 p-2 ${(errorMsg === "Passwords do not match" &&
                       pwd !== matchPwd) ||
                       (errorMsg === "Enter all fields" && !matchPwd)
                       ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
@@ -359,41 +367,41 @@ const SignUp = () => {
                   type="button"
                   onClick={() => navigate("/login")}
                   className="text-sm text-[#5663AC] hover:text-[#6773AC] font-medium"
-                >
-                  Log in
-                </button>
-              </div>
-              <div className="h-2 w-44 mb-0 text-center lg:text-left p-2">
-                {errorMsg && (
-                  <div className="text-[#99182C] text-sm">{errorMsg}</div>
-                )}
-              </div>
-              <div className="fixed lg:top-[90vh] lg:left-[22vw] top-[90vh] left-[50vw]">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed fixed bottom-14 "
-                >
-                  {loading ? (
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
-                  ) : (
-                    <img src="/arrow.svg" alt="Submit" />
+                  >
+                    Log in
+                  </button>
+                </div>
+                <div className="h-2 w-44 mb-0 text-center lg:text-left p-2">
+                  {errorMsg && (
+                    <div className="text-[#99182C] text-sm">{errorMsg}</div>
                   )}
-                </button>
-              </div>
-            </form>
+                </div>
+                <div className="flex justify-center lg:justify-end mt-[41.87%]">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] fixed bottom-14 bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed "
+                  >
+                    {loading ? (
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+                    ) : (
+                      <img src="/arrow.svg" alt="Submit" />
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
+        )}
+        <div className="hidden lg:block lg:w-[65.5vw] w-full h-72 lg:h-full bg-right bg-cover lg:fixed lg:top-0 lg:right-0 mt-4 lg:mt-0">
+          <img
+            src="/Frame.svg"
+            alt="bg"
+            className="w-full h-full object-cover object-right lg:object-center"
+          />
         </div>
-      )}
-      <div className="hidden lg:block lg:w-[65.5vw] w-full h-72 lg:h-full bg-right bg-cover lg:fixed lg:top-0 lg:right-0 mt-4 lg:mt-0">
-        <img
-          src="/Frame.svg"
-          alt="bg"
-          className="w-full h-full object-cover object-right lg:object-center"
-        />
       </div>
-    </div>
-  );
-};
-
-export default SignUp;
+    );
+  };
+  
+  export default SignUp;
