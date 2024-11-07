@@ -97,7 +97,7 @@ const Onboarding = () => {
         >
           <ChevronRight className="w-6 h-6 text-[#5663AC]" />
         </button>
-        <div className="fixed lg:bottom-8 lg:left-[70vw] bottom-[60vh] left-1/2 -translate-x-1/2 flex gap-2">
+        <div className="fixed lg:bottom-8 lg:left-[70vw] bottom-[58vh] left-1/2 -translate-x-1/2 flex gap-2">
           {images.map((_, index) => (
             <button
               key={index}
@@ -112,11 +112,11 @@ const Onboarding = () => {
 
       {/* Text content */}
       <div className="flex justify-center mt-8 md:mt-0  items-center flex-col w-full md:w-[411px] h-auto md:h-[322px] mx-auto gap-[72px] order-2 md:order-1">
-        <div className="h-auto md:h-[210px] flex flex-col">
-          <h1 className="text-[24px] font-bold leading-[31.2px] text-center">
+        <div className="h-auto md:h-[210px] flex flex-col min-h-[300px] lg:min-h-0 ">
+          <h1 className="text-[24px]  font-bold leading-[31.2px] text-center">
             <TypewriterText text="Welcome to HotelCrew" speed={70} />
           </h1>
-          <h2 className="text-[18px] font-semibold leading-[25.2px] text-center text-neutral-950 mb-[48px]">
+          <h2 className="text-[18px]  font-semibold leading-[25.2px] text-center text-neutral-950 mb-[48px]">
             <TypewriterText 
               text="Streamline Your Hotel Operations Today!" 
               speed={50}
