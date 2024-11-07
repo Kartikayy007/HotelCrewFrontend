@@ -130,7 +130,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
           ))}
         </div>
 
-        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
+        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mt-8">
           <img
             src={doc}
             alt="Hotel Icon"
@@ -193,12 +193,13 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
               </button>
             </div>
           </div>
-
+                <div className='h-1 lg:h-0'>
           {errorMessage && (
             <div className="text-[#99182C] text-sm fixed">
               {errorMessage}
             </div>
           )}
+          </div>
 
           {files.length > 0 && (
             <div className="mt-4">
@@ -216,8 +217,8 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
             </div>
           )}
 
-          <div className='fixed top-[80vh]'>   
-            <div className="flex justify-between">
+          <div className='lg:fixed lg:top-[80vh] mt-16 mb-8'>   
+            <div className="flex justify-between gap-4">
               <button 
                 type="button" 
                 onClick={onBack} 
