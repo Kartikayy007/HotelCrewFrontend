@@ -89,31 +89,29 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!user || !email || !pwd || !matchPwd) {
       setErrorMsg("Enter all fields");
       return;
     }
-
+  
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setErrorMsg("Invalid email");
       return;
     }
-
-    const pwdRegex = /^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
+  
+    const pwdRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,24}$/;
     if (!pwdRegex.test(pwd)) {
-      setErrorMsg(
-        'The password must be at least 8 characters including a digit,\na letter and a special character'
-      );
+      setErrorMsg('Invalid Password format');
       return;
     }
-
+    
     if (pwd !== matchPwd) {
       setErrorMsg("Passwords do not match");
       return;
     }
-
+  
     setErrorMsg("");
     const userCredentials = {
       user_name: user,
@@ -121,9 +119,9 @@ const SignUp = () => {
       password: pwd,
       confirm_password: matchPwd,
     };
-
+  
     localStorage.setItem('userEmail', email);
-
+  
     dispatch(registerUser(userCredentials)).then((result) => {
       if (registerUser.fulfilled.match(result)) {
         console.log("registered");
@@ -273,7 +271,7 @@ const SignUp = () => {
                   onChange={handleInputChange(setUser)}
                   value={user}
                   className={`w-full border-b transition duration-200 
-                         focus:outline-none focus:ring-0 text-xl placeholder:text-xs pl-4 pr-4 p-2 ${errorMsg === "Enter all fields" && !user
+                        focus:outline-none focus:ring-0 text-xl placeholder:text-xs pl-4 pr-4 p-2 ${errorMsg === "Enter all fields" && !user
                       ? "border-[#99182C] placeholder-[#99182C]"
                       : "border-gray-500 placeholder-gray-500"
                     }`}
@@ -316,7 +314,7 @@ const SignUp = () => {
                   className={`w-full border-b transition duration-200 
                         focus:outline-none focus:ring-0 text-xl placeholder:text-xs pl-4 pr-4 p-2 ${(errorMsg === "Enter all fields" && !pwd) ||
                       errorMsg ===
-                      "The password must include a digit, a Lowercase and Uppercase character, and a special character"
+                      "Invalid Password format"
                       ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
                       : "border-gray-500 placeholder-gray-500"
                     }`}
@@ -371,7 +369,7 @@ const SignUp = () => {
                     Log in
                   </button>
                 </div>
-                <div className="h-2 w-44 mb-0 text-center lg:text-left p-2">
+                <div className="h-2 w-44 -mt-9 text-center lg:text-left p-2">
                   {errorMsg && (
                     <div className="text-[#99182C] text-sm">{errorMsg}</div>
                   )}
