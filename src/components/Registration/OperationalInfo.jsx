@@ -32,8 +32,8 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-24 lg:ml-[5.1rem] mx-auto">
-        <div className="flex lg:hidden font-medium gap-3 mb-4">
+      <div className="flex flex-col lg:flex-row justify-center gap-16 items-center lg:gap-24 lg:ml-[5.1rem] mx-auto">
+        <div className="flex lg:hidden font-medium gap-3 mb-4 fixed top-9">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -126,8 +126,8 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
 
           {error && <p className="text-[#99182C] fixed">{error}</p>}
 
-          <div className='fixed top-[80vh]'>
-            <div className="flex justify-between">
+          <div className='lg:fixed lg:top-[80vh] mt-auto mb-8'>
+            <div className="flex justify-between gap-4">
               <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">
                 <span>Back </span>
               </button>
