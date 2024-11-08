@@ -1,10 +1,13 @@
-import React, { useState, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../redux/slices/UserSlice";
-import { useNavigate } from "react-router-dom";
+import React, {useState, useCallback} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {loginUser} from "../../redux/slices/UserSlice";
+import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import Verify from "./Verify";
-import validator from 'validator';
+import validator from "validator";
+import Lottie from "react-lottie";
+
+const eyeOpenAnimationDataUrl = "/eyeOpen.json";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,32 +21,41 @@ const Login = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((state) => state.user);
+  const {loading, error} = useSelector((state) => state.user);
 
   const validateEmail = useCallback((email) => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(String(email).toLowerCase());
   }, []);
 
-  const validatePassword = useCallback((password) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return passwordRegex.test(password);
-  }, []);
 
-  const handleInputChange = useCallback((set) => (e) => {
-    try {
-      const sanitizedValue = validator.escape(e.target.value.trim());
-      set(sanitizedValue);
-      setErrorMsg("");
-    } catch (error) {
-      console.error("Input sanitization error:", error);
-      setErrorMsg("Invalid input detected");
-    }
-  }, []);
+const validatePassword = useCallback((password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
+    const samplePass = "Kartikay123#";
+    console.log(`Testing sample password: ${samplePass}`);
+    console.log(`Sample Password Valid: ${passwordRegex.test(samplePass)}`); 
+    const isValid = passwordRegex.test(password);
+    console.log(`Password: ${password}, Valid: ${isValid}`);
+    return isValid;
+}, []);
+  const handleInputChange = useCallback(
+    (set) => (e) => {
+      try {
+        const sanitizedValue = validator.escape(e.target.value.trim());
+        set(sanitizedValue);
+        setErrorMsg("");
+        console.log(sanitizedValue)
+      } catch (error) {
+        console.error("Input sanitization error:", error);
+        setErrorMsg("Invalid input detected");
+      }
+    },
+    []
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       if (!email || !password) {
         setErrorMsg("All fields are required");
@@ -56,71 +68,83 @@ const Login = () => {
       }
 
       if (!validatePassword(password)) {
-        setErrorMsg("Invalid password format");
+        setErrorMsg("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character");
         return;
       }
 
-      const loginAttempts = JSON.parse(localStorage.getItem('loginAttempts') || '{"count": 0, "timestamp": 0}');
+      const loginAttempts = JSON.parse(
+        localStorage.getItem("loginAttempts") || '{"count": 0, "timestamp": 0}'
+      );
       const now = Date.now();
-      
-      if (loginAttempts.count >= 5 && now - loginAttempts.timestamp < 15 * 60 * 1000) {
+
+      if (
+        loginAttempts.count >= 5 &&
+        now - loginAttempts.timestamp < 15 * 60 * 1000
+      ) {
         setErrorMsg("Too many login attempts. Please try again in 15 minutes.");
         return;
       }
 
-      const userCredentials = { 
+      const userCredentials = {
         email: email.toLowerCase(),
-        password 
+        password,
       };
-      
+
       const result = await dispatch(loginUser(userCredentials));
-      
+
       if (loginUser.fulfilled.match(result)) {
-        localStorage.setItem('loginAttempts', JSON.stringify({"count": 0, "timestamp": now}));
+        localStorage.setItem(
+          "loginAttempts",
+          JSON.stringify({count: 0, timestamp: now})
+        );
         setEmail("");
         setPassword("");
         setErrorMsg("");
-        navigate('/dashboard');
+        navigate("/dashboard");
       } else {
         loginAttempts.count += 1;
         loginAttempts.timestamp = now;
-        localStorage.setItem('loginAttempts', JSON.stringify(loginAttempts));
-        
+        localStorage.setItem("loginAttempts", JSON.stringify(loginAttempts));
+
         throw new Error("Invalid credentials");
       }
     } catch (error) {
       console.error("Login error:", error);
-      console.log(error.response?.status)
+      console.log(error.response?.status);
       if (error.response?.status === "ERR_INTERNET_DISCONNECTED") {
         setErrorMsg("No internet connection. Please try again later");
-    }  if (error.message === "Network Error") {
-        setErrorMsg("Network error. Please check your connection and try again.");
-    }
-      if (error.name === 'Error' && error.message === 'Invalid credentials') {
+      }
+      if (error.message === "Network Error") {
+        setErrorMsg(
+          "Network error. Please check your connection and try again."
+        );
+      }
+      if (error.name === "Error" && error.message === "Invalid credentials") {
         setErrorMsg("Invalid email or password");
         setFieldErrors({
-            email: true,
-            password: true
+          email: true,
+          password: true,
         });
-    }  if (error.response?.status === 401) {
+      }
+      if (error.response?.status === 401) {
         setErrorMsg("Invalid email or password");
         setFieldErrors({
-            email: true,
-            password: true
+          email: true,
+          password: true,
         });
-    }  if (error.response?.status === 429) {
+      }
+      if (error.response?.status === 429) {
         setErrorMsg("Too many login attempts. Please try again later");
-    }  if (error.response?.status === 404) {
+      }
+      if (error.response?.status === 404) {
         setErrorMsg("Account not found. Please check your email");
-        setFieldErrors(prev => ({
-            ...prev,
-            email: true
+        setFieldErrors((prev) => ({
+          ...prev,
+          email: true,
         }));
-    }
-     
-    else {
+      } else {
         setErrorMsg("An error occurred during login. Please try again");
-    }
+      }
 
       setPassword("");
     }
@@ -137,10 +161,15 @@ const Login = () => {
         setErrorMsg("Please enter a valid email address");
         return;
       }
-      const resetAttempts = JSON.parse(localStorage.getItem('resetAttempts') || '{"count": 0, "timestamp": 0}');
+      const resetAttempts = JSON.parse(
+        localStorage.getItem("resetAttempts") || '{"count": 0, "timestamp": 0}'
+      );
       const now = Date.now();
-      
-      if (resetAttempts.count >= 3 && now - resetAttempts.timestamp < 60 * 60 * 1000) {
+
+      if (
+        resetAttempts.count >= 3 &&
+        now - resetAttempts.timestamp < 60 * 60 * 1000
+      ) {
         setErrorMsg("Too many reset attempts. Please try again in 1 hour.");
         return;
       }
@@ -150,30 +179,32 @@ const Login = () => {
       setErrorMsg("");
 
       const response = await axios.post(
-        "https://hotelcrew-1.onrender.com/api/auth/forget-password/", 
-        { email: email.toLowerCase() },
-        { timeout: 10000 } 
+        "https://hotelcrew-1.onrender.com/api/auth/forget-password/",
+        {email: email.toLowerCase()},
+        {timeout: 10000}
       );
 
-      console.log(response)
+      console.log(response);
 
       resetAttempts.count += 1;
       resetAttempts.timestamp = now;
-      localStorage.setItem('resetAttempts', JSON.stringify(resetAttempts));
+      localStorage.setItem("resetAttempts", JSON.stringify(resetAttempts));
 
       setResetSuccess(true);
       setErrorMsg("Password reset email sent successfully.");
       setShowVerify(true);
     } catch (error) {
       console.error("Reset password error:", error);
-      if (error.code === 'ECONNABORTED') {
-      setErrorMsg("Request timed out. Please try again.");
+      if (error.code === "ECONNABORTED") {
+        setErrorMsg("Request timed out. Please try again.");
       } else if (error.response?.status === 429) {
-      setErrorMsg("Too many requests. Please try again later.");
+        setErrorMsg("Too many requests. Please try again later.");
       } else if (error.response?.status === 400) {
-      setErrorMsg("User not found. Please check your email address");
+        setErrorMsg("User not found. Please check your email address");
       } else {
-      setErrorMsg(error.message || "Failed to send reset email. Please try again later.");
+        setErrorMsg(
+          error.message || "Failed to send reset email. Please try again later."
+        );
       }
     } finally {
       setResetLoading(false);
@@ -191,74 +222,107 @@ const Login = () => {
     return <Verify email={email} />;
   }
 
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    path: eyeOpenAnimationDataUrl,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen font-Montserrat overflow-hidden">
-      <div className="flex lg:hidden items-center justify-center h-[45vh] bg-[#8094D4] w-100vw">
-        <img className="w-full h-full object-fill" src="/web2 1.svg" alt="Login Hero" />
+    <div className="font-Montserrat lg:min-h-screen lg:w-full lg:flex lg:justify-center ">
+      <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] lg:hidden">
+        <img
+          className="w-full h-full object-fill"
+          src="/web2 1.svg"
+          alt="Login Hero"
+        />
       </div>
       {showForgotPassword ? (
         <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 lg:p-16">
-            <h1 className="text-[40px] font-[700] text-center lg:text-left lg:m-0 m-9">Forgot Password</h1>
-            <form className="w-[310px] relative bottom-4 mx-auto lg:space-y-5" onSubmit={(e) => e.preventDefault()}>
+          <div className="space-y-9">
+            <form
+              className="lg:w-96 lg:space-y-7 space-y-1"
+              onSubmit={(e) => e.preventDefault()}
+            >
+            <h1 className="text-[45px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
+              Forgot Password
+            </h1>
+            <div className="lg:space-y-4 space-y-2">
               <input
                 type="email"
                 value={email}
                 onChange={handleInputChange(setEmail)}
-                className={`w-full p-2 text-xl placeholder:text-xs pl-4 border-b  focus:outline-none font-normal font-[open sans] ${
-                  errorMsg ? "border-[#99182C] placeholder-[#99182C]" : "border-gray-500 placeholder-gray-500"
+                className={`w-full p-2 text-xl placeholder:text-base pl-4 border-b
+                        focus:outline-none focus:ring-0  pr-4 ${
+                  errorMsg
+                    ? "border-[#99182C] placeholder-[#99182C]"
+                    : "border-gray-500 placeholder-gray-500"
                 }`}
                 placeholder="Enter your email to reset password"
                 autoComplete="email"
               />
+            </div>
               {errorMsg && (
-                <div 
-                  className={`text-sm fixed lg:w-48 w-48 ${resetSuccess ? 'text-green-700' : 'text-[#99182C]'}`}
+                <div
+                  className="text-[#99182C] text-base text-center lg:text-left  lg:w-40"
                   role="alert"
                 >
                   {errorMsg}
                 </div>
               )}
               
+            <div className="flex justify-end">
+            
               <button
                 type="button"
                 onClick={() => {
                   setShowForgotPassword(false);
                   setErrorMsg("");
                 }}
-                className="relative left-56 text-xs text-gray-500"
+                className=" text-base text-gray-500"
               >
                 Back to Login
               </button>
-              <div className="flex justify-center lg:justify-end mt-[41.87%]">
-              <button
-                type="button"
-                onClick={resetMail}
-                disabled={resetLoading}
-                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] fixed bottom-14 bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {resetLoading ? (
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
-                ) : (
-                  <img src="/mingcute_arrow-up-fill.svg" alt="Submit" />
-                )}
-              </button>
-              </div>
+            </div>
+                <button
+                  type="button"
+                  onClick={resetMail}
+                  disabled={resetLoading}
+                  className="w-full h-9 bg-[#5663AC] text-white rounded-lg hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                > 
+                  {resetLoading ? (
+                    <div className="flex justify-center items-center">
+                    <img className="w-6" src="/bouncing-circles.svg" alt="Loading..." />
+                  </div>
+                  ) : (
+                    <p className="font-bold">Continue</p>
+                  )}
+                </button>
             </form>
           </div>
         </div>
       ) : (
-        <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 lg:mt-21 p-4 lg:p-16">
-            <h1 className="text-[40px] font-bold text-center lg:text-left">LogIn</h1>
-            <form className="w-full lg:w-[315px] relative bottom-4 space-y-5" onSubmit={handleSubmit}>
-              <div className="space-y-8">
+        <div className="w-full lg:w-1/2 flex justify-center items-center">
+          <div className="space-y-9">
+            <form
+              className="w-full lg:w-96 lg:space-y-7 space-y-4"
+              onSubmit={handleSubmit}
+            >
+            <h1 className="text-[40px] font-bold mt-5 text-center lg:text-left">
+              LogIn
+            </h1>
+              <div className="space-y-4">
                 <input
                   type="email"
                   value={email}
                   onChange={handleInputChange(setEmail)}
-                  className={`w-full p-2 text-xl placeholder:text-xs pl-4 border-b ${
-                    errorMsg ? "border-[#99182C] placeholder-[#99182C]" : "border-gray-500 placeholder-gray-500"
+                  className={`w-full p-2 text-xl placeholder:text-base pl-4 border-b ${
+                    errorMsg
+                      ? "border-[#99182C] placeholder-[#99182C]"
+                      : "border-gray-500 placeholder-gray-500"
                   } focus:outline-none font-normal font-[open sans]`}
                   placeholder="E-mail"
                   autoComplete="email"
@@ -268,8 +332,10 @@ const Login = () => {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={handleInputChange(setPassword)}
-                    className={`w-full p-2 pl-4 text-xl placeholder:text-xs border-b ${
-                      errorMsg ? "border-[#99182C] placeholder-[#99182C]" : "border-gray-500 placeholder-gray-500"
+                    className={`w-full p-2 pl-4 text-xl placeholder:text-base border-b ${
+                      errorMsg
+                        ? "border-[#99182C] placeholder-[#99182C]"
+                        : "border-gray-500 placeholder-gray-500"
                     } focus:outline-none`}
                     placeholder="Password"
                     autoComplete="current-password"
@@ -278,34 +344,57 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
                   >
-                    <img 
-                      src={showPassword ? "/eye-closed.svg" : "/eye-open.svg"} 
-                      alt={showPassword ? "Hide password" : "Show password"}
-                    />
+                    {showPassword ? (
+                      <Lottie options={defaultOptions} width={35} height={35} />
+                    ) : (
+                      <img src="/eyeMP_000.svg" width={35} height={35} />
+                    )}
                   </button>
                 </div>
               </div>
 
               {errorMsg && (
-                <div className="text-[#99182C] text-sm fixed text-center lg:text-left lg:top-[55%] top-[72.1%] lg:w-40" role="alert">
+                <div
+                  className="text-[#99182C] text-sm text-center lg:text-left lg:w-40"
+                  role="alert"
+                >
                   {errorMsg}
                 </div>
               )}
 
-              
-              <div className="text-right">
+              <div className="flex justify-between items-center text-base">
                 <button
                   type="button"
                   onClick={() => {
                     setShowForgotPassword(true);
                     setErrorMsg("");
                   }}
-                  className="text-xs relative right-3 top-[-1em] text-gray-500"
+                  className=" text-gray-500"
                 >
                   Forgot password?
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" />
+                  <label className=" text-gray-500">Remember me</label>
+                </div>
+              </div>
+
+              <div className="">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-9 bg-[#5663AC] text-white rounded-lg hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <div className="flex justify-center items-center">
+                    <img className="w-6" src="/bouncing-circles.svg" alt="" />
+                  </div>
+                  ) : (
+                    <p className="font-bold">Login</p>
+                  )}
                 </button>
               </div>
 
@@ -313,32 +402,18 @@ const Login = () => {
                 <span className="text-sm text-gray-500">Need an account? </span>
                 <button
                   type="button"
-                  onClick={() => navigate('/signup')}
+                  onClick={() => navigate("/signup")}
                   className="text-sm text-[#5663AC] hover:text-[#6773AC] font-medium"
                 >
                   Register
                 </button>
               </div>
-              <div className="flex justify-center lg:justify-end">
-              <button
-                type="submit"
-                disabled={loading}
-                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed fixed bottom-14"
-              >
-                {loading ? (
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
-                ) : (
-                  <img src="/mingcute_arrow-up-fill.svg" alt="Submit" />
-                )}
-              </button>
-              </div>
             </form>
-            
           </div>
         </div>
       )}
-      <div className="hidden lg:flex w-full lg:w-[95vw] items-center justify-center h-[380px] lg:h-auto bg-[#8094D4]">
-        <img className="h-auto lg:h-full" src="/web2 1.svg" alt="Login Hero" />
+      <div className="w-full lg:flex justify-center items-center bg-[#8094D4] hidden ">
+        <img className="w-[90%]" src="/web2 1.svg" alt="Login Hero" />
       </div>
     </div>
   );
