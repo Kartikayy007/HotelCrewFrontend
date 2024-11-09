@@ -117,7 +117,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
       <div className="flex flex-col lg:flex-row justify-center items-center gap-0 lg:ml-[5.1rem] m-auto p-0 lg:p-0 lg:gap-52">
-        <div className="flex lg:hidden font-medium gap-3 mb-4">
+        <div className="flex lg:hidden font-medium gap-3 mb-4 fixed lg:top-9 top-1">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
