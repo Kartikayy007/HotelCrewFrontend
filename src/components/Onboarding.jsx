@@ -1,12 +1,11 @@
 import {useState, useEffect} from "react";
 import Features from "./Features";
 import RevealLinks from "./RevealLinks";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Onboarding = () => {
   const [rangeValue, setRangeValue] = useState(50);
   const [visibleProfiles, setVisibleProfiles] = useState(2);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (rangeValue <= 50) {
@@ -31,37 +30,38 @@ const Onboarding = () => {
       <nav className="flex justify-between items-center font-bold text-xl backdrop:blur-xl bg-white bg-opacity-75 sticky top-0 z-50">
         <ul className="flex gap-24 items-center px-24 py-4">
           <li>
-            <a href="#home">
+            <Link to="/">
               <img
                 className="w-40 cursor-pointer"
                 src="/hotelcrewlogosmall.svg"
+                alt="HotelCrew Logo"
               />
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#about" className="cursor-pointer">
+            <Link to="/" className="cursor-pointer">
               Home
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#services" className="cursor-pointer">
+            <Link to="/#services" className="cursor-pointer">
               Features
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#contact" className="cursor-pointer">
+            <Link to="/#about" className="cursor-pointer">
               About
-            </a>
+            </Link>
           </li>
         </ul>
         <ul className="flex justify-evenly items-center gap-20 px-24 py-4">
           <li>
-            <button className="cursor-pointer" onClick={() => navigate('/login')}>Login</button>
+            <Link to="/login" className="cursor-pointer">Login</Link>
           </li>
           <li>
-            <button className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white w-fit transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]" >
+            <Link to="/signup" className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white w-fit transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]">
               Get Started
-            </button>
+            </Link>
           </li>
         </ul>
       </nav>
@@ -85,18 +85,24 @@ const Onboarding = () => {
               memorable experience for guests and staff alike.
             </p>
             <div className="flex justify-evenly items-center">
-              <button className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] w-32 h-12 z-10" onClick={() => navigate('/login')}>
+              <Link 
+                to="/login"
+                className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] w-32 h-12 z-10 flex items-center justify-center"
+              >
                 Login
-              </button>
-              <button className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] w-32 h-12 z-10" onClick={() => navigate('/signup')}>
+              </Link>
+              <Link
+                to="/signup"
+                className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] w-32 h-12 z-10 flex items-center justify-center"
+              >
                 Sign Up
-              </button>
+              </Link>
             </div>
           </div>
         </div>
 
         <div>
-          <img src="/hero2.svg" alt="" className="w-[90%] -mt-48" />
+          <img src="/hero2.svg" alt="Hero illustration" className="w-[90%] -mt-48" />
         </div>
 
         <div className="bg-[#5C69F8] m-24 rounded-2xl h-[80vh]">
@@ -120,7 +126,7 @@ const Onboarding = () => {
                   style={{accentColor: "#051733"}}
                 />
                 <br />
-                <label htmlFor="" className="text-white text-[40px] font-bold">
+                <label className="text-white text-[40px] font-bold">
                   {rangeValue === "500" ? "0-500+" : `0-${rangeValue}`}
                 </label>
                 <br />
@@ -130,52 +136,51 @@ const Onboarding = () => {
             <div className="relative">
               <img
                 src="/profile1.svg"
-                alt=""
+                alt="Profile 1"
                 className={`absolute w-16 h-16 left-[10%] top-[35%] z-10 animate-[float1_3s_ease-in-out_infinite] transition-opacity duration-500 ${
                   visibleProfiles >= 1 ? "opacity-100" : "opacity-0"
                 }`}
               />
               <img
                 src="/profile2.svg"
-                alt=""
+                alt="Profile 2"
                 className={`absolute w-16 h-16 left-[25%] top-[10%] z-10 animate-[float2_3s_ease-in-out_infinite_0.5s] transition-opacity duration-500 ${
                   visibleProfiles >= 6 ? "opacity-100" : "opacity-0"
                 }`}
               />
               <img
                 src="/profile3.svg"
-                alt=""
+                alt="Profile 3"
                 className={`absolute w-16 h-16 right-[10%] top-[17%] z-10 animate-[float3_3s_ease-in-out_infinite_1s] transition-opacity duration-500 ${
                   visibleProfiles >= 3 ? "opacity-100" : "opacity-0"
                 }`}
               />
               <img
                 src="/profile4.svg"
-                alt=""
+                alt="Profile 4"
                 className={`absolute w-16 h-16 right-[15%] bottom-[45%] z-10 animate-[float4_3s_ease-in-out_infinite_1.5s] transition-opacity duration-500 ${
                   visibleProfiles >= 2 ? "opacity-100" : "opacity-0"
                 }`}
               />
               <img
                 src="/profile7.svg"
-                alt=""
+                alt="Profile 7"
                 className={`absolute w-16 h-16 left-[20%] bottom-[20%] z-10 animate-[float5_3s_ease-in-out_infinite_2s] transition-opacity duration-500 ${
                   visibleProfiles >= 5 ? "opacity-100" : "opacity-0"
                 }`}
               />
-
               <img
                 src="/profile6.svg"
-                alt=""
+                alt="Profile 6"
                 className={`absolute w-16 h-16 left-[65%] bottom-[15%] z-10 animate-[float1_3s_ease-in-out_infinite_2.5s] transition-opacity duration-500 ${
                   visibleProfiles >= 6 ? "opacity-100" : "opacity-0"
                 }`}
               />
-              <img src="/hotelbuilding.svg" alt="" className="w-full h-full" />
+              <img src="/hotelbuilding.svg" alt="Hotel building" className="w-full h-full" />
 
               <div className="relative top-6 text-center">
-              <h1 className="text-5xl font-semibold text-[#252941]">Perfect</h1>
-              <p className="text-xl font-semibold mt-5 text-white">Management for your growth.</p>
+                <h1 className="text-5xl font-semibold text-[#252941]">Perfect</h1>
+                <p className="text-xl font-semibold mt-5 text-white">Management for your growth.</p>
               </div>
               <style>
                 {`
@@ -225,13 +230,10 @@ const Onboarding = () => {
                   </p>
                 </div>
               </div>
-              <img src="/optimse.svg" alt="" />
+              <img src="/optimse.svg" alt="Optimize operations illustration" />
             </div>
           </div>
         </div>
-
-        
-
 
         <div>
           <div className="bg-[#E2E3FF] m-24 rounded-2xl h-[403px] mt-32">
@@ -245,12 +247,12 @@ const Onboarding = () => {
                     Manage travel and expense, keep tabs on spending and
                     collaborate-all from the palm of your hand
                   </p>
-                  <img src="/playstore.svg" alt="" />
+                  <img src="/playstore.svg" alt="Play Store download" />
                 </div>
               </div>
               <img
                 src="/iPhone 15 Pro - Black Titanium - Portrait.svg"
-                alt=""
+                alt="iPhone mockup"
               />
             </div>
           </div>
@@ -259,7 +261,7 @@ const Onboarding = () => {
         <footer>
           <div className="bg-[#47518C] text-white py-8">
             <div className="container mx-auto flex justify-between items-center">
-                <RevealLinks />
+              <RevealLinks />
               <div>
                 <img src="/logowhite.svg" alt="HotelCrew Logo" className="w-40" />
                 <p className="mt-4">© 2023 HotelCrew. All rights reserved.</p>

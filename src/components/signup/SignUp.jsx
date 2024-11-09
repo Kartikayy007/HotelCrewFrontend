@@ -289,8 +289,8 @@ const SignUp = () => {
               onSubmit={handleSubmit}
               className="w-full lg:w-96  lg:space-y-7 space-y-1"
             >
-                Register
-              <h2 className="text-[40px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
+                
+              <h2 className="text-[40px] font-bold lg:mt-0 mt-5 text-center lg:text-left">Register
               </h2>
               <div className="lg:space-y-4 space-y-2">
                 <input
