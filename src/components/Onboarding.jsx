@@ -85,10 +85,10 @@ const Onboarding = () => {
               memorable experience for guests and staff alike.
             </p>
             <div className="flex justify-evenly items-center">
-              <button className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] w-32 h-12" onClick={() => navigate('/login')}>
+              <button className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] w-32 h-12 z-10" onClick={() => navigate('/login')}>
                 Login
               </button>
-              <button className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] w-32 h-12" onClick={() => navigate('/signup')}>
+              <button className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] w-32 h-12 z-10" onClick={() => navigate('/signup')}>
                 Sign Up
               </button>
             </div>
