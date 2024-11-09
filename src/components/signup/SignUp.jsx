@@ -33,8 +33,8 @@ const SignUp = () => {
   const [isResendDisabled, setIsResendDisabled] = useState(true);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
   const [otpResentMessage, setOtpResentMessage] = useState("");
-  const [hasInteractedAfterResend, setHasInteractedAfterResend] =
-    useState(false);
+  const [hasInteractedAfterResend, setHasInteractedAfterResend] =useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleInputChange = (set) => (e) => {
     const sanitizedValue = validator.escape(e.target.value);
@@ -128,7 +128,7 @@ const SignUp = () => {
 
     localStorage.setItem("userEmail", email);
 
-    dispatch(registerUser(userCredentials)).then((result) => {
+    dispatch(registerUser({ userCredentials, rememberMe })).then((result) => {
       if (registerUser.fulfilled.match(result)) {
         console.log("registered");
         setShowOtpInput(true);
@@ -283,14 +283,14 @@ const SignUp = () => {
           </div>
         </div>
       ) : (
-        <div className="w-full lg:w-1/2 flex justify-center items-center">
+        <div className="w-full lg:w-1/2 flex justify-center items-center ">
           <div className="space-y-9">
             <form
               onSubmit={handleSubmit}
               className="w-full lg:w-96  lg:space-y-7 space-y-1"
             >
-                Register
               <h2 className="text-[40px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
+                Register
               </h2>
               <div className="lg:space-y-4 space-y-2">
                 <input
@@ -325,7 +325,7 @@ const SignUp = () => {
                     onChange={handleInputChange(setEmail)}
                     value={email}
                     className={`w-full border-b transition duration-200 
-                        focus:outline-none focus:ring-0 text-xl placeholder:text-base pl-4pr-4 p-2 ${
+                        focus:outline-none focus:ring-0 text-xl placeholder:text-base pl-4 pr-4 p-2 ${
                           errorMsg === "Invalid email" ||
                           (errorMsg === "Enter all fields" && !email)
                             ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
@@ -410,7 +410,7 @@ const SignUp = () => {
                     )}
                   </button>
                 </div>
-
+                    <div className="h-1">
                 {errorMsg && (
                   <div
                     className="text-[#99182C] text-sm text-center lg:text-left lg:top-[55%] top-[72.1%] lg:w-40"
@@ -419,10 +419,15 @@ const SignUp = () => {
                     {errorMsg}
                   </div>
                 )}
+                </div>
 
                 <div className="flex justify-end items-center text-base">
                   <div className="flex items-center gap-2">
-                    <input type="checkbox" />
+                    <input 
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)} 
+                    />
                     <label className=" text-gray-500">Remember me</label>
                   </div>
                 </div>
