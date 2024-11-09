@@ -9,6 +9,8 @@ const Home = () => {
   const handleLogout = () => {
     localStorage.removeItem('userEmail');
     localStorage.removeItem('accessToken');
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('rememberMe');
     navigate('/login');
   };
 

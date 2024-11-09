@@ -7,11 +7,13 @@ const Verify = ({ email }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState(""); 
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [showOtpInput, setShowOtpInput] = useState(true);
   const [timeLeft, setTimeLeft] = useState(30);
   const [isResendDisabled, setIsResendDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [hasInteractedAfterResend, setHasInteractedAfterResend] = useState(false); 
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
 
   useEffect(() => {
@@ -44,6 +46,8 @@ const Verify = ({ email }) => {
     newOtp[index] = value;
     setOtp(newOtp);
     setErrorMessage("");
+    setSuccessMessage(""); 
+    setHasInteractedAfterResend(true); 
     if (value !== "" && index < 3) {
       inputRefs[index + 1].current.focus();
     }
@@ -80,6 +84,7 @@ const Verify = ({ email }) => {
 
   const handleResendOtp = async () => {
     setLoading(true);
+    setErrorMessage("");
     try {
       await axios.post("https://hotelcrew-1.onrender.com/api/auth/forget-password/", {
         email,
@@ -87,6 +92,8 @@ const Verify = ({ email }) => {
       console.log("OTP resent");
       setTimeLeft(30);
       setIsResendDisabled(true);
+      setSuccessMessage("OTP resent successfully"); 
+      setHasInteractedAfterResend(false); 
     } catch (err) {
       if (!err.response) {
         setErrorMessage("Network error. Please check your internet connection and try again.");
@@ -112,7 +119,6 @@ const Verify = ({ email }) => {
       return;
     }
     setErrorMessage("");
-
     setLoading(true);
     try {
       const response = await axios.post("https://hotelcrew-1.onrender.com/api/auth/reset-password/", {
@@ -134,15 +140,21 @@ const Verify = ({ email }) => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen font-Montserrat">
-      <div className="flex lg:hidden items-center justify-center h-[45vh] bg-[#8094D4] w-100vw">
-      <img className="w-full h-full object-fill" src=" /web2 1.svg" alt="Login Hero" />
-    </div>
+    <div className="font-Montserrat lg:min-h-screen lg:w-full lg:flex lg:justify-center ">
+      <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] lg:hidden">
+        <img className="w-full h-full object-fill" src=" /web2 1.svg" alt="Loading..." />
+      </div>
       {showOtpInput ? (
-        <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 lg:mt-28 p-4 lg:p-16 flex flex-col items-center">
-            <h2 className="text-[40px] font-bold text-center">Verify OTP</h2>
-            <form className="w-[311px] relative bottom-4 text-center space-y-5" onSubmit={handleVerifyOtp}>
+        <div className="w-full lg:w-1/2 flex justify-center items-center">
+        <div className="space-y-6">
+          <form
+            className="w-full lg:space-y-3 space-y-4 "
+            onSubmit={handleVerifyOtp}
+          >
+            <h2 className="text-[40px] font-bold lg:mt-0 mt-5 text-center">
+              Verify E-mail
+            </h2>
+            <div className="flex flex-col justify-center items-center gap-4 lg:gap-5">
               <div className="flex space-x-4">
                 {otp.map((digit, index) => (
                   <input
@@ -153,60 +165,69 @@ const Verify = ({ email }) => {
                     value={digit}
                     onChange={(e) => handleChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-12 h-12 relative left-9 text-lg border-2 border-transparent rounded-lg bg-[#D2E0F3] focus:border-[#5663AC] focus:outline-none text-center"
+                    className="w-12 h-12 text-center text-lg border-2 border-transparent rounded-lg 
+                             bg-[#D2E0F3] focus:border-[#5663AC] focus:outline-none"
                   />
                 ))}
               </div>
 
-              <p className="text-sm text-center font-normal leading-[16.34px]">
+              <p className="text-base font-normal leading-[16.34px] text-left">
                 An OTP has been sent to your E-mail
               </p>
-
-              <p className="text-sm text-center">Didn't receive a mail? </p>
-              <p className="text-sm">
+              <div className="text-center">
+              <p className="text-base">Didn't receive a mail? </p>
+              <p className="text-base">
                 {isResendDisabled ? (
-                  <span className="text-gray-600 text-center">
+                  <span className="text-gray-600">
                     Resend in {timeLeft} seconds
                   </span>
                 ) : (
                   <button
-                    type="button"
-                    className="text-blue-700 hover:text-blue-900 text-sm text-center"
+                    className="text-blue-700 hover:text-blue-900 text-base"
                     onClick={handleResendOtp}
-                    disabled={loading}
                   >
                     Resend OTP
                   </button>
                 )}
               </p>
+              </div>
+              
+        {errorMessage && <p className="text-[#99182C] text-base">{errorMessage}</p>}
+        {successMessage && !hasInteractedAfterResend && !errorMessage && (
+          <p className="text-[#32b550] text-base">
+            {successMessage || "OTP resent successfully"}
+          </p>
+        )}
+            </div>
 
-              {errorMessage && <p className="text-[#99182C] text-xs">{errorMessage}</p>}
-              <div className="flex lg:justify-end justify-center">
+            <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] fixed bottom-14 bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-9 bg-[#5663AC] text-white rounded-lg hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+                  <div className="flex justify-center items-center">
+                    <img className="w-6" src="/bouncing-circles.svg" alt="" />
+                  </div>
                 ) : (
-                  <img src=" /mingcute_arrow-up-fill.svg" alt="Submit" />
+                  <p className="font-bold">Verify</p>
                 )}
               </button>
-              </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
+      </div>
       ) : (
-        <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md space-y-14 p-16">
-            <h1 className="text-[40px] font-bold text-center lg:text-left">Reset Password</h1>
-            <form className="w-full lg:w-[311px] relative bottom-4 space-y-5" onSubmit={handleSubmit}>
+        <div className="w-full lg:w-1/2 flex justify-center items-center">
+          <div className="space-y-9">
+            <form className="w-full lg:w-96  lg:space-y-7 space-y-1" onSubmit={handleSubmit}>
+            <h1 className="text-[40px] font-bold lg:mt-0 mt-5 text-center lg:text-left">Reset Password</h1>
               <div className="space-y-8">
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    className="w-full p-2 text-xs pl-4 border-b border-gray-700 focus:outline-none"
+                    className="w-full p-2 text-base pl-4 border-b border-gray-700 focus:outline-none"
                     placeholder="New Password"
                     value={password}
                   maxLength={20}
@@ -253,7 +274,9 @@ const Verify = ({ email }) => {
                 disabled={loading}
               >
                 {loading ? (
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+                  <div className="flex justify-center items-center">
+                  <img className="w-6" src="/bouncing-circles.svg" alt="" />
+                </div>
                 ) : (
                   <img src="/mingcute_arrow-up-fill.svg" alt="Submit" />
                 )}

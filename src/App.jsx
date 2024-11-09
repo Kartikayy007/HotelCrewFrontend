@@ -21,7 +21,7 @@ const RegistrationFlowGuard = ({ children }) => {
 };
 
 const ProtectedRoute = ({ children }) => {
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = localStorage.getItem('accessToken')|| sessionStorage.getItem('accessToken');;
 
   if (!accessToken) {
     return <Navigate to="/login" replace />;
@@ -31,10 +31,27 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const PublicRoute = ({ children }) => {
-  const accessToken = localStorage.getItem('accessToken');
+  const location = useLocation();
+  const rememberMe = localStorage.getItem('rememberMe');
+  const accessToken = localStorage.getItem('accessToken')|| sessionStorage.getItem('accessToken');
   const user = useSelector((state) => state.user);
 
-  if (accessToken && user.email && location.pathname === '/login') {
+  if (accessToken && user.email && (location.pathname === '/login' || location.pathname === '/signup' ||location.pathname==='/')) {
+    // return <Navigate to="/dashboard" replace />;
+    if (rememberMe || sessionStorage.getItem('accessToken')) {
+      return <Navigate to="/dashboard" replace />;
+    }
+  }
+
+  return children;
+};
+const LandingRoute = ({ children }) => {
+  const rememberMe = localStorage.getItem('rememberMe') === 'true';
+  const accessToken = localStorage.getItem('accessToken') ;
+  const user = useSelector((state) => state.user);
+
+  // Redirect to dashboard if user is authenticated (remembered or session) when accessing the root path
+  if (accessToken && rememberMe) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -86,7 +103,11 @@ const App = () => {
         />
         <Route
           path="/"
-          element={<Onboarding />}
+          element={
+            <LandingRoute>
+            <Onboarding />
+          </LandingRoute>
+        }
         />
 
         
