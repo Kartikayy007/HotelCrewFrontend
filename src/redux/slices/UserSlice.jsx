@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const loginUser = createAsyncThunk(
   'user/loginUser',
-  async (userCredentials, { rejectWithValue }) => {
+  async ({userCredentials,rememberMe} ,{ rejectWithValue }) => {
     try {
       const request = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/login/",
@@ -16,10 +16,14 @@ export const loginUser = createAsyncThunk(
       );
       console.log(request);
       const response = await request.data;
-      localStorage.setItem('accessToken', response.access_token);
-      localStorage.setItem('refreshToken', response.refresh_token);
-      localStorage.setItem('userEmail', userCredentials.email);
-      localStorage.setItem('role', response.role);
+      if(rememberMe)
+        localStorage.setItem('rememberMe', true);
+      const storageMethod = rememberMe ? localStorage : sessionStorage;
+      storageMethod.setItem('accessToken', response.access_token);
+      storageMethod.setItem('refreshToken', response.refresh_token);
+      storageMethod.setItem('userEmail', userCredentials.email);
+      storageMethod.setItem('role', response.role);
+      
       localStorage.removeItem('registrationStarted');
       localStorage.removeItem('multiStepCompleted');
       localStorage.removeItem('otpVerified');
@@ -34,7 +38,7 @@ export const loginUser = createAsyncThunk(
 
 export const registerUser = createAsyncThunk(
   'user/registerUser',
-  async (userCredentials, { rejectWithValue }) => {
+  async ({userCredentials,rememberMe}, { rejectWithValue }) => {
     try {
       const request = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/registrationOTP/",
@@ -46,9 +50,19 @@ export const registerUser = createAsyncThunk(
         }
       );
       const response = await request.data;
+      console.log(request)
+      // localStorage.setItem('registrationStarted', 'true');
+      // const storageMethod = rememberMe ? localStorage : sessionStorage;
+      // storageMethod.setItem('userEmail', userCredentials.email);
+      // localStorage.setItem(email, userCredentials.email);
+
+      if(rememberMe)
+        localStorage.setItem('rememberMe', true);
       
       localStorage.setItem('registrationStarted', 'true');
-      localStorage.setItem(email, userCredentials.email);
+      const storageMethod = rememberMe ? localStorage : sessionStorage;
+      // storageMethod.setItem('userEmail', userCredentials.email);
+      storageMethod.setItem('email', userCredentials.email);
       
       return response;
     } catch (error) {
@@ -89,6 +103,7 @@ const userSlice = createSlice({
       state.email = null;
       state.error = null;
       localStorage.clear();
+      sessionStorage.clear();
     },
   },
   extraReducers: (builder) => {

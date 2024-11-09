@@ -18,6 +18,7 @@ const Login = () => {
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
   const [showVerify, setShowVerify] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -90,7 +91,7 @@ const validatePassword = useCallback((password) => {
         password,
       };
 
-      const result = await dispatch(loginUser(userCredentials));
+      const result = await dispatch(loginUser({ userCredentials, rememberMe }));
 
       if (loginUser.fulfilled.match(result)) {
         localStorage.setItem(
@@ -377,7 +378,11 @@ const validatePassword = useCallback((password) => {
                 </button>
 
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" />
+                  <input 
+                  type="checkbox"
+                  checked={rememberMe}
+                   onChange={(e) => setRememberMe(e.target.checked)} 
+                  />
                   <label className=" text-gray-500">Remember me</label>
                 </div>
               </div>
