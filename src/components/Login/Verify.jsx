@@ -20,9 +20,9 @@ const Verify = ({email}) => {
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
   const [showPasswords, setShowPasswords] = useState(false);
 
-const togglePasswordVisibility = () => {
-  setShowPasswords(!showPasswords);
-};
+  const togglePasswordVisibility = () => {
+    setShowPasswords(!showPasswords);
+  };
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -170,160 +170,162 @@ const togglePasswordVisibility = () => {
           alt="Loading..."
         />
       </div>
-     {showOtpInput ? (
+      {showOtpInput ? (
         <div className="w-full lg:w-1/2 flex justify-center items-center">
-        <div className="space-y-6">
-          <form
-            className="w-full lg:space-y-3 space-y-4 "
-            onSubmit={handleVerifyOtp}
-          >
-            <h2 className="text-[40px] font-bold lg:mt-0 mt-5 text-center">
-              Verify E-mail
-            </h2>
-            <div className="flex flex-col justify-center items-center gap-4 lg:gap-5">
-              <div className="flex space-x-4">
-                {otp.map((digit, index) => (
-                  <input
-                    key={index}
-                    ref={inputRefs[index]}
-                    type="text"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleChange(index, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-12 h-12 text-center text-lg border-2 border-transparent rounded-lg 
+          <div className="space-y-6">
+            <form
+              className="w-full lg:space-y-3 space-y-4 "
+              onSubmit={handleVerifyOtp}
+            >
+              <h2 className="text-[40px] font-bold lg:mt-0 mt-5 text-center">
+                Verify E-mail
+              </h2>
+              <div className="flex flex-col justify-center items-center gap-4 lg:gap-5">
+                <div className="flex space-x-4">
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      ref={inputRefs[index]}
+                      type="text"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
+                      className="w-12 h-12 text-center text-lg border-2 border-transparent rounded-lg 
                              bg-[#D2E0F3] focus:border-[#5663AC] focus:outline-none"
+                    />
+                  ))}
+                </div>
+
+                <p className="text-base font-normal leading-[16.34px] text-left">
+                  An OTP has been sent to your E-mail
+                </p>
+                <div className="text-center">
+                  <p className="text-base">Didn't receive a mail? </p>
+                  <p className="text-base">
+                    {isResendDisabled ? (
+                      <span className="text-gray-600">
+                        Resend in {timeLeft} seconds
+                      </span>
+                    ) : (
+                      <button
+                        className="text-blue-700 hover:text-blue-900 text-base"
+                        onClick={handleResendOtp}
+                      >
+                        Resend OTP
+                      </button>
+                    )}
+                  </p>
+                </div>
+
+                {errorMessage && (
+                  <p className="text-[#99182C] text-base">{errorMessage}</p>
+                )}
+                {successMessage &&
+                  !hasInteractedAfterResend &&
+                  !errorMessage && (
+                    <p className="text-[#32b550] text-base">
+                      {successMessage || "OTP resent successfully"}
+                    </p>
+                  )}
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-9 bg-[#5663AC] text-white rounded-lg hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <div className="flex justify-center items-center">
+                      <img className="w-6" src="/bouncing-circles.svg" alt="" />
+                    </div>
+                  ) : (
+                    <p className="font-bold">Verify</p>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : (
+        <div className="w-full lg:w-1/2 flex justify-center items-center">
+          <div className="space-y-9">
+            <form
+              className="w-full lg:w-96 lg:space-y-7 space-y-8"
+              onSubmit={handleSubmit}
+            >
+              <h1 className="text-[40px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
+                Reset Password
+              </h1>
+              <div className="space-y-8">
+                <div className="relative">
+                  <input
+                    type={showPasswords ? "text" : "password"}
+                    className="w-full p-2 text-xl pl-4 border-b border-gray-700 focus:outline-none"
+                    placeholder="New Password"
+                    value={password}
+                    maxLength={20}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
-                ))}
-              </div>
-
-              <p className="text-base font-normal leading-[16.34px] text-left">
-                An OTP has been sent to your E-mail
-              </p>
-              <div className="text-center">
-              <p className="text-base">Didn't receive a mail? </p>
-              <p className="text-base">
-                {isResendDisabled ? (
-                  <span className="text-gray-600">
-                    Resend in {timeLeft} seconds
-                  </span>
-                ) : (
                   <button
-                    className="text-blue-700 hover:text-blue-900 text-base"
-                    onClick={handleResendOtp}
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
                   >
-                    Resend OTP
+                    {showPasswords ? (
+                      <Lottie options={defaultOptions} width={35} height={35} />
+                    ) : (
+                      <img src="/eyeMP_000.svg" width={35} height={35} />
+                    )}
                   </button>
-                )}
-              </p>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type={showPasswords ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full p-2 pl-4 text-xl placeholder:text-base border-b border-gray-700 focus:outline-none"
+                    placeholder="Confirm Password"
+                    autoComplete="current-password"
+                    maxLength={24}
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                  >
+                    {showPasswords ? (
+                      <Lottie options={defaultOptions} width={35} height={35} />
+                    ) : (
+                      <img src="/eyeMP_000.svg" width={35} height={35} />
+                    )}
+                  </button>
+                </div>
               </div>
-              
-        {errorMessage && <p className="text-[#99182C] text-base">{errorMessage}</p>}
-        {successMessage && !hasInteractedAfterResend && !errorMessage && (
-          <p className="text-[#32b550] text-base">
-            {successMessage || "OTP resent successfully"}
-          </p>
-        )}
-            </div>
 
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full h-9 bg-[#5663AC] text-white rounded-lg hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <div className="flex justify-center items-center">
-                    <img className="w-6" src="/bouncing-circles.svg" alt="" />
-                  </div>
-                ) : (
-                  <p className="font-bold">Verify</p>
-                )}
-              </button>
-            </div>
-          </form>
+              {errorMessage && <p className="text-[#99182C]">{errorMessage}</p>}
+
+              <div className="">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-9 bg-[#5663AC] text-white rounded-lg hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <div className="flex justify-center items-center">
+                      <img className="w-6" src="/bouncing-circles.svg" alt="" />
+                    </div>
+                  ) : (
+                    <p className="font-bold">Continue</p>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
-      ) : ( 
-      <div className="w-full lg:w-1/2 flex justify-center items-center">
-        <div className="space-y-9">
-          <form
-            className="w-full lg:w-96 lg:space-y-7 space-y-8"
-            onSubmit={handleSubmit}
-          >
-            <h1 className="text-[40px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
-              Reset Password
-            </h1>
-            <div className="space-y-8">
-    <div className="relative">
-      <input
-        type={showPasswords ? "text" : "password"}
-        className="w-full p-2 text-xl pl-4 border-b border-gray-700 focus:outline-none"
-        placeholder="New Password"
-        value={password}
-        maxLength={20}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button
-        type="button"
-        onClick={togglePasswordVisibility}
-        className="absolute right-2 top-1/2 transform -translate-y-1/2"
-      >
-        {showPasswords ? (
-          <Lottie options={defaultOptions} width={35} height={35} />
-        ) : (
-          <img src="/eyeMP_000.svg" width={35} height={35} />
-        )}
-      </button>
-    </div>
-
-    <div className="relative">
-      <input
-        type={showPasswords ? "text" : "password"}
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        className="w-full p-2 pl-4 text-xl placeholder:text-base border-b border-gray-700 focus:outline-none"
-        placeholder="Confirm Password"
-        autoComplete="current-password"
-        maxLength={24}
-      />
-      <button
-        type="button"
-        onClick={togglePasswordVisibility}
-        className="absolute right-2 top-1/2 transform -translate-y-1/2"
-      >
-        {showPasswords ? (
-          <Lottie options={defaultOptions} width={35} height={35} />
-        ) : (
-          <img src="/eyeMP_000.svg" width={35} height={35} />
-        )}
-      </button>
-    </div>
-  </div>
-
-            {errorMessage && <p className="text-[#99182C]">{errorMessage}</p>}
-
-            <div className="">
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full h-9 bg-[#5663AC] text-white rounded-lg hov65er:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <div className="flex justify-center items-center">
-                    <img className="w-6" src="/bouncing-circles.svg" alt="" />
-                  </div>
-                    <img className="w-6" src="/bouncing-circles.svg" alt="" />
-                  </div>
-                ) : (
-                  <p className="font-bold">Continue</p>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-      )} 
+      )}
 
       <div className=" hidden lg:flex w-full lg:w-[95vw] items-center justify-center h-[380px] lg:h-auto bg-[#8094D4]">
         <img className="h-full" src="/web2 1.svg" alt="Login Hero" />
