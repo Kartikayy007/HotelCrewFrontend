@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
+import Lottie from "react-lottie";
+
+const eyeOpenAnimationDataUrl1 = "/eyeOpen.json";
+const eyeOpenAnimationDataUrl2 = "/eyeOpen.json";
 
 const Verify = ({ email }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,10 +31,12 @@ const Verify = ({ email }) => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+    setShowAnimations(!showAnimations);
   };
 
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
+    setShowAnimations(!showAnimations);
   };
 
   const handleKeyDown = (index, e) => {
@@ -107,7 +113,9 @@ const Verify = ({ email }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    
+       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,24}$/;
+
 
     if (!passwordRegex.test(password)) {
       setErrorMessage("Invalid password format");
@@ -138,9 +146,27 @@ const Verify = ({ email }) => {
       setLoading(false);
     }
   };
+  const defaultOptions1 = {
+    loop: true,
+    autoplay: true,
+    path: eyeOpenAnimationDataUrl1,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
+  const defaultOptions2 = {
+    loop: true,
+    autoplay: true,
+    path: eyeOpenAnimationDataUrl2,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
 
   return (
-    <div className="font-Montserrat lg:min-h-screen lg:w-full lg:flex lg:justify-center ">
+    <div className="font-Montserrat lg:min-h-screen lg:w-full lg:flex lg:justify-center overflow-hidden">
       <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] lg:hidden">
         <img className="w-full h-full object-fill" src=" /web2 1.svg" alt="Loading..." />
       </div>
@@ -237,17 +263,29 @@ const Verify = ({ email }) => {
                     type="button"
                     className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400"
                     onClick={togglePasswordVisibility}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
-                    <img
+                    {showPassword ? (
+                      <Lottie
+                        options={defaultOptions1}
+                        width={35}
+                        height={35}
+                      />
+                    ) : (
+                      <img src="/eyeMP_000.svg" width={35} height={35} />
+                    )}
+                    {/* <img
                       src={showPassword ? " /eye-open.svg" : " /eyeClosed.svg"}
                       alt="Toggle Password Visibility"
-                    />
+                    /> */}
                   </button>
                 </div>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
-                    className="w-full p-2 text-xs pl-4 border-b border-gray-700 focus:outline-none"
+                    className="w-full p-2 text-base pl-4 border-b border-gray-700 focus:outline-none"
                     placeholder="Confirm Password"
                     value={confirmPassword}
                   maxLength={20}
@@ -257,11 +295,23 @@ const Verify = ({ email }) => {
                     type="button"
                     className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400"
                     onClick={toggleConfirmPasswordVisibility}
+                    aria-label={
+                      showConfirmPassword ? "Hide password" : "Show password"
+                    }
                   >
-                    <img
+                    {showConfirmPassword ? (
+                      <Lottie
+                        options={defaultOptions2}
+                        width={35}
+                        height={35}
+                      />
+                    ) : (
+                      <img src="/eyeMP_000.svg" width={35} height={35} />
+                    )}
+                    {/* <img
                       src={showConfirmPassword ? " /eye-open.svg" : " /eyeClosed.svg"}
                       alt="Toggle Password Visibility"
-                    />
+                    /> */}
                   </button>
                 </div>
               </div>
@@ -270,15 +320,15 @@ const Verify = ({ email }) => {
               <div className="flex justify-center lg:justify-end mt-[41.87%]">
               <button
                 type="submit"
-                className="h-[58px] w-[180px] lg:w-[88px] lg:h-[88px] lg:fixed lg:bottom-[15vh] fixed bottom-14 bg-[#5663AC] text-white rounded-lg flex items-center justify-center hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
+                className="w-full h-9 bg-[#5663AC] text-white rounded-lg hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="flex justify-center items-center">
-                  <img className="w-6" src="/bouncing-circles.svg" alt="" />
-                </div>
+                    <img className="w-6" src="/bouncing-circles.svg" alt="" />
+                  </div>
                 ) : (
-                  <img src="/mingcute_arrow-up-fill.svg" alt="Submit" />
+                  <p className="font-bold">Reset</p>
                 )}
               </button>
               </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import { Trash2 } from "lucide-react";
 import plus from '/tabler_plus.svg';
 import hotelIcon from '/property.svg';
@@ -11,6 +11,8 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
   const [valetParking, setValetParking] = useState(false);
   const [parkingCapacity, setParkingCapacity] = useState("");
   const [error, setError] = useState("");
+  const roomRefs = useRef([]);
+
 
   useEffect(() => {
     if (initialData) {
@@ -56,11 +58,17 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
 
   const handleNextClick = (e) => {
     e.preventDefault();
+    
     if (!numberOfRooms || !numberOfFloors || roomTypes.some(room => !room.type || !room.count)) {
       setError("Please fill out all required fields.");
-      return;
+      const emptyRoomIndex = roomTypes.findIndex(room => !room.type || !room.count);
+    if (emptyRoomIndex !== -1 && roomRefs.current[emptyRoomIndex]) {
+      // Scroll to the first empty field
+      roomRefs.current[emptyRoomIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-
+      return;
+    }  
+    
     updateFormData(
       {
         total_number_of_rooms: numberOfRooms,
@@ -71,7 +79,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
       },
       4
     );
-
+    
     onNext();
   };
 
@@ -167,7 +175,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
             <div className="h-32 lg:w-[630px] w-[320px]  overflow-y-auto overflow-x-hidden pr-3 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100">
               <div className="space-y-2">
                 {roomTypes.map((room, index) => (
-                  <div key={index} className="flex items-center gap-4">
+                  <div 
+                  key={index} 
+                  ref={(el) => (roomRefs.current[index] = el)}
+                  className="flex items-center gap-4">
                     <input
                       type="text"
                       className={`h-8 w-[142px] lg:w-[299px] py-2 lg:px-4 px-2 text-xs border rounded-[4px] focus:outline-none ${

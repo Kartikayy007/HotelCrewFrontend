@@ -79,7 +79,7 @@ const validatePassword = useCallback((password) => {
       const now = Date.now();
 
       if (
-        loginAttempts.count >= 5 &&
+        loginAttempts.count >= 10 &&
         now - loginAttempts.timestamp < 15 * 60 * 1000
       ) {
         setErrorMsg("Too many login attempts. Please try again in 15 minutes.");

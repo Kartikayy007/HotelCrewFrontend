@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Trash2 } from 'lucide-react';
 import staffIcon from '/staff.svg';
 import plus from '/tabler_plus.svg';
@@ -7,6 +7,7 @@ import lineIcon from '/Line.svg';
 function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
   const [departments, setDepartments] = useState(['', '', '']);
   const [error, setError] = useState('');
+  const departmentRefs = useRef([]);
 
   useEffect(() => {
     if (initialData.department_names && initialData.department_names.length > 0) {
@@ -34,7 +35,13 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
     e.preventDefault();
     if (departments.some(department => department === '')) {
       setError('Please fill out all required fields.');
+      const emptyDepartmentIndex = departments.findIndex(department => !department);
+      if (emptyDepartmentIndex !== -1 && departmentRefs.current[emptyDepartmentIndex]) {
+        // Scroll to the first empty field
+        departmentRefs.current[emptyDepartmentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
+
     }
     const departmentData = {
       department_names: departments,
@@ -94,7 +101,10 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
 
           <div className="h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100">
             {departments.map((department, index) => (
-              <div key={index} className="mb-2 flex items-center gap-2">
+              <div 
+              key={index} 
+              ref={(el) => (departmentRefs.current[index] = el)}
+              className="mb-2 flex items-center gap-2">
                 <input
                   type="text"
                   className={`h-8 w-[285px] lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${

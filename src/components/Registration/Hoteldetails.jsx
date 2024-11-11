@@ -129,6 +129,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
             <input
               type="text"
               id="year-established"
+              // pattern="^(19|20)\d{2}$" 
               value={yearEstablished}
               onChange={handleYearInput}
               placeholder="YYYY"

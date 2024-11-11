@@ -107,7 +107,7 @@ const SignUp = () => {
     }
 
     const pwdRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,24}$/;
     if (!pwdRegex.test(pwd)) {
       setErrorMsg("Invalid Password format");
       return;
@@ -192,8 +192,13 @@ const SignUp = () => {
     },
   };
 
-  const toggleAnimations = () => {
+  const togglePasswordAnimations = () => {
     setShowPwd(!showPwd);
+    // setShowMatchPwd(!showMatchPwd);
+    setShowAnimations(!showAnimations);
+  };
+  const toggleConfirmPasswordAnimations = () => {
+    // setShowPwd(!showPwd);
     setShowMatchPwd(!showMatchPwd);
     setShowAnimations(!showAnimations);
   };
@@ -356,7 +361,7 @@ const SignUp = () => {
                   />
                   <button
                     type="button"
-                    onClick={toggleAnimations}
+                    onClick={togglePasswordAnimations}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2"
                     aria-label={
                       showMatchPwd ? "Hide password" : "Show password"
@@ -393,7 +398,7 @@ const SignUp = () => {
                   />
                   <button
                     type="button"
-                    onClick={toggleAnimations}
+                    onClick={toggleConfirmPasswordAnimations}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2"
                     aria-label={
                       showMatchPwd ? "Hide password" : "Show password"
