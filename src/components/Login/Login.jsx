@@ -245,7 +245,7 @@ const validatePassword = useCallback((password) => {
         <div className="w-full lg:w-1/2 flex items-center justify-center">
           <div className="space-y-9">
             <form
-              className="lg:w-96 lg:space-y-7 space-y-1"
+              className="lg:w-96 w-80 lg:space-y-7 space-y-4"
               onSubmit={(e) => e.preventDefault()}
             >
             <h1 className="text-[45px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
