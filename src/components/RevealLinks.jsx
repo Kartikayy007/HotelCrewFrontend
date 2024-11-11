@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const RevealLinks = () => {
   return (
-    <section className="grid place-content-center gap-3 py-12 text-white font-Montserrat">
+    <section className="flex justify-center gap-6  py-12 text-white font-Montserrat">
       <FlipLink href="#">Twitter</FlipLink>
       <FlipLink href="#">Linkedin</FlipLink>
       <FlipLink href="#">Facebook</FlipLink>
@@ -21,7 +21,7 @@ const FlipLink = ({ children, href }) => {
       initial="initial"
       whileHover="hovered"
       href={href}
-      className="relative block overflow-hidden whitespace-nowrap text-4xl font-black uppercase sm:text-7xl md:text-8xl lg:text-9xl"
+      className="relative block overflow-hidden whitespace-nowrap text-4xl font-black uppercase sm:text-7xl md:text-8xl lg:text-2xl"
       style={{
         lineHeight: 0.75,
       }}

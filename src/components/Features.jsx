@@ -11,12 +11,12 @@ const Features = () => {
     <section className="mx-auto mt-32 max-w-screen-2xl px-4 py-12 text-slate-800 font-Montserrat">
       <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end md:px-8">
         <h2 className="max-w-lg text-4xl font-bold md:text-5xl">
-          Grow your Hotel faster with our
+          Grow faster with our
           <span className="text-slate-400"> Exceptional Services</span>
         </h2>
-        <button className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] w-36 h-12"
+        <button className="px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] w-44 h-14 text-xl"
         onMouseEnter={() => setbutton('Sign Up')}
-        onMouseLeave={() => setbutton('And more...')}
+        onMouseLeave={() => setbutton('Learn More')}
         onClick={() => navigate('/signup')}>
               {button}
             </button>
@@ -51,10 +51,10 @@ const Features = () => {
           </div>
         </BounceCard>
         <BounceCard className="col-span-12 md:col-span-4">
-          <CardTitle></CardTitle>
+          <CardTitle>Staff Perfomance Tracking </CardTitle>
           <div className="absolute bottom-0 left-4 right-4 top-32 translate-y-8 rounded-t-2xl bg-gradient-to-br from-pink-400 to-red-400 p-4 transition-transform duration-[250ms] group-hover:translate-y-4 group-hover:rotate-[2deg]">
             <span className="block text-center font-semibold text-red-50">
-              
+            Staff Performance Tracking helps managers monitor and improve employee productivity and service quality. It provides real-time insights, promotes accountability, and enhances guest experience by ensuring consistent, high standards.
             </span>
           </div>
         </BounceCard>
