@@ -162,7 +162,7 @@ const togglePasswordVisibility = () => {
   };
 
   return (
-    <div className="font-Montserrat lg:min-h-screen lg:w-full lg:flex lg:justify-center ">
+    <div className="font-Montserrat lg:min-h-screen lg:w-full lg:flex lg:justify-center overflow-hidden">
       <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] lg:hidden">
         <img
           className="w-full h-full object-fill"
@@ -311,6 +311,8 @@ const togglePasswordVisibility = () => {
               >
                 {loading ? (
                   <div className="flex justify-center items-center">
+                    <img className="w-6" src="/bouncing-circles.svg" alt="" />
+                  </div>
                     <img className="w-6" src="/bouncing-circles.svg" alt="" />
                   </div>
                 ) : (

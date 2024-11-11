@@ -51,7 +51,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
       <div className="flex flex-col lg:flex-row justify-center items-center gap-4 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-52 ">
-        <div className="flex lg:hidden gap-3 mb-4 fixed top-9">
+        <div className="flex lg:hidden gap-3 mb-4 fixed lg:top-9 top-1">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -129,6 +129,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
             <input
               type="text"
               id="year-established"
+              // pattern="^(19|20)\d{2}$" 
               value={yearEstablished}
               onChange={handleYearInput}
               placeholder="YYYY"

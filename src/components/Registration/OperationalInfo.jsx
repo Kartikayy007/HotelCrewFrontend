@@ -32,8 +32,8 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center gap-16 items-center lg:gap-24 lg:ml-[5.1rem] mx-auto">
-        <div className="flex lg:hidden font-medium gap-3 mb-4 fixed top-9">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-0 lg:ml-[5.1rem] m-auto p-0 lg:p-0 lg:gap-52">
+        <div className="flex lg:hidden font-medium gap-3 mb-4 fixed lg:top-9 top-1">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -52,7 +52,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
             alt="Hotel Icon"
             className="h-[96] mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] font-[500] font-Montserrat ">
+          <h2 className="text-[28px] text-center font-[500] font-Montserrat ">
             Operational Information
           </h2>
           <p className="font-sans font-[400] text-center">
@@ -63,10 +63,10 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
             settings menu.
           </p>
         </div>
-        <form className="space-y-7">
-          <div className="flex justify-between items-center">
+        <form className="space-y-8 lg:w-full ">
+          
             <h1 className="text-[32px] font-[600] lg:block hidden">Operational Information</h1>
-          </div>
+          
 
           <div>
             <label
@@ -117,15 +117,15 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="payment-methods"
               value={paymentMethods}
               onChange={(e) => setPaymentMethods(e.target.value)}
-              className={`h-8 w-[380px] lg:w-[623px] py-2 px-4 border rounded-[4px] text-xs focus:outline-none ${
+              className={`h-8 w-[330px] lg:w-[623px] py-2 px-4 border rounded-[4px] text-xs focus:outline-none ${
                 !paymentMethods && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder='Add Methods'
             />
           </div>
-
+              <div className='h-5'>
           {error && <p className="text-[#99182C] fixed">{error}</p>}
-
+          </div>
           <div className='lg:fixed lg:top-[80vh] mt-auto mb-8'>
             <div className="flex justify-between gap-4">
               <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">

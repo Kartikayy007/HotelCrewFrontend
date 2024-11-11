@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Trash2 } from 'lucide-react';
 import staffIcon from '/staff.svg';
 import plus from '/tabler_plus.svg';
@@ -7,6 +7,7 @@ import lineIcon from '/Line.svg';
 function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
   const [departments, setDepartments] = useState(['', '', '']);
   const [error, setError] = useState('');
+  const departmentRefs = useRef([]);
 
   useEffect(() => {
     if (initialData.department_names && initialData.department_names.length > 0) {
@@ -34,7 +35,13 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
     e.preventDefault();
     if (departments.some(department => department === '')) {
       setError('Please fill out all required fields.');
+      const emptyDepartmentIndex = departments.findIndex(department => !department);
+      if (emptyDepartmentIndex !== -1 && departmentRefs.current[emptyDepartmentIndex]) {
+        // Scroll to the first empty field
+        departmentRefs.current[emptyDepartmentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
+
     }
     const departmentData = {
       department_names: departments,
@@ -47,7 +54,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
       <div className="flex flex-col lg:flex-row justify-center items-center gap-12 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-52">
-        <div className="flex lg:hidden gap-3 mb-4 fixed top-9">
+        <div className="flex lg:hidden gap-3 mb-4 fixed lg:top-9 top-1">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -92,12 +99,15 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
             </button>
           </div>
 
-          <div className="h-48 overflow-y-auto">
+          <div className="h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100">
             {departments.map((department, index) => (
-              <div key={index} className="mb-2 flex items-center gap-2">
+              <div 
+              key={index} 
+              ref={(el) => (departmentRefs.current[index] = el)}
+              className="mb-2 flex items-center gap-2">
                 <input
                   type="text"
-                  className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+                  className={`h-8 w-[285px] lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
                     !department && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                   } focus:border-purple-500`}
                   placeholder={'Department ' + (index + 1)}
@@ -115,9 +125,9 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
               </div>
             ))}
           </div>
-
+            <div className='h-5 '>
           {error && <p className="text-[#99182C] lg:fixed">{error}</p>}
-
+          </div>
           <div className="lg:fixed lg:top-[80vh]">
             <div className="lg:flex lg:justify-between flex justify-between">
               <button

@@ -103,7 +103,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
   const handleSubmitClick = (e) => {
     e.preventDefault();
     if (files.length === 0) {
-      setErrorMessage('Please upload a staff Excel sheet before submitting');
+      setErrorMessage('Please upload a staff Excel sheet');
       return;
     }
     updateFormData({ staff_excel_sheet: files[0] });
@@ -116,8 +116,8 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-24 lg:ml-[5.1rem] mx-auto ">
-        <div className="flex lg:hidden font-medium gap-3 mb-4">
+      <div className="flex flex-col lg:flex-row justify-center items-center gap-0 lg:ml-[5.1rem] m-auto p-0 lg:p-0 lg:gap-52">
+        <div className="flex lg:hidden font-medium gap-3 mb-4 fixed lg:top-9 top-1">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -165,7 +165,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
           />
 
           <div 
-            className={`w-[380px] lg:w-[623px] h-[227px] lg:h-[192px] border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer
+            className={`w-[330px] lg:w-[623px] h-[227px] lg:h-[192px] border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer
               ${dragActive ? 'border-[#5663AC] bg-[#F8F9FF]' : 'border-[#BDBDBD] bg-[#EFEFEF]'}
               ${errorMessage ? 'border-[#99182C]' : ''}`}
             onDragEnter={handleDrag}
@@ -193,9 +193,9 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
               </button>
             </div>
           </div>
-                <div className='h-1 lg:h-0'>
+                <div className='h-1 lg:text-left text-center '>
           {errorMessage && (
-            <div className="text-[#99182C] text-sm fixed">
+            <div className="text-[#99182C] text-sm ">
               {errorMessage}
             </div>
           )}
