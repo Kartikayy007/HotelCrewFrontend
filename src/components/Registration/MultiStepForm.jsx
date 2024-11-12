@@ -73,7 +73,7 @@ const MultiStepForm = () => {
     const departmentNamesArray = Array.isArray(formData.department_names)
       ? formData.department_names
       : formData.department_names.split(',').map(dep => dep.trim());
-
+  
     const transformedData = {
       user: userEmail,
       hotel_name: formData.hotel_name || "",
@@ -97,14 +97,15 @@ const MultiStepForm = () => {
       room_types: Array.isArray(formData.room_types) 
         ? formData.room_types.map(type => ({
             room_type: type.type || "",
-            count: safeParseInt(type.count) || 0
+            count: safeParseInt(type.count) || 0,
+            price: safeParseFloat(type.price) || 0
           }))
         : [],
       staff_excel_sheet: formData.staff_excel_sheet
     };
-
+  
     return transformedData;
-  };
+  };``
 
   const handleSubmit = async () => {
     try {
@@ -155,8 +156,11 @@ const MultiStepForm = () => {
     } catch (error) {
       console.error('Error submitting form:', error);
       console.error('Error response:', error.response?.data);
-      if(error.status == 400) {
-        alert("Uploaded EXCEL sheet already exists, Enter a unique EXCEL sheet");
+      if(error.status === 400) {
+        alert("EXCEL sheet already exists");
+      }
+      else if(error.status === 500) {
+        alert("Check your internet connection and try again");
       }
       else {
         alert("Hotel registration failed, please try again");
@@ -167,7 +171,7 @@ const MultiStepForm = () => {
   const updateFormData = (stepData, step) => {
     setFormData(prev => {
       const newData = { ...prev };
-      
+  
       switch (step) {
         case 1:
           return {
@@ -200,13 +204,12 @@ const MultiStepForm = () => {
             total_number_of_rooms: stepData.total_number_of_rooms || "",
             number_of_floors: stepData.number_of_floors || "",
             room_types: Array.isArray(stepData.room_types) ? stepData.room_types : [],
+            valet_parking_available: Boolean(stepData.valet_parking_available),
             valet_parking_capacity: stepData.valet_parking_capacity || ""
           };
         case 5:
           return {
             ...newData,
-            valet_parking_available: Boolean(stepData.valet_parking_available),
-            valet_parking_capacity: stepData.valet_parking_capacity || "",
             check_in_time: formatTime(stepData.check_in_time) || "",
             check_out_time: formatTime(stepData.check_out_time) || "",
             payment_methods: stepData.payment_methods || "",

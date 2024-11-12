@@ -107,7 +107,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
               className="mb-2 flex items-center gap-2">
                 <input
                   type="text"
-                  className={`h-8 w-[285px] lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+                  className={`placeholder:text-base h-8 w-[285px] lg:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                     !department && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                   } focus:border-purple-500`}
                   placeholder={'Department ' + (index + 1)}

@@ -80,7 +80,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-in-time"
               value={checkInTime}
               onChange={(e) => setCheckInTime(e.target.value)}
-              className={`h-8 w-[182px] lg:w-[299px] mr-6 py-2 px-4 border rounded-[4px] text-xs focus:outline-none ${
+              className={`placeholder:text-base h-8 w-[182px] lg:w-[299px] mr-6 py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
                 !checkInTime && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
@@ -98,7 +98,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-out-time"
               value={checkOutTime}
               onChange={(e) => setCheckOutTime(e.target.value)}
-              className={`h-8 w-[182px] lg:w-[299px] py-2 px-4 border rounded-[4px] text-xs focus:outline-none ${
+              className={`h-8 w-[182px] lg:w-[299px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
                 !checkOutTime && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder='Check-out timings'
@@ -117,7 +117,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="payment-methods"
               value={paymentMethods}
               onChange={(e) => setPaymentMethods(e.target.value)}
-              className={`h-8 w-[330px] lg:w-[623px] py-2 px-4 border rounded-[4px] text-xs focus:outline-none ${
+              className={`h-8 w-[330px] lg:w-[623px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
                 !paymentMethods && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder='Add Methods'

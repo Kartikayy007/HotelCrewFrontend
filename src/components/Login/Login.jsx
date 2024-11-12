@@ -31,12 +31,8 @@ const Login = () => {
 
 
 const validatePassword = useCallback((password) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
-    const samplePass = "Kartikay123#";
-    console.log(`Testing sample password: ${samplePass}`);
-    console.log(`Sample Password Valid: ${passwordRegex.test(samplePass)}`); 
-    const isValid = passwordRegex.test(password);
-    console.log(`Password: ${password}, Valid: ${isValid}`);
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
+    const isValid = passwordRegex.test(password);;
     return isValid;
 }, []);
   const handleInputChange = useCallback(
