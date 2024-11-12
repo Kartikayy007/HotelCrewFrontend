@@ -50,7 +50,6 @@ const LandingRoute = ({ children }) => {
   const accessToken = localStorage.getItem('accessToken') ;
   const user = useSelector((state) => state.user);
 
-  // Redirect to dashboard if user is authenticated (remembered or session) when accessing the root path
   if (accessToken && rememberMe) {
     return <Navigate to="/dashboard" replace />;
   }
