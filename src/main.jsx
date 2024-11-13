@@ -4,11 +4,13 @@ import { Provider } from 'react-redux'
 import { store } from './redux/Store.js'
 import './index.css'
 import App from './App.jsx'
+import Admin from './components/admin/Admin.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
-      <App />
+      {/* <App /> */}
+      <Admin />
     </ Provider>
   </StrictMode>,
 )

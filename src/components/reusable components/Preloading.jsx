@@ -10,7 +10,7 @@ function Preloading() {
     gsap.fromTo(preloadingRef.current, { top: '0' }, { top: '100vh', duration: 2, delay: 2.3, ease: 'power3.inOut' })
     const timeline = gsap.timeline();
     timeline
-      .fromTo(spansRef.current, { opacity: 1, y: 145 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, delay: 0.5 })
+      .fromTo(spansRef.current, { opacity: 1, y: 145 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, delay: 0.1 })
       .fromTo(spansRef1.current, { opacity: 1, y: 190 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1}); 
   }, []);
 

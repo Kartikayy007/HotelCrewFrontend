@@ -4,6 +4,10 @@ import RevealLinks from "./RevealLinks";
 import {Link} from "react-router-dom";
 import {Menu, X} from "lucide-react";
 import Preloading from "./reusable components/Preloading";
+import {gsap} from "gsap";
+import {ScrollTrigger} from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Onboarding = () => {
   const [rangeValue, setRangeValue] = useState(50);
@@ -31,6 +35,67 @@ const Onboarding = () => {
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  useEffect(() => {
+    gsap.fromTo(
+      ".animate-on-scroll",
+      { y: 200, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        scrollTrigger: {
+          trigger: ".animate-on-scroll",
+          start: "top 130%",
+          end: "top 90%",
+          scrub: 2,
+        },
+      }
+    );
+
+    gsap.fromTo(
+      ".animate-on-scroll1",
+      { y: 200, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        scrollTrigger: {
+          trigger: ".animate-on-scroll1",
+          start: "top 130%",
+          end: "top 90%",
+          scrub: 2,
+        },
+      }
+    );
+
+    gsap.fromTo(
+      ".animation3",
+      { y: 100, opacity: 0.5 },
+      {
+        y: 0,
+        opacity: 1,
+        scrollTrigger: {
+          trigger: ".animation3",
+          start: "top 80%",
+          end: "top 50%",
+          scrub: 1,
+        }
+      }
+    )
+
+    gsap.to(".parallax", {
+      y: -50, 
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".parallax",
+        start: "top 75%", 
+        end: "top 30%", 
+        scrub: 1,
+      },
+    });
+  }, []);
+
 
   return (
     <>
@@ -183,7 +248,7 @@ const Onboarding = () => {
               </div>
             </div>
 
-            <div className="relative left-9">
+            <div className="relative left-9 parallax">
               <img
                 src="/Mask group.svg"
                 alt="Hotel Staff Illustration"
@@ -192,9 +257,9 @@ const Onboarding = () => {
             </div>
           </div>
 
-          <div className="bg-[#5C69F8] m-4 md:m-12 lg:m-24 rounded-2xl min-h-[80vh] flex items-center">
+          <div className="bg-[#5C69F8] m-4 md:m-12 lg:m-24 rounded-2xl min-h-[80vh] flex items-center animate-on-scroll">
             <div className="flex flex-col lg:flex-row justify-center items-center w-full gap-8 lg:gap-16 py-8 lg:py-0">
-              <div className="w-full lg:w-1/2 px-6 lg:px-8 xl:px-16 flex flex-col justify-center">
+              <div className="w-full lg:w-1/2 px-6 lg:px-8 xl:px-16 flex flex-col justify-center ">
                 <div>
                   <h1 className="text-white text-3xl md:text-4xl lg:text-[44.9px] font-bold lg:w-full">
                     Transform your Hotel regardless of your{" "}
@@ -320,7 +385,7 @@ const Onboarding = () => {
           <Features />
 
           <div>
-            <div className="bg-[#252941] mx-4 md:mx-12 lg:m-24 rounded-2xl min-h-[450px] lg:h-[650px]">
+            <div className="bg-[#252941] mx-4 md:mx-12 lg:m-24 rounded-2xl min-h-[450px] lg:h-[650px] animate-on-scroll1">
               <div className="flex flex-col lg:flex-row justify-evenly items-center h-full py-8 lg:py-0 px-6 lg:px-0">
                 <div className="w-full lg:w-1/2 mb-8 lg:mb-0 lg:ml-12">
                   <div className="space-y-6 lg:space-y-12">
@@ -361,7 +426,7 @@ const Onboarding = () => {
                       unify team efforts while optimizing overall efficiency
                       across departments.
                     </p>
-                    <div className="flex justify-start">
+                    <div className="flex justify-start ">
                       <img
                         src="/playstore.svg"
                         alt="Play Store download"
@@ -371,9 +436,9 @@ const Onboarding = () => {
                   </div>
                 </div>
 
-                <div className="w-full lg:w-1/2 flex justify-center lg:justify-end lg:mr-40">
+                <div className="w-full lg:w-1/2 flex justify-center lg:justify-end lg:mr-40 animation3">
                   <img
-                    src="/iPhone 15 Pro - Black Titanium - Portrait.svg"
+                    src="/iPhone 15 Pro - Black Titanium - Portrait.svg "
                     alt="iPhone mockup"
                     className="w-56 md:w-64 lg:w-auto h-auto"
                   />
