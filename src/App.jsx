@@ -1,11 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import Login from './components/Login/Login';
-import Home from './components/Home';
-import MultiStepForm from './components/Registration/MultiStepForm';
-import SignUp from './components/signup/SignUp';
-import Onboarding from './components/Onboarding';
+// import Login from './components/Login/Login';
+// import Home from './components/Home';
+// import MultiStepForm from './components/Registration/MultiStepForm';
+// import SignUp from './components/signup/SignUp';
+// import Onboarding from './components/Onboarding';
+import Dash from './components/Manager/Dash'
 
 const RegistrationFlowGuard = ({ children }) => {
   const location = useLocation();
@@ -62,7 +63,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route
+        {/* <Route
           path="/signup"
           element={
             <PublicRoute>
@@ -111,8 +112,12 @@ const App = () => {
         />
 
         
+        <Route path="*" element={<Navigate to="/" replace />} /> */}
+        {/* Keep only the Dash route for now */}
+        <Route path="/mdashboard" element={<Dash />} />
+
+        {/* Redirect to "/" for any undefined routes */}
         <Route path="*" element={<Navigate to="/" replace />} />
-    
       </Routes>
     </Router>
   );
