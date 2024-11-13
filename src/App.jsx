@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 // import SignUp from './components/signup/SignUp';
 // import Onboarding from './components/Onboarding';
 import SidebarLayout from './components/Manager/MSideBar';
-import Dash from './components/manager/dash';
+import Dash from './components/Manager/Dash';
 import MDatabase from './components/Manager/MDatabase';
 import MExpense from './components/Manager/MExpense';
 import MSchedule from './components/Manager/MSchedule';
