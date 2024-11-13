@@ -6,8 +6,13 @@ import { useSelector } from 'react-redux';
 // import MultiStepForm from './components/Registration/MultiStepForm';
 // import SignUp from './components/signup/SignUp';
 // import Onboarding from './components/Onboarding';
-import Dash from './components/Manager/Dash'
-
+import SidebarLayout from './components/Manager/MSideBar';
+import Dash from './components/manager/dash';
+import MDatabase from './components/Manager/MDatabase';
+import MExpense from './components/Manager/MExpense';
+import MSchedule from './components/Manager/MSchedule';
+import MSettings from './components/Manager/MSettings';
+import MStaff from './components/Manager/MStaff';
 const RegistrationFlowGuard = ({ children }) => {
   const location = useLocation();
   const isRegistrationStarted = localStorage.getItem('registrationStarted');
@@ -112,12 +117,20 @@ const App = () => {
         />
 
         
-        <Route path="*" element={<Navigate to="/" replace />} /> */}
-        {/* Keep only the Dash route for now */}
-        <Route path="/mdashboard" element={<Dash />} />
+        // <Route path="*" element={<Navigate to="/" replace />} /> */}
+         {/* Keep only the Dash route for now */}
+        {/* // <Route path="/mdashboard" element={<Dash />} /> */}
 
-        {/* Redirect to "/" for any undefined routes */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+         {/* Redirect to "/" for any undefined routes */}
+        {/* // <Route path="*" element={<Navigate to="/" replace />} /> */}
+        <Route element={<SidebarLayout />}>
+          <Route path="/mdashboard" element={<Dash />} />
+          <Route path="/mschedule" element={<MSchedule />} />
+          <Route path="/mdatabase" element={<MDatabase />} />
+          <Route path="/mstaff" element={<MStaff />} />
+          <Route path="/mexpense" element={<MExpense />} />
+          <Route path="/msettings" element={<MSettings />} />
+        </Route>
       </Routes>
     </Router>
   );
