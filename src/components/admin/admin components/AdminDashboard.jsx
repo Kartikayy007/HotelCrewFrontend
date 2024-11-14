@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {PieChart} from "@mui/x-charts/PieChart";
 import {LineChart} from "@mui/x-charts/LineChart";
 import {BarChart} from "@mui/x-charts/BarChart";
+import { Database } from "lucide-react";
 
 function AdminDashboard() {
   const hours = new Date().getHours();
@@ -63,6 +64,19 @@ function AdminDashboard() {
         color: "#2A2AA9",
       },
     ],
+  };
+
+  const departmentData = {
+    xAxis: [{
+      id: "departments",
+      data: ["Front Desk", "Housekeeping", "Kitchen", "Maintenance", "Security"],
+      scaleType: "band",
+    }],
+    series: [{
+      type: "bar",
+      data: [12, 25, 18, 8, 15],
+      color: "#4C51BF",
+    }],
   };
 
   const greeting =
@@ -197,17 +211,19 @@ function AdminDashboard() {
           </div>
 
           <div className="bg-white rounded-lg shadow h-80 w-full p-4">
-            <h2 className="text-xl font-semibold mb-4">Leave Management</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="border rounded p-4">
-                <h3 className="font-medium">Pending Requests</h3>
-                <p className="text-2xl font-bold mt-2">5</p>
-              </div>
-              <div className="border rounded p-4">
-                <h3 className="font-medium">Approved Leaves</h3>
-                <p className="text-2xl font-bold mt-2">12</p>
-              </div>
-            </div>
+            <h2 className="text-xl font-semibold mb-4 flex gap-2">Staff Database</h2>
+            <BarChart
+    xAxis={departmentData.xAxis}
+    series={departmentData.series}
+    height={160}
+    margin={{top: 10, right: 10, bottom: 20, left: 40}}
+    sx={{
+      ".MuiBarElement-root:hover": {
+        fill: "#6B46C1",
+      },
+    }}
+  />
+              
           </div>
         </div>
 
@@ -223,9 +239,9 @@ function AdminDashboard() {
           </div>
 
           <div className="bg-white rounded-lg shadow h-56 w-full p-4 relative">
-            <h2 className="text-xl font-semibold">Calendar</h2>
+            <h2 className="text-xl font-semibold"></h2>
             <div className="text-sm text-gray-600">
-
+              
             </div>
           </div>
 

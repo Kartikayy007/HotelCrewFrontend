@@ -1,6 +1,6 @@
 import React from 'react'
 
-function AminAnalaytics() {
+function AdminAnalaytics() {
   return (
     <div>
       
@@ -8,4 +8,4 @@ function AminAnalaytics() {
   )
 }
 
-export default AminAnalaytics
+export default AdminAnalaytics
