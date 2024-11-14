@@ -1,18 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-// import Login from './components/Login/Login';
-// import Home from './components/Home';
-// import MultiStepForm from './components/Registration/MultiStepForm';
-// import SignUp from './components/signup/SignUp';
-// import Onboarding from './components/Onboarding';
-import SidebarLayout from './components/Manager/MSideBar';
-import Dash from './components/Manager/Dash';
-import MDatabase from './components/Manager/MDatabase';
-import MExpense from './components/Manager/MExpense';
-import MSchedule from './components/Manager/MSchedule';
-import MSettings from './components/Manager/MSettings';
-import MStaff from './components/Manager/MStaff';
+import Login from './components/Login/Login';
+import Home from './components/Home';
+import MultiStepForm from './components/Registration/MultiStepForm';
+import SignUp from './components/signup/SignUp';
+import Onboarding from './components/Onboarding';
+
 const RegistrationFlowGuard = ({ children }) => {
   const location = useLocation();
   const isRegistrationStarted = localStorage.getItem('registrationStarted');
@@ -68,7 +62,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* <Route
+        <Route
           path="/signup"
           element={
             <PublicRoute>
@@ -117,20 +111,12 @@ const App = () => {
         />
 
         
-        // <Route path="*" element={<Navigate to="/" replace />} /> */}
-         {/* Keep only the Dash route for now */}
-        {/* // <Route path="/mdashboard" element={<Dash />} /> */}
+         <Route path="*" element={<Navigate to="/" replace />} /> 
+       
 
          {/* Redirect to "/" for any undefined routes */}
-        {/* // <Route path="*" element={<Navigate to="/" replace />} /> */}
-        <Route element={<SidebarLayout />}>
-          <Route path="/mdashboard" element={<Dash />} />
-          <Route path="/mschedule" element={<MSchedule />} />
-          <Route path="/mdatabase" element={<MDatabase />} />
-          <Route path="/mstaff" element={<MStaff />} />
-          <Route path="/mexpense" element={<MExpense />} />
-          <Route path="/msettings" element={<MSettings />} />
-        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+        
       </Routes>
     </Router>
   );
