@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  LayoutDashboard, 
-  CalendarClock, 
-  Database, 
-  Receipt, 
-  Settings, 
+import {
+  LayoutDashboard,
+  CalendarClock,
+  Database,
+  Receipt,
+  Settings,
   LineChart,
   Menu,
   X,
@@ -33,31 +33,35 @@ const AdminSidebar = ({ onMenuItemClick }) => {
 
   const handleMenuClick = (component) => {
     onMenuItemClick(component);
-    setIsOpen(false); 
+    setIsOpen(false);
   };
 
   return (
     <>
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#252941] text-white lg:hidden"
         aria-label="Toggle menu"
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
+
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
-      <nav className={`
-        fixed top-0 left-0 h-full z-40 
-        lg:sticky lg:top-0 lg:left-0
-        w-64 bg-[#252941] text-white flex flex-col
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
+
+      <nav
+        className={`
+          fixed top-0 left-0 h-full z-40
+          lg:sticky lg:top-0 lg:left-0
+          w-64 bg-[#252941] text-white flex flex-col
+          transform transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
         <div className="flex flex-col items-center py-8 space-y-4">
           <div className="w-24 h-24 rounded-full overflow-hidden">
             <img

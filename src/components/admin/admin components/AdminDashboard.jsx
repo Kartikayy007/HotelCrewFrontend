@@ -214,11 +214,11 @@ function AdminDashboard() {
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
-      <h1 className="text-3xl font-semibold p-4 sm:p-8 lg:ml-8 ml-12">
+      <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
         {greeting}
       </h1>
 
-      <div className="flex flex-col lg:flex-row justify-around mx-2 sm:mx-8 gap-6">
+      <div className="flex flex-col lg:flex-row justify-around gap-6">
         <div className="flex flex-col space-y-6 w-full lg:w-4/6">
           <div className="bg-white rounded-lg shadow min-h-[320px] w-full p-4">
             <div className="mb-4">
@@ -226,7 +226,6 @@ function AdminDashboard() {
             </div>
 
             <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-2">
-              {/* Occupancy Rate */}
               <div className="flex-1 min-w-[250px]">
                 <h3 className="font-medium mb-2 text-center">Occupancy Rate</h3>
                 <PieChart
