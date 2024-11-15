@@ -1,22 +1,24 @@
-// import { Outlet, Link } from "react-router-dom";
 import { useState } from "react";
-import { Menu, X } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setCurrentComponent } from "../../redux/slices/ManagerSlice";
-import Dash from './Dash'
+import {
+    LayoutDashboard,
+    CalendarClock,
+    Database,
+    Settings,
+    LineChart,
+    Menu,
+    X,
+    ClipboardCheck } from 'lucide-react';
+import MDashboard from './MDashboard'
 import MDatabase from "./MDatabase";
-import MExpense from "./MExpense";
 import MSchedule from "./MSchedule";
-import MStaff from "./MStaff";
+import MAnalytics from "./MAnalytics";
+import MAttendance from "./MAttendance";
 import MSettings from "./MSettings";
-// import { setActiveComponent } from './redux/actions';
- // Import your Redux action
 
-const MSideBar = () => {
+
+const MSideBar = ({ onMenuItemClick }) => {
     const [image, setImage] = useState('/profile.png');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const dispatch = useDispatch();
-    const currentComponent = useSelector(state => state.manager.currentComponent);
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     }
@@ -28,94 +30,73 @@ const MSideBar = () => {
             setImage(imageUrl);
         }
     }
-    const renderContent = () => {
-        switch (currentComponent) {
-            case 'Dashboard': return <Dash />;
-            case 'Schedule':console.log("hell"); return <MSchedule />;
-            case 'Database': return <MDatabase />;
-            case 'Staff': return <MStaff />;
-            case 'Expense': return <MExpense />;
-            case 'Settings': return <MSettings />;
-            default: return <Dash />;
+    const menuItems = [
+        { icon: <LayoutDashboard size={20} />, label: 'Dashboard', component: MDashboard },
+        { icon: <CalendarClock size={20} />, label: 'Schedule ', component: MSchedule },
+        { icon: <ClipboardCheck size={20} />, label: 'Attendance', component: MAttendance },
+        { icon: <Database size={20} />, label: 'Database', component: MDatabase },
+        { icon: <LineChart size={20} />, label: 'Analytics', component: MAnalytics },
+        { icon: <Settings size={20} />, label: 'Settings', component: MSettings },
+    ];
+
+    const handleMenuClick = (component) => {
+        if (onMenuItemClick) {
+            onMenuItemClick(component); // Notify parent component
         }
     };
 
-
     return (
-        <section className='font-Montserrat lg:min-h-screen lg:w-full overflow-hidden'>
-            <div className='h-screen flex bg-[#e6eef9]'>
-                <div className={`lg:w-[17.5%] h-screen min-w-[253px] bg-[#252941] transition-transform transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-10`}>
-
-                    <div className='h-[30%] flex flex-col justify-center items-center text-[20px] text-[#e6eef9]'>
-                        <div className="w-[107px] h-[107px] rounded-full overflow-hidden flex items-center justify-center cursor-pointer">
-                            <img
-                                src={image}
-                                alt="profile"
-                                className="w-full h-full object-cover"
-                                onClick={() => document.getElementById("imageUpload").click()}
-                            />
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                                style={{ display: 'none' }}
-                                id="imageUpload"
-                            />
-                        </div>
-                        <div className="mt-6 font-semibold text-2xl">User Name</div>
-                    </div>
-                    <div className='h-[70%] flex flex-col text-[#e6eef9] justify-evenly text-base'>
-
-                        <div onClick={() => dispatch(setCurrentComponent('Dashboard'))} className='flex flex-row cursor-pointer'>
-                            <img src="/mdash.svg" alt="dash" className='pl-9 pr-9' />
-                            <div >
-                                Dashboard
-                            </div>
-
-                        </div>
-
-
-                        <div onClick={() => {dispatch(setCurrentComponent('Schedule')); console.log("schedule")} } className='flex flex-row cursor-pointer'>
-                            <img src="/mschedule.svg" alt="dash" className='pl-9 pr-9' />
-                            Schedule Status
-                        </div>
-
-
-                        <div onClick={() => {dispatch(setCurrentComponent('Database'));console.log("data")}} className='flex flex-row cursor-pointer'>
-                            <img src="/mdatabase.svg" alt="dash" className='pl-9 pr-9' />
-                            Database
-                        </div>
-
-
-                        <div onClick={() => dispatch(setCurrentComponent('Staff'))} className='flex flex-row cursor-pointer'>
-                            <img src="/mstaff.svg" alt="dash" className='pl-9 pr-9' />
-                            Staff Performance
-                        </div>
-
-
-                        <div onClick={() => dispatch(setCurrentComponent('Expense'))} className='flex flex-row cursor-pointer'>
-                            <img src="/mexpense.svg" alt="dash" className='pl-9 pr-9' />
-                            Expense Tracking
-                        </div>
-
-                        <div onClick={() => dispatch(setCurrentComponent('Settings'))} className='flex flex-row cursor-pointer'>
-                            <img src="/msettings.svg" alt="dash" className='pl-9 pr-9' />
-                            Settings
-                        </div>
-
-                    </div>
-                </div>
-                <div className='flex-1 p-6'>
-                    {renderContent()}
-                </div>
-                <div className='lg:hidden fixed top-4 left-4 z-20'>
-                    <button onClick={toggleSidebar} className={`${isSidebarOpen ? 'text-white' : 'text-[#252941]'}`}>
-                        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
-                </div>
+        <>
+            <div className='lg:hidden fixed top-4 left-2 z-20'>
+                <button onClick={toggleSidebar} className={`${isSidebarOpen ? 'text-white ' : 'text-[#252941]'}`}>
+                    {isSidebarOpen ? <X size={24} className="text-white" /> : <Menu size={24} />}
+                </button>
             </div>
-        </section>
+            <nav className={`
+                fixed top-0 left-0 h-full z-40 
+                lg:sticky lg:top-0 lg:left-0
+                w-64 bg-[#252941] text-white flex flex-col
+                transform transition-transform duration-300 ease-in-out
+                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+              `}>
+                <div className="flex flex-col items-center py-8 space-y-4">
+                    <div className="w-24 h-24 rounded-full overflow-hidden cursor-pointer">
+                        <img
+                            src={image}
+                            alt="profile"
+                            className="w-full h-full object-cover"
+                            onClick={() => document.getElementById("imageUpload").click()}
+                        />
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            style={{ display: 'none' }}
+                            id="imageUpload"
+                        />
+                    </div>
+                    <h2 className="text-xl font-semibold">Username</h2>
+                </div>
+
+                <ul className="flex-1 space-y-5  px-6 py-4 justify-center">
+                    {menuItems.map((item, index) => (
+                        <li key={index}>
+                            <button
+                                onClick={() => handleMenuClick(item.component)}
+                                className="flex items-center space-x-4 p-2 rounded-lg hover:bg-white/10 transition-colors w-full text-left"
+                            >
+                                {item.icon}
+                                <span className="text-lg">{item.label}</span>
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
+        </>
     );
+
+
+
 };
 
 export default MSideBar;

@@ -1,39 +1,53 @@
-import { useSelector } from 'react-redux';
-import Dash from './Dash';
-import MSchedule from './MSchedule';
-import MDatabase from './MDatabase';
-import MExpense from './MExpense';
-import MSettings from './MSettings';
-import MStaff from './MStaff';
+// import { useSelector, useDispatch } from 'react-redux';
+// import React from 'react';
+// import { setCurrentComponent } from "../../redux/slices/ManagerSlice";
+// import MSideBar from './MSideBar';
+
+// const MainLayout = () => {
+//   const dispatch=useDispatch();
+//   const currentComponent = useSelector(state => state.manager.currentComponent);
+
+//   const handleMenuItemClick = (component) => {
+//     dispatch(setCurrentComponent(component));
+//   };
+
+//   return (
+//     <div className="flex h-screen">
+//       <MSideBar onMenuItemClick={handleMenuItemClick} />
+//       <div className="flex-1 bg-[#e6eef9] overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-thumb-rounded-full scrollbar-track-gray-100">
+//       {currentComponent
+//                     ? React.createElement(currentComponent)
+//                     : <div>Component not found</div>}
+//       </div>
+//     </div>
+//   );
+
+// };
+
+// export default MainLayout;
+import { useSelector, useDispatch } from 'react-redux';
+import React from 'react';
+import { setCurrentComponent } from "../../redux/slices/ManagerSlice";
+import MSideBar from './MSideBar';
 
 const MainLayout = () => {
-  const activeComponent = useSelector((state) => state.view.activeComponent);
+    const dispatch = useDispatch();
+    const currentComponent = useSelector((state) => state.manager.currentComponent);
 
-  const renderComponent = () => {
-    switch (activeComponent) {
-      case 'dashboard':
-        return <Dash />;
-      case 'schedule':
-        return <MSchedule />;
-      case 'expense':
-        return <MExpense />;
-      case 'settings':
-        return <MSettings />;
-      case 'staff':
-        return <MStaff />;
-      default:
-        return <Dash />;
-    }
-  };
+    const handleMenuItemClick = (component) => {
+        dispatch(setCurrentComponent(component)); // Update the Redux state
+    };
 
-  return (
-    <div className="main-layout">
-      <MSideBar />
-      <div className="content-area">
-        {renderComponent()}
-      </div>
-    </div>
-  );
+    return (
+        <div className="flex h-screen">
+            <MSideBar onMenuItemClick={handleMenuItemClick} />
+            <div className="flex-1 bg-[#e6eef9] overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-thumb-rounded-full scrollbar-track-gray-100">
+                {currentComponent
+                    ? React.createElement(currentComponent)
+                    : <div>Component not found</div>}
+            </div>
+        </div>
+    );
 };
 
 export default MainLayout;
