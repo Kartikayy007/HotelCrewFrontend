@@ -10,6 +10,8 @@ const MAttendance = () => {
     { id: 1, name: "John Doe", email: "john@example.com", department: "Reception" },
     { id: 2, name: "Jane Smith", email: "jane@example.com", department: "Kitchen" },
     { id: 3, name: "Alice Brown", email: "alice@example.com", department: "Security" },
+    { id: 4, name: "Alice Brown", email: "alice@example.com", department: "Housekeeping" },
+    // { id: 5, name: "Alice Brown", email: "alice@example.com", department: "Housekeeping" },
   ]);
 
   const handleDepartmentChange = (e) => {
@@ -75,8 +77,10 @@ const MAttendance = () => {
     <section className=" h-screen p-2 mr-4 font-Montserrat">
       <h2 className="text-[#252941] text-2xl pl-3 mt-4 font-semibold">Staff Attendance</h2>
       {/* <div> */}
-      <h2 className="text-[#252941] text-lg pl-3 mt-4 mb-0 font-semibold">Select Department:</h2>
-      <div className="flex mb-4 p-2 flex-wrap gap-4">
+      <div className='flex justify-center mb-3 mt-3 pb-5 px-3'>
+      <div className="bg-white w-full h-auto pb-7  py-2  rounded-lg shadow">
+      <h2 className="text-[#252941] text-lg pl-6 mt-4 mb-0 font-semibold">Select Department:</h2>
+      <div className="flex mb-4 pl-6 p-2 flex-wrap gap-4">
          {/* "All" Button */}
          <button
           key="all"
@@ -94,17 +98,18 @@ const MAttendance = () => {
             className={`px-4 py-1 w-[150px]  rounded-xl border-none ${
               selectedDepartments.includes(dept)
                 ? "bg-[#8094D4] text-white"
-                : "bg-white text-gray-700 font-semibold border border-gray-800"
+                : "bg-gray-100 text-gray-700 font-semibold border border-gray-800"
             }`}
           >
             {dept}
           </button>
         ))}
       </div>
-      <table className="w-full mx-2 overflow-x-scroll px-3 table-auto border border-gray-200 rounded-xl shadow">
+      <div className="overflow-y-auto lg:overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-200 max-h-[200px] mx-2 px-3">
+      <table className="w-[96%] px-3 mx-auto  border border-gray-200 rounded-xl shadow">
         {/* Table Headers */}
         <thead>
-          <tr className="bg-[#252941] text-white">
+          <tr className="bg-white text-[#252941]">
             <th className="px-4 py-2 text-left">Name</th>
             <th className="px-4 py-2 text-left">Email</th>
             <th className="px-4 py-2 text-left">Department</th>
@@ -124,7 +129,7 @@ const MAttendance = () => {
                 <td className="px-4 py-2">{staff.email}</td>
                 <td className="px-4 py-2">{staff.department}</td>
                 <td className="px-4 py-2 text-center">
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  {/* <label className="relative inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
                       className="sr-only"
@@ -143,7 +148,15 @@ const MAttendance = () => {
                         staff.present ? "transform translate-x-5" : ""
                       }`}
                     ></span>
-                  </label>
+                  </label> */}
+                  <button
+                          className={`px-4 py-1 rounded-full ${
+                            staff.present ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                          }`}
+                          onClick={() => handleToggleAttendance(staff.id)}
+                        >
+                          {staff.present ? "P" : "A"}
+                        </button>
                 </td>
               </tr>
             ))
@@ -156,6 +169,9 @@ const MAttendance = () => {
           )}
         </tbody>
       </table>
+      </div>
+      </div>
+      </div>
     </section>
   )
 }
