@@ -10,6 +10,7 @@ import {
     ClipboardCheck } from 'lucide-react';
 import MDashboard from './MDashboard'
 import MSchedule from "./MSchedule";
+import MDatabase from "./MDatabase";
 import MAnalytics from "./MAnalytics";
 import MAttendance from "./MAttendance";
 import MSettings from "./MSettings";
@@ -47,8 +48,8 @@ const MSideBar = ({ onMenuItemClick }) => {
     return (
         <>
             <div className='lg:hidden fixed top-4 left-2 z-20'>
-                <button onClick={toggleSidebar} className={`${isSidebarOpen ? 'text-white ' : 'text-[#252941]'}`}>
-                    {isSidebarOpen ? <X size={24} className="text-white" /> : <Menu size={24} />}
+                <button onClick={toggleSidebar} className={`${isSidebarOpen ? 'text-white ' : 'text-[#252941]'} cursor-pointer`}>
+                    {isSidebarOpen ? <X size={24}  /> : <Menu size={24} />}
                 </button>
             </div>
             <nav className={`
