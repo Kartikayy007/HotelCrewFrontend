@@ -73,10 +73,10 @@ const MAttendance = () => {
       staff.name.toLowerCase().includes(searchTerm)
   );
   return (
-    <section className=" h-screen p-2 mr-4 font-Montserrat">
-      <h2 className="text-[#252941] text-2xl pl-3 mt-4 font-semibold">Staff Attendance</h2>
+    <section className=" h-screen p-2 mr-1 font-Montserrat">
+      <h2 className="text-[#252941] text-2xl pl-4 mt-5 font-semibold">Staff Attendance</h2>
       {/* <div> */}
-      <div className='flex justify-center mb-1 mt-3 pb-5 px-3'>
+      <div className='flex justify-center mb-1 mt-6 pb-5 px-3'>
         {/* <div className="bg-white w-full h-[392px] pb-7  py-2  rounded-lg shadow"> */}
         <div className={`bg-white w-full rounded-lg shadow ${isTableExpanded ? "h-screen" : "h-[392px]"}`}>
           <div className="flex justify-between items-center p-4">
@@ -96,12 +96,26 @@ const MAttendance = () => {
               />
             )}
           </div>
-          <div className="flex mb-4 pl-6 p-2 flex-wrap gap-4">
+          <div className="md:hidden p-4">
+            <select
+              className="w-full py-2 px-4 border border-gray-300 rounded-lg"
+              onChange={(e) => handleDepartmentToggle(e.target.value)}
+              value={selectedDepartments[0]} // Show the first selected option
+            >
+              <option value="All">All</option>
+              {department.map((dept) => (
+                <option key={dept} value={dept}>
+                  {dept}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className=" hidden md:flex mb-4 pl-[38px] p-2 flex-wrap gap-4">
             {/* "All" Button */}
             <button
               key="all"
               onClick={() => handleDepartmentToggle('All')}
-              className={`px-4 py-1 w-[150px] rounded-xl border-none ${selectedDepartments.includes('All') ? "bg-[#8094D4] text-white" : "bg-gray-100 text-gray-700 font-semibold border border-gray-700"
+              className={`px-4 py-1 w-[150px] rounded-xl border-none ${selectedDepartments.includes('All') ? "bg-[#252941] text-white" : "bg-gray-100 text-gray-700 font-semibold border border-gray-700"
                 }`}
             >
               All
@@ -111,7 +125,7 @@ const MAttendance = () => {
                 key={dept}
                 onClick={() => handleDepartmentToggle(dept)}
                 className={`px-4 py-1 w-[150px]  rounded-xl border-none ${selectedDepartments.includes(dept)
-                    ? "bg-[#8094D4] text-white"
+                    ? "bg-[#252941] text-white"
                     : "bg-gray-100 text-gray-700 font-semibold border border-gray-800"
                   }`}
               >
@@ -121,10 +135,10 @@ const MAttendance = () => {
           </div>
           <div
             className={`overflow-y-auto ${isTableExpanded ? "max-h-[calc(100%-200px)]" : "max-h-[200px]"
-              } mx-2 px-3`}
+              } mx-2 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-200`}
           >
-            {/* <div className="overflow-y-auto lg:overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-200 max-h-[200px] mx-2 px-3"> */}
-            <table className="w-[96%] px-3 mx-auto  border border-gray-200 rounded-xl shadow ">
+            
+            <table className="w-[96%] px-3 mx-auto  border border-gray-200 rounded-xl shadow  ">
               {/* Table Headers */}
               <thead>
                 <tr className="bg-white text-[#252941]">
@@ -191,7 +205,7 @@ const MAttendance = () => {
                   </div>
                   <div className="space-x-2 w-[100px] md:w-auto flex flex-col gap-5 md:gap-2 lg:flex-row">
                     <button
-                      className="px-4 w-full  py-1 text-white bg-[#8094D4] rounded-full hover:bg-[#252941]"
+                      className="px-4 w-full  py-1 text-white bg-[#252941] rounded-full hover:bg-[#252941]"
                       onClick={() => handleLeaveAction(request.id, "approved")}
                     >
                       Approve

@@ -20,7 +20,9 @@ const MSideBar = ({ onMenuItemClick }) => {
     const [image, setImage] = useState('/profile.png');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
+        console.log(isSidebarOpen)
+        setIsSidebarOpen(prevState => !prevState);
+
     }
 
     const handleImageUpload = (event) => {
@@ -47,13 +49,13 @@ const MSideBar = ({ onMenuItemClick }) => {
 
     return (
         <>
-            <div className='lg:hidden fixed top-4 left-2 z-20'>
+            <div className='lg:hidden fixed top-3 left-2 z-50'>
                 <button onClick={toggleSidebar} className={`${isSidebarOpen ? 'text-white ' : 'text-[#252941]'} cursor-pointer`}>
-                    {isSidebarOpen ? <X size={24}  /> : <Menu size={24} />}
+                    {isSidebarOpen ? <X size={24}   /> : <Menu size={24} />}
                 </button>
             </div>
             <nav className={`
-                fixed top-0 left-0 h-full z-40 
+                fixed top-0 left-0 h-full z-30 
                 lg:sticky lg:top-0 lg:left-0
                 w-64 bg-[#252941] text-white flex flex-col
                 transform transition-transform duration-300 ease-in-out
