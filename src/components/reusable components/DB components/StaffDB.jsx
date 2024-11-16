@@ -51,9 +51,9 @@ function StaffDB() {
   };
 
   return (
-    <div className="w-full mx-auto bg-white rounded-lg shadow-lg">
-      <div className="max-h-[calc(100vh-200px)] overflow-auto">
-        <table className="w-full">
+    <section className="max-w-full mx-auto bg-white rounded-lg shadow-lg">
+      <div className="max-h-[calc(100vh-260px)] overflow-auto">
+        <table className="w-full rounded-tr-lg overflow-hidden">
           <thead className="sticky top-0 bg-white z-10">
             <tr className="border-b bg-[#252941] text-white">
               <th className="p-4 text-left font-semibold">Employee</th>
@@ -62,7 +62,7 @@ function StaffDB() {
               <th className="p-4 text-left font-semibold">Email</th>
               <th className="p-4 text-left font-semibold">Shift</th>
               <th className="p-4 text-left font-semibold">Rating</th>
-              <th className="p-4 text-left font-semibold">Actions</th>
+              <th className="p-4 text-left font-semibold ">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -75,7 +75,7 @@ function StaffDB() {
               >
                 <td className="p-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden shadow-md">
                       <img
                         src={`https://randomuser.me/api/portraits/men/${employee.id}.jpg`}
                         alt={employee.name}
@@ -183,7 +183,7 @@ function StaffDB() {
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 }
 

@@ -1,25 +1,70 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import StaffDB from "./DB components/StaffDB";
 import CustomerDB from "./DB components/CustomerDB";
-import {Search} from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 
 function DataBase() {
   const [activeComponent, setActiveComponent] = React.useState("StaffDB");
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
+  const scrollContainerRef = useRef(null);
+
+  // Check scroll position to show/hide arrows
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setShowLeftArrow(scrollLeft > 0);
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  // Add scroll event listener
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', checkScroll);
+      // Initial check
+      checkScroll();
+      return () => scrollContainer.removeEventListener('scroll', checkScroll);
+    }
+  }, []);
+
+  const scroll = (direction) => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 200;
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
-      <div>
+      <div className="w-[95vw] sm:w-[95vw] md:w-[95vw] lg:w-[75vw] xl:w-[80vw]">
         <div>
-          <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12 text-[#252941]">
+          <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12 text-[#252941] mb-2">
             Database
           </h1>
         </div>
-        <div className="filters flex justify-center mb-5">
-          <div className="filter-buttons flex justify-between gap-8 items-center w-full max-w-7xl">
-            <h1 className="text-2xl font-medium [#F1F6FC]space-nowrap">Filters</h1>
+        <div className="filters flex justify-start md:justify-center mb-5">
+          <div className="filter-buttons flex flex-col lg:flex-row gap-2 items-center w-full max-w-7xl">
+            <h1 className="text-2xl font-medium space-nowrap text-start lg:block hidden">Filters</h1>
             
-            <div className="flex-1 mx-8 overflow-x-auto">
-              <div className="flex gap-2 min-w-max">
+            <div className="flex-1 w-full mx-8 relative">
+              {showLeftArrow && (
+                <button 
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 lg:hidden bg-white/80 rounded-full shadow-md p-1 hover:bg-white"
+                  onClick={() => scroll('left')}
+                >
+                  <ChevronLeft className="w-5 h-5 text-[#5663AC]" />
+                </button>
+              )}
+
+              <div 
+                ref={scrollContainerRef}
+                className="scroll-container flex gap-2 overflow-x-auto hide-scrollbar w-full" 
+              >
                 {activeComponent === "StaffDB" && (
                   <>
                     <select className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full ">
@@ -87,9 +132,18 @@ function DataBase() {
                   </>
                 )}
               </div>
+
+              {showRightArrow && (
+                <button 
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 lg:hidden bg-white/80 rounded-full shadow-md p-1 hover:bg-white"
+                  onClick={() => scroll('right')}
+                >
+                  <ChevronRight className="w-5 h-5 text-[#5663AC]" />
+                </button>
+              )}
             </div>
 
-            <div className="relative min-w-[320px] ">
+            <div className="relative w-full md:w-full lg:w-2/6">
               <input
                 type="text"
                 placeholder="Search..."

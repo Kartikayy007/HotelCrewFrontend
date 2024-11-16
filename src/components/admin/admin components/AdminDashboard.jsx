@@ -5,8 +5,8 @@ import {BarChart} from "@mui/x-charts/BarChart";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import {Dialog, TextField, Button} from "@mui/material";
-import Skeleton from '@mui/material/Skeleton';
-import { CircularProgress } from '@mui/material';
+import Skeleton from "@mui/material/Skeleton";
+import {CircularProgress} from "@mui/material";
 
 function AdminDashboard() {
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
@@ -22,8 +22,8 @@ function AdminDashboard() {
   const skeletonProps = {
     animation: "wave",
     sx: {
-      animationDuration: "0.8s", 
-    }
+      animationDuration: "0.8s",
+    },
   };
 
   useEffect(() => {
@@ -75,7 +75,6 @@ function AdminDashboard() {
 
     return marks;
   };
-
 
   const marks = generateMarks();
 
@@ -177,18 +176,18 @@ function AdminDashboard() {
       : "Good Evening";
 
   const [announcements, setAnnouncements] = useState([
-    {
-      id: 1,
-      title: "Hotel Maintenance",
-      description: "Pool maintenance scheduled for tomorrow 10 AM - 2 PM",
-      date: "2024-03-20 09:00",
-    },
-    {
-      id: 2,
-      title: "Staff Meeting",
-      description: "Monthly staff meeting in Conference Room A",
-      date: "2024-03-19 14:00",
-    },
+    // {
+    //   id: 1,
+    //   title: "Hotel Maintenance",
+    //   description: "Pool maintenance scheduled for tomorrow 10 AM - 2 PM",
+    //   date: "2024-03-20 09:00",
+    // },
+    // {
+    //   id: 2,
+    //   title: "Staff Meeting",
+    //   description: "Monthly staff meeting in Conference Room A",
+    //   date: "2024-03-19 14:00",
+    // },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newAnnouncement, setNewAnnouncement] = useState({
@@ -216,7 +215,6 @@ function AdminDashboard() {
     }
   };
 
-
   const handleViewAnnouncement = (announcement) => {
     setSelectedAnnouncement(announcement);
   };
@@ -225,24 +223,6 @@ function AdminDashboard() {
     setSelectedAnnouncement(null);
   };
 
-  const LoadingBarGraph = () => (
-    <Box
-      sx={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.7)',
-        zIndex: 1,
-      }}
-    >
-      <CircularProgress sx={{ color: '#4C51BF' }} />
-    </Box>
-  );
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
@@ -250,8 +230,8 @@ function AdminDashboard() {
         {greeting}
       </h1>
 
-      <div className="flex flex-col lg:flex-row justify-around gap-6">
-        <div className="flex flex-col space-y-6 w-full lg:w-4/6">
+      <div className="flex flex-col xl:flex-row justify-around gap-6">
+        <div className="flex flex-col space-y-6 w-full xl:w-4/6">
           <div className="bg-white rounded-lg shadow min-h-[320px] w-full p-4">
             <div className="mb-4">
               <h2 className="text-lg sm:text-xl font-semibold">Hotel Status</h2>
@@ -260,118 +240,132 @@ function AdminDashboard() {
             <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-2">
               {loading ? (
                 <>
-                  <Skeleton 
-                    variant="rectangular" 
-                    width={250} 
-                    height={220} 
-                    {...skeletonProps} 
+                  <Skeleton
+                    variant="rectangular"
+                    width={250}
+                    height={220}
+                    {...skeletonProps}
                   />
-                  <Skeleton 
-                    variant="rectangular" 
-                    width={250} 
-                    height={220} 
-                    {...skeletonProps} 
+                  <Skeleton
+                    variant="rectangular"
+                    width={250}
+                    height={220}
+                    {...skeletonProps}
                   />
-                  <Skeleton 
-                    variant="rectangular" 
-                    width={250} 
-                    height={220} 
-                    {...skeletonProps} 
+                  <Skeleton
+                    variant="rectangular"
+                    width={250}
+                    height={220}
+                    {...skeletonProps}
                   />
                 </>
               ) : (
                 <>
-                  <div className="flex-1 min-w-[250px]">
-                    <h3 className="font-medium mb-2 text-center">Occupancy Rate</h3>
-                    <PieChart
-                      series={[
-                        {
-                          data: occupancyData,
-                          highlightScope: {fade: "global", highlight: "item"},
-                          innerRadius: 45,
-                          paddingAngle: 1,
-                          cornerRadius: 1,
-                        },
-                      ]}
-                      height={220}
-                      width={250}
-                      margin={{top: 0, bottom: 40, left: 0, right: 0}}
-                      slotProps={{
-                        legend: {
-                          direction: "row",
-                          position: {vertical: "bottom", horizontal: "center"},
-                          padding: 0,
-                          markSize: 10,
-                          itemGap: 15,
-                          labelStyle: {
-                            fontSize: 12,
-                            fontWeight: 500,
+                  <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row overflow-hidden flex-1">
+                    <div className="flex-1 min-w-[250px] ">
+                      <h3 className="font-medium mb-2 text-center">
+                        Occupancy Rate
+                      </h3>
+                      <PieChart
+                        series={[
+                          {
+                            data: occupancyData,
+                            highlightScope: {fade: "global", highlight: "item"},
+                            innerRadius: 45,
+                            paddingAngle: 1,
+                            cornerRadius: 1,
                           },
-                        },
-                      }}
-                    />
-                  </div>
+                        ]}
+                        height={220}
+                        margin={{top: 0, bottom: 40, left: 0, right: 0}}
+                        slotProps={{
+                          legend: {
+                            direction: "row",
+                            position: {
+                              vertical: "bottom",
+                              horizontal: "center",
+                            },
+                            padding: 0,
+                            markSize: 10,
+                            itemGap: 15,
+                            labelStyle: {
+                              fontSize: 12,
+                              fontWeight: 500,
+                            },
+                          },
+                        }}
+                      />
+                    </div>
 
-                  <div className="flex-1 min-w-[250px]">
-                    <h3 className="font-medium mb-2 text-center">Staff Status</h3>
-                    <PieChart
-                      series={[
-                        {
-                          data: staffStatus,
-                          highlightScope: {fade: "global", highlight: "item"},
-                          innerRadius: 45,
-                          paddingAngle: 1,
-                          cornerRadius: 1,
-                        },
-                      ]}
-                      height={220}
-                      width={250}
-                      margin={{top: 0, bottom: 40, left: 0, right: 0}}
-                      slotProps={{
-                        legend: {
-                          direction: "row",
-                          position: {vertical: "bottom", horizontal: "center"},
-                          padding: 0,
-                          markSize: 10,
-                          itemGap: 15,
-                          labelStyle: {
-                            fontSize: 15,
-                            fontWeight: 500,
+                    <div className="flex-1 min-w-[250px]">
+                      <h3 className="font-medium mb-2 text-center">
+                        Staff Status
+                      </h3>
+                      <PieChart
+                        series={[
+                          {
+                            data: staffStatus,
+                            highlightScope: {fade: "global", highlight: "item"},
+                            innerRadius: 45,
+                            paddingAngle: 1,
+                            cornerRadius: 1,
                           },
-                        },
-                      }}
-                    />
-                  </div>
+                        ]}
+                        height={220}
+                        margin={{top: 0, bottom: 40, left: 0, right: 0}}
+                        slotProps={{
+                          legend: {
+                            direction: "row",
+                            position: {
+                              vertical: "bottom",
+                              horizontal: "center",
+                            },
+                            padding: 0,
+                            markSize: 10,
+                            itemGap: 15,
+                            labelStyle: {
+                              fontSize: 15,
+                              fontWeight: 500,
+                            },
+                          },
+                        }}
+                      />
+                    </div>
 
-                  <div className="flex-1 min-w-[250px]">
-                    <h3 className="font-medium mb-2 text-center">Staff Attendance</h3>
-                    <PieChart
-                      series={[
-                        {
-                          data: staffAttendance,
-                          highlightScope: {fade: "global", highlight: "item"},
-                          innerRadius: 45,
-                          paddingAngle: 1,
-                          cornerRadius: 1,
-                        },
-                      ]}
-                      height={220}
-                      width={250}
-                      margin={{top: 0, bottom: 40, left: 0, right: 0}}
-                      slotProps={{
-                        legend: {
-                          direction: "row",
-                          position: {vertical: "bottom", horizontal: "center"},
-                          padding: 0,
-                          markSize: 10,
-                          itemGap: 10,
-                          labelStyle: {
-                            fontSize: 13,
-                            fontWeight: 500,
+                    <div className="flex-1 min-w-[250px]">
+                      <h3 className="font-medium mb-2 text-center">
+                        Staff Attendance
+                      </h3>
+                      <PieChart
+                        series={[
+                          {
+                            data: staffAttendance,
+                            highlightScope: {fade: "global", highlight: "item"},
+                            innerRadius: 45,
+                            paddingAngle: 1,
+                            cornerRadius: 1,
                           },
-                        },
-                      }}
-                    />
+                        ]}
+                        height={220}
+                        margin={{top: 0, bottom: 40, left: 0, right: 0}}
+                        slotProps={{
+                          legend: {
+                            direction: "row",
+                            position: {
+                              vertical: "bottom",
+                              horizontal: "center",
+                            },
+                            padding: 0,
+                            markSize: 10,
+                            itemGap: 10,
+                            labelStyle: {
+                              fontSize: 13,
+                              fontWeight: 500,
+                            },
+                          },
+                        }}
+                      />
+                    </div>
                   </div>
                 </>
               )}
@@ -384,11 +378,11 @@ function AdminDashboard() {
             </h2>
             <Box sx={{width: "100%", mb: 4}}>
               {loading ? (
-                <Skeleton 
-                  variant="rectangular" 
-                  width="100%" 
-                  height={250} 
-                  {...skeletonProps} 
+                <Skeleton
+                  variant="rectangular"
+                  width="100%"
+                  height={250}
+                  {...skeletonProps}
                 />
               ) : (
                 <LineChart
@@ -427,15 +421,16 @@ function AdminDashboard() {
 
           <div className="bg-white rounded-lg shadow min-h-[416px] w-full p-4">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
-              Staff Metrics (Hours {performanceRange[0]} - {performanceRange[1]})
+              Staff Metrics (Hours {performanceRange[0]} - {performanceRange[1]}
+              )
             </h2>
             <Box sx={{width: "100%", mb: 4}}>
               {loading ? (
-                <Skeleton 
-                  variant="rectangular" 
-                  width="100%" 
-                  height={250} 
-                  {...skeletonProps} 
+                <Skeleton
+                  variant="rectangular"
+                  width="100%"
+                  height={250}
+                  {...skeletonProps}
                 />
               ) : (
                 <LineChart
@@ -460,78 +455,103 @@ function AdminDashboard() {
           </div>
         </div>
 
-        <div className="flex flex-col space-y-6 w-full lg:w-[30%]">
+        <div className="flex flex-col space-y-6 w-full xl:w-[30%]">
           <div className="bg-white rounded-lg shadow min-h-[416px] w-full p-4">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">Staff Database</h2>
-            <Box sx={{ position: 'relative', height: 340 }}>
-              <BarChart
-                xAxis={departmentData.xAxis}
-                series={departmentData.series}
-                height={340}
-                width={350}
-                margin={{top: 10, right: 10, bottom: 20, left: 40}}
-                sx={{
-                  ".MuiBarElement-root:hover": {
-                    fill: "#6B46C1",
-                  },
-                }}
-                borderRadius={10}
-              />
-              {loading && <LoadingBarGraph />}
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+              Staff Database
+            </h2>
+            <Box sx={{position: "relative", height: 340}}>
+              {loading ? (
+                <Skeleton
+                  variant="rectangular"
+                  width="100%"
+                  height={340}
+                  animation="wave"
+                  sx={{
+                    borderRadius: 2,
+                    backgroundColor: "rgba(0, 0, 0, 0.1)",
+                  }}
+                />
+              ) : (
+                <BarChart
+                  xAxis={departmentData.xAxis}
+                  series={departmentData.series}
+                  height={340}
+                  margin={{top: 10, right: 10, bottom: 20, left: 40}}
+                  sx={{
+                    ".MuiBarElement-root:hover": {
+                      fill: "#6B46C1",
+                    },
+                  }}
+                  borderRadius={10}
+                />
+              )}
             </Box>
           </div>
 
-          <div className="bg-white rounded-lg shadow min-h-[728px] w-full p-4">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">Announcements</h2>
-            {loading ? (
-              <div className="space-y-4">
-                <Skeleton 
-                  variant="text" 
-                  width="60%" 
-                  height={24} 
-                  {...skeletonProps} 
-                />
-                <Skeleton 
-                  variant="rectangular" 
-                  width="100%" 
-                  height={60} 
-                  {...skeletonProps} 
-                />
-                <Skeleton 
-                  variant="rectangular" 
-                  width="100%" 
-                  height={60} 
-                  {...skeletonProps} 
-                />
-                <Skeleton 
-                  variant="rectangular" 
-                  width="100%" 
-                  height={60} 
-                  {...skeletonProps} 
-                />
-              </div>
-            ) : (
-              <div className="overflow-auto h-[37]">
-                {announcements.map((announcement) => (
-                  <div
-                    key={announcement.id}
-                    className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
-                    onClick={() => handleViewAnnouncement(announcement)}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold text-lg">
-                        {announcement.title}
-                      </h3>
-                      <span className="text-sm text-gray-500">
-                        {announcement.date}
-                      </span>
+          <div className="bg-white rounded-lg shadow w-full p-4 flex flex-col h-[calc(66vh)] min-h-[765px]">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+              Announcements
+            </h2>
+            <div className="flex-1 overflow-y-auto mb-4">
+              {loading ? (
+                <div className="space-y-4">
+                  <Skeleton
+                    variant="text"
+                    width="60%"
+                    height={24}
+                    {...skeletonProps}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height={60}
+                    {...skeletonProps}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height={60}
+                    {...skeletonProps}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height={60}
+                    {...skeletonProps}
+                  />
+                </div>
+              ) : (
+                <div className="overflow-scroll">
+                  {announcements.length > 0 ? (
+                    announcements.map((announcement) => (
+                      <div
+                        key={announcement.id}
+                        className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
+                        onClick={() => handleViewAnnouncement(announcement)}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-semibold text-lg">
+                            {announcement.title}
+                          </h3>
+                          <span className="text-sm text-gray-500">
+                            {announcement.date}
+                          </span>
+                        </div>
+                        <p className="text-gray-600">
+                          {announcement.description}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex justify-center mt-72 h-full text-gray-500">
+                      No announcements available
                     </div>
-                    <p className="text-gray-600">{announcement.description}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="mt-4">
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="mt-auto">
               <Button
                 variant="contained"
                 fullWidth

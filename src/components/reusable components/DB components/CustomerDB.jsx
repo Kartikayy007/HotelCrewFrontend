@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { MoreVertical, Edit2, Trash2, Eye, X } from "lucide-react";
-import { Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
+import React, {useState} from "react";
+import {MoreVertical, Edit2, Trash2, Eye, X} from "lucide-react";
+import {Menu, MenuItem, ListItemIcon, ListItemText} from "@mui/material";
 
 function CustomerDB() {
   const [customers] = useState([
@@ -51,9 +51,9 @@ function CustomerDB() {
   };
 
   const getVipStatusColor = (status) => {
-    return status === 'VIP' 
-      ? 'bg-yellow-100 text-yellow-800 border-yellow-200' 
-      : 'bg-gray-100 text-gray-800 border-gray-200';
+    return status === "VIP"
+      ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+      : "bg-gray-100 text-gray-800 border-gray-200";
   };
 
   const handleMenuOpen = (event, customer) => {
@@ -67,9 +67,9 @@ function CustomerDB() {
   };
 
   return (
-    <section className="w-full mx-auto bg-white rounded-lg shadow-lg">
-      <div className="max-h-[calc(100vh-200px)] overflow-auto">
-        <table className="w-full">
+    <section className="max-w-full mx-auto bg-white rounded-lg shadow-lg">
+      <div className="max-h-[calc(100vh-260px)] overflow-auto">
+        <table className="w-full rounded-tr-lg overflow-hidden">
           <thead className="sticky top-0 bg-white z-10">
             <tr className="border-b bg-[#252941] text-white">
               <th className="p-4 text-left font-semibold">Profile</th>
@@ -79,7 +79,9 @@ function CustomerDB() {
               <th className="p-4 text-left font-semibold">Check-In</th>
               <th className="p-4 text-left font-semibold">Check-Out</th>
               <th className="p-4 text-left font-semibold">VIP Status</th>
-              <th className="p-4 text-left font-semibold">Actions</th>
+              <th className="p-4 text-left font-semibold !rounded-tl-lg">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -94,12 +96,16 @@ function CustomerDB() {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden shadow-md">
                       <img
-                        src={`https://randomuser.me/api/portraits/${index % 2 ? 'women' : 'men'}/${customer.id}.jpg`}
+                        src={`https://randomuser.me/api/portraits/${
+                          index % 2 ? "women" : "men"
+                        }/${customer.id}.jpg`}
                         alt={customer.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <span className="font-medium text-gray-900">{customer.name}</span>
+                    <span className="font-medium text-gray-900">
+                      {customer.name}
+                    </span>
                   </div>
                 </td>
                 <td className="p-4 text-gray-700">{customer.phone}</td>
@@ -108,7 +114,11 @@ function CustomerDB() {
                 <td className="p-4 text-gray-700">{customer.checkIn}</td>
                 <td className="p-4 text-gray-700">{customer.checkOut}</td>
                 <td className="p-4">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getVipStatusColor(customer.vipStatus)}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium border ${getVipStatusColor(
+                      customer.vipStatus
+                    )}`}
+                  >
                     {customer.vipStatus}
                   </span>
                 </td>
@@ -125,29 +135,32 @@ function CustomerDB() {
                       anchorEl={anchorEl}
                       open={Boolean(anchorEl)}
                       onClose={handleMenuClose}
-                      transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                      anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                      transformOrigin={{horizontal: "right", vertical: "top"}}
+                      anchorOrigin={{horizontal: "right", vertical: "bottom"}}
                     >
-                      <MenuItem onClick={() => {
-                        handleView(selectedCustomer?.id);
-                        handleMenuClose();
-                      }}>
+                      <MenuItem
+                        onClick={() => {
+                          handleView(selectedCustomer?.id);
+                          handleMenuClose();
+                        }}
+                      >
                         <ListItemIcon>
                           <Eye className="h-4 w-4" />
                         </ListItemIcon>
                         <ListItemText>View Details</ListItemText>
                       </MenuItem>
-                      
-                      <MenuItem onClick={() => {
-                        handleEdit(selectedCustomer?.id);
-                        handleMenuClose();
-                      }}>
+
+                      <MenuItem
+                        onClick={() => {
+                          handleEdit(selectedCustomer?.id);
+                          handleMenuClose();
+                        }}
+                      >
                         <ListItemIcon>
                           <Edit2 className="h-4 w-4" />
                         </ListItemIcon>
                         <ListItemText>Edit Booking</ListItemText>
                       </MenuItem>
-                    
                     </Menu>
                   </>
                 </td>
@@ -156,7 +169,6 @@ function CustomerDB() {
           </tbody>
         </table>
       </div>
-
     </section>
   );
 }
