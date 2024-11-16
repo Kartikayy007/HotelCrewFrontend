@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { MoreVertical, Edit2, Trash2, Eye, X } from "lucide-react";
+import { Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 
 function StaffDB() {
   const [employees, setEmployees] = useState([
@@ -13,22 +14,23 @@ function StaffDB() {
     { id: 8, name: "Arjun Gupta", department: "Housekeeping", email: "arjungupta@gmail.com", shift: "Night Shift", rating: 6.5, phone: "8901234567" },
   ]);
 
-  const [openMenuId, setOpenMenuId] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
 
   const handleView = (id) => {
     console.log("Viewing employee:", id);
-    setOpenMenuId(null);
+    setAnchorEl(null);
   };
 
   const handleEdit = (id) => {
     console.log("Editing employee:", id);
-    setOpenMenuId(null);
+    setAnchorEl(null);
   };
 
   const initiateDelete = (employee) => {
     setDeleteConfirmation(employee);
-    setOpenMenuId(null);
+    setAnchorEl(null);
   };
 
   const confirmDelete = () => {
@@ -38,8 +40,14 @@ function StaffDB() {
     }
   };
 
-  const toggleMenu = (id) => {
-    setOpenMenuId(openMenuId === id ? null : id);
+  const handleMenuOpen = (event, employee) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedEmployee(employee);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedEmployee(null);
   };
 
   return (
@@ -84,39 +92,56 @@ function StaffDB() {
                 <td className="p-4 font-medium text-gray-900">{employee.rating}</td>
                 <td className="p-4 relative">
                   <button
-                    onClick={() => toggleMenu(employee.id)}
+                    onClick={(e) => handleMenuOpen(e, employee)}
                     className="p-1 hover:bg-gray-100 rounded-full"
                   >
                     <MoreVertical className="h-5 w-5 text-gray-500" />
                   </button>
-                  
-                  {openMenuId === employee.id && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200">
-                      <div className="py-1">
-                        <button
-                          onClick={() => handleView(employee.id)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                        >
-                          <Eye className="h-4 w-4" />
-                          View
-                        </button>
-                        <button
-                          onClick={() => handleEdit(employee.id)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => initiateDelete(employee)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  )}
+
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                  >
+                    <MenuItem 
+                      onClick={() => {
+                        handleView(selectedEmployee?.id);
+                        handleMenuClose();
+                      }}
+                    >
+                      <ListItemIcon>
+                        <Eye className="h-4 w-4" />
+                      </ListItemIcon>
+                      <ListItemText>View Details</ListItemText>
+                    </MenuItem>
+
+                    <MenuItem 
+                      onClick={() => {
+                        handleEdit(selectedEmployee?.id);
+                        handleMenuClose();
+                      }}
+                    >
+                      <ListItemIcon>
+                        <Edit2 className="h-4 w-4" />
+                      </ListItemIcon>
+                      <ListItemText>Edit Employee</ListItemText>
+                    </MenuItem>
+
+                    <MenuItem 
+                      onClick={() => {
+                        initiateDelete(selectedEmployee);
+                        handleMenuClose();
+                      }}
+                      sx={{ color: 'error.main' }}
+                    >
+                      <ListItemIcon>
+                        <Trash2 className="h-4 w-4" style={{ color: 'inherit' }} />
+                      </ListItemIcon>
+                      <ListItemText>Delete</ListItemText>
+                    </MenuItem>
+                  </Menu>
                 </td>
               </tr>
             ))}
