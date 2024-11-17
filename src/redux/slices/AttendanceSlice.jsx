@@ -5,10 +5,11 @@ import axios from 'axios';
 const FETCH_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/list/';
 const UPDATE_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/change/42/';
 const FETCH_ATTENDANCE_STATS_URL = 'https://hotelcrew-1.onrender.com/api/attendance/stats/'; 
+const CHECK_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/check/'; 
 
-const api = axios.create({
-  baseURL: 'https://hotelcrew-1.onrender.com',
-});
+// const api = axios.create({
+//   baseURL: 'https://hotelcrew-1.onrender.com',
+// });
 
 
 const getAuthHeaders = () => {
@@ -21,7 +22,7 @@ const getAuthHeaders = () => {
 export const fetchAttendance = createAsyncThunk(
   'attendance/fetchAttendance',
   async () => {
-    const response = await api.get(FETCH_ATTENDANCE_URL, {
+    const response = await axios.get(FETCH_ATTENDANCE_URL, {
       headers: getAuthHeaders(),
     });
     return response.data;
@@ -31,7 +32,7 @@ export const fetchAttendance = createAsyncThunk(
 export const updateAttendance = createAsyncThunk(
   'attendance/updateAttendance',
   async (id) => {
-    const response = await api.post(
+    const response = await axios.post(
       UPDATE_ATTENDANCE_URL,
       { id },
       { headers: getAuthHeaders() }
@@ -43,7 +44,16 @@ export const updateAttendance = createAsyncThunk(
 export const fetchAttendanceStats = createAsyncThunk(
   'attendance/fetchAttendanceStats',
   async () => {
-    const response = await api.get(FETCH_ATTENDANCE_STATS_URL, {
+    const response = await axios.get(FETCH_ATTENDANCE_STATS_URL, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  }
+);
+export const checkAttendance = createAsyncThunk(
+  'attendance/checkAttendance',
+  async (date) => {
+    const response = await axios.get(`${CHECK_ATTENDANCE_URL}?date=${date}`, {
       headers: getAuthHeaders(),
     });
     return response.data;
@@ -61,6 +71,7 @@ const attendanceSlice = createSlice({
       daysWithRecordsThisMonth: 0,
       totalPresentMonth: 0,
     },
+    attendanceCheck: null,
     loading: false,
     error: null,
   },
@@ -103,8 +114,22 @@ const attendanceSlice = createSlice({
       .addCase(fetchAttendanceStats.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
-      });
-  },
+      })
+  
+  .addCase(checkAttendance.pending, (state) => {
+    state.loading = true;
+    state.attendanceCheck = null; // Reset attendance check state
+    state.error = null;
+  })
+  .addCase(checkAttendance.fulfilled, (state, action) => {
+    state.loading = false;
+    state.attendanceCheck = action.payload; // Store the attendance check result
+  })
+  .addCase(checkAttendance.rejected, (state, action) => {
+    state.loading = false;
+    state.error = action.error.message;
+  });
+},
 });
 
 export default attendanceSlice.reducer;
