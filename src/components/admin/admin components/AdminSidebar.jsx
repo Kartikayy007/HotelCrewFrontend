@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   LayoutDashboard,
-  CalendarClock,
   Database,
   Receipt,
   Settings,
@@ -11,7 +10,6 @@ import {
   ClipboardCheck
 } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
-import AdminScheduleStatus from './AdminScheduleStatus';
 import DataBase from '../../reusable components/DataBase';
 import AdminPayRoll from './AdminPayRoll';
 import AdminAnalaytics from './AdminAnalaytics';
@@ -23,8 +21,7 @@ const AdminSidebar = ({ onMenuItemClick }) => {
 
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', component: AdminDashboard },
-    { icon: <CalendarClock size={20} />, label: 'Schedule status', component: AdminScheduleStatus },
-    { icon: <ClipboardCheck size={20} />, label: 'Leave management', component: AdminLeaveManagment },
+    { icon: <ClipboardCheck size={20} />, label: 'Leave management ', component: AdminLeaveManagment },
     { icon: <Database size={20} />, label: 'Database', component: DataBase },
     { icon: <Receipt size={20} />, label: 'Payroll', component: AdminPayRoll },
     { icon: <LineChart size={20} />, label: 'Analytics', component: AdminAnalaytics },

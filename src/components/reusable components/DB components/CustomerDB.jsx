@@ -111,10 +111,7 @@ function CustomerDB() {
                 <th className="p-4 text-left font-semibold">Room</th>
                 <th className="p-4 text-left font-semibold">Check-In</th>
                 <th className="p-4 text-left font-semibold">Check-Out</th>
-                <th className="p-4 text-left font-semibold">VIP Status</th>
-                <th className="p-4 text-left font-semibold !rounded-tl-lg">
-                  Actions
-                </th>
+                <th className="pr-16 font-semibold " colspan="2">VIP Status</th>
               </tr>
             </thead>
             <tbody>
@@ -151,9 +148,9 @@ function CustomerDB() {
                     <td className="p-4 text-gray-700">{customer.room}</td>
                     <td className="p-4 text-gray-700">{customer.checkIn}</td>
                     <td className="p-4 text-gray-700">{customer.checkOut}</td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium border ${getVipStatusColor(
+                        className={`px-3 py-1 rounded-full text-sm font-medium border  ${getVipStatusColor(
                           customer.vipStatus
                         )}`}
                       >

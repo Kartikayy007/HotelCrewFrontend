@@ -88,17 +88,16 @@ function StaffDB() {
       <section className="max-w-full mx-auto bg-white rounded-lg shadow-lg">
         <div className="max-h-[calc(100vh-260px)] overflow-auto">
           <table className="w-full rounded-tr-lg overflow-hidden">
-            <thead className="sticky top-0 bg-white z-10">
-              <tr className="border-b bg-[#252941] text-white">
-                <th className="p-4 text-left font-semibold">Employee</th>
-                <th className="p-4 text-left font-semibold">Contact</th>
-                <th className="p-4 text-left font-semibold">Department</th>
-                <th className="p-4 text-left font-semibold">Email</th>
-                <th className="p-4 text-left font-semibold">Shift</th>
-                <th className="p-4 text-left font-semibold">Rating</th>
-                <th className="p-4 text-left font-semibold ">Actions</th>
-              </tr>
-            </thead>
+          <thead className="sticky top-0 bg-[#252941] shadow-sm z-20">
+  <tr className="border-b text-white">
+    <th className="p-4 text-left font-semibold">Employee</th>
+    <th className="p-4 text-left font-semibold">Contact</th>
+    <th className="p-4 text-left font-semibold">Department</th>
+    <th className="p-4 text-left font-semibold">Email</th>
+    <th className="p-4 text-left font-semibold">Shift</th>
+    <th className="p-4 text-left font-semibold rounded-tr-lg" colspan="2">Rating</th>
+  </tr>
+</thead>
             <tbody>
               {loading ? (
                 [...Array(5)].map((_, index) => (
@@ -128,7 +127,7 @@ function StaffDB() {
                     <td className="p-4 text-gray-700">{employee.department}</td>
                     <td className="p-4 text-gray-700">{employee.email}</td>
                     <td className="p-4 text-gray-700">{employee.shift}</td>
-                    <td className="p-4 font-medium text-gray-900">{employee.rating}</td>
+                    <td className="p-4 font-medium text-gray-900 text-center">{employee.rating}</td>
                     <td className="p-4 relative">
                       <button
                         onClick={(e) => handleMenuOpen(e, employee)}

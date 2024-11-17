@@ -24,7 +24,6 @@ export const fetchAttendanceStats = createAsyncThunk(
           }
         }
       );
-          
       return response.data;
     } catch (error) {
       if (error.message === 'Authentication token not found') {

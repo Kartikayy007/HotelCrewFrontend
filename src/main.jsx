@@ -5,7 +5,6 @@ import { store } from './redux/Store.js'
 import './index.css'
 import App from './App.jsx'
 import Admin from './components/admin/Admin.jsx'
-import MSideBar from './components/Manager/MSideBar.jsx'
 import MainLayout from './components/Manager/MainLayout.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -13,7 +12,6 @@ createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       {/* <App /> */}
       {/* <MainLayout /> */}
-      {/* <MSideBar /> */}
       <Admin />
     </ Provider>
   </StrictMode>,

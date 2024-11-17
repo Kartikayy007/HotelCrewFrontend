@@ -4,15 +4,21 @@ import {LineChart} from "@mui/x-charts/LineChart";
 import {BarChart} from "@mui/x-charts/BarChart";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
-import {Dialog, TextField, Button} from "@mui/material";
+import {Dialog, TextField, Button, Snackbar, Alert} from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
 import {useDispatch, useSelector} from "react-redux";
 import {fetchAttendanceStats} from "../../../redux/slices/AdminAttendanceSlice";
+import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { createTask, selectTasksLoading, selectTasksError } from '../../../redux/slices/taskSlice';
 
 function AdminDashboard() {
   const dispatch = useDispatch();
   const attendanceStats = useSelector((state) => state.attendance.stats);
   const attendanceLoading = useSelector((state) => state.attendance.loading);
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
+  const Taskloading = useSelector(selectTasksLoading);
+  const error = useSelector(selectTasksError);
 
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [performanceRange, setPerformanceRange] = useState([
@@ -23,6 +29,30 @@ function AdminDashboard() {
   const [timeData, setTimeData] = useState([]);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selected, setSelected] = useState({ 
+    label: 'Select Department', 
+    value: '' 
+  });
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+
+  const departments = [
+    { label: 'Security', value: 'security' },
+    { label: 'Housekeeping', value: 'housekeeping' },
+    { label: 'Kitchen', value: 'kitchen' },
+    { label: 'Front Desk', value: 'frontdesk' },
+    { label: 'Maintenance', value: 'maintenance' }
+  ];
+
+  const handleSelect = (dept) => {
+    setSelected(dept);
+    setIsDropdownOpen(false);
+  };
 
   const skeletonProps = {
     animation: "wave",
@@ -96,12 +126,14 @@ function AdminDashboard() {
   useEffect(() => {
     dispatch(fetchAttendanceStats());
     
-    const interval = setInterval(() => {
+    // const interval = setInterval(() => {
       dispatch(fetchAttendanceStats());
-    }, 300000);
+    // }, 300000);
   
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, [dispatch]);
+
+  console.log(attendanceStats);
   
   const staffAttendance = [
     {
@@ -244,6 +276,65 @@ function AdminDashboard() {
 
   const handleViewClose = () => {
     setSelectedAnnouncement(null);
+  };
+
+  const handleAssign = async (e) => {
+    e.preventDefault();
+    
+    if (!taskTitle.trim()) {
+      setSnackbar({
+        open: true,
+        message: 'Please enter a task title',
+        severity: 'error'
+      });
+      return;
+    }
+
+    if (!taskDescription.trim()) {
+      setSnackbar({
+        open: true,
+        message: 'Please enter a task description',
+        severity: 'error'
+      });
+      return;
+    }
+
+    if (!selected.value) {
+      setSnackbar({
+        open: true,
+        message: 'Please select a department',
+        severity: 'error'
+      });
+      return;
+    }
+
+    try {
+      await dispatch(createTask({
+        title: taskTitle.trim(),
+        description: taskDescription.trim(),
+        department: selected.value
+      })).unwrap();
+
+      setTaskTitle('');
+      setTaskDescription('');
+      setSelected({ label: 'Select Department', value: '' });
+      
+      setSnackbar({
+        open: true,
+        message: 'Task assigned successfully',
+        severity: 'success'
+      });
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: err.message || 'Failed to assign task',
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -518,8 +609,8 @@ function AdminDashboard() {
             </Box>
           </div>
 
-          <div className="bg-white rounded-lg shadow w-full p-4 flex flex-col h-[calc(66vh)] min-h-[765px]">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+          <div className="bg-white rounded-lg shadow w-full p-4 flex flex-col h-[calc(40vh)] ">
+            <h2 className="text-lg sm:text-xl font-semibold mb-2">
               Announcements
             </h2>
             <div className="flex-1 overflow-y-auto mb-4">
@@ -573,7 +664,7 @@ function AdminDashboard() {
                       </div>
                     ))
                   ) : (
-                    <div className="flex justify-center mt-72 h-full text-gray-500">
+                    <div className="flex justify-center mt-20 h-full text-gray-500">
                       No announcements available
                     </div>
                   )}
@@ -693,8 +784,87 @@ function AdminDashboard() {
               </div>
             </Dialog>
           </div>
+          <form onSubmit={handleAssign} className="flex flex-col gap-4 bg-white p-6 rounded-lg shadow flex-1">
+      <h2 className="text-lg sm:text-xl font-semibold mb-2">
+        Assign Task
+      </h2>
+      <input
+        type="text"
+        placeholder="Task Title"
+        value={taskTitle}
+        onChange={(e) => setTaskTitle(e.target.value)}
+        className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
+      />
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+            selected.value ? 'text-black' : 'text-gray-400'
+          } focus:outline-none flex justify-between items-center`}
+        >
+          {selected.label}
+          {isDropdownOpen ? (
+            <FaChevronUp className="text-gray-600" />
+          ) : (
+            <FaChevronDown className="text-gray-600" />
+          )}
+        </button>
+
+        {isDropdownOpen && (
+          <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+            {departments.map((dept, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => handleSelect(dept)}
+                disabled={dept.disabled}
+                className={`w-full text-left px-4 py-2 ${
+                  dept.disabled
+                    ? 'text-gray-400 cursor-default'
+                    : 'text-black hover:bg-gray-100'
+                }`}
+              >
+                {dept.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <textarea
+        value={taskDescription}
+        onChange={(e) => setTaskDescription(e.target.value)}
+        placeholder="Task Description"
+        maxLength={350}
+        className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 h-[120px] resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+      />
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          disabled={Taskloading}
+          className="h-9 w-28 lg:w-full bg-[#252941] font-Montserrat font-bold rounded-lg text-white disabled:opacity-50"
+        >
+          {Taskloading ? 'Assigning...' : 'Assign'}
+        </button>
+      </div>
+    </form>
         </div>
       </div>
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={6000} 
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </section>
   );
 }
