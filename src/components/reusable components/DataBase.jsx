@@ -18,7 +18,6 @@ function DataBase() {
     }
   };
 
-  // Add scroll event listener
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {

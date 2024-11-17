@@ -40,7 +40,7 @@ const AdminSidebar = ({ onMenuItemClick }) => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#252941] text-white min-[1440px]:hidden"
+        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#252941] text-white lg:hidden"
         aria-label="Toggle menu"
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -48,7 +48,7 @@ const AdminSidebar = ({ onMenuItemClick }) => {
 
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 min-[1440px]:hidden"
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}

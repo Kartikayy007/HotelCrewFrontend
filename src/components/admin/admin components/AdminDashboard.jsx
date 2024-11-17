@@ -6,9 +6,14 @@ import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import {Dialog, TextField, Button} from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
-import {CircularProgress} from "@mui/material";
+import {useDispatch, useSelector} from "react-redux";
+import {fetchAttendanceStats} from "../../../redux/slices/AdminAttendanceSlice";
 
 function AdminDashboard() {
+  const dispatch = useDispatch();
+  const attendanceStats = useSelector((state) => state.attendance.stats);
+  const attendanceLoading = useSelector((state) => state.attendance.loading);
+
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [performanceRange, setPerformanceRange] = useState([
     0,
@@ -37,7 +42,6 @@ function AdminDashboard() {
       }
     }, 60000);
 
-    // Simulate loading delay
     setTimeout(() => {
       setTimeData(generateTimeData(currentHour));
       setLoading(false);
@@ -89,10 +93,29 @@ function AdminDashboard() {
     {id: 1, value: 35, label: "Vacant", color: "#8094D4"},
   ];
 
+  useEffect(() => {
+    dispatch(fetchAttendanceStats());
+    
+    const interval = setInterval(() => {
+      dispatch(fetchAttendanceStats());
+    }, 300000);
+  
+    return () => clearInterval(interval);
+  }, [dispatch]);
+  
   const staffAttendance = [
-    {id: 0, value: 60, label: "Present", color: "#252941"},
-    {id: 1, value: 40, label: "Absent", color: "#8094D4"},
-    {id: 2, value: 10, label: "On Leave", color: "#6B46C1"},
+    {
+      id: 0,
+      value: attendanceStats.total_present,
+      label: "Present",
+      color: "#252941",
+    },
+    {
+      id: 1,
+      value: attendanceStats.total_crew - attendanceStats.total_present,
+      label: "Absent",
+      color: "#8094D4",
+    },
   ];
 
   const getFilteredData = (range) => {
@@ -223,7 +246,6 @@ function AdminDashboard() {
     setSelectedAnnouncement(null);
   };
 
-
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
       <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
@@ -336,35 +358,42 @@ function AdminDashboard() {
                       <h3 className="font-medium mb-2 text-center">
                         Staff Attendance
                       </h3>
-                      <PieChart
-                        series={[
-                          {
-                            data: staffAttendance,
-                            highlightScope: {fade: "global", highlight: "item"},
-                            innerRadius: 45,
-                            paddingAngle: 1,
-                            cornerRadius: 1,
-                          },
-                        ]}
-                        height={220}
-                        margin={{top: 0, bottom: 40, left: 0, right: 0}}
-                        slotProps={{
-                          legend: {
-                            direction: "row",
-                            position: {
-                              vertical: "bottom",
-                              horizontal: "center",
+                      
+                      {attendanceStats.total_present === 0 ? (
+                        <div className="flex items-center justify-center h-[180px] text-gray-500">
+                          No Data Available
+                        </div>
+                      ) : (
+                        <PieChart
+                          series={[
+                            {
+                              data: staffAttendance,
+                              highlightScope: {fade: "global", highlight: "item"},
+                              innerRadius: 45,
+                              paddingAngle: 1,
+                              cornerRadius: 1,
                             },
-                            padding: 0,
-                            markSize: 10,
-                            itemGap: 10,
-                            labelStyle: {
-                              fontSize: 13,
-                              fontWeight: 500,
+                          ]}
+                          height={220}
+                          margin={{top: 0, bottom: 40, left: 0, right: 0}}
+                          slotProps={{
+                            legend: {
+                              direction: "row",
+                              position: {
+                                vertical: "bottom",
+                                horizontal: "center",
+                              },
+                              padding: 0,
+                              markSize: 10,
+                              itemGap: 10,
+                              labelStyle: {
+                                fontSize: 13,
+                                fontWeight: 500,
+                              },
                             },
-                          },
-                        }}
-                      />
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
                 </>
