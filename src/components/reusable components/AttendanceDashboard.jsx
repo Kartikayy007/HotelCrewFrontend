@@ -47,14 +47,14 @@ const AttendanceDashboard = () => {
   };
 
   if (loading) {
-      return <p>Loading attendance...</p>;
-    }
-    
-    if (error) {
-        return <p>Error loading attendance: {error}</p>;
-    }
-    
-    localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY3NzY0LCJpYXQiOjE3MzE2NzU3NjQsImp0aSI6ImQ3NWVmNTUxMmE0NzQ1NWFiYmE3MmVhY2M2NzM0Mzk4IiwidXNlcl9pZCI6NDF9.pX8v_JU3baX_Vq-vavtHdqDgBDZ1tpOJQDgEMjClMRg")
+    return <p>Loading attendance...</p>;
+  }
+
+  if (error) {
+    return <p>Error loading attendance: {error}</p>;
+  }
+
+  localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY3NzY0LCJpYXQiOjE3MzE2NzU3NjQsImp0aSI6ImQ3NWVmNTUxMmE0NzQ1NWFiYmE3MmVhY2M2NzM0Mzk4IiwidXNlcl9pZCI6NDF9.pX8v_JU3baX_Vq-vavtHdqDgBDZ1tpOJQDgEMjClMRg")
   // Handle approve/reject
   const handleLeaveAction = (id, action) => {
     setLeaveRequests((prevRequests) =>
@@ -101,9 +101,9 @@ const AttendanceDashboard = () => {
       {/* <div> */}
       <div className='flex justify-center mb-1 mt-6 pb-5 px-3'>
         {/* <div className="bg-white w-full h-[392px] pb-7  py-2  rounded-lg shadow"> */}
-        <div className={`bg-white w-full rounded-lg shadow ${isTableExpanded ? "h-screen" : "h-[392px]"}`}>
+        <div className={`bg-white w-full rounded-xl shadow ${isTableExpanded ? "h-screen" : "h-[370px]"}`}>
           <div className="flex justify-between items-center p-4">
-            <h2 className="text-[#252941] text-lg pl-6 mt-4 mb-0 font-semibold">Select Department:</h2>
+            <h2 className="text-[#252941] text-lg pl-3 mt-2 md:mt-4 mb-0 font-semibold">Select Department:</h2>
             {/* Expand/Collapse Icons */}
             {isTableExpanded ? (
               <X
@@ -119,26 +119,26 @@ const AttendanceDashboard = () => {
               />
             )}
           </div>
-          <div className="md:hidden p-4">
+          <div className="md:hidden p-4 flex items-center justify-center">
             <select
-              className="w-full py-2 px-4 border border-gray-300 rounded-lg"
+              className="py-2 px-4 w-full  border border-gray-300 rounded-3xl"
               onChange={(e) => handleDepartmentToggle(e.target.value)}
               value={selectedDepartments[0]} // Show the first selected option
             >
               <option value="All">All</option>
               {department.map((dept) => (
-                <option key={dept} value={dept}>
+                <option key={dept} value={dept} className='bg-[#efefef] rounded-xl'>
                   {dept}
                 </option>
               ))}
             </select>
           </div>
-          <div className=" hidden md:flex mb-4 pl-[38px] p-2 flex-wrap gap-4">
+          <div className=" hidden md:flex mb-2 pl-7 pb-2 gap-4 rounded-3xl pr-9">
             {/* "All" Button */}
             <button
               key="all"
               onClick={() => handleDepartmentToggle('All')}
-              className={`px-4 py-1 w-[150px] rounded-xl border-none ${selectedDepartments.includes('All') ? "bg-[#252941] text-white" : "bg-gray-100 text-gray-700 font-semibold border border-gray-700"
+              className={`px-4 py-1 w-[150px] rounded-3xl font-semibold  border-none ${selectedDepartments.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
                 }`}
             >
               All
@@ -147,9 +147,9 @@ const AttendanceDashboard = () => {
               <button
                 key={dept}
                 onClick={() => handleDepartmentToggle(dept)}
-                className={`px-4 py-1 w-[150px]  rounded-xl border-none ${selectedDepartments.includes(dept)
-                    ? "bg-[#252941] text-white"
-                    : "bg-gray-100 text-gray-700 font-semibold border border-gray-800"
+                className={`px-4 py-1 w-[150px]  rounded-3xl border-none font-semibold ${selectedDepartments.includes(dept)
+                  ? "bg-[#6675C5] text-white"
+                  : "bg-[#E6EEF9] text-[#252941] "
                   }`}
               >
                 {dept}
@@ -157,69 +157,46 @@ const AttendanceDashboard = () => {
             ))}
           </div>
           <div
-            className={`overflow-y-auto ${isTableExpanded ? "max-h-[calc(100%-200px)]" : "max-h-[200px]"
-              } mx-2 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-200`}
+            className={` ${isTableExpanded ? "max-h-[calc(100%-200px)]" : "max-h-[200px]"
+              } md:ml-2 ml-4 mr-5 overflow-y-auto rounded-xl scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-200`}
           >
-            
-            <table className="w-[96%] px-3 mx-auto  border border-gray-200 rounded-xl shadow  ">
+
+            <table className="w-[96%] px-1 mx-auto border border-[#dcdcdc] rounded-2xl shadow  ">
               {/* Table Headers */}
               <thead>
-                <tr className="bg-white text-[#252941]">
+                <tr className="bg-[#3F4870] text-[#E6EEF9] rounded-xl">
                   <th className="px-4 py-2 text-left">Name</th>
                   <th className="px-4 py-2 text-left">Email</th>
                   <th className="px-4 py-2 text-left">Department</th>
                   <th className="px-4 py-2 text-center">Attendance</th>
+                  {/* <th className="px-4 py-2 text-center">Date</th> */}
                 </tr>
               </thead>
 
-              {/* Table Body */}
+
               <tbody>
-                {/* {filteredStaffList.length > 0 ? (
-                  filteredStaffList.map((staff, index) => (
-                    <tr
-                      key={staff.id}
-                      className={`${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
-                    >
-                      <td className="px-4 py-2">{staff.name}</td>
-                      <td className="px-4 py-2">{staff.email}</td>
-                      <td className="px-4 py-2">{staff.department}</td>
-                      <td className="px-4 py-2 text-center">
-                        <button
-                          className={`px-4 py-1 rounded-full ${staff.present ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                            }`}
-                          onClick={() => handleToggleAttendance(staff.id)}
-                        >
-                          {staff.present ? "P" : "A"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="4" className="px-4 py-2 text-center text-gray-500">
-                      No staff found
+                {staff.map((member, index) => (
+                  <tr
+                    key={member.id}
+                    className={`px-4 py-2 ${index % 2 === 0 ? 'bg-[#F1F6FC]' : 'bg-[#DEE8FF]'
+                      }`}
+                  >
+                    <td className="px-4 py-2">Navya</td>
+                    <td className="px-4 py-2">{member.email}</td>
+                    <td className="px-4 py-2">{member.role}</td>
+                    <td className="px-4 py-2 text-center">
+                      <button
+                        className={`px-4 py-1 rounded-full ${member.current_attendance === 'Present'
+                            ? 'bg-green-500 text-white'
+                            : 'bg-red-500 text-white'
+                          }`}
+                        onClick={() => handleToggleAttendance(member.id)}
+                      >
+                        {member.current_attendance}
+                      </button>
                     </td>
                   </tr>
-                )} */}
-                {staff.map((member) => (
-                <tr key={member.id} className="bg-gray-50">
-                  <td className="px-4 py-2">Navya</td>
-                  <td className="px-4 py-2">{member.email}</td>
-                  <td className="px-4 py-2">{member.role}</td>
-                  <td className="px-4 py-2 text-center">
-                    <button
-                      className={`px-4 py-1 rounded-full ${
-                        member.current_attendance === 'Present'
-                          ? 'bg-green-500 text-white'
-                          : 'bg-red-500 text-white'
-                      }`}
-                      onClick={() => handleToggleAttendance(member.id)}
-                    >
-                      {member.current_attendance}
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                ))}
               </tbody>
             </table>
           </div>
@@ -228,7 +205,7 @@ const AttendanceDashboard = () => {
       <div className='flex flex-col lg:flex-row gap-5 mb-1 mt-3 pb-5 px-3'>
         {/* <div className="p-6 space-y-6"> */}
         {/* Leave Requests */}
-        <div className="bg-white w-full h-auto pb-7 py-2 rounded-lg shadow">
+        <div className="bg-white w-full h-auto pb-7 py-2 rounded-xl shadow">
           <h2 className="text-[#252941] text-lg pl-6 mt-4 mb-0 font-semibold">Leave Requests</h2>
           <div className="px-6 mt-4 space-y-4">
             {leaveRequests
@@ -236,7 +213,7 @@ const AttendanceDashboard = () => {
               .map((request) => (
                 <div
                   key={request.id}
-                  className="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow-sm"
+                  className="flex justify-between items-center p-4 bg-[#E6EEF9] rounded-xl shadow-sm"
                 >
                   <div className='w-max'>
                     <p className="font-semibold text-[#252941]">{request.name}</p>
@@ -245,15 +222,15 @@ const AttendanceDashboard = () => {
                     <p className="text-sm text-gray-600">Duration: {request.duration}</p>
                     <p className="text-sm text-gray-600">Date: {request.date}</p>
                   </div>
-                  <div className="space-x-2 w-[100px] md:w-auto flex flex-col gap-5 md:gap-2 lg:flex-row">
+                  <div className="flex flex-col gap-2 ">
                     <button
-                      className="px-4 w-full  py-1 text-white bg-[#252941] rounded-full hover:bg-[#252941]"
+                      className="px-4 w-full  py-1 text-white bg-[#252941] rounded-full hover:bg-[#202338]"
                       onClick={() => handleLeaveAction(request.id, "approved")}
                     >
                       Approve
                     </button>
                     <button
-                      className="md:px-4 px-2 ml-0 w-full py-1 text-gray-800 bg-gray-200 rounded-full hover:bg-gray-300"
+                      className="md:px-4 px-2 ml-0 w-full py-1 text-gray-800 bg-[#fdfdfd] font-semibold border border-[#dcdcdc] rounded-full hover:bg-gray-300"
                       onClick={() => handleLeaveAction(request.id, "rejected")}
                     >
                       Reject
@@ -268,14 +245,14 @@ const AttendanceDashboard = () => {
         </div>
 
         {/* Approved Leaves */}
-        <div className="bg-white w-full h-auto pb-7 py-2 rounded-lg shadow">
+        <div className="bg-white w-full h-auto pb-7 py-2 rounded-xl shadow">
           <h2 className="text-[#252941] text-lg pl-6 mt-4 mb-0 font-semibold">Approved Leaves</h2>
-          <div className="px-6 mt-4 space-y-4">
+          <div className=" m-6 h-[88%] rounded-xl bg-white mt-4 space-y-4">
             {approvedLeaves.length > 0 ? (
               approvedLeaves.map((leave) => (
                 <div
                   key={leave.id}
-                  className="p-4 bg-gray-50 rounded-lg shadow-sm"
+                  className="p-4 bg-[#E6EEF9] rounded-lg shadow-sm"
                 >
                   <p className="font-semibold text-[#252941]">{leave.name}</p>
                   <p className="text-sm text-gray-600">{leave.department}</p>
@@ -285,7 +262,10 @@ const AttendanceDashboard = () => {
                 </div>
               ))
             ) : (
-              <p className="text-gray-500">No approved leaves yet.</p>
+              
+             
+              <p className="text-gray-500 ">No approved leaves yet.</p>
+              
             )}
           </div>
         </div>

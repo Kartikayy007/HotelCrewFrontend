@@ -1,29 +1,25 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// API Endpoints
+
 const FETCH_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/list/';
 const UPDATE_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/change/42/';
-const FETCH_ATTENDANCE_STATS_URL = 'https://hotelcrew-1.onrender.com/api/attendance/stats/'; // New stats API
+const FETCH_ATTENDANCE_STATS_URL = 'https://hotelcrew-1.onrender.com/api/attendance/stats/'; 
 
 const api = axios.create({
   baseURL: 'https://hotelcrew-1.onrender.com',
 });
 
-// Add token to the headers
+
 const getAuthHeaders = () => {
   const token = localStorage.getItem('accessToken');
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 
-// Thunks
+
 export const fetchAttendance = createAsyncThunk(
   'attendance/fetchAttendance',
-  // async () => {
-  //   const response = await axios.get(FETCH_ATTENDANCE_URL);
-  //   return response.data;
-  // }
   async () => {
     const response = await api.get(FETCH_ATTENDANCE_URL, {
       headers: getAuthHeaders(),
@@ -34,10 +30,6 @@ export const fetchAttendance = createAsyncThunk(
 
 export const updateAttendance = createAsyncThunk(
   'attendance/updateAttendance',
-  // async (id) => {
-  //   const response = await axios.post(UPDATE_ATTENDANCE_URL, { id });
-  //   return { id, ...response.data };
-  // }
   async (id) => {
     const response = await api.post(
       UPDATE_ATTENDANCE_URL,
@@ -54,11 +46,11 @@ export const fetchAttendanceStats = createAsyncThunk(
     const response = await api.get(FETCH_ATTENDANCE_STATS_URL, {
       headers: getAuthHeaders(),
     });
-    return response.data; // Assuming this matches the stats response structure
+    return response.data;
   }
 );
 
-// Slice
+
 const attendanceSlice = createSlice({
   name: 'attendance',
   initialState: {

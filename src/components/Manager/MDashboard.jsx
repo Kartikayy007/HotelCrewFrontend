@@ -35,9 +35,9 @@ const Dash = () => {
   }, [dispatch]);
 
   const roomData = [
-    {id: 0, value: 60, label: "Occupied", color: "#252941"}, // Green color
-    {id: 1, value: 30, label: "Vacant", color: "#8094D4"}, // Red color
-    {id: 2, value: 10, label: "Maintainence", color: "#6B46C1"}, // Red color
+    {id: 0, value: 60, label: "Occupied", color: "#252941"}, 
+    {id: 1, value: 30, label: "Vacant", color: "#8094D4"}, 
+    {id: 2, value: 10, label: "Maintainence", color: "#6B46C1"}, 
   ];
 
   const staffStatus = [
@@ -45,11 +45,6 @@ const Dash = () => {
     {id: 1, value: 35, label: "Vacant", color: "#8094D4"},
   ];
 
-  // const staffAttendance = [
-  //   {id: 0, value: 90, label: "Present", color: "#252941"},
-  //   {id: 1, value: 7, label: "Absent", color: "#8094D4"},
-  //   {id: 2, value: 3, label: "On Leave", color: "#6B46C1"},  
-  // ];
   const staffAttendanceData = [
     {
       id: 0,
@@ -64,22 +59,6 @@ const Dash = () => {
       color: '#8094D4',
     },
   ];
-  const performanceData = {
-    xAxis: [
-      {
-        id: "staff",
-        data: ["John", "Jane", "Bob", "Alice", "Tom"],
-        scaleType: "band",
-      },
-    ],
-    series: [
-      {
-        type: "bar",
-        data: [88, 92, 85, 95, 89],
-        color: "#2A2AA9",
-      },
-    ],
-  };[]
   const inOutData={
     xAxis:[
       {
@@ -170,15 +149,7 @@ const Dash = () => {
                   slotProps={{
                     legend: {
                       hidden:true,
-                      // direction: "row",
-                      // position: { vertical: "bottom", horizontal: "center" },
-                      // padding: 0,
-                      // markSize: 5,
-                      // itemGap: 4,
-                      // labelStyle: {
-                      //   fontSize: 11,
-                      //   fontWeight: 500
-                      // }
+                      
                     }
                   }}
                 />
@@ -201,15 +172,7 @@ const Dash = () => {
                   slotProps={{
                     legend: {
                       hidden:true,
-                    //   direction: "row",
-                    //   position: { vertical: "bottom", horizontal: "center" },
-                    //   padding: 0,
-                    //   markSize: 10,
-                    //   itemGap: 15,
-                    //   labelStyle: {
-                    //     fontSize: 15,
-                    //     fontWeight: 500
-                    //   }
+                    
                     }
                   }}
                   
@@ -255,7 +218,7 @@ const Dash = () => {
         margin={{top: 20, right: 5, bottom: 28, left: 47}}
         height={250}
         slotProps={{ legend: { hidden: true } }}
-        // barLabel={{hidden:true}}
+        
         />
         </div>
         
@@ -276,20 +239,7 @@ const Dash = () => {
         </div>
          {/* Second Column */}
          <div className="space-y-5">
-         {/* <div className="bg-white rounded-lg shadow  w-full p-4">
-        <div className="flex flex-col space-y-6 w-full  mt-6 lg:mt-0">
-          
-            <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Staff's Performance</h2>
-            <BarChart
-              xAxis={performanceData.xAxis}
-              series={performanceData.series}
-              height={300}
-              margin={{top: 10, right: 20, bottom: 30, left: 40}}
-            />
-          </div>
-        
-        </div>
-         */}
+         
          <div className="w-full ">
         <div className="bg-white  h-[50%] p-4 pr-6 pl-6 shadow rounded-lg">
         <div className="flex items-center justify-between mb-4">
@@ -312,15 +262,7 @@ const Dash = () => {
               placeholder="Task Title"
               className=" border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
             />
-            {/* <select
-              type="text"
-              placeholder="Department"
-              className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none "
-            >
-              <option value="" disabled>Select Department</option>
-              <option value="security">Security</option>
-              <option value="housekeeping">HouseKeeping</option>
-            </select> */}
+           
             <div className="relative">
               <button
                 type="button"
@@ -360,7 +302,7 @@ const Dash = () => {
             ></textarea>
             <div className="flex justify-end">
               <button
-                // onClick={handleAssign} 
+                
                 className="h-9 w-28 lg:w-full  bg-[#252941] font-Montserrat font-bold rounded-lg text-white"
               >
                 Assign
@@ -410,7 +352,7 @@ const Dash = () => {
 
 
       </div>
-      {/* </div> */}
+      
       </div>
     </section>
   )
