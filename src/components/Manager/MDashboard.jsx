@@ -4,12 +4,12 @@ import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { PieChart } from '@mui/x-charts/PieChart';
 import {LineChart} from "@mui/x-charts/LineChart";
 import { BarChart } from '@mui/x-charts/BarChart';
-import { FaStar, FaRegStar } from 'react-icons/fa';
-
-// import { BarChart } from '@mui/x-charts';
-
+import { FaStar } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAttendanceStats } from '../../redux/slices/AttendanceSlice';
 
 const Dash = () => {
+  const dispatch = useDispatch();
   const togglePriority = () => {
     setIsPriority(!isPriority);
   };
@@ -23,6 +23,17 @@ const Dash = () => {
     { value: 'housekeeping', label: 'HouseKeeping' },
   ];
   const [selected, setSelected] = useState(departments[0]);
+  const { stats, loading, error } = useSelector((state) => state.attendance);
+  useEffect(() => {
+    dispatch(fetchAttendanceStats());
+    
+    const interval = setInterval(() => {
+      dispatch(fetchAttendanceStats());
+    }, 300000);
+  
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
   const roomData = [
     {id: 0, value: 60, label: "Occupied", color: "#252941"}, // Green color
     {id: 1, value: 30, label: "Vacant", color: "#8094D4"}, // Red color
@@ -34,10 +45,24 @@ const Dash = () => {
     {id: 1, value: 35, label: "Vacant", color: "#8094D4"},
   ];
 
-  const staffAttendance = [
-    {id: 0, value: 90, label: "Present", color: "#252941"},
-    {id: 1, value: 7, label: "Absent", color: "#8094D4"},
-    {id: 2, value: 3, label: "On Leave", color: "#6B46C1"},  
+  // const staffAttendance = [
+  //   {id: 0, value: 90, label: "Present", color: "#252941"},
+  //   {id: 1, value: 7, label: "Absent", color: "#8094D4"},
+  //   {id: 2, value: 3, label: "On Leave", color: "#6B46C1"},  
+  // ];
+  const staffAttendanceData = [
+    {
+      id: 0,
+      value: stats.totalPresent || 0,
+      label: 'Present',
+      color: '#252941',
+    },
+    {
+      id: 1,
+      value: stats.totalCrew - stats.totalPresent || 0,
+      label: 'Absent',
+      color: '#8094D4',
+    },
   ];
   const performanceData = {
     xAxis: [
@@ -193,34 +218,31 @@ const Dash = () => {
 
               <div className="text-center">
                 <h3 className="font-medium mb-2">Staff Attendance</h3>
-                <PieChart
-                  series={[
-                    {
-                      data: staffAttendance,
-                      highlightScope: {fade: "global", highlight: "item"},
-                      innerRadius: 45,
-                      paddingAngle: 1,
-                      cornerRadius: 1,
-                    },
-                  ]}
-                  height={220}
-                  width={250}
-                  margin={{top: 0, bottom: 40, left: 0, right: 0}}
-                  slotProps={{
-                    legend: {
-                      hidden:true,
-                      // direction: "row",
-                      // position: { vertical: "bottom", horizontal: "center" },
-                      // padding: 0,
-                      // markSize: 5,
-                      // itemGap: 4,
-                      // labelStyle: {
-                      //   fontSize: 11,
-                      //   fontWeight: 500
-                      // }
-                    }
-                  }}
-                />
+                {loading ? (
+                  <p>Loading...</p>
+                ) : error ? (
+                  <p className="text-red-500">{error}</p>
+                ) : (
+                  <PieChart
+                    series={[
+                      {
+                        data: staffAttendanceData,
+                        highlightScope: { fade: 'global', highlight: 'item' },
+                        innerRadius: 45,
+                        paddingAngle: 1,
+                        cornerRadius: 1,
+                      },
+                    ]}
+                    height={220}
+                    width={250}
+                    margin={{ top: 0, bottom: 40, left: 0, right: 0 }}
+                    slotProps={{
+                      legend: {
+                        hidden: true,
+                      },
+                    }}
+                  />
+                )}
               </div>
             </div>
 

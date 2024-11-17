@@ -4,6 +4,7 @@ import axios from 'axios';
 // API Endpoints
 const FETCH_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/list/';
 const UPDATE_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/change/42/';
+const FETCH_ATTENDANCE_STATS_URL = 'https://hotelcrew-1.onrender.com/api/attendance/stats/'; // New stats API
 
 const api = axios.create({
   baseURL: 'https://hotelcrew-1.onrender.com',
@@ -47,12 +48,27 @@ export const updateAttendance = createAsyncThunk(
     return { id, ...response.data };
   }
 );
+export const fetchAttendanceStats = createAsyncThunk(
+  'attendance/fetchAttendanceStats',
+  async () => {
+    const response = await api.get(FETCH_ATTENDANCE_STATS_URL, {
+      headers: getAuthHeaders(),
+    });
+    return response.data; // Assuming this matches the stats response structure
+  }
+);
 
 // Slice
 const attendanceSlice = createSlice({
   name: 'attendance',
   initialState: {
     staff: [],
+    stats: {
+      totalCrew: 0,
+      totalPresent: 0,
+      daysWithRecordsThisMonth: 0,
+      totalPresentMonth: 0,
+    },
     loading: false,
     error: null,
   },
@@ -78,6 +94,23 @@ const attendanceSlice = createSlice({
             : member
         );
         state.staff = updatedStaff;
+      })
+      .addCase(fetchAttendanceStats.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAttendanceStats.fulfilled, (state, action) => {
+        state.loading = false;
+        state.stats = {
+          totalCrew: action.payload.total_crew,
+          totalPresent: action.payload.total_present,
+          daysWithRecordsThisMonth: action.payload.days_with_records_this_month,
+          totalPresentMonth: action.payload.total_present_month,
+        };
+      })
+      .addCase(fetchAttendanceStats.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   },
 });
