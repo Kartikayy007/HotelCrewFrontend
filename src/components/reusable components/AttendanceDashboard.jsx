@@ -1,6 +1,9 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import { Maximize2, X } from "lucide-react";
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchAttendance, updateAttendance } from '../../redux/slices/AttendanceSlice';
+
 
 const AttendanceDashboard = () => {
   const [department, setDepartment] = useState([]);// State for department filter
@@ -20,8 +23,38 @@ const AttendanceDashboard = () => {
     { id: 3, name: "Alice Brown", department: "Security", duration: "2 days", date: "2024-11-20 to 2024-11-22", type: "Personal Leave", status: null },
   ]);
 
+  const [isTableExpanded, setIsTableExpanded] = useState(false);
   const [approvedLeaves, setApprovedLeaves] = useState([]);
+  const { staff, loading, error } = useSelector((state) => state.attendance);
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(fetchAttendance());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      // Example API response
+      const departmentData = ["Reception", "Kitchen", "Security", "Housekeeping"];
+      setDepartment(departmentData);
+      setSelectedDepartments(['All']); // Select all by default
+    };
+    fetchDepartments();
+  }, []);
+
+  const handleToggleAttendance = (id) => {
+    dispatch(updateAttendance(id));
+  };
+
+  if (loading) {
+      return <p>Loading attendance...</p>;
+    }
+    
+    if (error) {
+        return <p>Error loading attendance: {error}</p>;
+    }
+    
+    localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY3NzY0LCJpYXQiOjE3MzE2NzU3NjQsImp0aSI6ImQ3NWVmNTUxMmE0NzQ1NWFiYmE3MmVhY2M2NzM0Mzk4IiwidXNlcl9pZCI6NDF9.pX8v_JU3baX_Vq-vavtHdqDgBDZ1tpOJQDgEMjClMRg")
   // Handle approve/reject
   const handleLeaveAction = (id, action) => {
     setLeaveRequests((prevRequests) =>
@@ -36,23 +69,13 @@ const AttendanceDashboard = () => {
     }
   };
 
-  const [isTableExpanded, setIsTableExpanded] = useState(false);
-  useEffect(() => {
-    const fetchDepartments = async () => {
-      // Example API response
-      const departmentData = ["Reception", "Kitchen", "Security", "Housekeeping"];
-      setDepartment(departmentData);
-      setSelectedDepartments(['All']); // Select all by default
-    };
-    fetchDepartments();
-  }, []);
-  const handleToggleAttendance = (id) => {
-    setStaffList((prevList) =>
-      prevList.map((staff) =>
-        staff.id === id ? { ...staff, present: !staff.present } : staff
-      )
-    );
-  };
+  // const handleToggleAttendance = (id) => {
+  //   setStaffList((prevList) =>
+  //     prevList.map((staff) =>
+  //       staff.id === id ? { ...staff, present: !staff.present } : staff
+  //     )
+  //   );
+  // };
   const handleDepartmentToggle = (department) => {
     if (department === "All") {
       setSelectedDepartments(["All"]);
@@ -151,7 +174,7 @@ const AttendanceDashboard = () => {
 
               {/* Table Body */}
               <tbody>
-                {filteredStaffList.length > 0 ? (
+                {/* {filteredStaffList.length > 0 ? (
                   filteredStaffList.map((staff, index) => (
                     <tr
                       key={staff.id}
@@ -177,7 +200,26 @@ const AttendanceDashboard = () => {
                       No staff found
                     </td>
                   </tr>
-                )}
+                )} */}
+                {staff.map((member) => (
+                <tr key={member.id} className="bg-gray-50">
+                  <td className="px-4 py-2">Navya</td>
+                  <td className="px-4 py-2">{member.email}</td>
+                  <td className="px-4 py-2">{member.role}</td>
+                  <td className="px-4 py-2 text-center">
+                    <button
+                      className={`px-4 py-1 rounded-full ${
+                        member.current_attendance === 'Present'
+                          ? 'bg-green-500 text-white'
+                          : 'bg-red-500 text-white'
+                      }`}
+                      onClick={() => handleToggleAttendance(member.id)}
+                    >
+                      {member.current_attendance}
+                    </button>
+                  </td>
+                </tr>
+              ))}
               </tbody>
             </table>
           </div>

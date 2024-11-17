@@ -31,12 +31,12 @@ const MSideBar = ({ onMenuItemClick }) => {
         }
     }
     const menuItems = [
-        { icon: <LayoutDashboard size={20} />, label: 'Dashboard', component: MDashboard },
-        { icon: <CalendarClock size={20} />, label: 'Schedule ', component: MSchedule },
-        { icon: <ClipboardCheck size={20} />, label: 'Attendance', component: MAttendance },
-        { icon: <Database size={20} />, label: 'Database', component: MDatabase },
-        { icon: <LineChart size={20} />, label: 'Analytics', component: MAnalytics },
-        { icon: <Settings size={20} />, label: 'Settings', component: MSettings },
+        { icon: <LayoutDashboard size={20} />, label: 'Dashboard', component: 'MDashboard' },
+        { icon: <CalendarClock size={20} />, label: 'Schedule ', component: 'MSchedule' },
+        { icon: <ClipboardCheck size={20} />, label: 'Attendance', component: 'MAttendance' },
+        { icon: <Database size={20} />, label: 'Database', component: 'MDatabase' },
+        { icon: <LineChart size={20} />, label: 'Analytics', component: 'MAnalytics' },
+        { icon: <Settings size={20} />, label: 'Settings', component: 'MSettings' },
     ];
 
     const handleMenuClick = (component) => {
