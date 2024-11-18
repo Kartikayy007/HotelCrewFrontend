@@ -343,9 +343,9 @@ function AdminDashboard() {
         {greeting}
       </h1>
 
-      <div className="flex flex-col xl:flex-row justify-around gap-6">
+      <div className="flex flex-col xl:flex-row justify-around">
         <div className="flex flex-col space-y-6 w-full xl:w-4/6">
-          <div className="bg-white rounded-lg shadow min-h-[320px] w-full p-4">
+          <div className="bg-white rounded-lg shadow-lg min-h-[320px] w-full p-4">
             <div className="mb-4">
               <h2 className="text-lg sm:text-xl font-semibold">Hotel Status</h2>
             </div>
@@ -492,7 +492,7 @@ function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow min-h-[384px] w-full p-4">
+          <div className="bg-white rounded-lg shadow-lg min-h-[384px] w-full p-4">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Revenue (Hours {revenueRange[0]} - {revenueRange[1]})
             </h2>
@@ -539,7 +539,7 @@ function AdminDashboard() {
             </Box>
           </div>
 
-          <div className="bg-white rounded-lg shadow min-h-[416px] w-full p-4">
+          <div className="bg-white rounded-lg shadow-lg min-h-[416px] w-full p-4">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Staff Metrics (Hours {performanceRange[0]} - {performanceRange[1]}
               )
@@ -576,7 +576,7 @@ function AdminDashboard() {
         </div>
 
         <div className="flex flex-col space-y-6 w-full xl:w-[30%]">
-          <div className="bg-white rounded-lg shadow min-h-[416px] w-full p-4">
+          <div className="bg-white rounded-lg shadow-lg min-h-[416px] w-full p-4">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Staff Database
             </h2>
@@ -609,7 +609,7 @@ function AdminDashboard() {
             </Box>
           </div>
 
-          <div className="bg-white rounded-lg shadow w-full p-4 flex flex-col h-[calc(40vh)] ">
+          <div className="bg-white rounded-lg shadow-lg w-full p-4 flex flex-col h-[calc(40vh)] ">
             <h2 className="text-lg sm:text-xl font-semibold mb-2">
               Announcements
             </h2>
@@ -784,7 +784,7 @@ function AdminDashboard() {
               </div>
             </Dialog>
           </div>
-          <form onSubmit={handleAssign} className="flex flex-col gap-4 bg-white p-6 rounded-lg shadow flex-1">
+          <form onSubmit={handleAssign} className="flex flex-col gap-4 bg-white p-6 rounded-lg shadow-lg flex-1">
       <h2 className="text-lg sm:text-xl font-semibold mb-2">
         Assign Task
       </h2>
