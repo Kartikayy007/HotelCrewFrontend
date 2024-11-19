@@ -6,4 +6,4 @@ const MAnalytics = () => {
   )
 }
 
-export default MAnalytics
+export default MAnalytics;
