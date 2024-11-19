@@ -7,7 +7,6 @@ const MAttendance = () => {
   const [selectedDepartments, setSelectedDepartments] = useState(['All']);
   const [searchTerm, setSearchTerm] = useState([]); // State for email search
   const [staffList, setStaffList] = useState([
-    // Example staff data
     { id: 1, name: "John Doe", email: "john@example.com", department: "Reception" },
     { id: 2, name: "Jane Smith", email: "jane@example.com", department: "Kitchen" },
     { id: 3, name: "Alice Brown", email: "alice@example.com", department: "Security" },
@@ -22,7 +21,6 @@ const MAttendance = () => {
 
   const [approvedLeaves, setApprovedLeaves] = useState([]);
 
-  // Handle approve/reject
   const handleLeaveAction = (id, action) => {
     setLeaveRequests((prevRequests) =>
       prevRequests.map((request) =>
@@ -39,10 +37,9 @@ const MAttendance = () => {
   const [isTableExpanded, setIsTableExpanded] = useState(false);
   useEffect(() => {
     const fetchDepartments = async () => {
-      // Example API response
       const departmentData = ["Reception", "Kitchen", "Security", "Housekeeping"];
       setDepartment(departmentData);
-      setSelectedDepartments(['All']); // Select all by default
+      setSelectedDepartments(['All']);
     };
     fetchDepartments();
   }, []);
@@ -75,13 +72,10 @@ const MAttendance = () => {
   return (
     <section className=" h-screen p-2 mr-1 font-Montserrat">
       <h2 className="text-[#252941] text-2xl pl-4 mt-5 font-semibold">Staff Attendance</h2>
-      {/* <div> */}
       <div className='flex justify-center mb-1 mt-6 pb-5 px-3'>
-        {/* <div className="bg-white w-full h-[392px] pb-7  py-2  rounded-lg shadow"> */}
         <div className={`bg-white w-full rounded-lg shadow ${isTableExpanded ? "h-screen" : "h-[392px]"}`}>
           <div className="flex justify-between items-center p-4">
             <h2 className="text-[#252941] text-lg pl-6 mt-4 mb-0 font-semibold">Select Department:</h2>
-            {/* Expand/Collapse Icons */}
             {isTableExpanded ? (
               <X
                 size={24}

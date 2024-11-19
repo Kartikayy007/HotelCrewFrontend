@@ -1,22 +1,25 @@
-import React, {useState, useEffect} from "react";
-import {PieChart} from "@mui/x-charts/PieChart";
-import {LineChart} from "@mui/x-charts/LineChart";
-import {BarChart} from "@mui/x-charts/BarChart";
+import React, { useState, useEffect } from "react";
+import { PieChart } from "@mui/x-charts/PieChart";
+import { LineChart } from "@mui/x-charts/LineChart";
+import { BarChart } from "@mui/x-charts/BarChart";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
-import {Dialog, TextField, Button, Snackbar, Alert} from "@mui/material";
+import { Dialog, TextField, Button, Snackbar, Alert, IconButton } from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
-import {useDispatch, useSelector} from "react-redux";
-import {fetchAttendanceStats} from "../../../redux/slices/AdminAttendanceSlice";
-import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-import { createTask, selectTasksLoading, selectTasksError } from '../../../redux/slices/taskSlice';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAttendanceStats } from "../../../redux/slices/AdminAttendanceSlice";
+import { FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { BsThreeDots } from "react-icons/bs";
+import { createTask, selectTasksLoading, selectTasksError } from "../../../redux/slices/taskSlice";
+import AdminTaskAssignment from "./AdminTaskAssignment";
+import { CreateAnnouncementBox } from "../../reusable components/CreateAnnouncementBox";
+import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError,deleteAnnouncement } from '../../../redux/slices/AnnouncementSlice';
 
 function AdminDashboard() {
   const dispatch = useDispatch();
   const attendanceStats = useSelector((state) => state.attendance.stats);
-  const attendanceLoading = useSelector((state) => state.attendance.loading);
-  const [taskTitle, setTaskTitle] = useState('');
-  const [taskDescription, setTaskDescription] = useState('');
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
   const Taskloading = useSelector(selectTasksLoading);
   const error = useSelector(selectTasksError);
 
@@ -30,23 +33,23 @@ function AdminDashboard() {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selected, setSelected] = useState({ 
-    label: 'Select Department', 
-    value: '' 
+  const [selected, setSelected] = useState({
+    label: "Select Department",
+    value: "",
   });
 
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success'
+    message: "",
+    severity: "success",
   });
 
   const departments = [
-    { label: 'Security', value: 'security' },
-    { label: 'Housekeeping', value: 'housekeeping' },
-    { label: 'Kitchen', value: 'kitchen' },
-    { label: 'Front Desk', value: 'frontdesk' },
-    { label: 'Maintenance', value: 'maintenance' }
+    {label: "Security", value: "security"},
+    {label: "Housekeeping", value: "housekeeping"},
+    {label: "Kitchen", value: "kitchen"},
+    {label: "Front Desk", value: "frontdesk"},
+    {label: "Maintenance", value: "maintenance"},
   ];
 
   const handleSelect = (dept) => {
@@ -125,16 +128,16 @@ function AdminDashboard() {
 
   useEffect(() => {
     dispatch(fetchAttendanceStats());
-    
+
     // const interval = setInterval(() => {
-      dispatch(fetchAttendanceStats());
+    dispatch(fetchAttendanceStats());
     // }, 300000);
-  
+
     // return () => clearInterval(interval);
   }, [dispatch]);
 
-  console.log(attendanceStats);
-  
+  // console.log(attendanceStats);
+
   const staffAttendance = [
     {
       id: 0,
@@ -230,25 +233,15 @@ function AdminDashboard() {
       ? "Good Afternoon"
       : "Good Evening";
 
-  const [announcements, setAnnouncements] = useState([
-    // {
-    //   id: 1,
-    //   title: "Hotel Maintenance",
-    //   description: "Pool maintenance scheduled for tomorrow 10 AM - 2 PM",
-    //   date: "2024-03-20 09:00",
-    // },
-    // {
-    //   id: 2,
-    //   title: "Staff Meeting",
-    //   description: "Monthly staff meeting in Conference Room A",
-    //   date: "2024-03-19 14:00",
-    // },
-  ]);
+  const announcements = useSelector(selectAllAnnouncements);
+  const announcementsLoading = useSelector(selectAnnouncementsLoading);
+  const announcementsError = useSelector(selectAnnouncementsError);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newAnnouncement, setNewAnnouncement] = useState({
     title: "",
     description: "",
   });
+  // const [showAnnouncementBox, setShowAnnouncementBox] = useState(false);
 
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
@@ -256,36 +249,81 @@ function AdminDashboard() {
     setNewAnnouncement({title: "", description: ""});
   };
 
-  const handleCreateAnnouncement = () => {
-    if (newAnnouncement.title && newAnnouncement.description) {
-      setAnnouncements([
-        {
-          id: Date.now(),
-          ...newAnnouncement,
-          date: new Date().toLocaleString(),
-        },
-        ...announcements,
-      ]);
-      handleModalClose();
+  useEffect(() => {
+    dispatch(fetchAnnouncements());
+  }, [dispatch]);
+  
+  const handleCreateAnnouncement = async (announcementData) => {
+    try {
+      await dispatch(createAnnouncement(announcementData)).unwrap();
+      setShowAnnouncementBox(false);
+      setSnackbar({
+        open: true,
+        message: "Announcement created successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error || "Failed to create announcement",
+        severity: "error",
+      });
     }
   };
-
+  
   const handleViewAnnouncement = (announcement) => {
     setSelectedAnnouncement(announcement);
   };
-
+  
   const handleViewClose = () => {
     setSelectedAnnouncement(null);
   };
 
+  const handleDeleteAnnouncement = async (id) => {
+    try {
+      await dispatch(deleteAnnouncement(id)).unwrap();
+      handleViewClose();
+      setSnackbar({
+        open: true,
+        message: "Announcement deleted successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error || "Failed to delete announcement",
+        severity: "error",
+      });
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(deleteAnnouncement(selectedAnnouncement._id));
+      handleViewClose(); 
+      setSnackbar({
+        open: true,
+        message: "Announcement deleted successfully",
+        severity: "success"
+      });
+      console.log(selectAllAnnouncements._id);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error || "Failed to delete announcement",
+        severity: "error"
+      });
+    }
+  };
+
   const handleAssign = async (e) => {
     e.preventDefault();
-    
+
     if (!taskTitle.trim()) {
       setSnackbar({
         open: true,
-        message: 'Please enter a task title',
-        severity: 'error'
+        message: "Please enter a task title",
+        severity: "error",
       });
       return;
     }
@@ -293,8 +331,8 @@ function AdminDashboard() {
     if (!taskDescription.trim()) {
       setSnackbar({
         open: true,
-        message: 'Please enter a task description',
-        severity: 'error'
+        message: "Please enter a task description",
+        severity: "error",
       });
       return;
     }
@@ -302,40 +340,60 @@ function AdminDashboard() {
     if (!selected.value) {
       setSnackbar({
         open: true,
-        message: 'Please select a department',
-        severity: 'error'
+        message: "Please select a department",
+        severity: "error",
       });
       return;
     }
 
     try {
-      await dispatch(createTask({
-        title: taskTitle.trim(),
-        description: taskDescription.trim(),
-        department: selected.value
-      })).unwrap();
+      await dispatch(
+        createTask({
+          title: taskTitle.trim(),
+          description: taskDescription.trim(),
+          department: selected.value,
+          priority: selectedPriority
+        })
+      ).unwrap();
 
-      setTaskTitle('');
-      setTaskDescription('');
-      setSelected({ label: 'Select Department', value: '' });
-      
+      setTaskTitle("");
+      setTaskDescription("");
+      setSelected({label: "Select Department", value: ""});
+
       setSnackbar({
         open: true,
-        message: 'Task assigned successfully',
-        severity: 'success'
+        message: "Task assigned successfully",
+        severity: "success",
       });
     } catch (err) {
       setSnackbar({
         open: true,
-        message: err.message || 'Failed to assign task',
-        severity: 'error'
+        message: err.message || "Failed to assign task",
+        severity: "error",
       });
     }
   };
 
   const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
+    setSnackbar({...snackbar, open: false});
   };
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [showTaskAssignment, setShowTaskAssignment] = useState(false);
+
+  const handleDotsClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleShowTaskAssignment = () => {
+    setShowTaskAssignment(true);
+    handleDotsClose();
+  };
+
+  const [isPriorityDropdownOpen, setPriorityDropdownOpen] = useState(false);
+  const [selectedPriority, setSelectedPriority] = useState("");
+
+  const [showAnnouncementBox, setShowAnnouncementBox] = useState(false);
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
@@ -345,7 +403,7 @@ function AdminDashboard() {
 
       <div className="flex flex-col xl:flex-row justify-around">
         <div className="flex flex-col space-y-6 w-full xl:w-4/6">
-          <div className="bg-white rounded-lg shadow-lg min-h-[320px] w-full p-4">
+          <div className="bg-white rounded-xl shadow-lg min-h-[320px] w-full p-4">
             <div className="mb-4">
               <h2 className="text-lg sm:text-xl font-semibold">Hotel Status</h2>
             </div>
@@ -449,7 +507,7 @@ function AdminDashboard() {
                       <h3 className="font-medium mb-2 text-center">
                         Staff Attendance
                       </h3>
-                      
+
                       {attendanceStats.total_present === 0 ? (
                         <div className="flex items-center justify-center h-[180px] text-gray-500">
                           No Data Available
@@ -459,7 +517,10 @@ function AdminDashboard() {
                           series={[
                             {
                               data: staffAttendance,
-                              highlightScope: {fade: "global", highlight: "item"},
+                              highlightScope: {
+                                fade: "global",
+                                highlight: "item",
+                              },
                               innerRadius: 45,
                               paddingAngle: 1,
                               cornerRadius: 1,
@@ -492,7 +553,7 @@ function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg min-h-[384px] w-full p-4">
+          <div className="bg-white rounded-xl shadow-lg min-h-[384px] w-full p-4">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Revenue (Hours {revenueRange[0]} - {revenueRange[1]})
             </h2>
@@ -539,7 +600,7 @@ function AdminDashboard() {
             </Box>
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg min-h-[416px] w-full p-4">
+          <div className="bg-white rounded-xl shadow-lg min-h-[416px] w-full p-4">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Staff Metrics (Hours {performanceRange[0]} - {performanceRange[1]}
               )
@@ -576,7 +637,7 @@ function AdminDashboard() {
         </div>
 
         <div className="flex flex-col space-y-6 w-full xl:w-[30%]">
-          <div className="bg-white rounded-lg shadow-lg min-h-[416px] w-full p-4">
+          <div className="bg-white rounded-xl shadow-lg min-h-[416px] w-full p-4">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Staff Database
             </h2>
@@ -609,12 +670,12 @@ function AdminDashboard() {
             </Box>
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg w-full p-4 flex flex-col h-[calc(40vh)] ">
+          <div className="bg-white rounded-xl shadow-lg w-full p-4 flex flex-col h-[calc(40vh)] ">
             <h2 className="text-lg sm:text-xl font-semibold mb-2">
               Announcements
             </h2>
             <div className="flex-1 overflow-y-auto mb-4">
-              {loading ? (
+              {announcementsLoading ? (
                 <div className="space-y-4">
                   <Skeleton
                     variant="text"
@@ -634,19 +695,17 @@ function AdminDashboard() {
                     height={60}
                     {...skeletonProps}
                   />
-                  <Skeleton
-                    variant="rectangular"
-                    width="100%"
-                    height={60}
-                    {...skeletonProps}
-                  />
+                </div>
+              ) : announcementsError ? (
+                <div className="text-red-500 text-center mt-4">
+                  {announcementsError}
                 </div>
               ) : (
                 <div className="overflow-scroll">
                   {announcements.length > 0 ? (
                     announcements.map((announcement) => (
                       <div
-                        key={announcement.id}
+                        key={announcement._id}
                         className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
                         onClick={() => handleViewAnnouncement(announcement)}
                       >
@@ -655,11 +714,17 @@ function AdminDashboard() {
                             {announcement.title}
                           </h3>
                           <span className="text-sm text-gray-500">
-                            {announcement.date}
+                            {new Date(announcement.created_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
                           </span>
                         </div>
                         <p className="text-gray-600">
-                          {announcement.description}
+                          {announcement.content}
                         </p>
                       </div>
                     ))
@@ -675,192 +740,251 @@ function AdminDashboard() {
               <Button
                 variant="contained"
                 fullWidth
-                onClick={handleModalOpen}
+                onClick={() => setShowAnnouncementBox(true)}
                 sx={{
                   backgroundColor: "#3A426F",
                   "&:hover": {backgroundColor: "#3A426F"},
                 }}
               >
-                Create Announcement
+                Create Announcement 
               </Button>
             </div>
 
-            <Dialog
-              open={isModalOpen}
-              onClose={handleModalClose}
-              maxWidth="sm"
-              fullWidth
-            >
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">
-                  Create Announcement
-                </h2>
-                <div className="space-y-4">
-                  <TextField
-                    label="Title"
-                    fullWidth
-                    value={newAnnouncement.title}
-                    onChange={(e) =>
-                      setNewAnnouncement({
-                        ...newAnnouncement,
-                        title: e.target.value,
-                      })
-                    }
+            {showAnnouncementBox && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl w-full max-w-2xl mx-4">
+                  <CreateAnnouncementBox 
+                    onClose={() => setShowAnnouncementBox(false)}
+                    onSubmit={handleCreateAnnouncement}
+                    departments={departments}
                   />
-                  <TextField
-                    label="Description"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    value={newAnnouncement.description}
-                    onChange={(e) =>
-                      setNewAnnouncement({
-                        ...newAnnouncement,
-                        description: e.target.value,
-                      })
-                    }
-                  />
-                  <div className="flex justify-end space-x-2 pt-4">
-                    <Button
-                      variant="outlined"
-                      onClick={handleModalClose}
-                      sx={{borderColor: "#3A426F", color: "#3A426F"}}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="contained"
-                      onClick={handleCreateAnnouncement}
-                      sx={{
-                        backgroundColor: "#3A426F",
-                        "&:hover": {backgroundColor: "#3A426F"},
-                      }}
-                    >
-                      Post Announcement
-                    </Button>
-                  </div>
                 </div>
               </div>
-            </Dialog>
+            )}
 
-            <Dialog
-              open={!!selectedAnnouncement}
-              onClose={handleViewClose}
-              maxWidth="sm"
-              fullWidth
-            >
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">
-                  View Announcement
-                </h2>
-                <div className="space-y-4">
-                  <TextField
-                    label="Title"
-                    fullWidth
-                    value={selectedAnnouncement?.title || ""}
-                    InputProps={{readOnly: true}}
-                  />
-                  <TextField
-                    label="Description"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    value={selectedAnnouncement?.description || ""}
-                    InputProps={{readOnly: true}}
-                  />
-                  <div className="flex justify-end pt-4">
-                    <Button
-                      variant="contained"
-                      onClick={handleViewClose}
-                      sx={{
-                        backgroundColor: "#3A426F",
-                        "&:hover": {backgroundColor: "#3A426F"},
-                      }}
-                    >
-                      Close
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Dialog>
-          </div>
-          <form onSubmit={handleAssign} className="flex flex-col gap-4 bg-white p-6 rounded-lg shadow-lg flex-1">
-      <h2 className="text-lg sm:text-xl font-semibold mb-2">
-        Assign Task
-      </h2>
-      <input
-        type="text"
-        placeholder="Task Title"
-        value={taskTitle}
-        onChange={(e) => setTaskTitle(e.target.value)}
-        className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
+<Dialog
+  open={!!selectedAnnouncement}
+  onClose={handleViewClose}
+  maxWidth="sm"
+  fullWidth
+>
+  <div className="p-6">
+    <h2 className="text-xl font-semibold mb-4">
+      View Announcement
+    </h2>
+    <div className="space-y-4">
+      <TextField
+        label="Title"
+        fullWidth
+        value={selectedAnnouncement?.title || ""}
+        InputProps={{readOnly: true}}
       />
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
-            selected.value ? 'text-black' : 'text-gray-400'
-          } focus:outline-none flex justify-between items-center`}
-        >
-          {selected.label}
-          {isDropdownOpen ? (
-            <FaChevronUp className="text-gray-600" />
-          ) : (
-            <FaChevronDown className="text-gray-600" />
-          )}
-        </button>
-
-        {isDropdownOpen && (
-          <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-            {departments.map((dept, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => handleSelect(dept)}
-                disabled={dept.disabled}
-                className={`w-full text-left px-4 py-2 ${
-                  dept.disabled
-                    ? 'text-gray-400 cursor-default'
-                    : 'text-black hover:bg-gray-100'
-                }`}
-              >
-                {dept.label}
-              </button>
+      <TextField
+        label="Description"
+        fullWidth
+        multiline
+        rows={4}
+        value={selectedAnnouncement?.description || ""}
+        InputProps={{readOnly: true}}
+      />
+      <div className="space-y-2">
+        <p className="text-sm text-gray-500">
+          <span className="font-medium">Department:</span> {selectedAnnouncement?.department}
+        </p>
+        <p className="text-sm text-gray-500">
+          <span className="font-medium">Urgency:</span> {selectedAnnouncement?.urgency}
+        </p>
+        <p className="text-sm text-gray-500">
+          <span className="font-medium">Created By:</span> {selectedAnnouncement?.assigned_by}
+        </p>
+        <p className="text-sm text-gray-500">
+          <span className="font-medium">Created At:</span> {' '}
+          {selectedAnnouncement?.created_at && 
+            new Date(selectedAnnouncement.created_at).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          }
+        </p>
+        <div className="text-sm text-gray-500">
+          <span className="font-medium">Assigned To:</span>
+          <ul className="list-disc pl-5 mt-1">
+            {selectedAnnouncement?.assigned_to.map((person, index) => (
+              <li key={index}>{person}</li>
             ))}
-          </div>
-        )}
-      </div>
-      <textarea
-        value={taskDescription}
-        onChange={(e) => setTaskDescription(e.target.value)}
-        placeholder="Task Description"
-        maxLength={350}
-        className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 h-[120px] resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
-      />
-      <div className="flex justify-end">
-        <button
-          type="submit"
-          disabled={Taskloading}
-          className="h-9 w-28 lg:w-full bg-[#252941] font-Montserrat font-bold rounded-lg text-white disabled:opacity-50"
-        >
-          {Taskloading ? 'Assigning...' : 'Assign'}
-        </button>
-      </div>
-    </form>
+          </ul>
         </div>
       </div>
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={6000} 
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      <div className="flex justify-end gap-2 mt-4">
+        <Button
+          onClick={handleDelete}
+          variant="contained"
+          sx={{
+            backgroundColor: "#dc2626",
+            "&:hover": {backgroundColor: "#b91c1c"},
+          }}
+        >
+          Delete
+        </Button>
+        <Button
+          onClick={handleViewClose}
+          variant="contained"
+          sx={{
+            backgroundColor: "#3A426F",
+            "&:hover": {backgroundColor: "#3A426F"},
+          }}
+        >
+          Close
+        </Button>
+      </div>
+    </div>
+  </div>
+</Dialog>
+
+
+          </div>
+          <form
+            onSubmit={handleAssign}
+            className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg flex-1"
+          >
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-lg sm:text-xl font-semibold">Assign Task</h2>
+              <IconButton
+                onClick={handleShowTaskAssignment}
+                size="small"
+                className="text-gray-600"
+              >
+                <BsThreeDots />
+              </IconButton>
+            </div>
+
+            <input
+              type="text"
+              placeholder="Task Title"
+              value={taskTitle}
+              onChange={(e) => setTaskTitle(e.target.value)}
+              className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
+            />
+          <div className="flex justify-between">
+            <div className="relative w-48">
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                  selected.value ? "text-black" : "text-gray-400"
+                } focus:outline-none flex justify-between items-center`}
+              >
+                {selected.label}
+                {isDropdownOpen ? (
+                  <FaChevronUp className="text-gray-600" />
+                ) : (
+                  <FaChevronDown className="text-gray-600" />
+                )}
+              </button>
+
+              {isDropdownOpen && (
+                <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+                  {departments.map((dept, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleSelect(dept)}
+                      disabled={dept.disabled}
+                      className={`w-full text-left px-4 py-2 ${
+                        dept.disabled
+                          ? "text-gray-400 cursor-default"
+                          : "text-black hover:bg-gray-100"
+                      }`}
+                    >
+                      {dept.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="relative w-40">
+              <button
+                type="button" 
+                onClick={() => setPriorityDropdownOpen(!isPriorityDropdownOpen)}
+                className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                  selectedPriority ? "text-black" : "text-gray-400"
+                } focus:outline-none flex justify-between items-center`}
+              >
+                {selectedPriority || "Select Priority"}
+                {isPriorityDropdownOpen ? (
+                  <FaChevronUp className="text-gray-600" />
+                ) : (
+                  <FaChevronDown className="text-gray-600" />
+                )}
+              </button>
+
+              {isPriorityDropdownOpen && (
+                <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+                  {["High", "Medium", "Low"].map((priority) => (
+                    <button
+                      key={priority}
+                      type="button"
+                      onClick={() => {
+                        setSelectedPriority(priority);
+                        setPriorityDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                        priority === "High" ? "bg-red-500" : 
+                        priority === "Medium" ? "bg-yellow-500" : 
+                        "bg-green-500"
+                      }`}></span>
+                      {priority}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            </div>   
+            <textarea
+              value={taskDescription}
+              onChange={(e) => setTaskDescription(e.target.value)}
+              placeholder="Task Description"
+              maxLength={350}
+              className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 h-[120px] resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+            />
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={Taskloading}
+                className="h-9 w-28 lg:w-full bg-[#252941] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50"
+              >
+                {Taskloading ? "Assigning..." : "Assign"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <Dialog
+        open={showTaskAssignment}
+        onClose={() => setShowTaskAssignment(false)}
+        maxWidth="md"
+        fullWidth
       >
-        <Alert 
-          onClose={handleSnackbarClose} 
+        <AdminTaskAssignment onClose={() => setShowTaskAssignment(false)} />
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{vertical: "top", horizontal: "right"}}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
           severity={snackbar.severity}
           variant="filled"
-          sx={{ width: '100%' }}
+          sx={{width: "100%"}}
         >
           {snackbar.message}
         </Alert>
