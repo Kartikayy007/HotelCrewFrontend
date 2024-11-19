@@ -66,20 +66,30 @@
     async (id, { rejectWithValue }) => {
       try {
         const token = getAuthToken();
-
         const config = {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
+        };
+
+        const URL = `${BASE_URL}${id}/`;
+  
+        console.log('Deleting announcement with ID:', id);
+        const response = await axios.delete(URL, config);
+  
+        if (response.status === 204) {
+          return id; 
         }
-        await axios.delete(`${BASE_URL}${id}`, config);
-
-        console.log(id)
-
-        return id;
+  
+        throw new Error('Unexpected response status: ' + response.status);
       } catch (error) {
-        return rejectWithValue(error.response?.data?.message || 'Failed to delete announcement');
+        console.error('Delete API error:', error);
+        return rejectWithValue(
+          error.response?.data?.message || 
+          error.message || 
+          'Failed to delete announcement'
+        );
       }
     }
   );
@@ -135,7 +145,7 @@
         .addCase(deleteAnnouncement.fulfilled, (state, action) => {
           state.loading = false;
           state.announcements = state.announcements.filter(
-            announcement => announcement._id !== action.payload
+            announcement => announcement.id !== action.payload
           );
         })
         .addCase(deleteAnnouncement.rejected, (state, action) => {

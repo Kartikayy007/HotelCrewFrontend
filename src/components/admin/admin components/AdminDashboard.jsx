@@ -241,7 +241,6 @@ function AdminDashboard() {
     title: "",
     description: "",
   });
-  // const [showAnnouncementBox, setShowAnnouncementBox] = useState(false);
 
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
@@ -279,38 +278,31 @@ function AdminDashboard() {
     setSelectedAnnouncement(null);
   };
 
-  const handleDeleteAnnouncement = async (id) => {
-    try {
-      await dispatch(deleteAnnouncement(id)).unwrap();
-      handleViewClose();
-      setSnackbar({
-        open: true,
-        message: "Announcement deleted successfully",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: error || "Failed to delete announcement",
-        severity: "error",
-      });
-    }
-  };
+  
 
   const handleDelete = async () => {
+    if (!selectedAnnouncement?.id) {
+      setSnackbar({
+        open: true,
+        message: "Invalid announcement ID",
+        severity: "error"
+      });
+      return;
+    }
+  
     try {
-      await dispatch(deleteAnnouncement(selectedAnnouncement._id));
-      handleViewClose(); 
+      await dispatch(deleteAnnouncement(selectedAnnouncement.id)).unwrap();
+      handleViewClose();
       setSnackbar({
         open: true,
         message: "Announcement deleted successfully",
         severity: "success"
       });
-      console.log(selectAllAnnouncements._id);
     } catch (error) {
+      console.error('Delete error:', error);
       setSnackbar({
         open: true,
-        message: error || "Failed to delete announcement",
+        message: error?.message || "Failed to delete announcement",
         severity: "error"
       });
     }
