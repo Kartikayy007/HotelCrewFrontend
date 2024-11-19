@@ -8,7 +8,7 @@ import { fetchAttendance, updateAttendance, checkAttendance } from '../../redux/
 
 const AttendanceDashboard = () => {
   const [department, setDepartment] = useState([]);// State for department filter
-  const [filteredStaffList, setFilteredStaffList] = useState([]);
+  // const [filteredStaffList, setFilteredStaffList] = useState([]);
   const [selectedDepartments, setSelectedDepartments] = useState(['All']);
   // const [searchTerm, setSearchTerm] = useState([]); // State for email search
   // const [selectedDate, setSelectedDate] = useState('');
