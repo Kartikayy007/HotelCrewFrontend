@@ -14,6 +14,7 @@ import {
 } from "chart.js";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import OccupancyHeatmap from "../../reusable components/OccupancyHeatmap";
 
 ChartJS.register(
   RadialLinearScale,
@@ -346,10 +347,11 @@ const AdminAnalytics = () => {
             </Box>
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg p-4 h-[51rem] sm:-mt-24 md:-mt-24 lg:-mt-24">
-            <h3 className="text-lg font-semibold">Occupancy Data</h3>
-            <div className="h-48 w-full">
-              
+          <div className="bg-white rounded-lg shadow-lg p-4 h-[51rem] sm:-mt-24 md:-mt-24 lg:-mt-24 overflow-scroll">
+            <h3 className="text-lg font-semibold">Occupancy Heatmap</h3>
+            <div className="h-48 w-full mt-6 ">
+            <OccupancyHeatmap />
+            
             </div>
           </div>
 
