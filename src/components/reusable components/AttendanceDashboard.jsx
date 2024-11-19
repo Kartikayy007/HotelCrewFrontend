@@ -2,21 +2,26 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import { Maximize2, X } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAttendance, updateAttendance } from '../../redux/slices/AttendanceSlice';
+import { fetchAttendance, updateAttendance, checkAttendance } from '../../redux/slices/AttendanceSlice';
+// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 
 const AttendanceDashboard = () => {
   const [department, setDepartment] = useState([]);// State for department filter
+  const [filteredStaffList, setFilteredStaffList] = useState([]);
   const [selectedDepartments, setSelectedDepartments] = useState(['All']);
-  const [searchTerm, setSearchTerm] = useState([]); // State for email search
-  const [staffList, setStaffList] = useState([
-    // Example staff data
-    { id: 1, name: "John Doe", email: "john@example.com", department: "Reception" },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", department: "Kitchen" },
-    { id: 3, name: "Alice Brown", email: "alice@example.com", department: "Security" },
-    { id: 4, name: "Alice Brown", email: "alice@example.com", department: "Housekeeping" },
-    { id: 5, name: "Alice Brown", email: "alice@example.com", department: "Housekeeping" },
-  ]);
+  // const [searchTerm, setSearchTerm] = useState([]); // State for email search
+  // const [selectedDate, setSelectedDate] = useState('');
+  
+
+  // const [staffList, setStaffList] = useState([
+  //   // Example staff data
+  //   { id: 1, name: "John Doe", email: "john@example.com", department: "Reception" },
+  //   { id: 2, name: "Jane Smith", email: "jane@example.com", department: "Kitchen" },
+  //   { id: 3, name: "Alice Brown", email: "alice@example.com", department: "Security" },
+  //   { id: 4, name: "Alice Brown", email: "alice@example.com", department: "Housekeeping" },
+  //   { id: 5, name: "Alice Brown", email: "alice@example.com", department: "Housekeeping" },
+  // ]);
   const [leaveRequests, setLeaveRequests] = useState([
     { id: 1, name: "John Doe", department: "Reception", duration: "2 days", date: "2024-11-20 to 2024-11-21", type: "Sick Leave", status: null },
     { id: 2, name: "Jane Smith", department: "Kitchen", duration: "5 days", date: "2024-11-20 to 2024-11-24", type: "Vacation Leave", status: null },
@@ -33,14 +38,15 @@ const AttendanceDashboard = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const fetchDepartments = async () => {
-      // Example API response
-      const departmentData = ["Reception", "Kitchen", "Security", "Housekeeping"];
-      setDepartment(departmentData);
-      setSelectedDepartments(['All']); // Select all by default
-    };
-    fetchDepartments();
-  }, []);
+    if (staff && staff.length > 0) {
+      // Extract unique departments
+      const uniqueDepartments = [
+        ...new Set(staff.map((item) => item.department))
+      ];
+      setDepartment(uniqueDepartments);
+      setSelectedDepartments(["All"]); // Select 'All' by default
+    }
+  }, [staff])
 
   const handleToggleAttendance = (id) => {
     dispatch(updateAttendance(id));
@@ -54,7 +60,7 @@ const AttendanceDashboard = () => {
     return <p>Error loading attendance: {error}</p>;
   }
 
-  localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY3NzY0LCJpYXQiOjE3MzE2NzU3NjQsImp0aSI6ImQ3NWVmNTUxMmE0NzQ1NWFiYmE3MmVhY2M2NzM0Mzk4IiwidXNlcl9pZCI6NDF9.pX8v_JU3baX_Vq-vavtHdqDgBDZ1tpOJQDgEMjClMRg")
+  // localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY3NzY0LCJpYXQiOjE3MzE2NzU3NjQsImp0aSI6ImQ3NWVmNTUxMmE0NzQ1NWFiYmE3MmVhY2M2NzM0Mzk4IiwidXNlcl9pZCI6NDF9.pX8v_JU3baX_Vq-vavtHdqDgBDZ1tpOJQDgEMjClMRg")
   // Handle approve/reject
   const handleLeaveAction = (id, action) => {
     setLeaveRequests((prevRequests) =>
@@ -76,25 +82,55 @@ const AttendanceDashboard = () => {
   //     )
   //   );
   // };
-  const handleDepartmentToggle = (department) => {
-    if (department === "All") {
-      setSelectedDepartments(["All"]);
-    } else {
-      setSelectedDepartments((prev) =>
-        prev.includes("All")
-          ? [department]
-          : prev.includes(department)
-            ? prev.filter((d) => d !== department)
-            : [department]
-      );
-    }
-  };
+ 
+  // const handleDepartmentToggle = (department) => {
+  //   setSelectedDepartments((prev) => {
+  //     if (department === "All") {
+  //       return ["All"];
+  //     }
+  //     if (prev.includes("All")) {
+  //       return [department];
+  //     }
+  //     if (prev.includes(department)) {
+  //       return prev.filter((d) => d !== department);
+  //     }
+  //     return [prev, department];
+  //   });
+  // };
 
-  const filteredStaffList = staffList.filter(
-    (staff) =>
-      (selectedDepartments.includes('All') || selectedDepartments.includes(staff.department)) &&
-      staff.name.toLowerCase().includes(searchTerm)
-  );
+  // const filteredStaffList = staffList.filter((staff) => {
+  //   const matchesDepartment =
+  //     selectedDepartments.includes("All") || selectedDepartments.includes(staff.department);
+  //   // const matchesSearchTerm = staff.name.toLowerCase().includes(searchTerm.toLowerCase());
+  //   return matchesDepartment;
+  //   //  && matchesSearchTerm;
+  // });
+  // const handleFilter = () => {
+  //   const filtered = attendanceList.filter((staff) => {
+  //     const matchesDepartment =
+  //       selectedDepartments.includes("All") ||
+  //       selectedDepartments.includes(staff.department);
+  //     return matchesDepartment;
+  //   });
+  //   setFilteredStaffList(filtered);
+  // };
+  const filteredStaff = selectedDepartments.includes("All")
+  ? staff
+  : staff.filter((member) => selectedDepartments.includes(member.department));
+
+
+  // Handle department selection
+  const toggleDepartmentSelection = (department) => {
+    setSelectedDepartments([department]);
+    // setSelectedDepartments((prev) => {
+    //   if (prev.includes(department)) {
+    //     return prev.filter((dep) => dep !== department);
+    //   } else {
+    //     return department === "All" ? ["All"] : prev.filter((dep) => dep !== "All").concat(department);
+    //   }
+    // });
+
+  };
   return (
     <section className=" h-screen p-2 mr-1 font-Montserrat">
       <h2 className="text-[#252941] text-2xl pl-4 mt-5 font-semibold">Staff Attendance</h2>
@@ -122,7 +158,7 @@ const AttendanceDashboard = () => {
           <div className="md:hidden p-4 flex items-center justify-center">
             <select
               className="py-2 px-4 w-full  border border-gray-300 rounded-3xl"
-              onChange={(e) => handleDepartmentToggle(e.target.value)}
+              onChange={(e) => toggleDepartmentSelection(e.target.value)}
               value={selectedDepartments[0]} // Show the first selected option
             >
               <option value="All">All</option>
@@ -137,7 +173,7 @@ const AttendanceDashboard = () => {
             {/* "All" Button */}
             <button
               key="all"
-              onClick={() => handleDepartmentToggle('All')}
+              onClick={() => toggleDepartmentSelection('All')}
               className={`px-4 py-1 w-[150px] rounded-3xl font-semibold  border-none ${selectedDepartments.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
                 }`}
             >
@@ -146,7 +182,7 @@ const AttendanceDashboard = () => {
             {department.map((dept) => (
               <button
                 key={dept}
-                onClick={() => handleDepartmentToggle(dept)}
+                onClick={() => toggleDepartmentSelection(dept)}
                 className={`px-4 py-1 w-[150px]  rounded-3xl border-none font-semibold ${selectedDepartments.includes(dept)
                   ? "bg-[#6675C5] text-white"
                   : "bg-[#E6EEF9] text-[#252941] "
@@ -169,32 +205,50 @@ const AttendanceDashboard = () => {
                   <th className="px-4 py-2 text-left">Email</th>
                   <th className="px-4 py-2 text-left">Department</th>
                   <th className="px-4 py-2 text-center">Attendance</th>
+                  <th className="px-4 py-2 text-center">
+                    {/* <input
+                      type="date"
+                      value={selectedDate || 'Date'}
+                      placeholder='date'
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      className="bg-[#E6EEF9] text-[#3F4870] px-1 border-[1px] border-[#A1C6E7] text-sm focus:outline-none " // Styling the date input "
+                    /> */}
+                     {/* <DatePicker
+        label="Helper text example"
+        slotProps={{
+          textField: {
+            helperText: 'MM/DD/YYYY',
+          },
+        }}
+      /> */}
+                  </th>
                   {/* <th className="px-4 py-2 text-center">Date</th> */}
                 </tr>
               </thead>
 
 
               <tbody>
-                {staff.map((member, index) => (
+                {filteredStaff.map((member, index) => (
                   <tr
                     key={member.id}
                     className={`px-4 py-2 ${index % 2 === 0 ? 'bg-[#F1F6FC]' : 'bg-[#DEE8FF]'
                       }`}
                   >
-                    <td className="px-4 py-2">Navya</td>
+                    <td className="px-4 py-2">{member.user_name}</td>
                     <td className="px-4 py-2">{member.email}</td>
-                    <td className="px-4 py-2">{member.role}</td>
+                    <td className="px-4 py-2">{member.department}</td>
                     <td className="px-4 py-2 text-center">
                       <button
                         className={`px-4 py-1 rounded-full ${member.current_attendance === 'Present'
-                            ? 'bg-green-500 text-white'
-                            : 'bg-red-500 text-white'
+                          ? 'bg-green-500 text-white'
+                          : 'bg-red-500 text-white'
                           }`}
                         onClick={() => handleToggleAttendance(member.id)}
                       >
                         {member.current_attendance}
                       </button>
                     </td>
+                    <td className="px-4 py-2"></td>
                   </tr>
                 ))}
               </tbody>
@@ -239,7 +293,7 @@ const AttendanceDashboard = () => {
                 </div>
               ))}
             {leaveRequests.filter((request) => request.status === null).length === 0 && (
-              <p className="text-gray-500">No leave requests pending.</p>
+              <p className="text-gray-900">No leave requests pending.</p>
             )}
           </div>
         </div>
@@ -262,10 +316,10 @@ const AttendanceDashboard = () => {
                 </div>
               ))
             ) : (
-              
-             
+
+
               <p className="text-gray-500 ">No approved leaves yet.</p>
-              
+
             )}
           </div>
         </div>
