@@ -1,5 +1,9 @@
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState,useEffect,useMemo,useRef } from 'react';
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
 const MSchedule = () => {
   const [daySearchQuery, setDaySearchQuery] = useState("");
@@ -50,9 +54,10 @@ const MSchedule = () => {
   const [dayShiftStaff, setDayShiftStaff] = useState(initialDayShiftStaff);
   const [nightShiftStaff, setNightShiftStaff] = useState(initialNightShiftStaff);
   const [infoBoxPosition, setInfoBoxPosition] = useState({ x: 0, y: 0 });
-  const [clickedElement, setClickedElement] = useState(null);
+  const [isDayDropdownOpen, setIsDayDropdownOpen] = useState(false);  // Track if day dropdown is open
+  const [isNightDropdownOpen, setIsNightDropdownOpen] = useState(false);  // Track if night dropdown is open
 
-
+  
   const handleNameClick = (e, staff) => {
     const { left, top, height, width } = e.target.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
@@ -168,10 +173,18 @@ const MSchedule = () => {
       setDayShiftStaff((prev) => [...prev, updatedStaff]);
     }
   };
-
-  const handleDepartmentSelection = (dept, setSelectedDepartment) => {
+  const handleDepartmentSelection = (dept, setSelectedDepartment, shift) => {
     setSelectedDepartment(dept);
+    if (shift === "day") {
+      setIsDayDropdownOpen(false);  // Close day dropdown
+    } else {
+      setIsNightDropdownOpen(false);  // Close night dropdown
+    }
   };
+
+  // const handleDepartmentSelection = (dept, setSelectedDepartment) => {
+  //   setSelectedDepartment(dept);
+  // };
   const renderShiftSection = (shift,
     selectedDepartment,
     setSelectedDepartment,
@@ -189,22 +202,97 @@ const MSchedule = () => {
     return (
         <div
         ref={shiftBoxRef}
-        className=" shift-box bg-white max-h-[330px]  overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow"
+        className=" shift-box bg-white max-h-[360px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow"
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => handleDrop(e, shift)}
       >
-        <div className='flex flex-col sm:flex-row gap-10 justify-between'>
+        <div className='flex flex-col sm:flex-row gap-3 sm:gap-10 justify-between'>
+       
         <h2 className="text-[#252941] text-2xl pl-3 mt-2 md:mt-4 mb-2 font-semibold">
           {shift === "day" ? "Day Shift" : "Night Shift"}
           </h2>
+          <div className="sm:hidden  items-center justify-center">
+            
+            <div 
+    // onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+    onClick={() => {
+      if (shift === "day") {
+        setIsDayDropdownOpen(!isDayDropdownOpen);  // Toggle Day Dropdown
+        setIsNightDropdownOpen(false);  // Close Night Dropdown if it's open
+      } else {
+        setIsNightDropdownOpen(!isNightDropdownOpen);  // Toggle Night Dropdown
+        setIsDayDropdownOpen(false);  // Close Day Dropdown if it's open
+      }
+    }}
+    className={`border border-gray-200 rounded-xl bg-[#e6eef9]  p-1 w-full text-left flex justify-between items-center cursor-pointer`}>
+    <span className={selectedDepartment ? 'text-black' : 'text-gray-400'}>
+      {selectedDepartment || 'Select Department'}
+    </span>
+    {shift === "day" ? (
+                isDayDropdownOpen ? (
+                  <FaChevronUp className="text-gray-600" />
+                ) : (
+                  <FaChevronDown className="text-gray-600" />
+                )
+              ) : (
+                isNightDropdownOpen ? (
+                  <FaChevronUp className="text-gray-600" />
+                ) : (
+                  <FaChevronDown className="text-gray-600" />
+                )
+              )}
+  </div>
+
+  {shift === "day" && isDayDropdownOpen && (
+              <div className="w-full mt-2">
+                <button
+                  onClick={() => handleDepartmentSelection("All", setSelectedDepartment, "day")}
+                  className={`w-full py-2 px-4 rounded-3xl mt-2 text-left ${selectedDepartment === "All" ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941]"}`}
+                >
+                  All
+                </button>
+                {departments.map((dept) => (
+                  <button
+                    key={dept}
+                    onClick={() => handleDepartmentSelection(dept, setSelectedDepartment, "day")}
+                    className={`w-full py-2 px-4 rounded-3xl mt-2 text-left ${selectedDepartment === dept ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941]"}`}
+                  >
+                    {dept}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {shift === "night" && isNightDropdownOpen && (
+              <div className="w-full mt-2">
+                <button
+                  onClick={() => handleDepartmentSelection("All", setSelectedDepartment, "night")}
+                  className={`w-full py-2 px-4 rounded-3xl mt-2 text-left ${selectedDepartment === "All" ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941]"}`}
+                >
+                  All
+                </button>
+                {departments.map((dept) => (
+                  <button
+                    key={dept}
+                    onClick={() => handleDepartmentSelection(dept, setSelectedDepartment, "night")}
+                    className={`w-full py-2 px-4 rounded-3xl mt-2 text-left ${selectedDepartment === dept ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941]"}`}
+                  >
+                    {dept}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <input
           type="text"
           value={searchQuery}
+          maxLength={50}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search Staff"
-          className="border  w-[300px] rounded-3xl   px-3 py-0 mt-3 focus:outline-none"
+          className="border  w-full sm:w-[300px] rounded-3xl   px-3 py-2 mt-3 focus:outline-none"
         />
         </div>
+        
         <div className="hidden sm:flex-wrap sm:flex mb-2 pl-2 pb-2 rounded-3xl pr-2">
           <button
             key="all"
@@ -259,7 +347,23 @@ const MSchedule = () => {
 
   return (
     <section className="h-screen p-2 mr-1 font-Montserrat">
+      <div className='md:flex  justify-between'>
       <h2 className="text-[#252941] text-2xl pl-4 mt-5 font-semibold">Shift Schedule</h2>
+      {/* <div className=''> */}
+      <div className='pl-4 pr-8 mt-2'>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DemoContainer components={['DatePicker']}>
+        <DatePicker 
+        label="Date"
+        sx={{
+          width:"80px",
+          padding:"1px",
+        }}
+        />
+      </DemoContainer>
+    </LocalizationProvider>
+    </div>
+    </div>
       <div className="flex flex-col justify-center mb-1 mt-6 pb-5 gap-5 px-3">
         {renderShiftSection(
           "day",
