@@ -198,7 +198,7 @@ const Dash = () => {
         {/* First Column */}
         <div className="space-y-5">
 
-          <div className="bg-white w-full  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
+          <div className="bg-white w-full  scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
             <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Hotel Status</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

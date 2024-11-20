@@ -259,7 +259,7 @@ const AttendanceDashboard = () => {
       <div className='flex flex-col lg:flex-row gap-5 mb-1 mt-3 pb-5 px-3'>
         {/* <div className="p-6 space-y-6"> */}
         {/* Leave Requests */}
-        <div className="bg-white w-full h-auto pb-7 py-2 rounded-xl shadow">
+        <div className="bg-white w-full max-h-[375px] overflow-y-auto pb-7 py-2 rounded-xl shadow scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-200">
           <h2 className="text-[#252941] text-lg pl-6 mt-4 mb-0 font-semibold">Leave Requests</h2>
           <div className="px-6 mt-4 space-y-4">
             {leaveRequests
@@ -299,7 +299,7 @@ const AttendanceDashboard = () => {
         </div>
 
         {/* Approved Leaves */}
-        <div className="bg-white w-full h-auto pb-7 py-2 rounded-xl shadow">
+        <div className="bg-white w-full max-h-[375px] overflow-y-auto pb-7 py-2 rounded-xl shadow scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-200">
           <h2 className="text-[#252941] text-lg pl-6 mt-4 mb-0 font-semibold">Approved Leaves</h2>
           <div className=" m-6 h-[88%] rounded-xl bg-white mt-4 space-y-4">
             {approvedLeaves.length > 0 ? (
