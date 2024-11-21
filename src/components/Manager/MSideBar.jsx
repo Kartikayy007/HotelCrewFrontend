@@ -33,12 +33,12 @@ const MSideBar = ({ onMenuItemClick }) => {
         }
     }
     const menuItems = [
-        { icon: <LayoutDashboard size={20} />, label: 'Dashboard', component: MDashboard },
-        { icon: <CalendarClock size={20} />, label: 'Schedule ', component: MSchedule },
-        { icon: <ClipboardCheck size={20} />, label: 'Attendance', component: MAttendance },
-        { icon: <Database size={20} />, label: 'Database', component: MDatabase },
-        { icon: <LineChart size={20} />, label: 'Analytics', component: MAnalytics },
-        { icon: <Settings size={20} />, label: 'Settings', component: MSettings },
+        { icon: <LayoutDashboard size={20} />, label: 'Dashboard', component: 'MDashboard' },
+        { icon: <CalendarClock size={20} />, label: 'Schedule ', component: 'MSchedule' },
+        { icon: <ClipboardCheck size={20} />, label: 'Attendance', component: 'MAttendance' },
+        { icon: <Database size={20} />, label: 'Database', component: 'MDatabase' },
+        { icon: <LineChart size={20} />, label: 'Analytics', component: 'MAnalytics' },
+        { icon: <Settings size={20} />, label: 'Settings', component: 'MSettings' },
     ];
 
     const handleMenuClick = (component) => {
@@ -49,9 +49,9 @@ const MSideBar = ({ onMenuItemClick }) => {
 
     return (
         <>
-            <div className='lg:hidden fixed top-3 left-2 z-50'>
-                <button onClick={toggleSidebar} className={`${isSidebarOpen ? 'text-white ' : 'text-[#252941]'} cursor-pointer`}>
-                    {isSidebarOpen ? <X size={24}   /> : <Menu size={24} />}
+            <div className='lg:hidden fixed top-4 left-2 z-50'>
+                <button onClick={toggleSidebar} className={`${isSidebarOpen ? 'text-white ' : 'text-[#252941]'}`}>
+                    {isSidebarOpen ? <X size={24} className="text-white" /> : <Menu size={24} />}
                 </button>
             </div>
             <nav className={`
