@@ -8,12 +8,7 @@ import {
     Menu,
     X,
     ClipboardCheck } from 'lucide-react';
-import MDashboard from './MDashboard'
-import MDatabase from "./MDatabase";
-import MSchedule from "./MSchedule";
-import MAnalytics from "./MAnalytics";
-import MAttendance from "./MAttendance";
-import MSettings from "./MSettings";
+
 
 
 const MSideBar = ({ onMenuItemClick }) => {
@@ -36,7 +31,7 @@ const MSideBar = ({ onMenuItemClick }) => {
         { icon: <ClipboardCheck size={20} />, label: 'Attendance', component: 'MAttendance' },
         { icon: <Database size={20} />, label: 'Database', component: 'MDatabase' },
         { icon: <LineChart size={20} />, label: 'Analytics', component: 'MAnalytics' },
-        { icon: <Settings size={20} />, label: 'Settings', component: 'MSettings' },
+        { icon: <Settings size={20} />, label: 'Profile', component: 'MProfile' },
     ];
 
     const handleMenuClick = (component) => {

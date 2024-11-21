@@ -2,51 +2,53 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useState,useEffect,useMemo,useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { Skeleton } from '@mui/material';
 
 const MSchedule = () => {
   const [daySearchQuery, setDaySearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
   const [nightSearchQuery, setNightSearchQuery] = useState("");
-  const departments = ["Reception", "Kitchen", "Maintainence", "Security", "Housekeeping","Parking"];
+  const departments = ["Reception", "Kitchen", "Maintainence", "Security", "Housekeeping", "Parking"];
   const [selectedStaff, setSelectedStaff] = useState(null);
   const initialDayShiftStaff = [
-    { id:1, name: "Alice ", department: "Reception",email: "alice@example.com",shift:"day" },
-    { id:2, name: "Anu", department: "Reception",email: "alice@example.com" ,shift:"day"},
-    {id:3,  name: "Ani", department: "Reception",email: "alice@example.com",shift:"day" },
-    { id:4, name: "Mani", department: "Reception",email: "alice@example.com",shift:"day" },
-    { id:5, name: "Shivam", department: "Kitchen",email: "alice@example.com",shift:"day" },
-    { id:6, name: "Charlie", department: "Housekeeping",email: "alice@example.com",shift:"day" },
-    { id:7, name: "Chiku", department: "Maintainence",email: "alice@example.com",shift:"day" },
-    { id:8, name: "David", department: "Security" ,email: "alice@example.com",shift:"day"},
-    { id:9, name: "Roger", department: "Security",email: "alice@example.com",shift:"day" },
-    { id:10, name: "Kaur", department: "Parking",email: "alice@example.com" ,shift:"day"},
-    { id:11, name: "Dope", department: "Parking",email: "alice@example.com" ,shift:"day"},
-    {id:12,  name: "Dark", department: "Security",email: "alice@example.com" ,shift:"day"},
-    { id:13, name: "Wild", department: "Kitchen",email: "alice@example.com" ,shift:"day"},
-    { id:14, name: "Duck", department: "Security",email: "alice@example.com",shift:"day" },
-    { id:15, name: "Puck", department: "Security" ,email: "alice@example.com",shift:"day"},
-    { id:16, name: "Muck", department: "Security" ,email: "alice@example.com",shift:"day"},
-    { id:17, name: "Chuck", department: "Security" ,email: "alice@example.com",shift:"day"},
-    { id:18, name: "Diljeet", department: "Security",email: "alice@example.com",shift:"day" },
-    { id:19, name: "Hitler", department: "Security",email: "alice@example.com",shift:"day" },
-    { id:20, name: "crunchy", department: "Security",email: "alice@example.com",shift:"day" },
+    { id: 1, name: "Alice ", department: "Reception", email: "alice@example.com", shift: "day" },
+    { id: 2, name: "Anu", department: "Reception", email: "alice@example.com", shift: "day" },
+    { id: 3, name: "Ani", department: "Reception", email: "alice@example.com", shift: "day" },
+    { id: 4, name: "Mani", department: "Reception", email: "alice@example.com", shift: "day" },
+    { id: 5, name: "Shivam", department: "Kitchen", email: "alice@example.com", shift: "day" },
+    { id: 6, name: "Charlie", department: "Housekeeping", email: "alice@example.com", shift: "day" },
+    { id: 7, name: "Chiku", department: "Maintainence", email: "alice@example.com", shift: "day" },
+    { id: 8, name: "David", department: "Security", email: "alice@example.com", shift: "day" },
+    { id: 9, name: "Roger", department: "Security", email: "alice@example.com", shift: "day" },
+    { id: 10, name: "Kaur", department: "Parking", email: "alice@example.com", shift: "day" },
+    { id: 11, name: "Dope", department: "Parking", email: "alice@example.com", shift: "day" },
+    { id: 12, name: "Dark", department: "Security", email: "alice@example.com", shift: "day" },
+    { id: 13, name: "Wild", department: "Kitchen", email: "alice@example.com", shift: "day" },
+    { id: 14, name: "Duck", department: "Security", email: "alice@example.com", shift: "day" },
+    { id: 15, name: "Puck", department: "Security", email: "alice@example.com", shift: "day" },
+    { id: 16, name: "Muck", department: "Security", email: "alice@example.com", shift: "day" },
+    { id: 17, name: "Chuck", department: "Security", email: "alice@example.com", shift: "day" },
+    { id: 18, name: "Diljeet", department: "Security", email: "alice@example.com", shift: "day" },
+    { id: 19, name: "Hitler", department: "Security", email: "alice@example.com", shift: "day" },
+    { id: 20, name: "crunchy", department: "Security", email: "alice@example.com", shift: "day" },
 
   ];
   const initialNightShiftStaff = [
-    { id:21, name: "Andy", department: "Reception",email: "alice@example.com",shift:"night" },
-    { id:22, name: "Abhi", department: "Reception",email: "alice@example.com",shift:"night" },
-    
-    { id:25, name: "Bob", department: "Kitchen" ,email: "alice@example.com",shift:"night"},
-    { id:26, name: "Marle", department: "Housekeeping",email: "alice@example.com",shift:"night" },
-    { id:27, name: "Piu", department: "Maintainence" ,email: "alice@example.com",shift:"night"},
-    { id:28, name: "Mavid", department: "Kit" ,email: "alice@example.com",shift:"night"},
-    { id:29, name: "Ben", department: "Security",email: "alice@example.com" ,shift:"night"},
-    { id:30, name: "Ken", department: "Parking" ,email: "alice@example.com",shift:"night"},
-    { id:31, name: "Deepti", department: "Parking" ,email: "alice@example.com",shift:"night"},
-    { id:32,  name: "Dinesh", department: "Security" ,email: "alice@example.com",shift:"night"},
-    { id:33, name: "Verma", department: "Security" ,email: "alice@example.com",shift:"night"},
-    { id:40, name: "Shin", department: "Security" ,email: "alice@example.com",shift:"night"},
+    { id: 21, name: "Andy", department: "Reception", email: "alice@example.com", shift: "night" },
+    { id: 22, name: "Abhi", department: "Reception", email: "alice@example.com", shift: "night" },
+
+    { id: 25, name: "Bob", department: "Kitchen", email: "alice@example.com", shift: "night" },
+    { id: 26, name: "Marle", department: "Housekeeping", email: "alice@example.com", shift: "night" },
+    { id: 27, name: "Piu", department: "Maintainence", email: "alice@example.com", shift: "night" },
+    { id: 28, name: "Mavid", department: "Kit", email: "alice@example.com", shift: "night" },
+    { id: 29, name: "Ben", department: "Security", email: "alice@example.com", shift: "night" },
+    { id: 30, name: "Ken", department: "Parking", email: "alice@example.com", shift: "night" },
+    { id: 31, name: "Deepti", department: "Parking", email: "alice@example.com", shift: "night" },
+    { id: 32, name: "Dinesh", department: "Security", email: "alice@example.com", shift: "night" },
+    { id: 33, name: "Verma", department: "Security", email: "alice@example.com", shift: "night" },
+    { id: 40, name: "Shin", department: "Security", email: "alice@example.com", shift: "night" },
   ];
 
   const [daySelectedDepartment, setDaySelectedDepartment] = useState("All");
@@ -56,46 +58,51 @@ const MSchedule = () => {
   const [infoBoxPosition, setInfoBoxPosition] = useState({ x: 0, y: 0 });
   const [isDayDropdownOpen, setIsDayDropdownOpen] = useState(false);  // Track if day dropdown is open
   const [isNightDropdownOpen, setIsNightDropdownOpen] = useState(false);  // Track if night dropdown is open
-
-  
+  const [selectedDate, setSelectedDate] = useState(null);
+  useEffect(() => {
+    // Simulate an API delay by using setTimeout
+    setTimeout(() => {
+      setLoading(false);  // Set loading to false after 2 seconds
+    }, 1000); // You can adjust the time to simulate loading delay
+  }, []);
   const handleNameClick = (e, staff) => {
     const { left, top, height, width } = e.target.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
-    const infoBoxHeight = 150; 
+    const infoBoxHeight = 150;
     const infoBoxWidth = 200;
 
     let xPosition = left;
     let yPosition;
 
-    
+
     const spaceBelow = viewportHeight - (top + height);
     if (spaceBelow < infoBoxHeight) {
-      
+
       yPosition = top - infoBoxHeight + window.scrollY;
     } else {
-     
+
       yPosition = top + height + window.scrollY;
     }
 
-   
+
     if (left + infoBoxWidth > window.innerWidth) {
-      xPosition = window.innerWidth - infoBoxWidth - 16; 
+      xPosition = window.innerWidth - infoBoxWidth - 16;
     }
 
     setSelectedStaff(staff);
     setInfoBoxPosition({ x: xPosition, y: yPosition });
-    setClickedElement(e.target); 
+    setClickedElement(e.target);
   };
-  const infoBoxRef = useRef(null);  
+  const infoBoxRef = useRef(null);
   const shiftBoxRef = useRef(null);
   useEffect(() => {
     const handleScroll = (e) => {
-      console.log("Scroll event detected");  
+      console.log("Scroll event detected");
       console.log("Scroll target:", e.target);
       setSelectedStaff(null);
     };
 
-    
+
     const shiftBoxElement = shiftBoxRef.current;
     if (shiftBoxElement) {
       shiftBoxElement.addEventListener("scroll", handleScroll);
@@ -109,14 +116,14 @@ const MSchedule = () => {
     };
   }, [selectedStaff]);// Effect depends on the selectedStaff state
 
-  
+
   const handleDragStart = (e, staff, shift) => {
     e.dataTransfer.setData("staff", JSON.stringify(staff));
     e.dataTransfer.setData("shift", shift);
   };
   useEffect(() => {
     const handleOutsideClick = (e) => {
-     
+
       if (!selectedStaff) {
         return;
       }
@@ -142,19 +149,19 @@ const MSchedule = () => {
     console.log("staff selected");
     const isDayShift = dayShiftStaff.some((staff) => staff.id === selectedStaff.id);
     const updatedStaff = { ...selectedStaff, shift: isDayShift ? "night" : "day" };
-  
-   
+
+
     if (isDayShift) {
-     
+
       setDayShiftStaff((prev) => prev.filter((staff) => staff.id !== selectedStaff.id));
       setNightShiftStaff((prev) => [...prev, updatedStaff]);
     } else {
-      
+
       setNightShiftStaff((prev) => prev.filter((staff) => staff.id !== selectedStaff.id));
       setDayShiftStaff((prev) => [...prev, updatedStaff]);
     }
-  
-  
+
+
     setSelectedStaff(null);
   };
   const handleDrop = (e, targetShift) => {
@@ -192,43 +199,43 @@ const MSchedule = () => {
     searchQuery,
     setSearchQuery) => {
 
-    const filteredStaff = useMemo(()=>{
+    const filteredStaff = useMemo(() => {
       return staff.filter(
-      (member) =>
-        (selectedDepartment === "All" || member.department === selectedDepartment) &&
-        member.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  },[staff, selectedDepartment, searchQuery]);
+        (member) =>
+          (selectedDepartment === "All" || member.department === selectedDepartment) &&
+          member.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }, [staff, selectedDepartment, searchQuery]);
     return (
-        <div
+      <div
         ref={shiftBoxRef}
         className=" shift-box bg-white max-h-[360px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow"
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => handleDrop(e, shift)}
       >
         <div className='flex flex-col sm:flex-row gap-3 sm:gap-10 justify-between'>
-       
-        <h2 className="text-[#252941] text-2xl pl-3 mt-2 md:mt-4 mb-2 font-semibold">
-          {shift === "day" ? "Day Shift" : "Night Shift"}
+
+          <h2 className="text-[#252941] text-2xl pl-3 mt-2 md:mt-4 mb-2 font-semibold">
+            {shift === "day" ? "Day Shift" : "Night Shift"}
           </h2>
           <div className="sm:hidden  items-center justify-center">
-            
-            <div 
-    // onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-    onClick={() => {
-      if (shift === "day") {
-        setIsDayDropdownOpen(!isDayDropdownOpen);  // Toggle Day Dropdown
-        setIsNightDropdownOpen(false);  // Close Night Dropdown if it's open
-      } else {
-        setIsNightDropdownOpen(!isNightDropdownOpen);  // Toggle Night Dropdown
-        setIsDayDropdownOpen(false);  // Close Day Dropdown if it's open
-      }
-    }}
-    className={`border border-gray-200 rounded-xl bg-[#e6eef9]  p-1 w-full text-left flex justify-between items-center cursor-pointer`}>
-    <span className={selectedDepartment ? 'text-black' : 'text-gray-400'}>
-      {selectedDepartment || 'Select Department'}
-    </span>
-    {shift === "day" ? (
+
+            <div
+              // onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onClick={() => {
+                if (shift === "day") {
+                  setIsDayDropdownOpen(!isDayDropdownOpen);  // Toggle Day Dropdown
+                  setIsNightDropdownOpen(false);  // Close Night Dropdown if it's open
+                } else {
+                  setIsNightDropdownOpen(!isNightDropdownOpen);  // Toggle Night Dropdown
+                  setIsDayDropdownOpen(false);  // Close Day Dropdown if it's open
+                }
+              }}
+              className={`border border-gray-200 rounded-xl bg-[#e6eef9]  p-1 w-full text-left flex justify-between items-center cursor-pointer`}>
+              <span className={selectedDepartment ? 'text-black' : 'text-gray-400'}>
+                {selectedDepartment || 'Select Department'}
+              </span>
+              {shift === "day" ? (
                 isDayDropdownOpen ? (
                   <FaChevronUp className="text-gray-600" />
                 ) : (
@@ -241,9 +248,9 @@ const MSchedule = () => {
                   <FaChevronDown className="text-gray-600" />
                 )
               )}
-  </div>
+            </div>
 
-  {shift === "day" && isDayDropdownOpen && (
+            {shift === "day" && isDayDropdownOpen && (
               <div className="w-full mt-2">
                 <button
                   onClick={() => handleDepartmentSelection("All", setSelectedDepartment, "day")}
@@ -283,25 +290,29 @@ const MSchedule = () => {
               </div>
             )}
           </div>
-          <input
-          type="text"
-          value={searchQuery}
-          maxLength={50}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search Staff"
-          className="border  w-full sm:w-[300px] rounded-3xl   px-3 py-2 mt-3 focus:outline-none"
-        />
+          <div className="relative w-full sm:w-[300px] mt-3">
+  <input
+    type="text"
+    value={searchQuery}
+    maxLength={50}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    placeholder="Search Staff"
+    className="border rounded-3xl bg-[#E6EEF9] px-10 py-2 w-full focus:outline-none"
+  />
+  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+   <img src="/search.svg" alt=""  />
+  </div>
+</div>
         </div>
-        
+
         <div className="hidden sm:flex-wrap sm:flex mb-2 pl-2 pb-2 rounded-3xl pr-2">
           <button
             key="all"
             onClick={() => handleDepartmentSelection("All", setSelectedDepartment)}
-            className={`px-4 py-1 w-[100px] rounded-3xl mx-2 font-semibold mt-2 border-none ${
-              selectedDepartment === "All"
+            className={`px-4 py-1 w-[100px] rounded-3xl mx-2 font-semibold mt-2 border-none ${selectedDepartment === "All"
                 ? "bg-[#6675C5] text-white"
                 : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
-            }`}
+              }`}
           >
             All
           </button>
@@ -309,38 +320,50 @@ const MSchedule = () => {
             <button
               key={dept}
               onClick={() => handleDepartmentSelection(dept, setSelectedDepartment)}
-              className={`px-2 py-1 w-[140px] mx-2 rounded-3xl border-none mt-2 font-semibold ${
-                selectedDepartment === dept
+              className={`px-2 py-1 w-[140px] mx-2 rounded-3xl border-none mt-2 font-semibold ${selectedDepartment === dept
                   ? "bg-[#6675C5] text-white"
                   : "bg-[#E6EEF9] text-[#252941]"
-              }`}
+                }`}
             >
               {dept}
             </button>
           ))}
         </div>
-        
+
         <p className="px-3 mt-3 font-semibold text-lg text-[#252941]">Staff Members:</p>
-        
-        
-      
+
+
+
         <div className="flex flex-wrap gap-3 mt-5 mb-10 rounded-xl mx-4">
-          {filteredStaff.length > 0 ? (
-            filteredStaff.map((member) => (
-              <div
-                key={`${member.name}-${member.department}`}
-                className="bg-[#E6EEF9] px-4 py-1 rounded-2xl shadow text-center cursor-pointer "
-                onClick={(e) => handleNameClick(e, member)}
-                draggable
-                onDragStart={(e) => handleDragStart(e, member, shift)}
-              >
-                {member.name}
-              </div>
-            ))
-          ) : (
-            <p className="text-red-500 font-semibold">Match not found</p>
-          )}
-        </div>
+  {loading ? (
+    // Skeleton loader for each staff member
+    Array(6).fill().map((_, index) => (
+      <Skeleton
+        key={index}
+        variant="rectangular"
+        width={140}
+        height={40}
+        sx={{ backgroundColor: '#E6EEF9' }}
+        className="rounded-2xl shadow"
+      />
+    ))
+  ) : filteredStaff.length > 0 ? (
+    filteredStaff.map((member) => (
+      <div
+        key={`${member.name}-${member.department}`}
+        className="bg-[#E6EEF9] px-4 py-1 rounded-2xl shadow text-center cursor-pointer"
+        onClick={(e) => handleNameClick(e, member)}
+        draggable
+        onDragStart={(e) => handleDragStart(e, member, shift)}
+      >
+        {member.name}
+      </div>
+    ))
+  ) : (
+    <p className="text-red-500 font-semibold">Match not found</p>
+  )}
+</div>
+
       </div>
     );
   };
@@ -348,22 +371,47 @@ const MSchedule = () => {
   return (
     <section className="h-screen p-2 mr-1 font-Montserrat">
       <div className='md:flex  justify-between'>
-      <h2 className="text-[#252941] text-2xl pl-4 mt-5 font-semibold">Shift Schedule</h2>
-      {/* <div className=''> */}
-      <div className='pl-4 pr-8 mt-2'>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DemoContainer components={['DatePicker']}>
-        <DatePicker 
+        <h2 className="text-[#252941] text-2xl pl-4 mt-5 font-semibold">Shift Schedule</h2>
+        {/* <div className=''> */}
+        <div className='pl-4 pr-8 mt-2'>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DatePicker
         label="Date"
-        sx={{
-          width:"80px",
-          padding:"1px",
-        }}
-        />
-      </DemoContainer>
+        value={selectedDate}
+        onChange={(newValue) => setSelectedDate(newValue)}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            sx={{
+              width: '200px', // Explicitly set width
+              height: '35px', // Explicitly set height for consistency
+              '& .MuiOutlinedInput-root': {
+                height: '35px', // Ensure the root height is consistent
+                borderRadius: '20px', // Fully rounded borders
+                '& fieldset': {
+                  borderColor: '#D3D3D3', // Light gray border color
+                },
+                '&:hover fieldset': {
+                  borderColor: '#D3D3D3', // Light gray on hover
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#D3D3D3', // Light gray on focus (no blue outline)
+                },
+              },
+              '& input': {
+                height: '35px', // Ensure input height is consistent
+                padding: '6px', // Optional: to control padding inside the input
+                fontSize: '14px', // Adjust font size as needed
+                boxSizing: 'border-box', // Ensure padding doesn't affect the width/height
+              },
+            }}
+          />
+        )}
+        inputFormat="DD/MM/YYYY" // Format the displayed date (day/month/year)
+      />
     </LocalizationProvider>
-    </div>
-    </div>
+        </div>
+      </div>
       <div className="flex flex-col justify-center mb-1 mt-6 pb-5 gap-5 px-3">
         {renderShiftSection(
           "day",
@@ -383,11 +431,11 @@ const MSchedule = () => {
         )}
       </div>
       {selectedStaff && (
-         <div
-         ref={infoBoxRef}
-         className="info-box fixed  bg-white p-4 rounded-lg shadow-xl"
-         style={{ top: infoBoxPosition.y, left: infoBoxPosition.x, zIndex: 10 }}
-       >
+        <div
+          ref={infoBoxRef}
+          className="info-box fixed  bg-white p-4 rounded-lg shadow-xl"
+          style={{ top: infoBoxPosition.y, left: infoBoxPosition.x, zIndex: 10 }}
+        >
           <p><span className='font-semibold'>Name :</span> {selectedStaff.name}</p>
           <p><span className='font-semibold'>E-mail :</span> {selectedStaff.email}</p>
           <p><span className='font-semibold'>Department :</span> {selectedStaff.department}</p>

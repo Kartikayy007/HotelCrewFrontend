@@ -3,6 +3,10 @@ import { useState, useEffect } from 'react';
 import { Maximize2, X } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAttendance, updateAttendance, checkAttendance } from '../../redux/slices/AttendanceSlice';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Skeleton from '@mui/material/Skeleton';
 
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -204,7 +208,7 @@ const AttendanceDashboard = () => {
           >
             {loading ? (
         <div className="flex justify-center items-center h-[500px]">
-        <Skeleton variant="rectangular" width="96%%" height={400} sx={{ backgroundColor: '#E6EEF9' }} />
+        <Skeleton variant="rectangular" width="96%" height={400} sx={{ backgroundColor: '#E6EEF9' }} />
       </div>
       ) : (
             <table className="w-[96%] px-1 mx-auto border border-[#dcdcdc] rounded-2xl shadow  ">
@@ -216,21 +220,25 @@ const AttendanceDashboard = () => {
                   <th className="px-4 py-2 text-left">Department</th>
                   <th className="px-4 py-2 text-center">Attendance</th>
                   <th className="px-4 py-2 text-center">
-                    {/* <input
-                      type="date"
-                      value={selectedDate || 'Date'}
-                      placeholder='date'
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      className="bg-[#E6EEF9] text-[#3F4870] px-1 border-[1px] border-[#A1C6E7] text-sm focus:outline-none " // Styling the date input "
-                    /> */}
-                     {/* <DatePicker
-        label="Helper text example"
-        slotProps={{
-          textField: {
-            helperText: 'MM/DD/YYYY',
-          },
-        }}
-      /> */}
+                  {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['DatePicker']}>
+              <DatePicker
+                label="Date"
+                sx={{
+                  width: "90px",
+                  padding: "0px",
+                  borderColor:"#E6EEF9",
+                  
+                  backgroundColor:"#E6EEF9"
+                }}
+              />
+            </DemoContainer>
+          </LocalizationProvider> */}
+          <input type="date"
+          className='bg-[#E6EEF9] '
+          placeholder='Date'
+          />
+
                   </th>
                   {/* <th className="px-4 py-2 text-center">Date</th> */}
                 </tr>
