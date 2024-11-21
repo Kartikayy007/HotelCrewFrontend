@@ -4,7 +4,7 @@ import OtpReducer from './slices/OtpSlice'
 import { adminReducer } from './slices/AdminSlice'
 import ManagerReducer from './slices/ManagerSlice.jsx'
 import AdminAttendanceSlice from './slices/AdminAttendanceSlice'
-import taskReducer from './slices/taskSlice'
+import taskReducer from './slices/TaskSlice'
 import announcementReducer from './slices/AnnouncementSlice'
 
 export const store = configureStore({
