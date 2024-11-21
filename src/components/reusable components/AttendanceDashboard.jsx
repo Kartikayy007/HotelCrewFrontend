@@ -63,7 +63,7 @@ const AttendanceDashboard = () => {
       </div>
     );
   }
-  // localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY3NzY0LCJpYXQiOjE3MzE2NzU3NjQsImp0aSI6ImQ3NWVmNTUxMmE0NzQ1NWFiYmE3MmVhY2M2NzM0Mzk4IiwidXNlcl9pZCI6NDF9.pX8v_JU3baX_Vq-vavtHdqDgBDZ1tpOJQDgEMjClMRg")
+  localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY3NzY0LCJpYXQiOjE3MzE2NzU3NjQsImp0aSI6ImQ3NWVmNTUxMmE0NzQ1NWFiYmE3MmVhY2M2NzM0Mzk4IiwidXNlcl9pZCI6NDF9.pX8v_JU3baX_Vq-vavtHdqDgBDZ1tpOJQDgEMjClMRg")
   
   // Handle approve/reject
   const handleLeaveAction = (id, action) => {
@@ -79,45 +79,7 @@ const AttendanceDashboard = () => {
     }
   };
 
-  // const handleToggleAttendance = (id) => {
-  //   setStaffList((prevList) =>
-  //     prevList.map((staff) =>
-  //       staff.id === id ? { ...staff, present: !staff.present } : staff
-  //     )
-  //   );
-  // };
  
-  // const handleDepartmentToggle = (department) => {
-  //   setSelectedDepartments((prev) => {
-  //     if (department === "All") {
-  //       return ["All"];
-  //     }
-  //     if (prev.includes("All")) {
-  //       return [department];
-  //     }
-  //     if (prev.includes(department)) {
-  //       return prev.filter((d) => d !== department);
-  //     }
-  //     return [prev, department];
-  //   });
-  // };
-
-  // const filteredStaffList = staffList.filter((staff) => {
-  //   const matchesDepartment =
-  //     selectedDepartments.includes("All") || selectedDepartments.includes(staff.department);
-  //   // const matchesSearchTerm = staff.name.toLowerCase().includes(searchTerm.toLowerCase());
-  //   return matchesDepartment;
-  //   //  && matchesSearchTerm;
-  // });
-  // const handleFilter = () => {
-  //   const filtered = attendanceList.filter((staff) => {
-  //     const matchesDepartment =
-  //       selectedDepartments.includes("All") ||
-  //       selectedDepartments.includes(staff.department);
-  //     return matchesDepartment;
-  //   });
-  //   setFilteredStaffList(filtered);
-  // };
   const filteredStaff = selectedDepartments.includes("All")
   ? staff
   : staff.filter((member) => selectedDepartments.includes(member.department));

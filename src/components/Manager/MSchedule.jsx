@@ -372,45 +372,7 @@ const MSchedule = () => {
     <section className="h-screen p-2 mr-1 font-Montserrat">
       <div className='md:flex  justify-between'>
         <h2 className="text-[#252941] text-2xl pl-4 mt-5 font-semibold">Shift Schedule</h2>
-        {/* <div className=''> */}
-        <div className='pl-4 pr-8 mt-2'>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DatePicker
-        label="Date"
-        value={selectedDate}
-        onChange={(newValue) => setSelectedDate(newValue)}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            sx={{
-              width: '200px', // Explicitly set width
-              height: '35px', // Explicitly set height for consistency
-              '& .MuiOutlinedInput-root': {
-                height: '35px', // Ensure the root height is consistent
-                borderRadius: '20px', // Fully rounded borders
-                '& fieldset': {
-                  borderColor: '#D3D3D3', // Light gray border color
-                },
-                '&:hover fieldset': {
-                  borderColor: '#D3D3D3', // Light gray on hover
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#D3D3D3', // Light gray on focus (no blue outline)
-                },
-              },
-              '& input': {
-                height: '35px', // Ensure input height is consistent
-                padding: '6px', // Optional: to control padding inside the input
-                fontSize: '14px', // Adjust font size as needed
-                boxSizing: 'border-box', // Ensure padding doesn't affect the width/height
-              },
-            }}
-          />
-        )}
-        inputFormat="DD/MM/YYYY" // Format the displayed date (day/month/year)
-      />
-    </LocalizationProvider>
-        </div>
+        
       </div>
       <div className="flex flex-col justify-center mb-1 mt-6 pb-5 gap-5 px-3">
         {renderShiftSection(

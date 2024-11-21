@@ -6,17 +6,20 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import { BarChart } from '@mui/x-charts/BarChart';
 import { FaStar } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
+import { BsThreeDots } from "react-icons/bs";
 import { fetchAttendanceStats } from '../../redux/slices/AttendanceSlice';
 import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";
 import { Skeleton } from "@mui/material";
 import Box from "@mui/material/Box";
+import MTaskAssignment from "./MTaskAssignment";
 
-const Dash = () => {
+const MDashboard = () => {
   const dispatch = useDispatch();
   // const [loading,setloading]=useState(false);
   const [isPriority, setIsPriority] = useState(false);
   const [timeData, setTimeData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [performanceRange, setPerformanceRange] = useState([
     0,
@@ -30,6 +33,9 @@ const Dash = () => {
     department: '',
     // priority: false, // For priority status
   });
+
+
+
   const skeletonProps = {
     animation: "wave",
     sx: {
@@ -58,9 +64,10 @@ const Dash = () => {
     { value: 'kitchen', label: 'Kitchen' },
     { value: 'reception', label: 'Reception' },
   ];
-  // const [selected, setSelected] = useState(departments[0]);
+
   const [selected, setSelected] = useState({ label: 'Select Department', value: '' });
-  const { stats, loading, error } = useSelector((state) => state.attendance);
+
+  const { stats, error } = useSelector((state) => state.attendance);
   useEffect(() => {
     dispatch(fetchAttendanceStats());
 
@@ -71,7 +78,7 @@ const Dash = () => {
     return () => clearInterval(interval);
   }, [dispatch]);
 
-  const roomData = [
+  const occupancyData = [
     { id: 0, value: 60, label: "Occupied", color: "#252941" },
     { id: 1, value: 30, label: "Vacant", color: "#8094D4" },
     { id: 2, value: 10, label: "Maintainence", color: "#6B46C1" },
@@ -96,58 +103,115 @@ const Dash = () => {
       color: '#8094D4',
     },
   ];
-  const inOutData = {
+
+
+  const sampleInOutData = {
     xAxis: [
       {
-        data: ["Mon", "Tue", "Wed", "Thus", "Fri", "Sat", "Sun"],
+        data: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         scaleType: "band",
-        categoryGapRatio: 0.5
-
-      }
+        categoryGapRatio: 0.5,
+      },
     ],
     series: [
-
       {
         id: "checkin",
         type: "bar",
         data: [40, 92, 85, 60, 58, 60, 90],
         color: "#8094D4",
-
         label: "Check-in",
+        
       },
       {
         id: "checkout",
         type: "bar",
         data: [70, 40, 49, 25, 89, 50, 70],
         color: "#2A2AA9",
-
-        label: "Check-out"
-      }
-    ]
-  }
-  const revenueData = {
-    xAxis: [
-      {
-        id: "months",
-        data: ["mon", "tue", "wed", "thus", "fri", "sat", "sun"],
-        scaleType: "band",
-      },
-    ],
-
-    series: [
-      {
-        data: [2400, 1398, 9800, 3908, 2800, 2800, 0],
-        curve: 'linear',
-        color: "#6B46C1",
-        highlightScope: {
-          highlighted: 'none',
-          faded: 'global'
-        },
-
+        label: "Check-out",
+        
       },
     ],
   };
+  const [inOutData, setInOutData] = useState(sampleInOutData);
+  
+  const [sliderValue, setSliderValue] = useState([0, 6]);
 
+
+
+  const rotateWeeklyData = (data, todayIndex) => {
+    // Rotate the xAxis and series data to make todayIndex the last element
+    const { xAxis, series } = data;
+
+    const rotatedXAxis = [
+      ...xAxis[0].data.slice(todayIndex + 1),
+      ...xAxis[0].data.slice(0, todayIndex + 1),
+    ];
+
+    const rotatedSeries = series.map((s) => ({
+      ...s,
+      data: [
+        ...s.data.slice(todayIndex + 1),
+        ...s.data.slice(0, todayIndex + 1),
+      ],
+    }));
+
+    return { xAxis: [{ ...xAxis[0], data: rotatedXAxis }], series: rotatedSeries };
+  };
+
+  const getCurrentDayIndex = () => {
+    const currentDay = new Date().getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    return currentDay;
+  };
+
+
+  useEffect(() => {
+    const currentDayIndex = getCurrentDayIndex();
+    const rotatedData = rotateWeeklyData(sampleInOutData, currentDayIndex);
+    setInOutData(rotatedData);
+
+    
+    setSliderValue([0, 6]); 
+  }, []); 
+
+
+
+
+  const handleSliderChange = (e, newValue) => {
+    setSliderValue(newValue); // Dynamically update slider range
+  };
+  const filteredData = {
+    xAxis: [inOutData.xAxis[0].data.slice(sliderValue[0], sliderValue[1] + 1)],
+    series: inOutData.series.map((s) => ({
+      ...s,
+      data: s.data.slice(sliderValue[0], sliderValue[1] + 1),
+    })),
+  };
+  
+ 
+  
+  const getFilteredData = (range) => {
+    return timeData.slice(range[0], range[1] + 1);
+  };
+  const revenueData = {
+    xAxis: [
+      {
+        id: "hours",
+        data: getFilteredData(revenueRange).map((d) => d.hour),
+        scaleType: "band",
+      },
+    ],
+    series: [
+      {
+        data: getFilteredData(revenueRange).map((d) => d.revenue),
+        curve: "linear",
+        color: "#6B46C1",
+        highlightScope: {
+          highlighted: "none",
+          faded: "global",
+        },
+      },
+    ],
+  };
   const handleRevenueRangeChange = (event, newValue) => {
     setRevenueRange(newValue);
   };
@@ -167,15 +231,15 @@ const Dash = () => {
     const marks = [];
     const maxHour = currentHour || 1;
 
-    marks.push({value: 0, label: "0h"});
+    marks.push({ value: 0, label: "0h" });
 
-    if (maxHour >= 6) marks.push({value: 6, label: "6h"});
-    if (maxHour >= 12) marks.push({value: 12, label: "12h"});
-    if (maxHour >= 18) marks.push({value: 18, label: "18h"});
-    if (maxHour === 24) marks.push({value: 24, label: "24h"});
+    if (maxHour >= 6) marks.push({ value: 6, label: "6h" });
+    if (maxHour >= 12) marks.push({ value: 12, label: "12h" });
+    if (maxHour >= 18) marks.push({ value: 18, label: "18h" });
+    if (maxHour === 24) marks.push({ value: 24, label: "24h" });
 
     if (!marks.find((mark) => mark.value === maxHour)) {
-      marks.push({value: maxHour, label: `${maxHour}h`});
+      marks.push({ value: maxHour, label: `${maxHour}h` });
     }
 
     return marks;
@@ -194,6 +258,7 @@ const Dash = () => {
 
     setTimeout(() => {
       setTimeData(generateTimeData(currentHour));
+      
       setLoading(false);
     }, 1500);
 
@@ -205,16 +270,13 @@ const Dash = () => {
     setTaskData((prevData) => ({
       ...prevData,
       [name]: value,
-      
+
     }));
     // console.log(taskData);
   };
 
 
-  // const handleSelect = (dept) => {
-  //   setSelected(dept);
-  //   setIsDropdownOpen(false);
-  // };
+ 
   const handleSelect = (dept) => {
     // console.log(taskData);
     setSelected(dept);
@@ -236,7 +298,7 @@ const Dash = () => {
       alert("Please fill in all fields");
       return;
     }
-  localStorage.setItem('accessToken',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY")
+    // localStorage.setItem('accessToken',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY")
 
     // const dataToSend = {
     //   title,
@@ -246,7 +308,7 @@ const Dash = () => {
     // };
 
     try {
-      const response = await dispatch(createTask( taskData ));
+      const response = await dispatch(createTask(taskData));
       // console.log(response.data);
       if (response.data.status === 'success') {
         alert('Task created successfully');
@@ -268,120 +330,202 @@ const Dash = () => {
         <div className="space-y-5">
 
           <div className="bg-white w-full  scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
-            <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Hotel Status</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <h3 className="font-medium mb-4 ">Room Status</h3>
-                <PieChart
-                  series={[
-                    {
-                      data: roomData,
-                      highlightScope: { fade: "global", highlight: "item" },
-                      innerRadius: 45,
-                      paddingAngle: 1,
-                      cornerRadius: 1,
-                    },
-                  ]}
-                  height={220}
-                  width={250}
-                  margin={{ top: 0, bottom: 40, left: 0, right: 0 }}
-                  slotProps={{
-                    legend: {
-                      hidden: true,
-
-                    }
-                  }}
-                />
-              </div>
-              <div className="text-center">
-                <h3 className="font-medium mb-2">Staff status</h3>
-                <PieChart
-                  series={[
-                    {
-                      data: staffStatus,
-                      highlightScope: { fade: "global", highlight: "item" },
-                      innerRadius: 45,
-                      paddingAngle: 1,
-                      cornerRadius: 1,
-                    },
-                  ]}
-                  height={220}
-                  width={250}
-                  margin={{ top: 0, bottom: 40, left: 0, right: 0 }}
-                  slotProps={{
-                    legend: {
-                      hidden: true,
-
-                    }
-                  }}
-
-                />
-              </div>
-
-              <div className="text-center">
-                <h3 className="font-medium mb-2">Staff Attendance</h3>
-                {loading ? (
-                  <p>Loading...</p>
-                ) : error ? (
-                  <p className="text-red-500">{error}</p>
-                ) : (
-                  <PieChart
-                    series={[
-                      {
-                        data: staffAttendanceData,
-                        highlightScope: { fade: 'global', highlight: 'item' },
-                        innerRadius: 45,
-                        paddingAngle: 1,
-                        cornerRadius: 1,
-                      },
-                    ]}
-                    height={220}
-                    width={250}
-                    margin={{ top: 0, bottom: 40, left: 0, right: 0 }}
-                    slotProps={{
-                      legend: {
-                        hidden: true,
-                      },
-                    }}
-                  />
-                )}
-              </div>
+            <div className="mb-4">
+              <h2 className="text-lg sm:text-xl font-semibold">Hotel Status</h2>
             </div>
+
+            <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-2">
+              {loading ? (
+                <>
+                  <Skeleton
+                    variant="rectangular"
+                    width={250}
+                    height={220}
+                    {...skeletonProps}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width={250}
+                    height={220}
+                    {...skeletonProps}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width={250}
+                    height={220}
+                    {...skeletonProps}
+                  />
+                </>
+              ) : (
+                <>
+                  <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row overflow-hidden flex-1">
+                    <div className="flex-1 min-w-[250px] ">
+                      <h3 className="font-medium mb-2 text-center">
+                        Occupancy Rate
+                      </h3>
+                      <PieChart
+                        series={[
+                          {
+                            data: occupancyData,
+                            highlightScope: { fade: "global", highlight: "item" },
+                            innerRadius: 45,
+                            paddingAngle: 1,
+                            cornerRadius: 1,
+                          },
+                        ]}
+                        height={220}
+                        margin={{ top: 0, bottom: 40, left: 0, right: 0 }}
+                        slotProps={{
+                          legend: {
+                            hidden: true,
+
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex-1 min-w-[250px]">
+                      <h3 className="font-medium mb-2 text-center">
+                        Staff Status
+                      </h3>
+                      <PieChart
+                        series={[
+                          {
+                            data: staffStatus,
+                            highlightScope: { fade: "global", highlight: "item" },
+                            innerRadius: 45,
+                            paddingAngle: 1,
+                            cornerRadius: 1,
+                          },
+                        ]}
+                        height={220}
+                        margin={{ top: 0, bottom: 40, left: 0, right: 0 }}
+                        slotProps={{
+                          legend: {
+                            hidden: true,
+
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex-1 min-w-[250px]">
+                      <h3 className="font-medium mb-2 text-center">
+                        Staff Attendance
+                      </h3>
+
+                      {/* {staffAttendanceData.total_present === 0 ? (
+                        <div className="flex items-center justify-center h-[180px] text-gray-500">
+                          No Data Available
+                        </div> */}
+                      {loading ? (
+                        <p>Loading...</p>
+                      ) : error ? (
+                        <p className="text-red-500 text-center">No Data Available</p>
+                      ) : (
+                        <PieChart
+                          series={[
+                            {
+                              data: staffAttendanceData,
+                              highlightScope: { fade: 'global', highlight: 'item' },
+                              innerRadius: 45,
+                              paddingAngle: 1,
+                              cornerRadius: 1,
+                            },
+                          ]}
+                          height={220}
+                          margin={{ top: 0, bottom: 40, left: 0, right: 0 }}
+                          slotProps={{
+                            legend: {
+                              hidden: true,
+
+                            }
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
 
           </div>
           <div className="bg-white rounded-lg shadow  w-full p-4">
-            <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Guest Flow Overview</h2>
-            <BarChart
-              xAxis={inOutData.xAxis}
-              series={inOutData.series}
-              margin={{ top: 20, right: 5, bottom: 28, left: 47 }}
-              height={250}
-              slotProps={{ legend: { hidden: true } }}
-
-            />
-          </div>
-
-          {/* <div className="bg-white rounded-lg shadow  w-full p-4">
-            <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Revenue</h2>
-            <LineChart
-              xAxis={revenueData.xAxis}
-              series={revenueData.series}
-              height={250}
-              margin={{ top: 20, right: 5, bottom: 28, left: 47 }}
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Guest Flow Overview</h2>
+            <Box sx={{ width: "100%" }}>
+              {/* Bar Chart with Weekly Data */}
+              {loading ? (
+                <Skeleton
+                  variant="rectangular"
+                  width="100%"
+                  height={250}
+                  {...skeletonProps}
+                />
+              ) : (
+                <>
+                   <BarChart
+            xAxis={[
+              {
+                data: filteredData.xAxis[0], // Dynamically updated xAxis
+                scaleType: "band",
+                categoryGapRatio: 0.5,
+              },
+            ]}
+            series={filteredData.series}
+            margin={{ top: 20, right: 5, bottom: 28, left: 47 }}
+            height={250}
+            
+            slotProps={{
+              legend: { hidden: true },
+              bar: {
+                sx: {
+                  borderRadius: "15px 15px 0px 0px", // Round the top corners of the bars
+                },
+              },
+            }}
+          />
+          {/* Slider Component */}
+          <Box sx={{ width: "100%", px: 2, mt: 2 }}>
+            <Slider
+              value={sliderValue}
+              onChange={handleSliderChange}
+              min={0}
+              max={6}
+              step={1}
+              valueLabelDisplay="auto"
+              valueLabelFormat={(value) => {
+                const days = inOutData.xAxis[0].data; // Rotated xAxis labels
+                return days[value];
+              }}
+              valueLabelPosition="top"
+              disableSwap
               sx={{
-                ".MuiLineElement-root": {
-                  strokeWidth: 2,
+                
+                bottom: 20,
+                height: 3,
+                "& .MuiSlider-thumb": {
+                  height: 12,
+                  width: 12,
                 },
               }}
+              // marks={inOutData.xAxis[0].data.map((day, idx) => ({
+              //   value: idx,
+              //   label: day,
+              // }))}
             />
+          </Box>
+                </>
+              )}
+            </Box>
+
           </div>
-        </div> */}
-        <div className="bg-white rounded-xl shadow-lg min-h-[384px] w-full p-4">
+          <div className="bg-white rounded-xl shadow-lg min-h-[384px] w-full p-4">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Revenue (Hours {revenueRange[0]} - {revenueRange[1]})
             </h2>
-            <Box sx={{width: "100%", mb: 4}}>
+            <Box sx={{ width: "100%", mb: 4 }}>
               {loading ? (
                 <Skeleton
                   variant="rectangular"
@@ -394,7 +538,7 @@ const Dash = () => {
                   xAxis={revenueData.xAxis}
                   series={revenueData.series}
                   height={250}
-                  margin={{top: 20, right: 20, bottom: 30, left: 40}}
+                  margin={{ top: 20, right: 20, bottom: 30, left: 40 }}
                   sx={{
                     ".MuiLineElement-root": {
                       strokeWidth: 2,
@@ -403,7 +547,7 @@ const Dash = () => {
                 />
               )}
             </Box>
-            <Box sx={{width: "100%", px: 2}}>
+            <Box sx={{ width: "100%", px: 2 }}>
               <Slider
                 value={revenueRange}
                 onChange={handleRevenueRangeChange}
@@ -423,7 +567,7 @@ const Dash = () => {
               />
             </Box>
           </div>
-          </div>
+        </div>
         {/* Second Column */}
         <div className="space-y-5">
 
@@ -495,7 +639,7 @@ const Dash = () => {
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="h-9 w-28 lg:w-full  bg-[#252941] font-Montserrat font-bold rounded-lg text-white"
+                    className="h-9 w-28 lg:w-full  bg-[#3f4870] font-Montserrat font-bold rounded-lg text-white"
                     disabled={taskLoading}
                   >
                     {taskLoading ? 'Assigning...' : 'Assign'}
@@ -557,4 +701,4 @@ const Dash = () => {
   )
 }
 
-export default Dash;
+export default MDashboard;

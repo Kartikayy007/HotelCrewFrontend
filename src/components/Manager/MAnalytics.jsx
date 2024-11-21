@@ -241,15 +241,15 @@ const MAnalytics = () => {
         {showAnalytics ? (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4">
             <div className="bg-white rounded-lg shadow-lg p-4 sm:col-span-2 h-96">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-lg font-semibold">Attendance</h3>
-                <button 
+            
+                <h3 className="text-xl font-semibold mb-8">Attendance</h3>
+                {/* <button 
                   onClick={() => setShowAnalytics(false)}
                   className="text-gray-500 hover:text-gray-700 px-2 focus:outline-none text-4xl font-semibold h-12 z-10"
                 >
                   ⋯
-                </button>
-              </div>
+                </button> */}
+              
               <Box sx={{ width: "100%", height: "95%", mt: -7 }}>
                 <BarChart
                   height={330}
@@ -258,11 +258,14 @@ const MAnalytics = () => {
                       data: filteredData.present,
                       id: "present",
                       color: "#3331D1",
+                      label:"Present",
+                      
                     },
                     {
                       data: filteredData.absent,
                       id: "absent",
                       color: "#151542",
+                      label:"Absent",
                     },
                   ]}
                   borderRadius={5}
@@ -270,6 +273,12 @@ const MAnalytics = () => {
                     data: filteredData.dates,
                     scaleType: "band",
                   }]}
+                  slotProps={{
+                    legend: {
+                      hidden: true,
+
+                    }
+                  }}
                 />
                 <Box sx={{ width: "100%", px: 5, mt: -2 }}>
                   <Slider
@@ -278,6 +287,14 @@ const MAnalytics = () => {
                     valueLabelDisplay="auto"
                     min={1}
                     max={maxDays}
+                    sx={{
+                      bottom: 20,
+                      height: 3,
+                      "& .MuiSlider-thumb": {
+                        height: 12,
+                        width: 12,
+                      },
+                    }}
                     marks={[
                       { value: 1, label: "1" },
                       { value: maxDays, label: maxDays.toString() }
@@ -359,7 +376,15 @@ const MAnalytics = () => {
                 marks={marks}
                 min={0}
                 max={currentHour || 1}
-                sx={{ mt: -2 }}
+                sx={{
+                  bottom: 20,
+                  mt:-2,
+                  height: 3,
+                  "& .MuiSlider-thumb": {
+                    height: 12,
+                    width: 12,
+                  },
+                }}
               />
             </Box>
           </div>
