@@ -8,7 +8,7 @@ import MSchedule from './MSchedule';
 import MAttendance from './MAttendance';
 import MDatabase from './MDatabase';
 import MAnalytics from './MAnalytics';
-import MSettings from './MSettings';
+import MProfile from './MProfile';
 
 const MainLayout = () => {
     const dispatch = useDispatch();
@@ -18,7 +18,7 @@ const MainLayout = () => {
         MAttendance: <MAttendance />,
         MDatabase: <MDatabase />,
         MAnalytics: <MAnalytics />,
-        MSettings: <MSettings />,
+        MProfile: <MProfile />,
     };
     const currentComponent = useSelector((state) => state.manager.currentComponent);
 

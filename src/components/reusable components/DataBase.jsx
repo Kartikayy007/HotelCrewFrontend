@@ -9,7 +9,6 @@ function DataBase() {
   const [showRightArrow, setShowRightArrow] = useState(true);
   const scrollContainerRef = useRef(null);
 
-  // Check scroll position to show/hide arrows
   const checkScroll = () => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
@@ -22,7 +21,6 @@ function DataBase() {
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
       scrollContainer.addEventListener('scroll', checkScroll);
-      // Initial check
       checkScroll();
       return () => scrollContainer.removeEventListener('scroll', checkScroll);
     }

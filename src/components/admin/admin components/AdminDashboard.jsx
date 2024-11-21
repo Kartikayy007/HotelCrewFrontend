@@ -949,7 +949,7 @@ function AdminDashboard() {
               <button
                 type="submit"
                 disabled={Taskloading}
-                className="h-9 w-28 lg:w-full bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50 "
+                className="h-9  w-full  bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50 shadow-xl"
               >
                 {Taskloading ? "Assigning..." : "Assign"}
               </button>
