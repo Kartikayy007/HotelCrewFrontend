@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react';
 import { Maximize2, X } from "lucide-react";
 
 const MAttendance = () => {
-  const [department, setDepartment] = useState([]);// State for department filter
+  const [department, setDepartment] = useState([]);
   const [selectedDepartments, setSelectedDepartments] = useState(['All']);
-  const [searchTerm, setSearchTerm] = useState([]); // State for email search
+  const [searchTerm, setSearchTerm] = useState([]); 
   const [staffList, setStaffList] = useState([
     { id: 1, name: "John Doe", email: "john@example.com", department: "Reception" },
     { id: 2, name: "Jane Smith", email: "jane@example.com", department: "Kitchen" },
@@ -143,7 +143,6 @@ const MAttendance = () => {
                 </tr>
               </thead>
 
-              {/* Table Body */}
               <tbody>
                 {filteredStaffList.length > 0 ? (
                   filteredStaffList.map((staff, index) => (
@@ -178,8 +177,6 @@ const MAttendance = () => {
         </div>
       </div>
       <div className='flex flex-col lg:flex-row gap-5 mb-1 mt-3 pb-5 px-3'>
-        {/* <div className="p-6 space-y-6"> */}
-        {/* Leave Requests */}
         <div className="bg-white w-full h-auto pb-7 py-2 rounded-lg shadow">
           <h2 className="text-[#252941] text-lg pl-6 mt-4 mb-0 font-semibold">Leave Requests</h2>
           <div className="px-6 mt-4 space-y-4">
@@ -219,7 +216,6 @@ const MAttendance = () => {
           </div>
         </div>
 
-        {/* Approved Leaves */}
         <div className="bg-white w-full h-auto pb-7 py-2 rounded-lg shadow">
           <h2 className="text-[#252941] text-lg pl-6 mt-4 mb-0 font-semibold">Approved Leaves</h2>
           <div className="px-6 mt-4 space-y-4">
@@ -241,7 +237,6 @@ const MAttendance = () => {
             )}
           </div>
         </div>
-        {/* </div> */}
       </div>
     </section>
   )

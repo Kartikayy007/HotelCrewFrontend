@@ -14,7 +14,7 @@ import {
 } from "chart.js";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import OccupancyHeatmap from "../../reusable components/OccupancyHeatmap";
+import OccupancyHeatmap from "./ admin analysis components/OccupancyHeatmap";
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 

@@ -7,12 +7,10 @@ import {
   Box,
   Tooltip 
 } from '@mui/material';
-import { pad } from 'crypto-js';
 
 function HotelOccupancyHeatmap() {
   const currentDate = new Date();
   const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
-  // Change length to 5 rows
   const weekLabels =  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const dayLabels = Array.from({length: 4}, (_, i) => ``);
 
@@ -129,13 +127,13 @@ function HotelOccupancyHeatmap() {
                 ? 'rgba(62, 72, 112, 0.1)' 
                 : `rgba(62, 72, 112, ${ratio})`,
             width: "85%",
-            borderRadius: "14px", // Increased from 3px
-            height: "75%", // Reduced from 80%
+            borderRadius: "14px", 
+            height: "75%", 
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             cursor: 'pointer',
-            margin: "10px", // Added margin for gaps
+            margin: "10px", 
         })}
           cellHeight="4rem"
           xLabelsPos="top"

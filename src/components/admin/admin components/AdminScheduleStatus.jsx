@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Search, Move } from "lucide-react";
+import { Snackbar, Alert } from '@mui/material';
 
 function AdminScheduleStatus() {
   const [activeFilter, setActiveFilter] = useState("All");
@@ -22,6 +23,8 @@ function AdminScheduleStatus() {
   ]);
   
   const [draggedStaff, setDraggedStaff] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [targetShift, setTargetShift] = useState(null);
   
   const handleDragStart = (e, staff) => {
     if (isShiftChangeMode) {
@@ -34,18 +37,26 @@ function AdminScheduleStatus() {
     e.preventDefault(); 
   };
   
-  const handleDrop = (e, targetShift) => {
+  const handleDrop = (e, newShift) => {
     e.preventDefault();
     if (draggedStaff && isShiftChangeMode) {
+      setTargetShift(newShift);
+      
       const updatedStaffData = staffData.map(staff => 
         staff.name === draggedStaff.name 
-          ? { ...staff, shift: targetShift }
+          ? { ...staff, shift: newShift }
           : staff
       );
       
       setStaffData(updatedStaffData);
       setDraggedStaff(null);
+      setSnackbarOpen(true); 
     }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+    setTargetShift(null); 
   };
 
   const toggleShiftChangeMode = () => {
@@ -89,10 +100,10 @@ function AdminScheduleStatus() {
               </h1>
               <button 
                 onClick={toggleShiftChangeMode} 
-                className={`text-xs xs:text-sm sm:text-base md:text-base lg:text-base font-semibold text-white rounded-full p-1.5 xs:p-2 px-3 xs:px-4 lg:mr-9 sm:px-6 
+                className={`text-xs xs:text-sm sm:text-base md:text-base lg:text-base font-semibold text-white rounded-full p-1.5 xs:p-2 px-3 xs:px-4 lg:mr-9 sm:px-6 transition-colors
                   ${isShiftChangeMode 
-                    ? 'bg-red-500 hover:bg-red-600' 
-                    : 'bg-[#5663AC] hover:bg-blue-700'}`}
+                    ? 'bg-red-500 hover:bg-red-600 ease-in-out' 
+                    : 'bg-[#5663AC] hover:bg-[#6675C5] ease-in-out'}`}
               >
                 {isShiftChangeMode ? 'Cancel' : 'Change Shift'}
               </button>
@@ -119,7 +130,7 @@ function AdminScheduleStatus() {
                       ${
                         activeFilter === department
                           ? "bg-[#6675C5] text-white"
-                          : "bg-[#E6EEF9] hover:bg-purple-100"
+                          : "bg-[#E6EEF9] hover:bg-[#D1DFEF]"
                       }`}
                   >
                     {department}
@@ -228,6 +239,29 @@ function AdminScheduleStatus() {
           </div>
         </div>
       </div>
+      <Snackbar
+  open={snackbarOpen}
+  autoHideDuration={3000}
+  onClose={handleSnackbarClose}
+  anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+>
+  <Alert 
+    onClose={handleSnackbarClose} 
+    severity="success"
+    variant="filled"
+    sx={{ 
+      width: '100%',
+      '& .MuiAlert-filledSuccess': {
+        backgroundColor: '#4CAF50'
+      }
+    }}
+  >
+    {draggedStaff && targetShift ? 
+      `Shift updated successfully` : 
+      'Shift updated successfully'
+    }
+  </Alert>
+</Snackbar>
     </section>
   );
 }
