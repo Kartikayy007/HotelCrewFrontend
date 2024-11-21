@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAttendanceStats } from "../../../redux/slices/AdminAttendanceSlice";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { BsThreeDots } from "react-icons/bs";
-import { createTask, selectTasksLoading, selectTasksError } from "../../../redux/slices/taskSlice";
+import { createTask, selectTasksLoading, selectTasksError } from "../../../redux/slices/TaskSlice";
 import AdminTaskAssignment from "./AdminTaskAssignment";
 import { CreateAnnouncementBox } from "../../reusable components/CreateAnnouncementBox";
 import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError,deleteAnnouncement } from '../../../redux/slices/AnnouncementSlice';
