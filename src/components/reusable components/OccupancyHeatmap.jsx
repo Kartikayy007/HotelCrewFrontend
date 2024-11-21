@@ -7,12 +7,14 @@ import {
   Box,
   Tooltip 
 } from '@mui/material';
+import { pad } from 'crypto-js';
 
 function HotelOccupancyHeatmap() {
   const currentDate = new Date();
   const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
-  const weekLabels = Array.from({length: 13.04}, (_, i) => `Week${i + 1}`);
-  const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  // Change length to 5 rows
+  const weekLabels =  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dayLabels = Array.from({length: 4}, (_, i) => ``);
 
   const generateOccupancyData = () => {
     return weekLabels.map(() => 
@@ -73,62 +75,76 @@ function HotelOccupancyHeatmap() {
   };
 
   return (
-    <Box>
-      <HeatMapGrid
-        data={occupancyData}
-        xLabels={dayLabels}
-        yLabels={weekLabels}
-        cellRender={(x, y, value) => {
-          const cellDate = new Date(startOfYear);
-          cellDate.setDate(startOfYear.getDate() + (y * 7) + x);
-          
-          return (
-            <Tooltip 
-              title={`Date: ${cellDate.toDateString()}
-              Occupancy: ${value}%`}
-              arrow
-            >
-              <div style={{ 
-                color: value > 80 ? 'white' : 'black',
-                fontSize: '0rem',
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                {value}%
-              </div>
-            </Tooltip>
-          );
-        }}
-        xLabelsStyle={() => ({
-          color: "#777",
-          fontSize: ".7rem",
-          textTransform: "uppercase"
+    <Box sx={{ 
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '0px'
+    }}>
+      <Box sx={{ maxWidth: '1000px', width: '100%' }}>
+        <HeatMapGrid
+          data={occupancyData}
+          xLabels={dayLabels}
+          yLabels={weekLabels}
+          cellRender={(x, y, value) => {
+            const cellDate = new Date(startOfYear);
+            cellDate.setDate(startOfYear.getDate() + (y * 7) + x);
+            
+            return (
+              <Tooltip 
+                title={`Date: ${cellDate.toDateString()}
+                Occupancy: ${value}%`}
+                arrow
+              >
+                <div style={{ 
+                  color: value > 80 ? 'white' : 'black',
+                  fontSize: '0rem',
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {}%
+                </div>
+              </Tooltip>
+            );
+          }}
+          xLabelsStyle={() => ({
+            color: "#777",
+            fontSize: "0",
+            textTransform: "uppercase"
+          })}
+          yLabelsStyle={() => ({
+            fontSize: "1rem",
+            paddingBottom: "1.5rem",
+            color: "black",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          })}
+          cellStyle={(_x, _y, ratio) => ({
+            background: ratio === 0 
+                ? 'rgba(62, 72, 112, 0.1)' 
+                : `rgba(62, 72, 112, ${ratio})`,
+            width: "85%",
+            borderRadius: "14px", // Increased from 3px
+            height: "75%", // Reduced from 80%
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: 'pointer',
+            margin: "10px", // Added margin for gaps
         })}
-        yLabelsStyle={() => ({
-          fontSize: "1rem",
-          color: "#777",
-        })}
-        cellStyle={(_x, _y, ratio) => ({
-          background: ratio === 0 
-          ? 'rgba(63, 72, 112, 0.1)' 
-          : `rgba(63, 72, 112, ${ratio})`,
-          width: "90%",
-          borderRadius: "3px",
-          height: "90%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: 'pointer'
-        })}
-        cellHeight="3.3rem"
-        xLabelsPos="top"
-        yLabelsPos="center"
-        onClick={handleCellClick}
-      />
-      {renderCellDetails()}
+          cellHeight="4rem"
+          xLabelsPos="top"
+          yLabelsPos="center"
+          onClick={handleCellClick}
+          square
+        />
+        {renderCellDetails()}
+      </Box>
     </Box>
   );
 }

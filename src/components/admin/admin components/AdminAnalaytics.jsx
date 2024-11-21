@@ -15,6 +15,8 @@ import {
 import { BarChart } from "@mui/x-charts/BarChart";
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import OccupancyHeatmap from "../../reusable components/OccupancyHeatmap";
+import CircularProgress from '@mui/material/CircularProgress';
+import Typography from '@mui/material/Typography';
 
 ChartJS.register(
   RadialLinearScale,
@@ -285,31 +287,46 @@ const AdminAnalytics = () => {
               </Box>
             </div>
 
-            <div className="bg-white rounded-lg shadow-lg p-4 h-72">
+            <div className="bg-white rounded-lg shadow-lg p-4 h-96">
               <h3 className="text-lg font-semibold">Total Revenue</h3>
-              <div className="h-48 w-full">
-                <RadialBarChart
-                  width={400}
-                  height={250}
-                  cx={280}
-                  cy={120}
-                  innerRadius={20}
-                  outerRadius={125}
-                  barSize={20}
-                  data={radialData}
+              <Box
+                sx={{
+                  position: 'relative',
+                  display: 'inline-flex',
+                  width: 400,
+                  height: 250,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <CircularProgress
+                  variant="determinate"
+                  value={15} 
+                  size={200}
+                  thickness={4}
+                  sx={{
+                    color: '#1a90ff',
+                    backgroundColor: '#e6e6e6',
+                    borderRadius: '50%'
+                  }}
+                />
+                <Box
+                  sx={{
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                    position: 'absolute',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  <RadialBar minAngle={0} background clockWise dataKey="value" />
-                  <Tooltip />
-                  <Legend
-                    iconSize={10}
-                    width={120}
-                    height={90}
-                    layout="vertical"
-                    verticalAlign="bottom"
-                    align="bottom"
-                  />
-                </RadialBarChart>
-              </div>
+                  <Typography variant="h6" component="div" color="text.secondary">
+                    {`${Math.round(75)}%`} {/* Replace with your actual value */}
+                  </Typography>
+                </Box>
+              </Box>
             </div>
 
             <div className="bg-white rounded-lg shadow-lg p-4 sm:col-span-2 h-96">
@@ -347,15 +364,15 @@ const AdminAnalytics = () => {
             </Box>
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg p-4 h-[51rem] sm:-mt-24 md:-mt-24 lg:-mt-24 overflow-scroll">
+          <div className="bg-white rounded-lg shadow-lg p-4  h-[45rem]">
             <h3 className="text-lg font-semibold">Occupancy Heatmap</h3>
-            <div className="h-48 w-full mt-6 ">
+            <div className="h-48 w-full mt-6">
             <OccupancyHeatmap />
             
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg p-4 h-80 sm:-mt-[21rem] md:-mt-[21rem] lg:-mt-[21rem]">
+          <div className="bg-white rounded-lg shadow-lg p-4 h-80 mt-[-21rem]">
             <h3 className="text-lg font-semibold">Department Load</h3>
             <div className="h-64 w-full flex justify-center items-center">
               <Radar
@@ -391,7 +408,7 @@ const AdminAnalytics = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg p-4 h-80 sm:-mt-[21rem] md:-mt-[21rem] lg:-mt-[21rem]">
+          <div className="bg-white rounded-lg shadow-lg p-4 h-80 mt-[-21rem]">
             <h3 className="text-lg font-semibold">Departments Performance</h3>
             <div className="h-64 w-full flex justify-center items-center">
               <Radar
