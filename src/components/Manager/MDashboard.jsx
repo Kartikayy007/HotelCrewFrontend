@@ -8,10 +8,21 @@ import { FaStar } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAttendanceStats } from '../../redux/slices/AttendanceSlice';
 import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
+import Slider from "@mui/material/Slider";
+import { Skeleton } from "@mui/material";
+import Box from "@mui/material/Box";
 
 const Dash = () => {
   const dispatch = useDispatch();
+  // const [loading,setloading]=useState(false);
   const [isPriority, setIsPriority] = useState(false);
+  const [timeData, setTimeData] = useState([]);
+  const [currentHour, setCurrentHour] = useState(new Date().getHours());
+  const [performanceRange, setPerformanceRange] = useState([
+    0,
+    currentHour || 1,
+  ]);
+  const [revenueRange, setRevenueRange] = useState([0, currentHour || 1]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [taskData, setTaskData] = useState({
     title: '',
@@ -19,6 +30,12 @@ const Dash = () => {
     department: '',
     // priority: false, // For priority status
   });
+  const skeletonProps = {
+    animation: "wave",
+    sx: {
+      animationDuration: "0.8s",
+    },
+  };
   const taskLoading = useSelector(selectTasksLoading);
   const taskError = useSelector(selectTasksError);
   const togglePriority = () => {
@@ -130,6 +147,58 @@ const Dash = () => {
       },
     ],
   };
+
+  const handleRevenueRangeChange = (event, newValue) => {
+    setRevenueRange(newValue);
+  };
+  const generateTimeData = (hour) => {
+    const performanceData = [];
+    for (let i = 0; i <= hour; i++) {
+      performanceData.push({
+        hour: `${i}:00`,
+        performance: Math.floor(Math.random() * (95 - 85 + 1)) + 85,
+        revenue: Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000,
+      });
+    }
+    return performanceData;
+  };
+
+  const generateMarks = () => {
+    const marks = [];
+    const maxHour = currentHour || 1;
+
+    marks.push({value: 0, label: "0h"});
+
+    if (maxHour >= 6) marks.push({value: 6, label: "6h"});
+    if (maxHour >= 12) marks.push({value: 12, label: "12h"});
+    if (maxHour >= 18) marks.push({value: 18, label: "18h"});
+    if (maxHour === 24) marks.push({value: 24, label: "24h"});
+
+    if (!marks.find((mark) => mark.value === maxHour)) {
+      marks.push({value: maxHour, label: `${maxHour}h`});
+    }
+
+    return marks;
+  };
+  const marks = generateMarks();
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newHour = new Date().getHours();
+      if (newHour !== currentHour) {
+        setCurrentHour(newHour);
+        setPerformanceRange([0, newHour || 1]);
+        setRevenueRange([0, newHour || 1]);
+        setTimeData(generateTimeData(newHour));
+      }
+    }, 60000);
+
+    setTimeout(() => {
+      setTimeData(generateTimeData(currentHour));
+      setLoading(false);
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [currentHour]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -293,7 +362,7 @@ const Dash = () => {
             />
           </div>
 
-          <div className="bg-white rounded-lg shadow  w-full p-4">
+          {/* <div className="bg-white rounded-lg shadow  w-full p-4">
             <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Revenue</h2>
             <LineChart
               xAxis={revenueData.xAxis}
@@ -307,7 +376,54 @@ const Dash = () => {
               }}
             />
           </div>
-        </div>
+        </div> */}
+        <div className="bg-white rounded-xl shadow-lg min-h-[384px] w-full p-4">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+              Revenue (Hours {revenueRange[0]} - {revenueRange[1]})
+            </h2>
+            <Box sx={{width: "100%", mb: 4}}>
+              {loading ? (
+                <Skeleton
+                  variant="rectangular"
+                  width="100%"
+                  height={250}
+                  {...skeletonProps}
+                />
+              ) : (
+                <LineChart
+                  xAxis={revenueData.xAxis}
+                  series={revenueData.series}
+                  height={250}
+                  margin={{top: 20, right: 20, bottom: 30, left: 40}}
+                  sx={{
+                    ".MuiLineElement-root": {
+                      strokeWidth: 2,
+                    },
+                  }}
+                />
+              )}
+            </Box>
+            <Box sx={{width: "100%", px: 2}}>
+              <Slider
+                value={revenueRange}
+                onChange={handleRevenueRangeChange}
+                valueLabelDisplay="auto"
+                step={1}
+                marks={marks}
+                min={0}
+                max={currentHour || 1}
+                sx={{
+                  bottom: 20,
+                  height: 3,
+                  "& .MuiSlider-thumb": {
+                    height: 12,
+                    width: 12,
+                  },
+                }}
+              />
+            </Box>
+          </div>
+          </div>
         {/* Second Column */}
         <div className="space-y-5">
 
