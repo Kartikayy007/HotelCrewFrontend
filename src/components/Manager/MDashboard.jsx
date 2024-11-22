@@ -10,7 +10,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { fetchAttendanceStats } from '../../redux/slices/AttendanceSlice';
 import { Dialog, TextField, Button, Snackbar, Alert, IconButton } from "@mui/material";
 import { CreateAnnouncementBox } from "../reusable components/CreateAnnouncementBox";
-import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError,deleteAnnouncement } from '../../redux/slices/AnnouncementSlice';
+import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError, deleteAnnouncement } from '../../redux/slices/AnnouncementSlice';
 import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";
 import { Skeleton } from "@mui/material";
@@ -59,7 +59,7 @@ const MDashboard = () => {
       animationDuration: "0.8s",
     },
   };
-  
+
   // const togglePriority = () => {
   //   setIsPriority((prev) => !prev);
   //   setTaskData((prevData) => ({
@@ -144,7 +144,7 @@ const MDashboard = () => {
         data: [40, 92, 85, 60, 58, 60, 90],
         color: "#8094D4",
         label: "Check-in",
-        
+
       },
       {
         id: "checkout",
@@ -152,12 +152,12 @@ const MDashboard = () => {
         data: [70, 40, 49, 25, 89, 50, 70],
         color: "#2A2AA9",
         label: "Check-out",
-        
+
       },
     ],
   };
   const [inOutData, setInOutData] = useState(sampleInOutData);
-  
+
   const [sliderValue, setSliderValue] = useState([0, 6]);
 
 
@@ -193,9 +193,9 @@ const MDashboard = () => {
     const rotatedData = rotateWeeklyData(sampleInOutData, currentDayIndex);
     setInOutData(rotatedData);
 
-    
-    setSliderValue([0, 6]); 
-  }, []); 
+
+    setSliderValue([0, 6]);
+  }, []);
 
 
 
@@ -210,9 +210,9 @@ const MDashboard = () => {
       data: s.data.slice(sliderValue[0], sliderValue[1] + 1),
     })),
   };
-  
- 
-  
+
+
+
   const getFilteredData = (range) => {
     return timeData.slice(range[0], range[1] + 1);
   };
@@ -282,7 +282,7 @@ const MDashboard = () => {
 
     setTimeout(() => {
       setTimeData(generateTimeData(currentHour));
-      
+
       setLoading(false);
     }, 1500);
 
@@ -300,7 +300,7 @@ const MDashboard = () => {
   // };
 
 
- 
+
   const handleSelect = (dept) => {
     // console.log(taskData);
     setSelected(dept);
@@ -313,15 +313,15 @@ const MDashboard = () => {
   // useEffect(() => {
   //   console.log("Updated taskData:", taskData);
   // }, [taskData]);
- 
-    // localStorage.setItem('accessToken',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY")
 
-    // const dataToSend = {
-    //   title,
-    //   description,
-    //   department,
-    //   // priority,
-    // };
+  // localStorage.setItem('accessToken',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY")
+
+  // const dataToSend = {
+  //   title,
+  //   description,
+  //   department,
+  //   // priority,
+  // };
 
   //   try {
   //     const response = await dispatch(createTask(taskData));
@@ -377,7 +377,7 @@ const MDashboard = () => {
 
       setTaskTitle("");
       setTaskDescription("");
-      setSelected({label: "Select Department", value: ""});
+      setSelected({ label: "Select Department", value: "" });
 
       setSnackbar({
         open: true,
@@ -393,7 +393,7 @@ const MDashboard = () => {
     }
   };
   const handleSnackbarClose = () => {
-    setSnackbar({...snackbar, open: false});
+    setSnackbar({ ...snackbar, open: false });
   };
 
   const announcements = useSelector(selectAllAnnouncements);
@@ -408,13 +408,13 @@ const MDashboard = () => {
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setNewAnnouncement({title: "", description: ""});
+    setNewAnnouncement({ title: "", description: "" });
   };
 
   useEffect(() => {
     dispatch(fetchAnnouncements());
   }, [dispatch]);
-  
+
   const handleCreateAnnouncement = async (announcementData) => {
     try {
       await dispatch(createAnnouncement(announcementData)).unwrap();
@@ -432,16 +432,16 @@ const MDashboard = () => {
       });
     }
   };
-  
+
   const handleViewAnnouncement = (announcement) => {
     setSelectedAnnouncement(announcement);
   };
-  
+
   const handleViewClose = () => {
     setSelectedAnnouncement(null);
   };
 
-  
+
 
   const handleDelete = async () => {
     if (!selectedAnnouncement?.id) {
@@ -452,7 +452,7 @@ const MDashboard = () => {
       });
       return;
     }
-  
+
     try {
       await dispatch(deleteAnnouncement(selectedAnnouncement.id)).unwrap();
       handleViewClose();
@@ -619,57 +619,57 @@ const MDashboard = () => {
                 />
               ) : (
                 <>
-                   <BarChart
-            xAxis={[
-              {
-                data: filteredData.xAxis[0], // Dynamically updated xAxis
-                scaleType: "band",
-                categoryGapRatio: 0.5,
-              },
-            ]}
-            series={filteredData.series}
-            margin={{ top: 20, right: 5, bottom: 28, left: 47 }}
-            height={250}
-            
-            slotProps={{
-              legend: { hidden: true },
-              bar: {
-                sx: {
-                  borderRadius: "15px 15px 0px 0px", // Round the top corners of the bars
-                },
-              },
-            }}
-          />
-          {/* Slider Component */}
-          <Box sx={{ width: "100%", px: 2, mt: 2 }}>
-            <Slider
-              value={sliderValue}
-              onChange={handleSliderChange}
-              min={0}
-              max={6}
-              step={1}
-              valueLabelDisplay="auto"
-              valueLabelFormat={(value) => {
-                const days = inOutData.xAxis[0].data; // Rotated xAxis labels
-                return days[value];
-              }}
-              valueLabelPosition="top"
-              disableSwap
-              sx={{
-                
-                bottom: 20,
-                height: 3,
-                "& .MuiSlider-thumb": {
-                  height: 12,
-                  width: 12,
-                },
-              }}
-              // marks={inOutData.xAxis[0].data.map((day, idx) => ({
-              //   value: idx,
-              //   label: day,
-              // }))}
-            />
-          </Box>
+                  <BarChart
+                    xAxis={[
+                      {
+                        data: filteredData.xAxis[0], // Dynamically updated xAxis
+                        scaleType: "band",
+                        categoryGapRatio: 0.5,
+                      },
+                    ]}
+                    series={filteredData.series}
+                    margin={{ top: 20, right: 5, bottom: 28, left: 47 }}
+                    height={250}
+
+                    slotProps={{
+                      legend: { hidden: true },
+                      bar: {
+                        sx: {
+                          borderRadius: "15px 15px 0px 0px", // Round the top corners of the bars
+                        },
+                      },
+                    }}
+                  />
+                  {/* Slider Component */}
+                  <Box sx={{ width: "100%", px: 2, mt: 2 }}>
+                    <Slider
+                      value={sliderValue}
+                      onChange={handleSliderChange}
+                      min={0}
+                      max={6}
+                      step={1}
+                      valueLabelDisplay="auto"
+                      valueLabelFormat={(value) => {
+                        const days = inOutData.xAxis[0].data; // Rotated xAxis labels
+                        return days[value];
+                      }}
+                      valueLabelPosition="top"
+                      disableSwap
+                      sx={{
+
+                        bottom: 20,
+                        height: 3,
+                        "& .MuiSlider-thumb": {
+                          height: 12,
+                          width: 12,
+                        },
+                      }}
+                    // marks={inOutData.xAxis[0].data.map((day, idx) => ({
+                    //   value: idx,
+                    //   label: day,
+                    // }))}
+                    />
+                  </Box>
                 </>
               )}
             </Box>
@@ -727,10 +727,10 @@ const MDashboard = () => {
 
           <div className="w-full ">
             <div className="bg-white  h-[50%] p-4 pr-6 pl-6 shadow rounded-lg">
-            <form className="flex flex-col gap-4" onSubmit={handleAssign}>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[#3f4870] text-lg font-semibold mb-2">Task Assignment</h2>
-                {/* <div
+              <form className="flex flex-col gap-4" onSubmit={handleAssign}>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-[#3f4870] text-lg font-semibold mb-2">Task Assignment</h2>
+                  {/* <div
                   className={`cursor-pointer ${isPriority ? 'text-gold' : 'text-gray-200'}`}
                   onClick={togglePriority}
                 >
@@ -742,126 +742,122 @@ const MDashboard = () => {
                   )}
 
                 </div> */}
-                 <IconButton
-                onClick={handleShowTaskAssignment}
-                size="small"
-                className="text-gray-600"
-              >
-                <BsThreeDots />
-                </IconButton>
-              </div>
-              
-              <input
-              type="text"
-              placeholder="Task Title"
-              value={taskTitle}
-              onChange={(e) => setTaskTitle(e.target.value)}
-              className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
-            />
-          <div className="flex lg:justify-between gap-2">
-            <div className="relative lg:w-48 w-full">
-              <button
-                type="button"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
-                  selected.value ? "text-black" : "text-gray-400"
-                } focus:outline-none flex justify-between items-center`}
-              >
-                {selected.label}
-                {isDropdownOpen ? (
-                  <FaChevronUp className="text-gray-600" />
-                ) : (
-                  <FaChevronDown className="text-gray-600" />
-                )}
-              </button>
-
-              {isDropdownOpen && (
-                <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                  {departments.map((dept, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleSelect(dept)}
-                      disabled={dept.disabled}
-                      className={`w-full text-left px-4 py-2 ${
-                        dept.disabled
-                          ? "text-gray-400 cursor-default"
-                          : "text-black hover:bg-gray-100"
-                      }`}
-                    >
-                      {dept.label}
-                    </button>
-                  ))}
+                  <IconButton
+                    onClick={handleShowTaskAssignment}
+                    size="small"
+                    className="text-gray-600"
+                  >
+                    <BsThreeDots />
+                  </IconButton>
                 </div>
-              )}
-            </div>
-            <div className="relative w-full lg:w-40">
-              <button
-                type="button" 
-                onClick={() => setPriorityDropdownOpen(!isPriorityDropdownOpen)}
-                className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
-                  selectedPriority ? "text-black" : "text-gray-400"
-                } focus:outline-none flex justify-between items-center`}
-              >
-                {selectedPriority || " Priority"}
-                {isPriorityDropdownOpen ? (
-                  <FaChevronUp className="text-gray-600" />
-                ) : (
-                  <FaChevronDown className="text-gray-600" />
-                )}
-              </button>
 
-              {isPriorityDropdownOpen && (
-                <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                  {["High", "Medium", "Low"].map((priority) => (
+                <input
+                  type="text"
+                  placeholder="Task Title"
+                  value={taskTitle}
+                  onChange={(e) => setTaskTitle(e.target.value)}
+                  className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
+                />
+                <div className="flex lg:justify-between gap-2">
+                  <div className="relative lg:w-48 w-full">
                     <button
-                      key={priority}
                       type="button"
-                      onClick={() => {
-                        setSelectedPriority(priority);
-                        setPriorityDropdownOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${selected.value ? "text-black" : "text-gray-400"
+                        } focus:outline-none flex justify-between items-center`}
                     >
-                      <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                        priority === "High" ? "bg-red-500" : 
-                        priority === "Medium" ? "bg-yellow-500" : 
-                        "bg-green-500"
-                      }`}></span>
-                      {priority}
+                      {selected.label}
+                      {isDropdownOpen ? (
+                        <FaChevronUp className="text-gray-600" />
+                      ) : (
+                        <FaChevronDown className="text-gray-600" />
+                      )}
                     </button>
-                  ))}
+
+                    {isDropdownOpen && (
+                      <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+                        {departments.map((dept, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => handleSelect(dept)}
+                            disabled={dept.disabled}
+                            className={`w-full text-left px-4 py-2 ${dept.disabled
+                              ? "text-gray-400 cursor-default"
+                              : "text-black hover:bg-gray-100"
+                              }`}
+                          >
+                            {dept.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="relative w-full lg:w-40">
+                    <button
+                      type="button"
+                      onClick={() => setPriorityDropdownOpen(!isPriorityDropdownOpen)}
+                      className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${selectedPriority ? "text-black" : "text-gray-400"
+                        } focus:outline-none flex justify-between items-center`}
+                    >
+                      {selectedPriority || " Priority"}
+                      {isPriorityDropdownOpen ? (
+                        <FaChevronUp className="text-gray-600" />
+                      ) : (
+                        <FaChevronDown className="text-gray-600" />
+                      )}
+                    </button>
+
+                    {isPriorityDropdownOpen && (
+                      <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+                        {["High", "Medium", "Low"].map((priority) => (
+                          <button
+                            key={priority}
+                            type="button"
+                            onClick={() => {
+                              setSelectedPriority(priority);
+                              setPriorityDropdownOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                          >
+                            <span className={`inline-block w-2 h-2 rounded-full mr-2 ${priority === "High" ? "bg-red-500" :
+                              priority === "Medium" ? "bg-yellow-500" :
+                                "bg-green-500"
+                              }`}></span>
+                            {priority}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
-            </div>   
-            <textarea
-              value={taskDescription}
-              onChange={(e) => setTaskDescription(e.target.value)}
-              placeholder="Task Description"
-              maxLength={350}
-              className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 h-[120px] resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
-            />
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={Taskloading}
-                className="h-9  w-full  bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50 shadow-xl"
-              >
-                {Taskloading ? "Assigning..." : "Assign"}
-              </button>
-            </div>
-          </form>
+                <textarea
+                  value={taskDescription}
+                  onChange={(e) => setTaskDescription(e.target.value)}
+                  placeholder="Task Description"
+                  maxLength={350}
+                  className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 h-[120px] resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+                />
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={Taskloading}
+                    className="h-9  w-full  bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white  shadow-xl"
+                  >
+                    {Taskloading ? "Assigning..." : "Assign"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
           <Dialog
-        open={showTaskAssignment}
-        onClose={() => setShowTaskAssignment(false)}
-        maxWidth="lg"
-        fullWidth
-      >
-        <MTaskAssignment onClose={() => setShowTaskAssignment(false)} />
-      </Dialog>
+            open={showTaskAssignment}
+            onClose={() => setShowTaskAssignment(false)}
+            maxWidth="lg"
+            fullWidth
+          >
+            <MTaskAssignment onClose={() => setShowTaskAssignment(false)} />
+          </Dialog>
           <div className="bg-white rounded-lg shadow  w-full p-4">
             <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Announcements</h2>
             {/* <div className="space-y-4">
@@ -946,7 +942,7 @@ const MDashboard = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="mt-auto ">
               <Button
                 variant="contained"
@@ -954,19 +950,22 @@ const MDashboard = () => {
                 onClick={() => setShowAnnouncementBox(true)}
                 sx={{
                   backgroundColor: "#3A426F",
-                  "&:hover": {backgroundColor: "#3A426F"},
-                  borderRadius: "12px"
-                  
+                  "&:hover": { backgroundColor: "#3A426F" },
+                  borderRadius: "12px",
+                  fontFamily: "'Montserrat'", // Add Montserrat font
+                  fontWeight: "bold",
+                  textTransform: "none",
+                  fontSize: "16px",
                 }}
               >
-                Create Announcement 
+                Create Announcement
               </Button>
             </div>
 
             {showAnnouncementBox && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-xl w-full max-w-2xl mx-4">
-                  <CreateAnnouncementBox 
+                  <CreateAnnouncementBox
                     onClose={() => setShowAnnouncementBox(false)}
                     onSubmit={handleCreateAnnouncement}
                     departments={departments}
@@ -975,87 +974,87 @@ const MDashboard = () => {
               </div>
             )}
 
-<Dialog
-  open={!!selectedAnnouncement}
-  onClose={handleViewClose}
-  maxWidth="sm"
-  fullWidth
->
-  <div className="p-6">
-    <h2 className="text-xl font-semibold mb-4">
-      View Announcement
-    </h2>
-    <div className="space-y-4">
-      <TextField
-        label="Title"
-        fullWidth
-        value={selectedAnnouncement?.title || ""}
-        InputProps={{readOnly: true}}
-      />
-      <TextField
-        label="Description"
-        fullWidth
-        multiline
-        rows={4}
-        value={selectedAnnouncement?.description || ""}
-        InputProps={{readOnly: true}}
-      />
-      <div className="space-y-2">
-        <p className="text-sm text-gray-500">
-          <span className="font-medium">Department:</span> {selectedAnnouncement?.department}
-        </p>
-        <p className="text-sm text-gray-500">
-          <span className="font-medium">Urgency:</span> {selectedAnnouncement?.urgency}
-        </p>
-        <p className="text-sm text-gray-500">
-          <span className="font-medium">Created By:</span> {selectedAnnouncement?.assigned_by}
-        </p>
-        <p className="text-sm text-gray-500">
-          <span className="font-medium">Created At:</span> {' '}
-          {selectedAnnouncement?.created_at && 
-            new Date(selectedAnnouncement.created_at).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })
-          }
-        </p>
-        <div className="text-sm text-gray-500">
-          <span className="font-medium">Assigned To:</span>
-          <ul className="list-disc pl-5 mt-1">
-            {selectedAnnouncement?.assigned_to.map((person, index) => (
-              <li key={index}>{person}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <div className="flex justify-end gap-2 mt-4">
-        <Button
-          onClick={handleDelete}
-          variant="contained"
-          sx={{
-            backgroundColor: "#dc2626",
-            "&:hover": {backgroundColor: "#b91c1c"},
-          }}
-        >
-          Delete
-        </Button>
-        <Button
-          onClick={handleViewClose}
-          variant="contained"
-          sx={{
-            backgroundColor: "#3A426F",
-            "&:hover": {backgroundColor: "#3A426F"},
-          }}
-        >
-          Close
-        </Button>
-      </div>
-    </div>
-  </div>
-</Dialog>
+            <Dialog
+              open={!!selectedAnnouncement}
+              onClose={handleViewClose}
+              maxWidth="sm"
+              fullWidth
+            >
+              <div className="p-6">
+                <h2 className="text-xl font-semibold mb-4">
+                  View Announcement
+                </h2>
+                <div className="space-y-4">
+                  <TextField
+                    label="Title"
+                    fullWidth
+                    value={selectedAnnouncement?.title || ""}
+                    InputProps={{ readOnly: true }}
+                  />
+                  <TextField
+                    label="Description"
+                    fullWidth
+                    multiline
+                    rows={4}
+                    value={selectedAnnouncement?.description || ""}
+                    InputProps={{ readOnly: true }}
+                  />
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Department:</span> {selectedAnnouncement?.department}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Urgency:</span> {selectedAnnouncement?.urgency}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Created By:</span> {selectedAnnouncement?.assigned_by}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Created At:</span> {' '}
+                      {selectedAnnouncement?.created_at &&
+                        new Date(selectedAnnouncement.created_at).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })
+                      }
+                    </p>
+                    <div className="text-sm text-gray-500">
+                      <span className="font-medium">Assigned To:</span>
+                      <ul className="list-disc pl-5 mt-1">
+                        {selectedAnnouncement?.assigned_to.map((person, index) => (
+                          <li key={index}>{person}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 mt-4">
+                    <Button
+                      onClick={handleDelete}
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "#dc2626",
+                        "&:hover": { backgroundColor: "#b91c1c" },
+                      }}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      onClick={handleViewClose}
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "#3A426F",
+                        "&:hover": { backgroundColor: "#3A426F" },
+                      }}
+                    >
+                      Close
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Dialog>
 
           </div>
           <div className="bg-white rounded-lg shadow h-auto w-full p-4">
