@@ -477,7 +477,7 @@ const MDashboard = () => {
 
   return (
     <section className=" h-screen p-2 mr-2 sm:mr-4 font-Montserrat">
-      <h2 className="text-[#252941] text-2xl pl-3 mt-4 font-semibold">Dashboard</h2>
+      <h2 className="text-[#252941] text-3xl my-4 pl-12 font-semibold">Dashboard</h2>
       <div className="grid grid-cols-1 lg:grid-cols-[70%,30%] gap-5 p-3">
 
         {/* First Column */}

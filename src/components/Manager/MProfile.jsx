@@ -19,12 +19,14 @@ useEffect(() => {
   }, 500); 
 }, []);
   return (
-    <section className=" h-screen mx-4 font-Montserrat">
-      <h2 className="text-[#252941] text-3xl pl-5 mb-6 xl:mt-5 font-semibold">Profile</h2>
+    <section className=" h-screen py-2 mr-1 px-0 font-Montserrat">
+      
+      <h2 className="text-[#252941] text-3xl  my-4 pl-12 font-semibold">Profile</h2>
+      
       {loading ? (
       <Skeleton variant="rectangular" width="100%" height="85%" sx={{ backgroundColor: 'white', margin:"16px", paddingRight:"16px"}} />
     ) : (
-      <div className="bg-white  h-auto xl:mt-1 mt-2  mx-4 pt-2 pb-1 px-7 rounded-lg shadow">
+      <div className="bg-white z-10  h-auto xl:mt-1 mt-2  mx-4 pt-2 pb-1 px-7 rounded-lg shadow">
 
     <div className=" xl:flex-row flex-col  flex  w-full  xl:items-start items-center xl:justify-evenly ">
   <div

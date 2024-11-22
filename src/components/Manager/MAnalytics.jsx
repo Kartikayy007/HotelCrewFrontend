@@ -192,8 +192,8 @@ const MAnalytics = () => {
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
-      <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
+    <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
+      <h1 className="text-[#252941] text-3xl my-4 pl-12 font-semibold">
         Analytics
       </h1>
 

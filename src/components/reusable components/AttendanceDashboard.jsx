@@ -129,7 +129,7 @@ const AttendanceDashboard = () => {
   };
   return (
     <section className=" h-screen p-2 mr-1 font-Montserrat">
-      <h2 className="text-[#252941] text-2xl pl-4 mt-5 font-semibold">Staff Attendance</h2>
+      <h2 className="text-[#252941] text-3xl my-4 pl-12 font-semibold">Staff Attendance</h2>
       {/* <div> */}
       <div className='flex justify-center mb-1 mt-6 pb-5 px-3'>
         {/* <div className="bg-white w-full h-[392px] pb-7  py-2  rounded-lg shadow"> */}

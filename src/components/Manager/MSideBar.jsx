@@ -42,9 +42,9 @@ const MSideBar = ({ onMenuItemClick }) => {
 
     return (
         <>
-            <div className='xl:hidden fixed top-4 left-2 z-50'>
+            <div className='xl:hidden fixed top-6  left-2 z-50'>
                 <button onClick={toggleSidebar} className={`${isSidebarOpen ? 'text-white ' : 'text-[#252941]'}`}>
-                    {isSidebarOpen ? <X size={24} className="text-white" /> : <Menu size={24} />}
+                    {isSidebarOpen ? <X size={34} className="text-white" /> : <Menu size={34} />}
                 </button>
             </div>
             <nav className={`
