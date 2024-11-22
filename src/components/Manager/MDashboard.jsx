@@ -8,6 +8,7 @@ import { FaStar } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { BsThreeDots } from "react-icons/bs";
 import { fetchAttendanceStats } from '../../redux/slices/AttendanceSlice';
+import { Dialog, TextField, Button, Snackbar, Alert, IconButton } from "@mui/material";
 import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";
 import { Skeleton } from "@mui/material";
@@ -18,8 +19,14 @@ const MDashboard = () => {
   const dispatch = useDispatch();
   // const [loading,setloading]=useState(false);
   const [isPriority, setIsPriority] = useState(false);
+  const [isPriorityDropdownOpen, setPriorityDropdownOpen] = useState(false);
+  const [selectedPriority, setSelectedPriority] = useState("");
   const [timeData, setTimeData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
+  const Taskloading = useSelector(selectTasksLoading);
+  const Taskerror = useSelector(selectTasksError);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [performanceRange, setPerformanceRange] = useState([
     0,
@@ -27,12 +34,18 @@ const MDashboard = () => {
   ]);
   const [revenueRange, setRevenueRange] = useState([0, currentHour || 1]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [taskData, setTaskData] = useState({
-    title: '',
-    description: '',
-    department: '',
-    // priority: false, // For priority status
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
   });
+
+  // const [taskData, setTaskData] = useState({
+  //   title: '',
+  //   description: '',
+  //   department: '',
+  //   // priority: false, // For priority status
+  // });
 
 
 
@@ -89,6 +102,17 @@ const MDashboard = () => {
     { id: 1, value: 35, label: "Vacant", color: "#8094D4" },
   ];
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [showTaskAssignment, setShowTaskAssignment] = useState(false);
+
+  const handleDotsClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleShowTaskAssignment = () => {
+    setShowTaskAssignment(true);
+    handleDotsClose();
+  };
   const staffAttendanceData = [
     {
       id: 0,
@@ -265,15 +289,15 @@ const MDashboard = () => {
     return () => clearInterval(interval);
   }, [currentHour]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setTaskData((prevData) => ({
-      ...prevData,
-      [name]: value,
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setTaskData((prevData) => ({
+  //     ...prevData,
+  //     [name]: value,
 
-    }));
-    // console.log(taskData);
-  };
+  //   }));
+  //   // console.log(taskData);
+  // };
 
 
  
@@ -286,18 +310,10 @@ const MDashboard = () => {
     }));
     setIsDropdownOpen(false);
   };
-  useEffect(() => {
-    console.log("Updated taskData:", taskData);
-  }, [taskData]);
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const { title, description, department } = taskData;
-
-    if (!title?.trim() && !description?.trim() && !department?.trim()) {
-      alert("Please fill in all fields");
-      return;
-    }
+  // useEffect(() => {
+  //   console.log("Updated taskData:", taskData);
+  // }, [taskData]);
+ 
     // localStorage.setItem('accessToken',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY")
 
     // const dataToSend = {
@@ -307,18 +323,80 @@ const MDashboard = () => {
     //   // priority,
     // };
 
+  //   try {
+  //     const response = await dispatch(createTask(taskData));
+  //     // console.log(response.data);
+  //     if (response.data.status === 'success') {
+  //       alert('Task created successfully');
+  //     } else {
+  //       alert('Failed to create task: ' + response.data.message);
+  //     }
+  //   } catch (error) {
+  //     alert('An error occurred: ' + error.message);
+  //   }
+  // };
+  const handleAssign = async (e) => {
+    e.preventDefault();
+
+    if (!taskTitle.trim()) {
+      setSnackbar({
+        open: true,
+        message: "Please enter a task title",
+        severity: "error",
+      });
+      return;
+    }
+
+    if (!taskDescription.trim()) {
+      setSnackbar({
+        open: true,
+        message: "Please enter a task description",
+        severity: "error",
+      });
+      return;
+    }
+
+    if (!selected.value) {
+      setSnackbar({
+        open: true,
+        message: "Please select a department",
+        severity: "error",
+      });
+      return;
+    }
+
     try {
-      const response = await dispatch(createTask(taskData));
-      // console.log(response.data);
-      if (response.data.status === 'success') {
-        alert('Task created successfully');
-      } else {
-        alert('Failed to create task: ' + response.data.message);
-      }
-    } catch (error) {
-      alert('An error occurred: ' + error.message);
+      await dispatch(
+        createTask({
+          title: taskTitle.trim(),
+          description: taskDescription.trim(),
+          department: selected.value,
+          priority: selectedPriority
+        })
+      ).unwrap();
+
+      setTaskTitle("");
+      setTaskDescription("");
+      setSelected({label: "Select Department", value: ""});
+
+      setSnackbar({
+        open: true,
+        message: "Task assigned successfully",
+        severity: "success",
+      });
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: err.message || "Failed to assign task",
+        severity: "error",
+      });
     }
   };
+  const handleSnackbarClose = () => {
+    setSnackbar({...snackbar, open: false});
+  };
+
+
 
 
   return (
@@ -573,9 +651,10 @@ const MDashboard = () => {
 
           <div className="w-full ">
             <div className="bg-white  h-[50%] p-4 pr-6 pl-6 shadow rounded-lg">
+            <form className="flex flex-col gap-4" onSubmit={handleAssign}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[#3f4870] text-lg font-semibold mb-2">Task Assignment</h2>
-                <div
+                {/* <div
                   className={`cursor-pointer ${isPriority ? 'text-gold' : 'text-gray-200'}`}
                   onClick={togglePriority}
                 >
@@ -585,75 +664,128 @@ const MDashboard = () => {
                     // <FaRegStar size={25} color="gray" />
                     <p className="text-gray-400">Mark Priority</p>
                   )}
-                </div>
+
+                </div> */}
+                 <IconButton
+                onClick={handleShowTaskAssignment}
+                size="small"
+                className="text-gray-600"
+              >
+                <BsThreeDots />
+                </IconButton>
               </div>
-              <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  name="title"
-                  placeholder="Task Title"
-                  value={taskData.title || ""}
-                  onChange={handleInputChange}
-                  className=" border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
-                />
-
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${selected.value ? 'text-black' : 'text-gray-400'} focus:outline-none flex justify-between items-center`}
-                  >
-                    {selected.label}
-                    {isDropdownOpen ? (
-                      <FaChevronUp className="text-gray-600" />
-                    ) : (
-                      <FaChevronDown className="text-gray-600" />
-                    )}
-                  </button>
-
-                  {isDropdownOpen && (
-                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                      {departments.map((dept, index) => (
-                        <button
-                          key={index}
-                          type="button"
-                          value={taskData.department || ""}
-                          onClick={() => handleSelect(dept)}
-                          disabled={dept.disabled}
-                          className={`w-full text-left px-4 py-2 ${dept.disabled ? 'text-gray-400 cursor-default' : 'text-black hover:bg-gray-100'}`}
-                        >
-                          {dept.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <textarea
-                  name="description"
-                  value={taskData.description || ""}
-                  onChange={handleInputChange}
-                  placeholder="Task Description"
-                  maxLength={350}
-                  className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 h-[150px] resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
-                ></textarea>
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    className="h-9 w-28 lg:w-full  bg-[#3f4870] font-Montserrat font-bold rounded-lg text-white"
-                    disabled={taskLoading}
-                  >
-                    {taskLoading ? 'Assigning...' : 'Assign'}
-                  </button>
-                </div>
-                {taskError && (
-                  <div className="mt-2 text-red-500 text-sm">
-                    <p>Error: {taskError.message}</p>
-                  </div>
+              
+              <input
+              type="text"
+              placeholder="Task Title"
+              value={taskTitle}
+              onChange={(e) => setTaskTitle(e.target.value)}
+              className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
+            />
+          <div className="flex justify-between">
+            <div className="relative w-48">
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                  selected.value ? "text-black" : "text-gray-400"
+                } focus:outline-none flex justify-between items-center`}
+              >
+                {selected.label}
+                {isDropdownOpen ? (
+                  <FaChevronUp className="text-gray-600" />
+                ) : (
+                  <FaChevronDown className="text-gray-600" />
                 )}
-              </form>
+              </button>
 
+              {isDropdownOpen && (
+                <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+                  {departments.map((dept, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleSelect(dept)}
+                      disabled={dept.disabled}
+                      className={`w-full text-left px-4 py-2 ${
+                        dept.disabled
+                          ? "text-gray-400 cursor-default"
+                          : "text-black hover:bg-gray-100"
+                      }`}
+                    >
+                      {dept.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="relative w-40">
+              <button
+                type="button" 
+                onClick={() => setPriorityDropdownOpen(!isPriorityDropdownOpen)}
+                className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                  selectedPriority ? "text-black" : "text-gray-400"
+                } focus:outline-none flex justify-between items-center`}
+              >
+                {selectedPriority || "Select Priority"}
+                {isPriorityDropdownOpen ? (
+                  <FaChevronUp className="text-gray-600" />
+                ) : (
+                  <FaChevronDown className="text-gray-600" />
+                )}
+              </button>
+
+              {isPriorityDropdownOpen && (
+                <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+                  {["High", "Medium", "Low"].map((priority) => (
+                    <button
+                      key={priority}
+                      type="button"
+                      onClick={() => {
+                        setSelectedPriority(priority);
+                        setPriorityDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                        priority === "High" ? "bg-red-500" : 
+                        priority === "Medium" ? "bg-yellow-500" : 
+                        "bg-green-500"
+                      }`}></span>
+                      {priority}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            </div>   
+            <textarea
+              value={taskDescription}
+              onChange={(e) => setTaskDescription(e.target.value)}
+              placeholder="Task Description"
+              maxLength={350}
+              className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 h-[120px] resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+            />
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={Taskloading}
+                className="h-9  w-full  bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50 shadow-xl"
+              >
+                {Taskloading ? "Assigning..." : "Assign"}
+              </button>
+            </div>
+          </form>
             </div>
           </div>
+          <Dialog
+        open={showTaskAssignment}
+        onClose={() => setShowTaskAssignment(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <MTaskAssignment onClose={() => setShowTaskAssignment(false)} />
+      </Dialog>
           <div className="bg-white rounded-lg shadow  w-full p-4">
             <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Announcements</h2>
             <div className="space-y-4">

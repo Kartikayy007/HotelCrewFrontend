@@ -162,7 +162,7 @@ const MTaskAssignment = () => {
       <h1 className="text-2xl font-bold mb-6">Monitor Active Tasks</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-gray-50 rounded-lg p-4 h-[80vh] overflow-scroll">
+        <div className="bg-gray-50 rounded-lg p-4 h-[80vh] overflow-auto">
           <h2 className="text-lg font-semibold mb-4 flex items-center">
             <div className="w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
             Pending
@@ -174,7 +174,7 @@ const MTaskAssignment = () => {
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-4 h-[80vh] overflow-scroll">
+        <div className="bg-gray-50 rounded-lg p-4 h-[80vh] overflow-auto">
           <h2 className="text-lg font-semibold mb-4 flex items-center">
             <div className="w-3 h-3 rounded-full bg-blue-400 mr-2"></div>
             In Progress
@@ -186,7 +186,7 @@ const MTaskAssignment = () => {
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-4 h-[80vh] overflow-scroll">
+        <div className="bg-gray-50 rounded-lg p-4 h-[80vh] overflow-auto">
           <h2 className="text-lg font-semibold mb-4 flex items-center">
             <div className="w-3 h-3 rounded-full bg-green-400 mr-2"></div>
             Completed
