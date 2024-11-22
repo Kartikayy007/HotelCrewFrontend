@@ -9,18 +9,28 @@ function AdminScheduleStatus() {
   const [isShiftChangeMode, setIsShiftChangeMode] = useState(false);
   const [staffData, setStaffData] = useState([
     {name: "Ben Smith", department: "Kitchen", shift: "Day Shift"},
-    {name: "Sarah Johnson", department: "Housekeeping", shift: "Night Shift"},
-    {name: "Mike Chen", department: "Kitchen", shift: "Night Shift"},
-    {name: "Maria Garcia", department: "Reception", shift: "Day Shift"},
-    {name: "Alex Wong", department: "Security", shift: "Night Shift"},
-    {name: "Lisa Parker", department: "Housekeeping", shift: "Day Shift"},
-    {name: "James Wilson", department: "Reception", shift: "Night Shift"},
-    {name: "Priya Patel", department: "Security", shift: "Day Shift"},
-    {name: "Emma Rodriguez", department: "Kitchen", shift: "Day Shift"},
-    {name: "David Kim", department: "Security", shift: "Night Shift"},
-    {name: "Anna Lee", department: "Housekeeping", shift: "Day Shift"},
-    {name: "Carlos Mendes", department: "Reception", shift: "Night Shift"}
-  ]);
+  {name: "Sarah Johnson", department: "Housekeeping", shift: "Evening Shift"},
+  {name: "Mike Chen", department: "Kitchen", shift: "Night Shift"},
+  {name: "Maria Garcia", department: "Reception", shift: "Day Shift"},
+  {name: "Alex Wong", department: "Security", shift: "Evening Shift"},
+  {name: "Lisa Parker", department: "Housekeeping", shift: "Day Shift"},
+  {name: "James Wilson", department: "Reception", shift: "Night Shift"},
+  {name: "Thomas Anderson", department: "Maintenance", shift: "Day Shift"},
+  {name: "Nina Patel", department: "F&B", shift: "Evening Shift"},
+  {name: "Carlos Rodriguez", department: "Front Office", shift: "Night Shift"},
+  {name: "Sophie Zhang", department: "Kitchen", shift: "Day Shift"},
+  {name: "Omar Hassan", department: "Security", shift: "Evening Shift"},
+  {name: "Emily Brown", department: "Housekeeping", shift: "Night Shift"},
+  {name: "Daniel Lee", department: "Maintenance", shift: "Day Shift"},
+  {name: "Isabella Silva", department: "F&B", shift: "Evening Shift"},
+  {name: "Ryan Murphy", department: "Front Office", shift: "Night Shift"},
+  {name: "Aisha Khan", department: "Kitchen", shift: "Day Shift"},
+  {name: "Marcus Thompson", department: "Security", shift: "Evening Shift"},
+  {name: "Julia Kim", department: "Housekeeping", shift: "Night Shift"},
+  {name: "Mohammed Al-Said", department: "Maintenance", shift: "Day Shift"},
+  {name: "Lucy Chen", department: "F&B", shift: "Evening Shift"},
+  {name: "Samuel Jackson", department: "Front Office", shift: "Night Shift"}
+]);
   
   const [draggedStaff, setDraggedStaff] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -81,8 +91,56 @@ function AdminScheduleStatus() {
   const dayShiftStaff = filteredStaff.filter(
     (staff) => staff.shift === "Day Shift"
   );
+  const eveningShiftStaff = filteredStaff.filter(
+    (staff) => staff.shift === "Evening Shift"
+  );
   const nightShiftStaff = filteredStaff.filter(
     (staff) => staff.shift === "Night Shift"
+  );
+
+
+  const ShiftSection = ({ title, staff, shiftType }) => (
+    <div className="h-auto sm:h-80">
+      <div className="px-2 xs:px-4 sm:px-8">
+        <div 
+          className={`bg-white ${shiftType !== "Day Shift" ? "mt-6 sm:mt-11" : ""}`}
+          onDragOver={handleDragOver}
+          onDrop={(e) => handleDrop(e, shiftType)}
+        >
+          <div className="sticky z-20 bg-white py-2 xs:py-4 flex items-center justify-between">
+            <h2 className="text-base xs:text-lg sm:text-xl font-semibold">
+              {title} ({staff.length})
+            </h2>
+            {isShiftChangeMode && (
+              <div className="text-sm text-gray-500 flex items-center">
+                <Move className="mr-2" size={16} />
+                Drag staff to change shift
+              </div>
+            )}
+          </div>
+          <div className="h-[180px] xs:h-[200px] sm:h-[280px] overflow-y-auto">
+            <div className="flex flex-wrap gap-2 xs:gap-3 sm:gap-4 pt-2">
+              {staff.map((staff, index) => (
+                <div
+                  key={`${shiftType}-${index}`}
+                  draggable={isShiftChangeMode}
+                  onDragStart={(e) => handleDragStart(e, staff)}
+                  className={`rounded-3xl text-sm xs:text-base sm:text-xl 
+                    ${isShiftChangeMode 
+                      ? 'cursor-move hover:bg-blue-100 transition-colors' 
+                      : ''} 
+                    bg-[#E6EEF9] min-w-[100px] xs:min-w-[120px] sm:min-w-32 
+                    text-center p-1.5 xs:p-2 sm:p-3`}
+                >
+                  <p>{staff.name}</p>
+                  <p className="text-xs text-gray-500">{staff.department}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 
   return (
@@ -92,7 +150,7 @@ function AdminScheduleStatus() {
       </h1>
 
       <div>
-        <div className="bg-white rounded-lg shadow-lg mx-6 min-h-[calc(100vh-120px)] lg:h-[55rem]">
+        <div className="bg-white rounded-lg shadow-lg mx-6 min-h-[calc(118vh-120px)] lg:h-[80rem]">
           <div className="z-10 pb-2 xs:pb-4 sm:pb-6">
             <div className="flex justify-between items-start sm:items-center p-2 xs:p-4 sm:p-6">
               <h1 className="font-semibold text-lg xs:text-xl sm:text-2xl mb-2 xs:mb-4 sm:mb-0">
@@ -124,9 +182,9 @@ function AdminScheduleStatus() {
                     className={`p-1.5 xs:p-2 sm:p-3 
                       min-w-16 xs:min-w-20 
                       text-[10px] xs:text-xs sm:text-sm md:text-base lg:text-lg 
-                    rounded-3xl 
-                    whitespace-nowrap 
-                    transition-colors 
+                      rounded-3xl 
+                      whitespace-nowrap 
+                      transition-colors 
                       ${
                         activeFilter === department
                           ? "bg-[#6675C5] text-white"
@@ -153,115 +211,35 @@ function AdminScheduleStatus() {
             </div>
           </div>
 
-          <div className="h-auto sm:h-80">
-            <div className="px-2 xs:px-4 sm:px-8">
-              <div 
-                className="bg-white"
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, "Day Shift")}
-              >
-                <div className="sticky z-20 bg-white py-2 xs:py-4 flex items-center justify-between">
-                  <h2 className="text-base xs:text-lg sm:text-xl font-semibold">
-                    Day Shift ({dayShiftStaff.length})
-                  </h2>
-                  {isShiftChangeMode && (
-                    <div className="text-sm text-gray-500 flex items-center">
-                      <Move className="mr-2" size={16} />
-                      Drag staff to change shift
-                    </div>
-                  )}
-                </div>
-                <div className="h-[180px] xs:h-[200px] sm:h-[280px] overflow-y-auto">
-                  <div className="flex flex-wrap gap-2 xs:gap-3 sm:gap-4 pt-2">
-                    {dayShiftStaff.map((staff, index) => (
-                      <div
-                        key={`day-${index}`}
-                        draggable={isShiftChangeMode}
-                        onDragStart={(e) => handleDragStart(e, staff)}
-                        className={`rounded-3xl text-sm xs:text-base sm:text-xl 
-                          ${isShiftChangeMode 
-                            ? 'cursor-move hover:bg-blue-100 transition-colors' 
-                            : ''} 
-                          bg-[#E6EEF9] min-w-[100px] xs:min-w-[120px] sm:min-w-32 
-                          text-center p-1.5 xs:p-2 sm:p-3`}
-                      >
-                        <p>{staff.name}</p>
-                        <p className="text-xs text-gray-500">{staff.department}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="h-auto sm:h-80">
-            <div className="px-4 sm:px-8">
-              <div 
-                className="relative bg-white mt-6 sm:mt-11"
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, "Night Shift")}
-              >
-                <div className="sticky top-0 z-20 bg-white py-4 flex items-center justify-between">
-                  <h2 className="text-lg sm:text-xl font-semibold">
-                    Night Shift ({nightShiftStaff.length})
-                  </h2>
-                  {isShiftChangeMode && (
-                    <div className="text-sm text-gray-500 flex items-center">
-                      <Move className="mr-2" size={16} />
-                      Drag staff to change shift
-                    </div>
-                  )}
-                </div>
-                <div className="h-[200px] sm:h-[280px] overflow-y-auto">
-                  <div className="flex flex-wrap gap-3 sm:gap-4 pt-2">
-                    {nightShiftStaff.map((staff, index) => (
-                      <div
-                        key={`night-${index}`}
-                        draggable={isShiftChangeMode}
-                        onDragStart={(e) => handleDragStart(e, staff)}
-                        className={`rounded-3xl text-base sm:text-xl 
-                          ${isShiftChangeMode 
-                            ? 'cursor-move hover:bg-blue-100 transition-colors' 
-                            : ''} 
-                          bg-[#E6EEF9] min-w-[120px] sm:min-w-32 
-                          text-center p-2 sm:p-3`}
-                      >
-                        
-                        <p>{staff.name}</p>
-                        <p className="text-xs text-gray-500">{staff.department}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ShiftSection title="Day Shift" staff={dayShiftStaff} shiftType="Day Shift" />
+          <ShiftSection title="Evening Shift" staff={eveningShiftStaff} shiftType="Evening Shift" />
+          <ShiftSection title="Night Shift" staff={nightShiftStaff} shiftType="Night Shift" />
         </div>
       </div>
+
       <Snackbar
-  open={snackbarOpen}
-  autoHideDuration={3000}
-  onClose={handleSnackbarClose}
-  anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
->
-  <Alert 
-    onClose={handleSnackbarClose} 
-    severity="success"
-    variant="filled"
-    sx={{ 
-      width: '100%',
-      '& .MuiAlert-filledSuccess': {
-        backgroundColor: '#4CAF50'
-      }
-    }}
-  >
-    {draggedStaff && targetShift ? 
-      `Shift updated successfully` : 
-      'Shift updated successfully'
-    }
-  </Alert>
-</Snackbar>
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity="success"
+          variant="filled"
+          sx={{ 
+            width: '100%',
+            '& .MuiAlert-filledSuccess': {
+              backgroundColor: '#4CAF50'
+            }
+          }}
+        >
+          {draggedStaff && targetShift ? 
+            `Shift updated successfully` : 
+            'Shift updated successfully'
+          }
+        </Alert>
+      </Snackbar>
     </section>
   );
 }

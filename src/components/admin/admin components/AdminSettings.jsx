@@ -621,7 +621,7 @@ const AdminSettings = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow lg:w-[75vw] -mt-6">{renderContent()}</div>
+      <div className="bg-white rounded-tr-lg rounded-b-lg shadow lg:w-[75vw] -mt-7">{renderContent()}</div>
     </section>
   );
 };
