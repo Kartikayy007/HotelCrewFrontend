@@ -29,9 +29,31 @@ const AttendanceDashboard = () => {
   const { staff, loading, error } = useSelector((state) => state.attendance);
   const dispatch = useDispatch();
 
+  const demoStaff = [
+    { id: 1, user_name: "John Doe", email: "john.doe@example.com", department: "HR", current_attendance: "Present" },
+    { id: 2, user_name: "Jane Smith", email: "jane.smith@example.com", department: "IT", current_attendance: "Absent" },
+    { id: 3, user_name: "Alice Johnson", email: "alice.j@example.com", department: "Finance", current_attendance: "Present" },
+  ];
+
+  
+  const [demoMode, setDemoMode] = useState(false);
+
+  
+  const dataToUse = demoMode ? demoStaff : staff;
+
   useEffect(() => {
     dispatch(fetchAttendance());
   }, [dispatch]);
+
+  // useEffect(() => {
+  //   const fetchData = () => {
+  //     dispatch(fetchAttendance());
+  //   };
+  //   fetchData();
+  //   const intervalId = setInterval(fetchData, 900000);
+  //   return () => clearInterval(intervalId);
+  // }, [dispatch]);
+
 
   useEffect(() => {
     if (staff && staff.length > 0) {
@@ -49,20 +71,25 @@ const AttendanceDashboard = () => {
   };
 
   // if (loading) {
+
   //   return <p>Loading attendance...</p>;
   // }
 
-  // if (error) {
-  //   return <p>Error loading attendance: {error}</p>;
-  // }
+  if (error) {
+    <div className="flex justify-center text-2xl items-center h-full">
+    return <p>Error loading attendance: {error}</p>;
+    </div>
+  }
   
   if (error) {
     return (
-      <div className="flex justify-center text-2xl items-center h-full">
-        <p className="text-red-500">{error}</p>
+      console.log({error}),
+      <div className="flex justify-center text-2xl items-center h-full">    
+        <p >No data Available</p>
       </div>
     );
   }
+  // localStorage.clear
   localStorage.setItem('accessToken', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY3NzY0LCJpYXQiOjE3MzE2NzU3NjQsImp0aSI6ImQ3NWVmNTUxMmE0NzQ1NWFiYmE3MmVhY2M2NzM0Mzk4IiwidXNlcl9pZCI6NDF9.pX8v_JU3baX_Vq-vavtHdqDgBDZ1tpOJQDgEMjClMRg")
   
   // Handle approve/reject
@@ -80,11 +107,14 @@ const AttendanceDashboard = () => {
   };
 
  
-  const filteredStaff = selectedDepartments.includes("All")
+  const 
+  filteredStaff = selectedDepartments.includes("All")
   ? staff
   : staff.filter((member) => selectedDepartments.includes(member.department));
 
-
+  // const filteredStaff = selectedDepartments.includes("All")
+  // ? dataToUse
+  // : dataToUse.filter((member) => selectedDepartments.includes(member.department));
   // Handle department selection
   const toggleDepartmentSelection = (department) => {
     setSelectedDepartments([department]);
@@ -178,28 +208,51 @@ const AttendanceDashboard = () => {
               <thead>
                 <tr className="bg-[#3F4870] text-[#E6EEF9] rounded-xl">
                   <th className="px-4 py-2 text-left">Name</th>
-                  <th className="px-4 py-2 text-left">Email</th>
+                  <th className="px-4 py-2 text-le3t">Email</th>
                   <th className="px-4 py-2 text-left">Department</th>
                   <th className="px-4 py-2 text-center">Attendance</th>
-                  <th className="px-4 py-2 text-center">
-                  {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <th className="px-4 py-2 flex mb-1  items-center justify-center">
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DemoContainer components={['DatePicker']}>
               <DatePicker
-                label="Date"
+              className='w-[50px] '
+              placeholder="Date" 
                 sx={{
-                  width: "90px",
-                  padding: "0px",
-                  borderColor:"#E6EEF9",
                   
-                  backgroundColor:"#E6EEF9"
+                  height: "28px", // Minimize padding
+                  fontSize: "12px", // Smaller font size
+                  borderRadius: "3px", // Adjust border radius
+                  borderColor: "transparent",
+                  backgroundColor: "#E6EEF9",
+          
+                  
+                  "& .MuiInputBase-root": {
+                  
+                    fontSize: "16px",
+                    fontFamily:"Montserrat" 
+                  },
+                 
+                  "& .MuiSvgIcon-root": {
+                    fontSize: "19px", 
+                  },
+                  "& .MuiIconButton-root": {
+                    paddingTop: "4px", 
+                    paddingBottom: "10px", 
+                  },
+                  "& .MuiInputBase-input":{
+                    paddingTop: '4px',
+                    paddingBottom: '4px',
+                   
+                  },
+                 
                 }}
               />
             </DemoContainer>
-          </LocalizationProvider> */}
-          <input type="date"
+          </LocalizationProvider>
+          {/* <input type="date"
           className='bg-[#E6EEF9] '
           placeholder='Date'
-          />
+          /> */}
 
                   </th>
                   {/* <th className="px-4 py-2 text-center">Date</th> */}

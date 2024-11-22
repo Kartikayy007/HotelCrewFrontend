@@ -218,9 +218,9 @@ const TaskCard = ({ task }) => (
               {task.department}
             </span>
           
-          <p className="text-sm text-gray-600 mt-1">
+          {/* <p className="text-sm text-gray-600 mt-1">
             Deadline: {task.deadline}
-          </p>
+          </p> */}
           
           <p className="text-sm text-gray-700 mt-1">
             {task.description}

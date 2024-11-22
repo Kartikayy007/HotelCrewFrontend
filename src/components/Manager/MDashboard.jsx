@@ -78,7 +78,7 @@ const MDashboard = () => {
     { value: 'reception', label: 'Reception' },
   ];
 
-  const [selected, setSelected] = useState({ label: 'Select Department', value: '' });
+  const [selected, setSelected] = useState({ label: 'Department', value: '' });
 
   const { stats, error } = useSelector((state) => state.attendance);
   useEffect(() => {
@@ -476,7 +476,7 @@ const MDashboard = () => {
 
 
   return (
-    <section className=" h-screen p-2 mr-4 font-Montserrat">
+    <section className=" h-screen p-2 mr-2 sm:mr-4 font-Montserrat">
       <h2 className="text-[#252941] text-2xl pl-3 mt-4 font-semibold">Dashboard</h2>
       <div className="grid grid-cols-1 lg:grid-cols-[70%,30%] gap-5 p-3">
 
@@ -758,8 +758,8 @@ const MDashboard = () => {
               onChange={(e) => setTaskTitle(e.target.value)}
               className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
             />
-          <div className="flex justify-between">
-            <div className="relative w-48">
+          <div className="flex lg:justify-between gap-2">
+            <div className="relative lg:w-48 w-full">
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -795,7 +795,7 @@ const MDashboard = () => {
                 </div>
               )}
             </div>
-            <div className="relative w-40">
+            <div className="relative w-full lg:w-40">
               <button
                 type="button" 
                 onClick={() => setPriorityDropdownOpen(!isPriorityDropdownOpen)}
@@ -803,7 +803,7 @@ const MDashboard = () => {
                   selectedPriority ? "text-black" : "text-gray-400"
                 } focus:outline-none flex justify-between items-center`}
               >
-                {selectedPriority || "Select Priority"}
+                {selectedPriority || " Priority"}
                 {isPriorityDropdownOpen ? (
                   <FaChevronUp className="text-gray-600" />
                 ) : (
@@ -911,7 +911,7 @@ const MDashboard = () => {
                   {announcementsError}
                 </div>
               ) : (
-                <div className="overflow-scroll">
+                <div className="overflow-auto md:h-[400px]">
                   {announcements.length > 0 ? (
                     announcements.map((announcement) => (
                       <div
@@ -946,7 +946,8 @@ const MDashboard = () => {
                 </div>
               )}
             </div>
-            <div className="mt-auto">
+            
+            <div className="mt-auto ">
               <Button
                 variant="contained"
                 fullWidth
@@ -955,6 +956,7 @@ const MDashboard = () => {
                   backgroundColor: "#3A426F",
                   "&:hover": {backgroundColor: "#3A426F"},
                   borderRadius: "12px"
+                  
                 }}
               >
                 Create Announcement 
@@ -1056,7 +1058,7 @@ const MDashboard = () => {
 </Dialog>
 
           </div>
-          <div className="bg-white rounded-lg shadow lg:h-[29.5%] h-auto w-full p-4">
+          <div className="bg-white rounded-lg shadow h-auto w-full p-4">
             <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Leave Management</h2>
             <div className="grid grid-cols-2 gap-3">
               <div className="border rounded p-4">
@@ -1069,10 +1071,6 @@ const MDashboard = () => {
               </div>
             </div>
           </div>
-
-
-
-
         </div>
 
       </div>
