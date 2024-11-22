@@ -4,11 +4,15 @@ import { Provider } from 'react-redux'
 import { store } from './redux/Store.js'
 import './index.css'
 import App from './App.jsx'
+import MSideBar from './components/Manager/MSideBar.jsx'
+import MainLayout from './components/Manager/MainLayout.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
-      <App />
+      {/* <App /> */}
+      {/* <MSideBar /> */}
+      <MainLayout />
     </ Provider>
   </StrictMode>,
 )

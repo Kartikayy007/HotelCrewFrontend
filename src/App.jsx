@@ -111,8 +111,12 @@ const App = () => {
         />
 
         
+         <Route path="*" element={<Navigate to="/" replace />} /> 
+       
+
+         {/* Redirect to "/" for any undefined routes */}
         <Route path="*" element={<Navigate to="/" replace />} />
-    
+        
       </Routes>
     </Router>
   );
