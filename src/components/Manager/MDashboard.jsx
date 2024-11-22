@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BsThreeDots } from "react-icons/bs";
 import { fetchAttendanceStats } from '../../redux/slices/AttendanceSlice';
 import { Dialog, TextField, Button, Snackbar, Alert, IconButton } from "@mui/material";
+import { CreateAnnouncementBox } from "../reusable components/CreateAnnouncementBox";
+import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError,deleteAnnouncement } from '../../redux/slices/AnnouncementSlice';
 import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";
 import { Skeleton } from "@mui/material";
@@ -24,6 +26,7 @@ const MDashboard = () => {
   const [timeData, setTimeData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [taskTitle, setTaskTitle] = useState("");
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [taskDescription, setTaskDescription] = useState("");
   const Taskloading = useSelector(selectTasksLoading);
   const Taskerror = useSelector(selectTasksError);
@@ -34,6 +37,7 @@ const MDashboard = () => {
   ]);
   const [revenueRange, setRevenueRange] = useState([0, currentHour || 1]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showAnnouncementBox, setShowAnnouncementBox] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -55,11 +59,7 @@ const MDashboard = () => {
       animationDuration: "0.8s",
     },
   };
-  const taskLoading = useSelector(selectTasksLoading);
-  const taskError = useSelector(selectTasksError);
-  const togglePriority = () => {
-    setIsPriority(!isPriority);
-  };
+  
   // const togglePriority = () => {
   //   setIsPriority((prev) => !prev);
   //   setTaskData((prevData) => ({
@@ -395,6 +395,82 @@ const MDashboard = () => {
   const handleSnackbarClose = () => {
     setSnackbar({...snackbar, open: false});
   };
+
+  const announcements = useSelector(selectAllAnnouncements);
+  const announcementsLoading = useSelector(selectAnnouncementsLoading);
+  const announcementsError = useSelector(selectAnnouncementsError);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newAnnouncement, setNewAnnouncement] = useState({
+    title: "",
+    description: "",
+  });
+
+  const handleModalOpen = () => setIsModalOpen(true);
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setNewAnnouncement({title: "", description: ""});
+  };
+
+  useEffect(() => {
+    dispatch(fetchAnnouncements());
+  }, [dispatch]);
+  
+  const handleCreateAnnouncement = async (announcementData) => {
+    try {
+      await dispatch(createAnnouncement(announcementData)).unwrap();
+      setShowAnnouncementBox(false);
+      setSnackbar({
+        open: true,
+        message: "Announcement created successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error || "Failed to create announcement",
+        severity: "error",
+      });
+    }
+  };
+  
+  const handleViewAnnouncement = (announcement) => {
+    setSelectedAnnouncement(announcement);
+  };
+  
+  const handleViewClose = () => {
+    setSelectedAnnouncement(null);
+  };
+
+  
+
+  const handleDelete = async () => {
+    if (!selectedAnnouncement?.id) {
+      setSnackbar({
+        open: true,
+        message: "Invalid announcement ID",
+        severity: "error"
+      });
+      return;
+    }
+  
+    try {
+      await dispatch(deleteAnnouncement(selectedAnnouncement.id)).unwrap();
+      handleViewClose();
+      setSnackbar({
+        open: true,
+        message: "Announcement deleted successfully",
+        severity: "success"
+      });
+    } catch (error) {
+      console.error('Delete error:', error);
+      setSnackbar({
+        open: true,
+        message: error?.message || "Failed to delete announcement",
+        severity: "error"
+      });
+    }
+  };
+
 
 
 
@@ -788,7 +864,7 @@ const MDashboard = () => {
       </Dialog>
           <div className="bg-white rounded-lg shadow  w-full p-4">
             <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Announcements</h2>
-            <div className="space-y-4">
+            {/* <div className="space-y-4">
               <div className="border-b pb-2">
                 <h3 className="font-medium">Monthly Staff Meeting</h3>
                 <p className="text-sm text-gray-600">
@@ -807,7 +883,178 @@ const MDashboard = () => {
                   Scheduled for next weekend
                 </p>
               </div>
+            </div> */}
+            <div className="flex-1 overflow-y-auto mb-4">
+              {announcementsLoading ? (
+                <div className="space-y-4">
+                  <Skeleton
+                    variant="text"
+                    width="60%"
+                    height={24}
+                    {...skeletonProps}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height={60}
+                    {...skeletonProps}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height={60}
+                    {...skeletonProps}
+                  />
+                </div>
+              ) : announcementsError ? (
+                <div className="text-red-500 text-center mt-4">
+                  {announcementsError}
+                </div>
+              ) : (
+                <div className="overflow-scroll">
+                  {announcements.length > 0 ? (
+                    announcements.map((announcement) => (
+                      <div
+                        key={announcement._id}
+                        className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
+                        onClick={() => handleViewAnnouncement(announcement)}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-semibold text-lg">
+                            {announcement.title}
+                          </h3>
+                          <span className="text-sm text-gray-500">
+                            {new Date(announcement.created_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                        <p className="text-gray-600">
+                          {announcement.content}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex justify-center mt-20 h-full text-gray-500">
+                      No announcements available
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+            <div className="mt-auto">
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => setShowAnnouncementBox(true)}
+                sx={{
+                  backgroundColor: "#3A426F",
+                  "&:hover": {backgroundColor: "#3A426F"},
+                  borderRadius: "12px"
+                }}
+              >
+                Create Announcement 
+              </Button>
+            </div>
+
+            {showAnnouncementBox && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl w-full max-w-2xl mx-4">
+                  <CreateAnnouncementBox 
+                    onClose={() => setShowAnnouncementBox(false)}
+                    onSubmit={handleCreateAnnouncement}
+                    departments={departments}
+                  />
+                </div>
+              </div>
+            )}
+
+<Dialog
+  open={!!selectedAnnouncement}
+  onClose={handleViewClose}
+  maxWidth="sm"
+  fullWidth
+>
+  <div className="p-6">
+    <h2 className="text-xl font-semibold mb-4">
+      View Announcement
+    </h2>
+    <div className="space-y-4">
+      <TextField
+        label="Title"
+        fullWidth
+        value={selectedAnnouncement?.title || ""}
+        InputProps={{readOnly: true}}
+      />
+      <TextField
+        label="Description"
+        fullWidth
+        multiline
+        rows={4}
+        value={selectedAnnouncement?.description || ""}
+        InputProps={{readOnly: true}}
+      />
+      <div className="space-y-2">
+        <p className="text-sm text-gray-500">
+          <span className="font-medium">Department:</span> {selectedAnnouncement?.department}
+        </p>
+        <p className="text-sm text-gray-500">
+          <span className="font-medium">Urgency:</span> {selectedAnnouncement?.urgency}
+        </p>
+        <p className="text-sm text-gray-500">
+          <span className="font-medium">Created By:</span> {selectedAnnouncement?.assigned_by}
+        </p>
+        <p className="text-sm text-gray-500">
+          <span className="font-medium">Created At:</span> {' '}
+          {selectedAnnouncement?.created_at && 
+            new Date(selectedAnnouncement.created_at).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          }
+        </p>
+        <div className="text-sm text-gray-500">
+          <span className="font-medium">Assigned To:</span>
+          <ul className="list-disc pl-5 mt-1">
+            {selectedAnnouncement?.assigned_to.map((person, index) => (
+              <li key={index}>{person}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className="flex justify-end gap-2 mt-4">
+        <Button
+          onClick={handleDelete}
+          variant="contained"
+          sx={{
+            backgroundColor: "#dc2626",
+            "&:hover": {backgroundColor: "#b91c1c"},
+          }}
+        >
+          Delete
+        </Button>
+        <Button
+          onClick={handleViewClose}
+          variant="contained"
+          sx={{
+            backgroundColor: "#3A426F",
+            "&:hover": {backgroundColor: "#3A426F"},
+          }}
+        >
+          Close
+        </Button>
+      </div>
+    </div>
+  </div>
+</Dialog>
+
           </div>
           <div className="bg-white rounded-lg shadow lg:h-[29.5%] h-auto w-full p-4">
             <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Leave Management</h2>
