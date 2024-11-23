@@ -1,7 +1,7 @@
 import {useState, useEffect, React} from 'react'
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card, CardContent, Typography, Paper, Container , Box, Skeleton, Slider } from '@mui/material';
-
+import { LineChart } from '@mui/x-charts/LineChart';
 
 const SDashboard = () => {
   const tasks = [];
@@ -10,6 +10,15 @@ const SDashboard = () => {
     {}
   ]
 const announcements=[
+  {
+    id: 2,
+    title: "Fire Drill Reminder",
+    description: "A fire drill is scheduled for all staff next Monday at 10 AM.",
+    created_at: "2024-11-19T09:45:00.456789Z",
+    assigned_by: "manager@hotelxyz.com (Manager)",
+    department: "All",
+    urgency: "urgent",
+  },
   {
     id: 1,
         title: "System Maintenance",
@@ -24,15 +33,6 @@ const announcements=[
         urgency: "normal",
         // "hotel": "Hotel raj",
   },
-        {
-          id: 2,
-          title: "Fire Drill Reminder",
-          description: "A fire drill is scheduled for all staff next Monday at 10 AM.",
-          created_at: "2024-11-19T09:45:00.456789Z",
-          assigned_by: "manager@hotelxyz.com (Manager)",
-          department: "All",
-          urgency: "urgent",
-        },
         {
           id: 3,
           title: "Kitchen Staff Meeting",
@@ -69,16 +69,46 @@ const announcements=[
           department: "All",
           urgency: "normal",
   }
-]
+];
+
   const demoTasks = [
-    { date: "2024-11-17", tasksCompleted: 4, averageDuration: 25 },  // Sunday
-    { date: "2024-11-18", tasksCompleted: 10, averageDuration: 60 },  // Monday
-    { date: "2024-11-19", tasksCompleted: 12, averageDuration: 80 },  // Tuesday
-    { date: "2024-11-20", tasksCompleted: 5, averageDuration: 38 },  // Wednesday
-    { date: "2024-11-21", tasksCompleted: 12, averageDuration: 98 },  // Thursday
-    { date: "2024-11-22", tasksCompleted: 7, averageDuration: 88 }, // Friday
-    { date: "2024-11-23", tasksCompleted: 8, averageDuration: 51 }, // Saturday
+    { day: 0, tasksCompleted: 4, averageDuration: 29 },  // Sunday
+    { day: 1, tasksCompleted: 10, averageDuration: 60 },  // Monday
+    { day: 2, tasksCompleted: 12, averageDuration: 41 },  // Tuesday
+    { day: 3, tasksCompleted: 5, averageDuration: 83 },  // Wednesday
+    { day: 4, tasksCompleted: 12, averageDuration: 124 },  // Thursday
+    { day: 5, tasksCompleted: 7, averageDuration: 88 }, // Friday
+    { day: 6, tasksCompleted: 8, averageDuration: 51 }, // Saturday
   ];
+
+  const demoLeave=[
+    {
+      id:1,
+      leave_type:'Sic',
+      description:'Annual Leave Request for vacation plannig',
+      from_date:2024-11-20,
+      to_date:2024-11-24,
+    },
+    {
+      id:2,
+      leave_type:'Sick',
+      description:'Annual Leave Request for vacation plannig',
+      from_date:2024-11-20,
+      to_date:2024-11-23,
+    },
+    {
+      id:3,
+      leave_type:'Sick',
+      description:'Annual Leave Request for vacation plannig',
+      from_date:2024-11-25,
+      to_date:2024-11-30,
+    }
+  ]
+
+  // const days = demoTasks.map(task => task.day);
+const averageDurations = demoTasks.map(task => task.averageDuration);
+// console.log('days:', days);
+// console.log('averageDurations:', averageDurations);
   const totalDays = 300;
   const presentDays = 280;
   const absentDays = totalDays - presentDays;
@@ -157,36 +187,25 @@ const announcements=[
       
     }
   };
-    // const demoTasks = generateDemoTasks(); // Replace with real data when available
+  
   const [weekData, setWeekData] = useState([]);
   const [displayRange, setDisplayRange] = useState([0, 6]);
 
 
-  // const performanceData = [
-  //   { time: '00:00', value: 6 },
-  //   { time: '04:00', value: 4 },
-  //   { time: '08:00', value: 8 },
-  //   { time: '12:00', value: 9 },
-  //   { time: '16:00', value: 5 },
-  //   { time: '20:00', value: 0 },
-  //   { time: '24:00', value: 2 },
-  // ];
-
-
-  const PerformanceChart = ({ weekData }) => {
-    return (
-      <LineChart width={800} height={400} data={weekData}>
-        {/* <CartesianGrid strokeDasharray="3 3" /> */}
-        <XAxis dataKey="weekday" /> 
-        <YAxis
-          domain={[0, 10]} // Ensure y-axis is restricted between 0 and 10
-          ticks={[0, 2, 4, 6, 8, 10]} // Custom ticks
-        />
-        {/* <Tooltip /> */}
-        <Line dataKey="performance" stroke="#82ca9d" />
-      </LineChart>
-    );
-  };
+  // const PerformanceChart = ({ weekData }) => {
+  //   return (
+  //     <LineChart width={800} height={400} data={weekData}>
+        
+  //       <XAxis dataKey="weekday" /> 
+  //       <YAxis
+  //         domain={[0, 10]} 
+  //         ticks={[0, 2, 4, 6, 8, 10]} 
+  //       />
+  //       <Tooltip />
+  //       <Line dataKey="performance" stroke="#82ca9d" />
+  //     </LineChart>
+  //   );
+  // };
 
 
   useEffect(() => {
@@ -218,25 +237,28 @@ const announcements=[
 {/* First Column */}
 <div className="space-y-5">
 
-  <div className="bg-white w-full  scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
-  <Box sx={{ flex: "1 1 " }}>
-              <Card elevation={2}>
-                <CardContent>
-                  <h2 className="text-lg sm:text-xl font-semibold">Your Performance</h2>
-                  <Box sx={{ height: 300, pt: 2 }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PerformanceChart weekData={filteredData} />
-                    </ResponsiveContainer>
-                    <DateRangeSlider
-                      range={weekData.map((day) => day.weekday)} // Use weekday names
-                      displayRange={displayRange}
-                      onRangeChange={(newRange) => setDisplayRange(newRange)}
-                    />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Box>
+  <div className="bg-white w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
+  <h2 className="text-lg sm:text-xl font-semibold text-left">Your Performance</h2>
+  <LineChart
+       xAxis={demoTasks.day}
+       series={[{ data: averageDurations, 
+        showMark:false
+       }]} 
+      margin={{ top: 20, right: 20, bottom: 30, left: 40 }}
+                  sx={{
+                    ".MuiLineElement-root": {
+                      strokeWidth: 2, 
+                      stroke: '#4b59aa'
+                    },
+                    ".MuiHighlightElement-root": {
+      fill: "#4b59aa", // Set the color of the circle (e.g., red)
+      stroke: "#4b59aa", // Optional: set the border color if needed
+    },
 
+                  }}
+      // width={500}
+      height={340}
+    />
     </div>
     <div className="flex lg:flex-row flex-col gap-4">
       <div className="bg-white w-full  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
@@ -260,8 +282,8 @@ const announcements=[
                 nameKey="label"
                 cx="50%"
                 cy="50%"
-                outerRadius="70%"
-                innerRadius="49%"
+                outerRadius="80%"
+                innerRadius="55%"
                 paddingAngle={5}
                 labelLine={false}
               >
