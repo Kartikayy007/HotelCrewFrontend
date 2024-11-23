@@ -1,19 +1,37 @@
-import React, { useState, useEffect } from "react";
-import { PieChart } from "@mui/x-charts/PieChart";
-import { LineChart } from "@mui/x-charts/LineChart";
-import { BarChart } from "@mui/x-charts/BarChart";
+import React, {useState, useEffect} from "react";
+import {PieChart} from "@mui/x-charts/PieChart";
+import {LineChart} from "@mui/x-charts/LineChart";
+import {BarChart} from "@mui/x-charts/BarChart";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
-import { Dialog, TextField, Button, Snackbar, Alert, IconButton } from "@mui/material";
+import {
+  Dialog,
+  TextField,
+  Button,
+  Snackbar,
+  Alert,
+  IconButton,
+} from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAttendanceStats } from "../../../redux/slices/AdminAttendanceSlice";
-import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import { BsThreeDots } from "react-icons/bs";
-import { createTask, selectTasksLoading, selectTasksError } from "../../../redux/slices/TaskSlice";
+import {useDispatch, useSelector} from "react-redux";
+import {fetchAttendanceStats} from "../../../redux/slices/AdminAttendanceSlice";
+import {FaChevronUp, FaChevronDown} from "react-icons/fa";
+import {BsThreeDots} from "react-icons/bs";
+import {
+  createTask,
+  selectTasksLoading,
+  selectTasksError,
+} from "../../../redux/slices/TaskSlice";
 import AdminTaskAssignment from "./AdminTaskAssignment";
-import { CreateAnnouncementBox } from "../../reusable components/CreateAnnouncementBox";
-import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError,deleteAnnouncement } from '../../../redux/slices/AnnouncementSlice';
+import {CreateAnnouncementBox} from "../../reusable components/CreateAnnouncementBox";
+import {
+  createAnnouncement,
+  fetchAnnouncements,
+  selectAllAnnouncements,
+  selectAnnouncementsLoading,
+  selectAnnouncementsError,
+  deleteAnnouncement,
+} from "../../../redux/slices/AnnouncementSlice";
 
 function AdminDashboard() {
   const dispatch = useDispatch();
@@ -34,7 +52,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selected, setSelected] = useState({
-    label: "Select Department",
+    label: "Department",
     value: "",
   });
 
@@ -251,7 +269,7 @@ function AdminDashboard() {
   useEffect(() => {
     dispatch(fetchAnnouncements());
   }, [dispatch]);
-  
+
   const handleCreateAnnouncement = async (announcementData) => {
     try {
       await dispatch(createAnnouncement(announcementData)).unwrap();
@@ -269,41 +287,39 @@ function AdminDashboard() {
       });
     }
   };
-  
+
   const handleViewAnnouncement = (announcement) => {
     setSelectedAnnouncement(announcement);
   };
-  
+
   const handleViewClose = () => {
     setSelectedAnnouncement(null);
   };
-
-  
 
   const handleDelete = async () => {
     if (!selectedAnnouncement?.id) {
       setSnackbar({
         open: true,
         message: "Invalid announcement ID",
-        severity: "error"
+        severity: "error",
       });
       return;
     }
-  
+
     try {
       await dispatch(deleteAnnouncement(selectedAnnouncement.id)).unwrap();
       handleViewClose();
       setSnackbar({
         open: true,
         message: "Announcement deleted successfully",
-        severity: "success"
+        severity: "success",
       });
     } catch (error) {
-      console.error('Delete error:', error);
+      console.error("Delete error:", error);
       setSnackbar({
         open: true,
         message: error?.message || "Failed to delete announcement",
-        severity: "error"
+        severity: "error",
       });
     }
   };
@@ -344,7 +360,7 @@ function AdminDashboard() {
           title: taskTitle.trim(),
           description: taskDescription.trim(),
           department: selected.value,
-          priority: selectedPriority
+          priority: selectedPriority,
         })
       ).unwrap();
 
@@ -393,7 +409,7 @@ function AdminDashboard() {
         {greeting}
       </h1>
 
-      <div className="flex flex-col xl:flex-row justify-around">
+      <div className="flex flex-col xl:flex-row  justify-around">
         <div className="flex flex-col space-y-6 w-full xl:w-4/6">
           <div className="bg-white rounded-xl shadow-lg min-h-[320px] w-full p-4">
             <div className="mb-4">
@@ -592,12 +608,12 @@ function AdminDashboard() {
             </Box>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg min-h-[416px] w-full p-4">
+          <div className="bg-white rounded-xl shadow-lg flex-1 w-full p-4">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Staff Metrics (Hours {performanceRange[0]} - {performanceRange[1]}
               )
             </h2>
-            <Box sx={{width: "100%", mb: 4}}>
+            <Box sx={{width: "100%", mb: 4, mt: 5}}>
               {loading ? (
                 <Skeleton
                   variant="rectangular"
@@ -610,7 +626,7 @@ function AdminDashboard() {
                   xAxis={performanceData.xAxis}
                   series={performanceData.series}
                   height={250}
-                  margin={{top: 10, right: 20, bottom: 30, left: 40}}
+                  margin={{top: 5, right: 20, bottom: 30, left: 40}}
                 />
               )}
             </Box>
@@ -628,7 +644,7 @@ function AdminDashboard() {
           </div>
         </div>
 
-        <div className="flex flex-col space-y-6 w-full xl:w-[30%]">
+        <div className="flex flex-col space-y-6 w-full xl:w-[30%] mt-5 xl:mt-0">
           <div className="bg-white rounded-xl shadow-lg min-h-[416px] w-full p-4">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Staff Database
@@ -662,7 +678,7 @@ function AdminDashboard() {
             </Box>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg w-full p-4 flex flex-col h-[calc(40vh)] ">
+          <div className="bg-white rounded-xl shadow-lg w-full p-4 flex flex-col h-[40rem] xl:h-[calc(40vh)] ">
             <h2 className="text-lg sm:text-xl font-semibold mb-2">
               Announcements
             </h2>
@@ -706,18 +722,18 @@ function AdminDashboard() {
                             {announcement.title}
                           </h3>
                           <span className="text-sm text-gray-500">
-                            {new Date(announcement.created_at).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
+                            {new Date(
+                              announcement.created_at
+                            ).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
                             })}
                           </span>
                         </div>
-                        <p className="text-gray-600">
-                          {announcement.content}
-                        </p>
+                        <p className="text-gray-600">{announcement.content}</p>
                       </div>
                     ))
                   ) : (
@@ -736,17 +752,17 @@ function AdminDashboard() {
                 sx={{
                   backgroundColor: "#3A426F",
                   "&:hover": {backgroundColor: "#3A426F"},
-                  borderRadius: "12px"
+                  borderRadius: "12px",
                 }}
               >
-                Create Announcement 
+                Create Announcement
               </Button>
             </div>
 
             {showAnnouncementBox && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-xl w-full max-w-2xl mx-4">
-                  <CreateAnnouncementBox 
+                  <CreateAnnouncementBox
                     onClose={() => setShowAnnouncementBox(false)}
                     onSubmit={handleCreateAnnouncement}
                     departments={departments}
@@ -755,95 +771,99 @@ function AdminDashboard() {
               </div>
             )}
 
-<Dialog
-  open={!!selectedAnnouncement}
-  onClose={handleViewClose}
-  maxWidth="sm"
-  fullWidth
->
-  <div className="p-6">
-    <h2 className="text-xl font-semibold mb-4">
-      View Announcement
-    </h2>
-    <div className="space-y-4">
-      <TextField
-        label="Title"
-        fullWidth
-        value={selectedAnnouncement?.title || ""}
-        InputProps={{readOnly: true}}
-      />
-      <TextField
-        label="Description"
-        fullWidth
-        multiline
-        rows={4}
-        value={selectedAnnouncement?.description || ""}
-        InputProps={{readOnly: true}}
-      />
-      <div className="space-y-2">
-        <p className="text-sm text-gray-500">
-          <span className="font-medium">Department:</span> {selectedAnnouncement?.department}
-        </p>
-        <p className="text-sm text-gray-500">
-          <span className="font-medium">Urgency:</span> {selectedAnnouncement?.urgency}
-        </p>
-        <p className="text-sm text-gray-500">
-          <span className="font-medium">Created By:</span> {selectedAnnouncement?.assigned_by}
-        </p>
-        <p className="text-sm text-gray-500">
-          <span className="font-medium">Created At:</span> {' '}
-          {selectedAnnouncement?.created_at && 
-            new Date(selectedAnnouncement.created_at).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })
-          }
-        </p>
-        <div className="text-sm text-gray-500">
-          <span className="font-medium">Assigned To:</span>
-          <ul className="list-disc pl-5 mt-1">
-            {selectedAnnouncement?.assigned_to.map((person, index) => (
-              <li key={index}>{person}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <div className="flex justify-end gap-2 mt-4">
-        <Button
-          onClick={handleDelete}
-          variant="contained"
-          sx={{
-            backgroundColor: "#dc2626",
-            "&:hover": {backgroundColor: "#b91c1c"},
-          }}
-        >
-          Delete
-        </Button>
-        <Button
-          onClick={handleViewClose}
-          variant="contained"
-          sx={{
-            backgroundColor: "#3A426F",
-            "&:hover": {backgroundColor: "#3A426F"},
-          }}
-        >
-          Close
-        </Button>
-      </div>
-    </div>
-  </div>
-</Dialog>
-
-
+            <Dialog
+              open={!!selectedAnnouncement}
+              onClose={handleViewClose}
+              maxWidth="sm"
+              fullWidth
+            >
+              <div className="p-6">
+                <h2 className="text-xl font-semibold mb-4">
+                  View Announcement
+                </h2>
+                <div className="space-y-4">
+                  <TextField
+                    label="Title"
+                    fullWidth
+                    value={selectedAnnouncement?.title || ""}
+                    InputProps={{readOnly: true}}
+                  />
+                  <TextField
+                    label="Description"
+                    fullWidth
+                    multiline
+                    rows={4}
+                    value={selectedAnnouncement?.description || ""}
+                    InputProps={{readOnly: true}}
+                  />
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Department:</span>{" "}
+                      {selectedAnnouncement?.department}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Urgency:</span>{" "}
+                      {selectedAnnouncement?.urgency}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Created By:</span>{" "}
+                      {selectedAnnouncement?.assigned_by}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Created At:</span>{" "}
+                      {selectedAnnouncement?.created_at &&
+                        new Date(
+                          selectedAnnouncement.created_at
+                        ).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                    </p>
+                    <div className="text-sm text-gray-500">
+                      <span className="font-medium">Assigned To:</span>
+                      <ul className="list-disc pl-5 mt-1">
+                        {selectedAnnouncement?.assigned_to.map(
+                          (person, index) => (
+                            <li key={index}>{person}</li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 mt-4">
+                    <Button
+                      onClick={handleDelete}
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "#dc2626",
+                        "&:hover": {backgroundColor: "#b91c1c"},
+                      }}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      onClick={handleViewClose}
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "#3A426F",
+                        "&:hover": {backgroundColor: "#3A426F"},
+                      }}
+                    >
+                      Close
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Dialog>
           </div>
           <form
             onSubmit={handleAssign}
-            className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg flex-1"
+            className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg lg:flex-1"
           >
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-2 ">
               <h2 className="text-lg sm:text-xl font-semibold">Assign Task</h2>
               <IconButton
                 onClick={handleShowTaskAssignment}
@@ -861,89 +881,95 @@ function AdminDashboard() {
               onChange={(e) => setTaskTitle(e.target.value)}
               className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
             />
-          <div className="flex justify-between">
-            <div className="relative w-48">
-              <button
-                type="button"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
-                  selected.value ? "text-black" : "text-gray-400"
-                } focus:outline-none flex justify-between items-center`}
-              >
-                {selected.label}
-                {isDropdownOpen ? (
-                  <FaChevronUp className="text-gray-600" />
-                ) : (
-                  <FaChevronDown className="text-gray-600" />
-                )}
-              </button>
+            <div className="flex justify-between gap-4">
+              <div className="relative w-full">
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                    selected.value ? "text-black" : "text-gray-400"
+                  } focus:outline-none flex justify-between items-center`}
+                >
+                  {selected.label}
+                  {isDropdownOpen ? (
+                    <FaChevronUp className="text-gray-600" />
+                  ) : (
+                    <FaChevronDown className="text-gray-600" />
+                  )}
+                </button>
 
-              {isDropdownOpen && (
-                <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                  {departments.map((dept, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleSelect(dept)}
-                      disabled={dept.disabled}
-                      className={`w-full text-left px-4 py-2 ${
-                        dept.disabled
-                          ? "text-gray-400 cursor-default"
-                          : "text-black hover:bg-gray-100"
-                      }`}
-                    >
-                      {dept.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="relative w-40">
-              <button
-                type="button" 
-                onClick={() => setPriorityDropdownOpen(!isPriorityDropdownOpen)}
-                className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
-                  selectedPriority ? "text-black" : "text-gray-400"
-                } focus:outline-none flex justify-between items-center`}
-              >
-                {selectedPriority || "Select Priority"}
-                {isPriorityDropdownOpen ? (
-                  <FaChevronUp className="text-gray-600" />
-                ) : (
-                  <FaChevronDown className="text-gray-600" />
+                {isDropdownOpen && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+                    {departments.map((dept, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleSelect(dept)}
+                        disabled={dept.disabled}
+                        className={`w-full text-left px-4 py-2 ${
+                          dept.disabled
+                            ? "text-gray-400 cursor-default"
+                            : "text-black hover:bg-gray-100"
+                        }`}
+                      >
+                        {dept.label}
+                      </button>
+                    ))}
+                  </div>
                 )}
-              </button>
+              </div>
+              <div className="relative w-full">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setPriorityDropdownOpen(!isPriorityDropdownOpen)
+                  }
+                  className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                    selectedPriority ? "text-black" : "text-gray-400"
+                  } focus:outline-none flex justify-between  items-center`}
+                >
+                  {selectedPriority || "Select Priority"}
+                  {isPriorityDropdownOpen ? (
+                    <FaChevronUp className="text-gray-600" />
+                  ) : (
+                    <FaChevronDown className="text-gray-600" />
+                  )}
+                </button>
 
-              {isPriorityDropdownOpen && (
-                <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                  {["High", "Medium", "Low"].map((priority) => (
-                    <button
-                      key={priority}
-                      type="button"
-                      onClick={() => {
-                        setSelectedPriority(priority);
-                        setPriorityDropdownOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                    >
-                      <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                        priority === "High" ? "bg-red-500" : 
-                        priority === "Medium" ? "bg-yellow-500" : 
-                        "bg-green-500"
-                      }`}></span>
-                      {priority}
-                    </button>
-                  ))}
-                </div>
-              )}
+                {isPriorityDropdownOpen && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+                    {["High", "Medium", "Low"].map((priority) => (
+                      <button
+                        key={priority}
+                        type="button"
+                        onClick={() => {
+                          setSelectedPriority(priority);
+                          setPriorityDropdownOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                      >
+                        <span
+                          className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                            priority === "High"
+                              ? "bg-red-500"
+                              : priority === "Medium"
+                              ? "bg-yellow-500"
+                              : "bg-green-500"
+                          }`}
+                        ></span>
+                        {priority}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-            </div>   
             <textarea
               value={taskDescription}
               onChange={(e) => setTaskDescription(e.target.value)}
               placeholder="Task Description"
               maxLength={350}
-              className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 h-[120px] resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+              className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-[120px] h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
             />
             <div className="flex justify-end">
               <button

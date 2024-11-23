@@ -100,7 +100,7 @@ function CustomerDB() {
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <section className="max-w-full mx-auto bg-white rounded-lg shadow-lg">
+      <section className="w-full bg-white rounded-lg shadow-lg ">
         <div className="max-h-[calc(100vh-260px)] overflow-auto">
           <table className="w-full rounded-tr-lg overflow-hidden">
             <thead className="sticky top-0 bg-white z-10">

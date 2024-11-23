@@ -40,7 +40,7 @@ const AdminSidebar = ({ onMenuItemClick }) => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#252941] text-white lg:hidden"
+        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#252941] text-white 2xl:hidden"
         aria-label="Toggle menu"
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -48,7 +48,7 @@ const AdminSidebar = ({ onMenuItemClick }) => {
 
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-30 2xl:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -56,10 +56,10 @@ const AdminSidebar = ({ onMenuItemClick }) => {
       <nav
         className={`
           fixed top-0 left-0 h-full z-40
-          lg:sticky lg:top-0 lg:left-0
+          2xl:sticky 2xl:top-0 2xl:left-0
           w-64 bg-[#252941] text-white flex flex-col
           transform transition-transform duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          ${isOpen ? 'translate-x-0' : '-translate-x-full 2xl:translate-x-0'}
         `}
       >
         <div className="flex flex-col items-center py-8 space-y-4">

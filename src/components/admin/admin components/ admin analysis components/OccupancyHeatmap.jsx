@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HeatMapGrid } from 'react-grid-heatmap';
-import { 
-  Menu, 
-  MenuItem, 
-  Typography, 
-  Box,
-  Tooltip 
-} from '@mui/material';
+import { Menu, MenuItem, Typography, Box, Tooltip, useTheme, useMediaQuery } from '@mui/material';
 
 function HotelOccupancyHeatmap() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+
   const currentDate = new Date();
   const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
   const weekLabels =  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -72,15 +70,37 @@ function HotelOccupancyHeatmap() {
     );
   };
 
+  const getCellDimensions = () => {
+    if (isMobile) return "2.5rem";
+    if (isTablet) return "3rem";
+    return "4rem";
+  };
+
+  const getFontSize = () => {
+    if (isMobile) return "0.75rem";
+    if (isTablet) return "0.875rem";
+    return "1rem";
+  };
+
   return (
     <Box sx={{ 
       width: '100%',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      padding: '0px'
+      padding: { xs: '0.5rem', sm: '1rem', md: '1.5rem' }
     }}>
-      <Box sx={{ maxWidth: '1000px', width: '100%' }}>
+      <Box sx={{ 
+        width: '100%',
+        overflowX: 'auto',
+        '&::-webkit-scrollbar': {
+          height: '8px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: 'rgba(0,0,0,.2)',
+          borderRadius: '4px',
+        }
+      }}>
         <HeatMapGrid
           data={occupancyData}
           xLabels={dayLabels}
@@ -91,51 +111,39 @@ function HotelOccupancyHeatmap() {
             
             return (
               <Tooltip 
-                title={`Date: ${cellDate.toDateString()}
-                Occupancy: ${value}%`}
+                title={`Date: ${cellDate.toDateString()}\nOccupancy: ${value}%`}
                 arrow
               >
                 <div style={{ 
-                  color: value > 80 ? 'white' : 'black',
-                  fontSize: '0rem',
                   width: '100%',
                   height: '100%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
-                }}>
-                  {}%
-                </div>
+                }} />
               </Tooltip>
             );
           }}
           xLabelsStyle={() => ({
-            color: "#777",
-            fontSize: "0",
-            textTransform: "uppercase"
+            display: 'none'
           })}
           yLabelsStyle={() => ({
-            fontSize: "1rem",
-            paddingBottom: "1.5rem",
-            color: "black",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center"
+            fontSize: getFontSize(),
+            paddingBottom: { xs: '0.5rem', sm: '1rem', md: '1.5rem' },
+            color: 'black',
+            whiteSpace: 'nowrap'
           })}
           cellStyle={(_x, _y, ratio) => ({
             background: ratio === 0 
-                ? 'rgba(62, 72, 112, 0.1)' 
-                : `rgba(62, 72, 112, ${ratio})`,
+              ? 'rgba(62, 72, 112, 0.1)' 
+              : `rgba(62, 72, 112, ${ratio})`,
             width: "85%",
-            borderRadius: "14px", 
-            height: "75%", 
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            height: "75%",
+            borderRadius: { xs: '8px', sm: '10px', md: '14px' },
             cursor: 'pointer',
-            margin: "10px", 
-        })}
-          cellHeight="4rem"
+            margin: { xs: '4px', sm: '6px', md: '10px' },
+          })}
+          cellHeight={getCellDimensions()}
           xLabelsPos="top"
           yLabelsPos="center"
           onClick={handleCellClick}
