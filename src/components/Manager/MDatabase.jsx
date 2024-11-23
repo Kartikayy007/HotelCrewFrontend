@@ -1,6 +1,5 @@
 import React from 'react'
-import { useState } from 'react';
-import DataBase from '../reusable components/Database';
+import DataBase from '../reusable components/DataBase';
 const MDatabase = () => {
   // const [selected, setSelected] = useState('staff');
   return (

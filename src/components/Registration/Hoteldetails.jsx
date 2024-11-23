@@ -44,7 +44,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
   };
 
   const inputClass = (value) =>
-    `h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+    `h-8 w-full lg:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
       !value && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
     } focus:border-purple-500`;
 
@@ -87,7 +87,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
             <h1 className="text-[32px] font-semibold hidden lg:block lg:text-left">Hotel Information</h1>
           </div>
 
-          <div>
+          <div >
             <label
               htmlFor="hotel-name"
               className="block text-sm font-sans font-semibold"
@@ -95,6 +95,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               Hotel Name*
             </label>
             <input
+            
               type="text"
               id="hotel-name"
               value={hotelName}

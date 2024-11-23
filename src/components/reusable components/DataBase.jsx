@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {useState, useRef, useEffect} from "react";
 import StaffDB from "./DB components/StaffDB";
 import CustomerDB from "./DB components/CustomerDB";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import {Search, ChevronLeft, ChevronRight} from "lucide-react";
 
 function DataBase() {
   const [activeComponent, setActiveComponent] = React.useState("StaffDB");
@@ -9,10 +9,9 @@ function DataBase() {
   const [showRightArrow, setShowRightArrow] = useState(true);
   const scrollContainerRef = useRef(null);
 
-  // Check scroll position to show/hide arrows
   const checkScroll = () => {
     if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      const {scrollLeft, scrollWidth, clientWidth} = scrollContainerRef.current;
       setShowLeftArrow(scrollLeft > 0);
       setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
     }
@@ -21,10 +20,9 @@ function DataBase() {
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', checkScroll);
-      // Initial check
+      scrollContainer.addEventListener("scroll", checkScroll);
       checkScroll();
-      return () => scrollContainer.removeEventListener('scroll', checkScroll);
+      return () => scrollContainer.removeEventListener("scroll", checkScroll);
     }
   }, []);
 
@@ -32,15 +30,15 @@ function DataBase() {
     if (scrollContainerRef.current) {
       const scrollAmount = 200;
       scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
       });
     }
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
-      <div className="w-[95vw] sm:w-[95vw] md:w-[95vw] lg:w-[75vw] xl:w-[80vw]">
+    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+      <div className="w-[95vw] sm:w-[95vw] md:w-[95vw] lg:w-[95vw] xl:w-[95vw] 2xl:w-[80vw]">
         <div>
           <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12 text-[#252941] mb-2">
             Database
@@ -48,21 +46,23 @@ function DataBase() {
         </div>
         <div className="filters flex justify-start md:justify-center mb-5">
           <div className="filter-buttons flex flex-col lg:flex-row gap-2 items-center w-full max-w-7xl">
-            <h1 className="text-2xl font-medium space-nowrap text-start lg:block hidden">Filters</h1>
-            
+            <h1 className="text-2xl font-medium space-nowrap text-start lg:block hidden">
+              Filters
+            </h1>
+
             <div className="flex-1 w-full mx-8 relative">
               {showLeftArrow && (
-                <button 
+                <button
                   className="absolute left-0 top-1/2 -translate-y-1/2 z-10 lg:hidden bg-white/80 rounded-full shadow-md p-1 hover:bg-white"
-                  onClick={() => scroll('left')}
+                  onClick={() => scroll("left")}
                 >
                   <ChevronLeft className="w-5 h-5 text-[#5663AC]" />
                 </button>
               )}
 
-              <div 
+              <div
                 ref={scrollContainerRef}
-                className="scroll-container flex gap-2 overflow-x-auto hide-scrollbar w-full" 
+                className="scroll-container flex gap-2 overflow-x-auto hide-scrollbar w-full"
               >
                 {activeComponent === "StaffDB" && (
                   <>
@@ -84,19 +84,6 @@ function DataBase() {
                       <option value="Morning">Day Shift</option>
                       <option value="Night">Night Shift</option>
                     </select>
-                    <select className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2 ">
-                      <option value="All">Performance</option>
-                      <option value="1">1 stars & up</option>
-                      <option value="2">2 stars & up</option>
-                      <option value="3">3 stars & up</option>
-                      <option value="4">4 stars & up</option>
-                      <option value="5">5 stars & up</option>
-                      <option value="6">6 stars & up</option>
-                      <option value="7">7 stars & up</option>
-                      <option value="8">8 stars & up</option>
-                      <option value="9">9 stars & up</option>
-                      <option value="10">10</option>
-                    </select>
                   </>
                 )}
                 {activeComponent === "CustomerDB" && (
@@ -105,44 +92,27 @@ function DataBase() {
                       <option value="All">Customer Type</option>
                       <option value="Regular">Regular</option>
                       <option value="VIP">VIP</option>
-                      <option value="New">New</option>
                     </select>
                     <select className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full border-2 mr-2 ">
                       <option value="All">Booking Status</option>
-                      <option value="Confirmed">Active</option>
-                      <option value="Pending">Upcoming</option>
-                      <option value="Cancelled">Completed</option>
-                    </select>
-                    <select className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full border-2 mr-2 ">
-                      <option value="All">Stay Duration</option>
-                      <option value="1-3">1-3 days</option>
-                      <option value="4-7">4-7 days</option>
-                      <option value="8-14">8-14 days</option>
-                      <option value="15+">15+ days</option>
-                    </select>
-                    <select className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2 ">
-                      <option value="All">Feedback Rating</option>
-                      <option value="1">1 star & up</option>
-                      <option value="2">2 stars & up</option>
-                      <option value="3">3 stars & up</option>
-                      <option value="4">4 stars & up</option>
-                      <option value="5">5 stars & up</option>
+                      <option value="Confirmed">Active Customer</option>
+                      <option value="past">Past Customer</option>
                     </select>
                   </>
                 )}
               </div>
 
               {showRightArrow && (
-                <button 
+                <button
                   className="absolute right-0 top-1/2 -translate-y-1/2 z-10 lg:hidden bg-white/80 rounded-full shadow-md p-1 hover:bg-white"
-                  onClick={() => scroll('right')}
+                  onClick={() => scroll("right")}
                 >
                   <ChevronRight className="w-5 h-5 text-[#5663AC]" />
                 </button>
               )}
             </div>
 
-            <div className="relative w-full md:w-full lg:w-2/6">
+            <div className="relative lg:w-2/6 w-full">
               <input
                 type="text"
                 placeholder="Search..."
@@ -153,7 +123,7 @@ function DataBase() {
           </div>
         </div>
 
-        <div className="flex flex-col ">
+        <div className="flex flex-col">
           <div>
             <button
               className={`${
@@ -176,10 +146,9 @@ function DataBase() {
               Customer
             </button>
           </div>
-        <div>
-          
-        {activeComponent === "StaffDB" ? <StaffDB /> : <CustomerDB />}
-        </div>
+          <div>
+            {activeComponent === "StaffDB" ? <StaffDB /> : <CustomerDB />}
+          </div>
         </div>
       </div>
     </section>

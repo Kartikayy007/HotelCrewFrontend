@@ -106,7 +106,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="complete-address"
               value={completeAddress}
               onChange={(e) => setCompleteAddress(e.target.value)}
-              className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+              className={`placeholder:text-base h-8 w-full lg:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                 !completeAddress && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder="Enter full address"
@@ -127,7 +127,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
                 id="main-phone"
                 value={mainPhoneNumber}
                 onChange={(e) => handleNumberInput(e, setMainPhoneNumber)}
-                className={`h-8 w-full lg:w-[299px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+                className={`placeholder:text-base h-8 w-full lg:w-[299px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                   !mainPhoneNumber && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                 } focus:border-purple-500`}
                 placeholder="Main number"
@@ -140,7 +140,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="emergency-phone"
               value={emergencyPhoneNumber}
               onChange={(e) => handleNumberInput(e, setEmergencyPhoneNumber)}
-              className={`h-8 w-1/2 lg:w-[299px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+              className={` placeholder:text-base h-8 w-1/2 lg:w-[299px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                 !emergencyPhoneNumber && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500 lg:ml-4`}
               placeholder="Emergency number"
@@ -160,7 +160,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="hotel-email"
               value={emailAddress}
               onChange={(e) => setEmailAddress(e.target.value)}
-              className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+              className={`placeholder:text-base h-8 w-full lg:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                 !emailAddress && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder="hotel@example.com"

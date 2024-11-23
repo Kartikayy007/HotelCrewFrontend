@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Trash2 } from "lucide-react";
 import plus from '/tabler_plus.svg';
 import hotelIcon from '/property.svg';
@@ -13,16 +13,15 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
   const [error, setError] = useState("");
   const roomRefs = useRef([]);
 
-
   useEffect(() => {
     if (initialData) {
       const initialRoomTypes =
         initialData.room_types && initialData.room_types.length > 0
           ? initialData.room_types
           : [
-              { type: "", count: "" },
-              { type: "", count: "" },
-              { type: "", count: "" },
+              { type: "", count: "", price: "" },
+              { type: "", count: "", price: "" },
+              { type: "", count: "", price: "" },
             ];
       setRoomTypes(initialRoomTypes);
 
@@ -34,7 +33,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
   }, [initialData]);
 
   const handleAddRoomType = () => {
-    setRoomTypes([...roomTypes, { type: "", count: "" }]);
+    setRoomTypes([...roomTypes, { type: "", count: "", price: "" }]);
     setError("");
   };
 
@@ -58,17 +57,16 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
 
   const handleNextClick = (e) => {
     e.preventDefault();
-    
-    if (!numberOfRooms || !numberOfFloors || roomTypes.some(room => !room.type || !room.count)) {
+  
+    if (!numberOfRooms || !numberOfFloors || roomTypes.some(room => !room.type || !room.count || !room.price)) {
       setError("Please fill out all required fields.");
-      const emptyRoomIndex = roomTypes.findIndex(room => !room.type || !room.count);
-    if (emptyRoomIndex !== -1 && roomRefs.current[emptyRoomIndex]) {
-      // Scroll to the first empty field
-      roomRefs.current[emptyRoomIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+      const emptyRoomIndex = roomTypes.findIndex(room => !room.type || !room.count || !room.price);
+      if (emptyRoomIndex !== -1 && roomRefs.current[emptyRoomIndex]) {
+        roomRefs.current[emptyRoomIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }  
-    
+  
     updateFormData(
       {
         total_number_of_rooms: numberOfRooms,
@@ -79,10 +77,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
       },
       4
     );
-    
+  
     onNext();
   };
-
+  
   const handleBackClick = () => {
     updateFormData(
       {
@@ -94,7 +92,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
       },
       4
     );
-
+  
     onBack();
   };
 
@@ -149,7 +147,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               id="number-of-rooms"
               value={numberOfRooms}
               onChange={(e) => handleNumberInput(e, setNumberOfRooms)}
-              className={`h-8 w-full lg:w-[623px] py-2 px-4 text-xs border rounded-[4px] focus:outline-none ${
+              className={`placeholder:text-base h-8 w-full lg:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                 !numberOfRooms && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
@@ -181,7 +179,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                   className="flex items-center gap-4">
                     <input
                       type="text"
-                      className={`h-8 w-[142px] lg:w-[299px] py-2 lg:px-4 px-2 text-xs border rounded-[4px] focus:outline-none ${
+                      className={`placeholder:text-base h-8 w-[142px] lg:w-[200px] py-2 lg:px-4 px-2 text-xl border rounded-[4px] focus:outline-none ${
                         !room.type && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
                       placeholder="Types of Rooms"
@@ -192,7 +190,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                     />
                     <input
                       type="text"
-                      className={`h-8 w-[120px] lg:w-[260px] py-2 px-2 lg:px-4 text-xs border rounded-[4px] focus:outline-none ${
+                      className={`placeholder:text-base h-8 w-[120px] lg:w-[180px] py-2 px-2 lg:px-4 text-xl border rounded-[4px] focus:outline-none ${
                         !room.count && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
                       placeholder="Number of Rooms"
@@ -200,6 +198,19 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                       onChange={(e) =>
                         handleNumberInput(e, (value) =>
                           handleRoomTypeChange(index, "count", value)
+                        )
+                      }
+                    />
+                    <input
+                      type="text"
+                      className={`placeholder:text-base h-8 w-[120px] lg:w-[160px] py-2 px-2 lg:px-4 text-xl border rounded-[4px] focus:outline-none ${
+                        !room.price && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
+                      } focus:border-purple-500`}
+                      placeholder="Price of Room"
+                      value={room.price}
+                      onChange={(e) =>
+                        handleNumberInput(e, (value) =>
+                          handleRoomTypeChange(index, "price", value)
                         )
                       }
                     />
@@ -229,7 +240,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               id="number-of-floors"
               value={numberOfFloors}
               onChange={(e) => handleNumberInput(e, setNumberOfFloors)}
-              className={`h-8 w-full lg:w-[623px] py-2 text-xs px-4 border rounded-[4px] focus:outline-none ${
+              className={`h-8 w-full lg:w-[623px] py-2 text-xl px-4 border rounded-[4px] focus:outline-none ${
                 !numberOfFloors && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />

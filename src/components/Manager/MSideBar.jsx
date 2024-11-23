@@ -15,7 +15,9 @@ const MSideBar = ({ onMenuItemClick }) => {
     const [image, setImage] = useState('/profile.png');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
+        console.log(isSidebarOpen)
+        setIsSidebarOpen(prevState => !prevState);
+
     }
 
     const handleImageUpload = (event) => {

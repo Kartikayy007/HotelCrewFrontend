@@ -114,8 +114,7 @@ const Verify = ({email}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
 
     if (!passwordRegex.test(password)) {
       setErrorMessage("Invalid password format");

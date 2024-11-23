@@ -15,7 +15,8 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center">
+
+    <><div className="min-h-screen bg-white flex flex-col items-center">
       <header className="w-full bg-[#5663AC] text-white py-4 flex justify-between items-center px-4">
         <h1 className="text-2xl font-bold">{role} Dashboard</h1>
         <button
@@ -31,6 +32,7 @@ const Home = () => {
         </h2>
       </div>
     </div>
+    </>
   );
 };
 
