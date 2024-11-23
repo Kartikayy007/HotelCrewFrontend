@@ -20,9 +20,9 @@ useEffect(() => {
 }, []);
   return (
     <section className=" h-screen py-2 mr-1 px-0 font-Montserrat">
-      <div className='h-[10%] bg-[#e6efe9] opacity-100  top-3'>
+      
       <h2 className="text-[#252941] text-3xl  my-3 pl-12 ml-5 font-semibold">Profile</h2>
-      </div>
+
       {loading ? (
       <Skeleton variant="rectangular" width="100%" height="85%" sx={{ backgroundColor: 'white', margin:"16px", paddingRight:"16px"}} />
     ) : (
