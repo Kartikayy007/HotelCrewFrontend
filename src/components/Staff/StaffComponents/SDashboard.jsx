@@ -84,31 +84,37 @@ const announcements=[
   const demoLeave=[
     {
       id:1,
-      leave_type:'Sic',
+      leave_type:'Sick',
       description:'Annual Leave Request for vacation plannig',
-      from_date:2024-11-20,
-      to_date:2024-11-24,
+      from_date:"2024-11-20",
+      to_date:"2024-11-24",
+      created_at:"2024-11-15",
+      status:"Pending"
+
     },
     {
       id:2,
       leave_type:'Sick',
       description:'Annual Leave Request for vacation plannig',
-      from_date:2024-11-20,
-      to_date:2024-11-23,
+      from_date:"2024-11-20",
+      to_date:"2024-11-23",
+      created_at:"2024-11-15",
+      status:"Pending"
     },
     {
       id:3,
       leave_type:'Sick',
       description:'Annual Leave Request for vacation plannig',
-      from_date:2024-11-25,
-      to_date:2024-11-30,
+      from_date:"2024-11-25",
+      to_date:"2024-11-30",
+      created_at:"2024-11-15",
+      status:"Pending"
     }
   ]
 
-  // const days = demoTasks.map(task => task.day);
+  
 const averageDurations = demoTasks.map(task => task.averageDuration);
-// console.log('days:', days);
-// console.log('averageDurations:', averageDurations);
+
   const totalDays = 300;
   const presentDays = 280;
   const absentDays = totalDays - presentDays;
@@ -118,65 +124,8 @@ const averageDurations = demoTasks.map(task => task.averageDuration);
     { name:"Absent", value: absentDays, label: "Absent", color: " #A1B7FF" },
     
   ];
-  const processTaskData = (tasks) => {
-    const today = new Date();
-    const oneDay = 24 * 60 * 60 * 1000;
   
-    // Initializing weekData with days of the week
-    const weekData = Array(7)
-      .fill(0)
-      .map((_, i) => {
-        const date = new Date(today - (6 - i) * oneDay);
-        const weekday = date.toLocaleString("en-US", { weekday: "short" }); // Get day as 'Sat', 'Sun', etc.
-        return {
-          date: date.toISOString().split("T")[0],
-          weekday,
-          tasksCompleted: 0,
-          averageDuration: 0,
-          performance: 0,
-        };
-      });
-  
-    // Simulate or process tasks as per the demo data
-    tasks.forEach((task) => {
-      const createdDate = task.date; // Assume task.date is already in 'YYYY-MM-DD' format
-      const dayData = weekData.find((day) => day.date === createdDate);
-  
-      if (dayData) {
-        dayData.tasksCompleted += task.tasksCompleted;
-  
-        // Calculate average duration for tasks on that day
-        dayData.averageDuration = 
-          (dayData.averageDuration * (dayData.tasksCompleted - task.tasksCompleted) + task.averageDuration * task.tasksCompleted) 
-          / dayData.tasksCompleted;
-  
-        // Calculate performance (as you mentioned, this could be a function of average duration)
-        dayData.performance = Math.min(10, Math.max(0, 10 - dayData.averageDuration / 5));
-      }
-    });
-    console.log(weekData)  ;
 
-    return weekData;
-  };
-
-  const DateRangeSlider = ({ range, displayRange, onRangeChange }) => {
-    const marks = range.map((day, index) => ({ value: index, label: day }));
-  
-    return (
-      <div style={{ marginTop: "20px" }}>
-        <Slider
-          value={displayRange} // Bind slider to state
-          onChange={(_, newRange) => onRangeChange(newRange)} // Update range on change
-          valueLabelDisplay="auto"
-          valueLabelFormat={(value) => range[value]} // Show weekday label on hover
-          min={0}
-          max={range.length - 1}
-          marks={marks}
-          step={1}
-        />
-      </div>
-    );
-  };
   
   const getUrgencyClass = (urgency) => {
     switch (urgency) {
@@ -188,54 +137,14 @@ const averageDurations = demoTasks.map(task => task.averageDuration);
     }
   };
   
-  const [weekData, setWeekData] = useState([]);
-  const [displayRange, setDisplayRange] = useState([0, 6]);
-
-
-  // const PerformanceChart = ({ weekData }) => {
-  //   return (
-  //     <LineChart width={800} height={400} data={weekData}>
-        
-  //       <XAxis dataKey="weekday" /> 
-  //       <YAxis
-  //         domain={[0, 10]} 
-  //         ticks={[0, 2, 4, 6, 8, 10]} 
-  //       />
-  //       <Tooltip />
-  //       <Line dataKey="performance" stroke="#82ca9d" />
-  //     </LineChart>
-  //   );
-  // };
-
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const currentDate = new Date().toISOString().split("T")[0];
-      const lastDateInRange = weekData[weekData.length - 1].date;
-      if (currentDate !== lastDateInRange) {
-        setWeekData(processTaskData(tasks));
-      }
-    }, 24 * 60 * 60 * 1000); // Check daily
-  
-    return () => clearInterval(interval);
-  }, [weekData, tasks]);
-
-
-  useEffect(() => {
-    const processedData = processTaskData(demoTasks); // Pass the demoTasks array
-    setWeekData(processedData);
-  }, []);
-  
-
-  const filteredData = weekData.slice(displayRange[0], displayRange[1] + 1);
-
+ 
   return (
-    <section className=" h-screen py-2 mx-4 px-0 font-Montserrat">
-            <h2 className="text-[#252941] text-3xl  my-3 pl-12 ml-5 font-semibold">Dashboard</h2>
-            <div className="grid grid-cols-1 xl:grid-cols-[70%,30%] gap-5 p-3 ">
+    <section className=" h-screen py-2 mx-4 px-0 font-Montserrat ">
+            <h2 className="text-[#252941] text-3xl  my-3 pl-8 ml-5 font-semibold">Dashboard</h2>
+            <div className="grid grid-cols-1 h-full xl:grid-cols-[70%,30%] gap-5 p-3 ">
 
 {/* First Column */}
-<div className="space-y-5">
+<div className="space-y-5 h-full">
 
   <div className="bg-white w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
   <h2 className="text-lg sm:text-xl font-semibold text-left">Your Performance</h2>
@@ -315,18 +224,34 @@ const averageDurations = demoTasks.map(task => task.averageDuration);
       
           <h2 className="text-lg sm:text-xl font-semibold mb-2 text-center">Attendance : {AttendanceData[0].value}/{totalDays}</h2>
     </div>
-    <div className="bg-white w-full  scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
-    <h2 className="text-lg sm:text-xl font-semibold">Leave Request Status</h2>
-    <Box sx={{ flex: '1 1 300px' }}>
+    <div className="bg-white w-full h-[315px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
+    <h2 className="text-lg sm:text-xl font-semibold mb-3">Leave Request Status</h2>
+    <div className='h-[80%] my-2 overflow-y-auto flex flex-col scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent'>
+      {demoLeave.map((leave)=>{
+         const fromDate = new Date(leave.from_date);
+         const toDate = new Date(leave.to_date);
+         const durationInMillis = toDate - fromDate;
+         const durationInDays = durationInMillis / (1000 * 3600 * 24) + 1;
+        return(
+          <div  key={leave.id} className='bg-[#e6efe9] font-sans my-4 p-3 rounded-lg flex flex-col '>
+                 {/* <p className="text-md text-gray-500">{leave.created_at}</p> */}
+                 <p className="text-md ">{leave.description}</p>
+                 <p className="text-md text-gray-500">Type: {leave.leave_type}</p>
+                 <p className="text-md text-gray-500">Date: {leave.from_date} to {leave.to_date}</p>
+                 <p className="text-md text-gray-500 font-semibold">Status: {leave.status} </p>
+                 </div>
+        )
+      })}
             
-          </Box>
+    </div>
+         
     </div>
     </div>
     </div>
     <div className="space-y-5 h-[725px]  ">
             <div className='bg-white w-full mb-4 h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow'>
-            <h2 className="text-lg sm:text-xl font-semibold text-left mb-2">Announcements</h2>
-            <div className='h-[90%] mb-4 overflow-y-auto flex flex-col scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent'>
+            <h2 className="text-lg sm:text-xl font-semibold text-left mt-3 mb-4">Announcements</h2>
+            <div className='h-[90%] my-4 overflow-y-auto flex flex-col scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent'>
             {announcements.map((announcement) => {
         // Format the created_at date
         const createdDate = new Date(announcement.created_at);
@@ -345,7 +270,7 @@ const averageDurations = demoTasks.map(task => task.averageDuration);
                  <h2 className="text-lg font-semibold text-gray-800">{announcement.title}</h2>
             <p className="text-gray-600 mt-2">{announcement.description}</p>
             <p className="text-sm text-gray-500 mt-1">
-              <strong>Created At:</strong> {formattedDate} At {formattedTime}
+              <strong>Created At:</strong> {formattedDate}  {formattedTime}
             </p>
             <p className="text-sm text-gray-500">
               <strong>Assigned By:</strong> {announcement.assigned_by}
