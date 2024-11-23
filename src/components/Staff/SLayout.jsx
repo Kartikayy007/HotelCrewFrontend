@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import React from 'react';
-import { setCurrentComponent } from "../../redux/slices/ManagerSlice";
-import SSidebar from './StaffComponents/SSideBar';
+import { setCurrentComponent } from "../../redux/slices/StaffSlice";
+import SSidebar from './StaffComponents/SSidebar'
 import SDashboard from './StaffComponents/SDashboard'
 import STask from './StaffComponents/STask';
 import SSchedule from './StaffComponents/SSchedule';
@@ -17,19 +17,17 @@ const SLayout = () => {
         STask: <STask />,
         
     };
-    const currentComponent = useSelector((state) => state.manager.currentComponent);
+    const currentComponent = useSelector((state) => state.staff.currentComponent);
 
     const handleMenuItemClick = (component) => {
-        dispatch(setCurrentComponent(component)); // Update the Redux state
+        dispatch(setCurrentComponent(component)); 
     };
 
     return (
         <div className="flex h-screen">
             <SSidebar onMenuItemClick={handleMenuItemClick} />
             <div className="flex-1 bg-[#e6eef9] overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-thumb-rounded-full scrollbar-track-gray-100">
-                {/* {currentComponent
-                    ? React.createElement(currentComponent)
-                    : <div>Component not found</div>} */}
+                
                     {componentMap[currentComponent] || <div>Component not found</div>}
             </div>
         </div>
