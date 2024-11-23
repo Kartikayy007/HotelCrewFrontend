@@ -5,30 +5,7 @@ import { Bell } from 'lucide-react';
 
 
 
-const CircularProgressWithLabel = ({ value }) => {
-  return (
-    <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-      <svg viewBox="0 0 36 36" width="120" height="120">
-        <path
-          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-          fill="none"
-          stroke="#e0e0e0"
-          strokeWidth="3"
-        />
-        <path
-          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-          fill="none"
-          stroke="#1976d2"
-          strokeWidth="3"
-          strokeDasharray={`${value}, 100`}
-        />
-        <text x="18" y="20.35" fontSize="8" textAnchor="middle" fill="#1976d2">
-          {value}%
-        </text>
-      </svg>
-    </Box>
-  );
-};
+
 
 const SSchedule = () => {
   return (

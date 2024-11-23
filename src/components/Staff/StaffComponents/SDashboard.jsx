@@ -1,7 +1,7 @@
 import {useState, useEffect, React} from 'react'
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { Card, CardContent, Typography, Paper, Container } from '@mui/material';
-import { Box, Skeleton, Slider } from "@mui/material";
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
+import { Card, CardContent, Typography, Paper, Container , Box, Skeleton, Slider } from '@mui/material';
+
 
 const SDashboard = () => {
   const tasks = [];
@@ -17,7 +17,15 @@ const SDashboard = () => {
     { date: "2024-11-22", tasksCompleted: 7, averageDuration: 88 }, // Friday
     { date: "2024-11-23", tasksCompleted: 8, averageDuration: 51 }, // Saturday
   ];
-   
+  const totalDays = 300;
+  const presentDays = 280;
+  const absentDays = totalDays - presentDays;
+  const presentPercentage=((presentDays/totalDays)*100).toFixed(2);
+  const AttendanceData = [
+    { name:"Present" ,value: presentDays, label: "Present", color: "#2A2AA9" },
+    { name:"Absent", value: absentDays, label: "Absent", color: " #A1B7FF" },
+    
+  ];
   const processTaskData = (tasks) => {
     const today = new Date();
     const oneDay = 24 * 60 * 60 * 1000;
@@ -131,21 +139,21 @@ const SDashboard = () => {
   
 
   const filteredData = weekData.slice(displayRange[0], displayRange[1] + 1);
-  
+
   return (
-    <section className=" h-screen py-2 mr-1 px-0 font-Montserrat">
+    <section className=" h-screen py-2 mx-4 px-0 font-Montserrat">
             <h2 className="text-[#252941] text-3xl  my-3 pl-12 ml-5 font-semibold">Dashboard</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-[70%,30%] gap-5 p-3">
+            <div className="grid grid-cols-1 lg:grid-cols-[70%,30%] gap-5 p-3 ">
 
 {/* First Column */}
 <div className="space-y-5">
 
   <div className="bg-white w-full  scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
   <Box sx={{ flex: "1 1 " }}>
-              <Card elevation={0}>
+              <Card elevation={2}>
                 <CardContent>
                   <h2 className="text-lg sm:text-xl font-semibold">Your Performance</h2>
-                  <Box sx={{ height: 800, pt: 2 }}>
+                  <Box sx={{ height: 300, pt: 2 }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <PerformanceChart weekData={filteredData} />
                     </ResponsiveContainer>
@@ -159,6 +167,67 @@ const SDashboard = () => {
               </Card>
             </Box>
 
+    </div>
+    <div className="flex lg:flex-row flex-col gap-4">
+      <div className="bg-white w-full  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
+            position: 'relative', 
+          }}
+        >
+          <h2 className="text-lg sm:text-xl font-semibold">Your Attendance</h2>
+
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={AttendanceData}
+                dataKey="value"
+                nameKey="label"
+                cx="50%"
+                cy="50%"
+                outerRadius="70%"
+                innerRadius="50%"
+                paddingAngle={5}
+                labelLine={false}
+              >
+                {AttendanceData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+
+          
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '55%',
+              left: '51%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 1000, // Ensure it's on top of the Pie chart
+            }}
+          >
+            <h2 className="text-[28px]  font-semibold">
+              {`${presentPercentage}%`}
+              </h2>
+            
+          </Box>
+        </Box>
+     
+      
+          <h2 className="text-lg sm:text-xl font-semibold mb-2 text-center">Attendance : {AttendanceData[0].value}/{totalDays}</h2>
+    </div>
+    <div className="bg-white w-full  scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
+    <Box sx={{ flex: '1 1 300px' }}>
+    <h2 className="text-lg sm:text-xl font-semibold">Leave Request Status</h2>
+    
+          </Box>
+    </div>
     </div>
     </div>
     </div>
