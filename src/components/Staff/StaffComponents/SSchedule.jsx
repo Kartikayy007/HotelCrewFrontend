@@ -52,22 +52,7 @@ const SSchedule = () => {
           </Box>
 
           {/* Attendance Section */}
-          <Box sx={{ flex: '1 1 300px' }}>
-            <Card elevation={2}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Attendance
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 2 }}>
-                  <CircularProgressWithLabel value={86} />
-                  <Box sx={{ ml: 3 }}>
-                    <Typography color="text.secondary">Attendance:</Typography>
-                    <Typography variant="h5">120/300</Typography>
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          </Box>
+          
 
           {/* Leave Request Section */}
           <Box sx={{ flex: '1 1 600px' }}>

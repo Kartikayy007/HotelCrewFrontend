@@ -6,8 +6,70 @@ import { Card, CardContent, Typography, Paper, Container , Box, Skeleton, Slider
 const SDashboard = () => {
   const tasks = [];
   const today = new Date();
-
-
+  const leave=[
+    {}
+  ]
+const announcements=[
+  {
+    id: 1,
+        title: "System Maintenance",
+        description: "The system will be under maintenance tomorrow.",
+        created_at: "2024-11-18T21:14:23.162456Z",
+        // "assigned_to": [
+        //     "kfbwidfciwen544@jncnsd.com (Staff) (kitchen) (night)",
+        //     "bjkhjbbjb@gmail.com (Staff) (maintenance) (evening)"
+        // ],
+        assigned_by: "cawifon795@cpaurl.com (Admin)",
+        department: "All",
+        urgency: "normal",
+        // "hotel": "Hotel raj",
+  },
+        {
+          id: 2,
+          title: "Fire Drill Reminder",
+          description: "A fire drill is scheduled for all staff next Monday at 10 AM.",
+          created_at: "2024-11-19T09:45:00.456789Z",
+          assigned_by: "manager@hotelxyz.com (Manager)",
+          department: "All",
+          urgency: "urgent",
+        },
+        {
+          id: 3,
+          title: "Kitchen Staff Meeting",
+          description: "Kitchen staff meeting at 4 PM in the main conference room.",
+          created_at: "2024-11-20T14:30:12.897654Z",
+          assigned_by: "chef@hotelxyz.com (Manager)",
+          department: "Kitchen",
+          urgency: "normal",
+        },
+        {
+          id: 4,
+          title: "Guest Complaint Follow-Up",
+          description: "A guest complaint requires immediate attention by the reception staff.",
+          created_at: "2024-11-21T11:00:32.456123Z",
+          assigned_by: "reception@hotelxyz.com ( Reception)",
+          department: "Reception",
+          urgency: "urgent",
+        },
+        {
+          id: 5,
+          title: "Inventory Check",
+          description: "Please ensure all inventory lists are updated by end of day.",
+          created_at: "2024-11-22T17:10:45.123789Z",
+          assigned_by: "stockmanager@hotelxyz.com (Manager)",
+          department: "Maintenance",
+          urgency: "urgent",
+        },
+        {
+          id: 6,
+          title: "New Policy Update",
+          description: "A new policy regarding overtime has been published. Please review.",
+          created_at: "2024-11-23T10:05:15.654321Z",
+          assigned_by: "hr@hotelxyz.com (Manager)",
+          department: "All",
+          urgency: "normal",
+  }
+]
   const demoTasks = [
     { date: "2024-11-17", tasksCompleted: 4, averageDuration: 25 },  // Sunday
     { date: "2024-11-18", tasksCompleted: 10, averageDuration: 60 },  // Monday
@@ -86,7 +148,15 @@ const SDashboard = () => {
     );
   };
   
-  
+  const getUrgencyClass = (urgency) => {
+    switch (urgency) {
+      case "urgent":
+        return "text-red-500 uppercase font-semibold";
+      case "normal":
+        return "hidden";
+      
+    }
+  };
     // const demoTasks = generateDemoTasks(); // Replace with real data when available
   const [weekData, setWeekData] = useState([]);
   const [displayRange, setDisplayRange] = useState([0, 6]);
@@ -143,7 +213,7 @@ const SDashboard = () => {
   return (
     <section className=" h-screen py-2 mx-4 px-0 font-Montserrat">
             <h2 className="text-[#252941] text-3xl  my-3 pl-12 ml-5 font-semibold">Dashboard</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-[70%,30%] gap-5 p-3 ">
+            <div className="grid grid-cols-1 xl:grid-cols-[70%,30%] gap-5 p-3 ">
 
 {/* First Column */}
 <div className="space-y-5">
@@ -170,6 +240,7 @@ const SDashboard = () => {
     </div>
     <div className="flex lg:flex-row flex-col gap-4">
       <div className="bg-white w-full  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
+      <h2 className="text-lg sm:text-xl font-semibold text-left">Your Attendance</h2>
         <Box
           sx={{
             display: 'flex',
@@ -179,9 +250,9 @@ const SDashboard = () => {
             position: 'relative', 
           }}
         >
-          <h2 className="text-lg sm:text-xl font-semibold">Your Attendance</h2>
+         
 
-          <ResponsiveContainer width="100%" height={250}>
+          <ResponsiveContainer width="100%" height={230}>
             <PieChart>
               <Pie
                 data={AttendanceData}
@@ -190,7 +261,7 @@ const SDashboard = () => {
                 cx="50%"
                 cy="50%"
                 outerRadius="70%"
-                innerRadius="50%"
+                innerRadius="49%"
                 paddingAngle={5}
                 labelLine={false}
               >
@@ -206,13 +277,13 @@ const SDashboard = () => {
           <Box
             sx={{
               position: 'absolute',
-              top: '55%',
+              top: '50%',
               left: '51%',
               transform: 'translate(-50%, -50%)',
-              zIndex: 1000, // Ensure it's on top of the Pie chart
+               // Ensure it's on top of the Pie chart
             }}
           >
-            <h2 className="text-[28px]  font-semibold">
+            <h2 className="text-[28px] mt-0  font-semibold">
               {`${presentPercentage}%`}
               </h2>
             
@@ -223,12 +294,51 @@ const SDashboard = () => {
           <h2 className="text-lg sm:text-xl font-semibold mb-2 text-center">Attendance : {AttendanceData[0].value}/{totalDays}</h2>
     </div>
     <div className="bg-white w-full  scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
-    <Box sx={{ flex: '1 1 300px' }}>
     <h2 className="text-lg sm:text-xl font-semibold">Leave Request Status</h2>
-    
+    <Box sx={{ flex: '1 1 300px' }}>
+            
           </Box>
     </div>
     </div>
+    </div>
+    <div className="space-y-5 h-[725px]  ">
+            <div className='bg-white w-full mb-4 h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow'>
+            <h2 className="text-lg sm:text-xl font-semibold text-left mb-2">Announcements</h2>
+            <div className='h-[90%] mb-4 overflow-y-auto flex flex-col scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent'>
+            {announcements.map((announcement) => {
+        // Format the created_at date
+        const createdDate = new Date(announcement.created_at);
+        const formattedDate = createdDate.toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+        const formattedTime = createdDate.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+        return (
+              <div  key={announcement.id} className='bg-[#e6efe9] my-4 p-3 rounded-lg flex flex-col '>
+                 <h2 className="text-lg font-semibold text-gray-800">{announcement.title}</h2>
+            <p className="text-gray-600 mt-2">{announcement.description}</p>
+            <p className="text-sm text-gray-500 mt-1">
+              <strong>Created At:</strong> {formattedDate} At {formattedTime}
+            </p>
+            <p className="text-sm text-gray-500">
+              <strong>Assigned By:</strong> {announcement.assigned_by}
+            </p>
+            <p className="text-sm text-gray-500">
+              <strong>Department:</strong> {announcement.department}
+            </p>
+            <p className={`text-sm mt-3 ${getUrgencyClass(announcement.urgency)}`}>
+              {announcement.urgency}
+            </p>
+              </div>
+            )
+          })}
+            </div>
+            </div>
     </div>
     </div>
     </section>
