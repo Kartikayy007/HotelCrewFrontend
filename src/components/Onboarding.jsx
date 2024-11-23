@@ -3,7 +3,7 @@ import Features from "./Features";
 import RevealLinks from "./RevealLinks";
 import {Link} from "react-router-dom";
 import {Menu, X} from "lucide-react";
-import Preloading from "./reusable components/Preloading";
+import Preloading from "./common/Preloading";
 import {gsap} from "gsap";
 import {ScrollTrigger} from "gsap/ScrollTrigger";
 

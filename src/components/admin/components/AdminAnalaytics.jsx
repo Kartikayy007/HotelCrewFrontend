@@ -24,8 +24,7 @@ import {
   Legend as ChartLegend,
 } from "chart.js";
 import {TrendingUp, TrendingDown, Menu, X} from "lucide-react";
-import OccupancyHeatmap from "./ admin analysis components/OccupancyHeatmap";
-import AdminAttendanceList from "../admin components/ admin analysis components/AdminAttendanceList";
+import AdminAttendanceList from "./analysis/AdminAttendanceList";
 
 ChartJS.register(
   RadialLinearScale,

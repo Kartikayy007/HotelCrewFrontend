@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import AdminDashboard from '../../components/admin/admin components/AdminDashboard';
+import AdminDashboard from '../../components/admin/components/AdminDashboard';
 
 const adminSlice = createSlice({
   name: 'admin',

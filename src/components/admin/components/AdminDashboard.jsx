@@ -23,7 +23,7 @@ import {
   selectTasksError,
 } from "../../../redux/slices/TaskSlice";
 import AdminTaskAssignment from "./AdminTaskAssignment";
-import {CreateAnnouncementBox} from "../../reusable components/CreateAnnouncementBox";
+import {CreateAnnouncementBox} from "../../common/CreateAnnouncementBox";
 import {
   createAnnouncement,
   fetchAnnouncements,

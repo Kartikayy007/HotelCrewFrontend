@@ -15,7 +15,6 @@ import {
 } from "chart.js";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import OccupancyHeatmap from '../reusable components/Occupancy'
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 
@@ -392,7 +391,6 @@ const MAnalytics = () => {
           <div className="bg-white rounded-lg shadow-lg p-4  h-[45rem]">
             <h3 className="text-lg font-semibold">Occupancy Heatmap</h3>
             <div className="h-48 w-full mt-6">
-            <OccupancyHeatmap />
             
             </div>
           </div>

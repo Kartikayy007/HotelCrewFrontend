@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import AdminSidebar from './admin components/AdminSidebar';
+import AdminSidebar from './components/AdminSidebar';
 import { setActiveComponent } from '../../redux/slices/AdminSlice';
 
 const Admin = () => {

@@ -11,7 +11,7 @@ import {
   Calendar
 } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
-import DataBase from '../../reusable components/DataBase';
+import DataBase from '../../common/DataBase';
 import AdminPayRoll from './AdminPayRoll';
 import AdminAnalaytics from './AdminAnalaytics';
 import AdminLeaveManagment from './AdminLeaveManagment';

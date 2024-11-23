@@ -1,6 +1,6 @@
 import React, {useState, useRef, useEffect} from "react";
-import StaffDB from "./DB components/StaffDB";
-import CustomerDB from "./DB components/CustomerDB";
+import StaffDB from "./DB/StaffDB";
+import CustomerDB from "./DB/CustomerDB";
 import {Search, ChevronLeft, ChevronRight} from "lucide-react";
 
 function DataBase() {

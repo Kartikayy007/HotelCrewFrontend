@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BsThreeDots } from "react-icons/bs";
 import { fetchAttendanceStats } from '../../redux/slices/AttendanceSlice';
 import { Dialog, TextField, Button, Snackbar, Alert, IconButton } from "@mui/material";
-import { CreateAnnouncementBox } from "../reusable components/CreateAnnouncementBox";
+import { CreateAnnouncementBox } from "../common/CreateAnnouncementBox";
 import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError, deleteAnnouncement } from '../../redux/slices/AnnouncementSlice';
 import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";

@@ -1,5 +1,5 @@
 import React from 'react'
-import AttendanceDashboard from "../reusable components/AttendanceDashboard"
+import AttendanceDashboard from "../common/AttendanceDashboard";  
 const MAttendance = () => {
   return (
     <AttendanceDashboard />
