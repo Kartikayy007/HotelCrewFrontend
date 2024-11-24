@@ -132,6 +132,36 @@ const sampleTasks: Task[] = [
     description: "Regular security rounds",
     assignedBy: "Head of Security",
     lastUpdated: "2:30 PM"
+  },
+  {
+    id: 4,
+    title: "Lobby Security Check",
+    department: "Security",
+    status: "in-progress",
+    deadline: "3:00 PM",
+    description: "Regular security rounds",
+    assignedBy: "Head of Security",
+    lastUpdated: "2:30 PM"
+  },
+  {
+    id: 4,
+    title: "Lobby Security Check",
+    department: "Security",
+    status: "in-progress",
+    deadline: "3:00 PM",
+    description: "Regular security rounds",
+    assignedBy: "Head of Security",
+    lastUpdated: "2:30 PM"
+  },
+  {
+    id: 4,
+    title: "Lobby Security Check",
+    department: "Security",
+    status: "in-progress",
+    deadline: "3:00 PM",
+    description: "Regular security rounds",
+    assignedBy: "Head of Security",
+    lastUpdated: "2:30 PM"
   }
 ];
 
@@ -170,45 +200,51 @@ const TaskAssignment: React.FC = () => {
 
   return (
     <div className="w-full px-4 md:px-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-[1400px] mx-auto gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-[1400px] mx-auto gap-4 h-[calc(100vh-140px)]">
         {/* Pending Column */}
-        <div className="bg-[#FFFFFF] border-[#BDBDBD] rounded-xl h-[60vh] lg:h-[87vh] overflow-y-auto shadow-lg">
-          <h2 className="text-base md:text-lg font-semibold -mt-4 sticky top-0 p-4 md:p-6 bg-[#FFFFFF] border-[#BDBDBD] flex items-center">
+        <div className="bg-[#FFFFFF] border-[#BDBDBD] rounded-xl shadow-lg flex flex-col max-h-full">
+          <h2 className="text-base md:text-lg font-semibold sticky top-0 p-4 md:p-6 bg-[#FFFFFF] border-b border-[#BDBDBD] flex items-center z-10">
             <div className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-full bg-yellow-400 mr-2"></div>
             Pending
           </h2>
-          <div className="space-y-3 md:space-y-4 p-3 md:p-4">
-            {tasks.filter(task => task.status === 'pending').map((task, index) => (
-              <TaskCard key={`pending-${index}`} task={task} />
-            ))}
+          <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+            <div className="space-y-3 md:space-y-4 p-3 md:p-4">
+              {tasks.filter(task => task.status === 'pending').map((task, index) => (
+                <TaskCard key={`pending-${index}`} task={task} />
+              ))}
+            </div>
           </div>
         </div>
 
         {/* In Progress and Completed Column */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4 max-h-[calc(100vh-65px)]">
           {/* In Progress */}
-          <div className="bg-[#FFFFFF] border-[#BDBDBD] rounded-xl h-[45vh] lg:h-[42vh] overflow-y-auto shadow-lg">
-            <h2 className="text-base md:text-lg font-semibold -mt-4 sticky top-0 p-4 md:p-6 bg-[#FFFFFF] border-[#BDBDBD] flex items-center">
+          <div className="flex-1 bg-[#FFFFFF] border-[#BDBDBD] rounded-xl shadow-lg flex flex-col overflow-hidden">
+            <h2 className="text-base md:text-lg font-semibold sticky top-0 p-4 md:p-6 bg-[#FFFFFF] border-b border-[#BDBDBD] flex items-center z-10">
               <div className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-full bg-blue-400 mr-2"></div>
               In Progress
             </h2>
-            <div className="space-y-3 md:space-y-4 p-3 md:p-4">
-              {tasks.filter(task => task.status === 'in-progress').map((task, index) => (
-                <TaskCard key={`progress-${index}`} task={task} />
-              ))}
+            <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+              <div className="space-y-3 md:space-y-4 p-3 md:p-4">
+                {tasks.filter(task => task.status === 'in-progress').map((task, index) => (
+                  <TaskCard key={`progress-${index}`} task={task} />
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Completed */}
-          <div className="bg-[#FFFFFF] border-[#BDBDBD] rounded-xl h-[45vh] lg:h-[43vh] overflow-y-auto shadow-lg">
-            <h2 className="text-base md:text-lg font-semibold -mt-4 sticky top-0 p-4 md:p-6 bg-[#FFFFFF] border-[#BDBDBD] flex items-center">
+          <div className="flex-1 bg-[#FFFFFF] border-[#BDBDBD] rounded-xl shadow-lg flex flex-col overflow-hidden">
+            <h2 className="text-base md:text-lg font-semibold sticky top-0 p-4 md:p-6 bg-[#FFFFFF] border-b border-[#BDBDBD] flex items-center z-10">
               <div className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-full bg-green-400 mr-2"></div>
               Completed
             </h2>
-            <div className="space-y-3 md:space-y-4 p-3 md:p-4">
-              {tasks.filter(task => task.status === 'completed').map((task, index) => (
-                <TaskCard key={`completed-${index}`} task={task} />
-              ))}
+            <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+              <div className="space-y-3 md:space-y-4 p-3 md:p-4">
+                {tasks.filter(task => task.status === 'completed').map((task, index) => (
+                  <TaskCard key={`completed-${index}`} task={task} />
+                ))}
+              </div>
             </div>
           </div>
         </div>

@@ -38,9 +38,9 @@ const GuestRequest: React.FC = () => {
   });
 
   const taskStats = {
-    ongoing: 8,   
-    completed: 12, 
-    total: 20   
+    ongoing: 8,
+    completed: 12,
+    total: 20
   };
 
   const completionPercentage = 60;
@@ -116,7 +116,7 @@ const GuestRequest: React.FC = () => {
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] h-screen w-full overflow-scroll p-2 sm:p-4">
       <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
         Guest Request
       </h1>
@@ -127,7 +127,7 @@ const GuestRequest: React.FC = () => {
 
         <div className='flex xl:flex-col lg:flex-row flex-col gap-4 xl:w-2/6 h-full xl:mr-12 xl:p-0 p-6 '>
 
-          <form onSubmit={handleAssign} className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg w-full h-full">
+          <form onSubmit={handleAssign} className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg w-full ">
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-lg sm:text-xl font-semibold">Assign Task</h2>
             </div>
@@ -223,12 +223,12 @@ const GuestRequest: React.FC = () => {
             </div>
           </form>
 
-          <div className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg w-full xl:h-[28.7vh]">
+          <div className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg w-full ">
             <h2 className="text-lg sm:text-xl font-semibold">
               Task Progress
             </h2>
             <div className="flex justify-center items-center gap-12">
-              <div className="relative w-48 h-full">
+              <div className="relative w-48">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-2xl -mt-8 font-bold">{completionPercentage}%</span>
                 </div>
