@@ -1,8 +1,8 @@
-import { useState, React, useRef } from 'react'
+import { useState, React, useRef,useEffect } from 'react'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaChevronDown, FaChevronUp, FaPaperclip, FaCalendarAlt } from "react-icons/fa";
-import { Snackbar, Alert } from "@mui/material";
+import { Snackbar,Skeleton, Alert } from "@mui/material";
 
 const SSchedule = () => {
   const [isStartDropdownOpen, setIsStartDropdownOpen] = useState(false);
@@ -13,8 +13,22 @@ const SSchedule = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const fileInputRef = useRef(null);
   const [fileName, setFileName] = useState("");
-
+  const [loading,setLoading]=useState(true);
   const today = new Date();
+
+  useEffect(() => {
+    setTimeout(() => {
+
+      setLoading(false);
+    }, 1500);
+
+  }, []);
+  const skeletonProps = {
+    animation: "wave",
+    sx: {
+      animationDuration: "0.8s",
+    },
+  };
 
   const toggleStartDropdown = () => {
     setIsStartDropdownOpen((prev) => !prev);
@@ -58,9 +72,15 @@ const SSchedule = () => {
         setSelectedFile(file);
         setSnackbar({ open: true, message: "File uploaded successfully.", severity: "success" });
         setFileName(file.name);
+        setTimeout(() => {
+          handleCloseSnackbar(); // Close snackbar after 3 seconds
+        }, 3000);
       } else {
         setSnackbar({ open: true, message: "Invalid file type. Please upload a PDF, JPG, or PNG file.", severity: "error" });
         event.target.value = ""; // Clear the input
+        setTimeout(() => {
+          handleCloseSnackbar(); // Close snackbar after 3 seconds
+        }, 3000);
       }
     }
   };
@@ -104,15 +124,34 @@ const SSchedule = () => {
         <div className="space-y-5 xl:w-[40%]">
           <div className="bg-white w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 text-left">Shift Schedule</h2>
+            {loading ? (
+              <div className='ml-4 mb-2'>
+                <Skeleton variant="rectangular"
+                  width="95%"
+                  height={100}
+                  {...skeletonProps}
+                />
+              </div>
+            ) : (
             <div className='text-md text-[#47518C] font-semibold mb-2'>
               <p className='capitalize'>{shifts[0]}</p>
               <p className=''>Time: {shiftTime(shifts[0])}</p>
             </div>
+            )}
           </div>
 
           <div className="bg-white w-full h-[70%] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 text-left">Attendance</h2>
             <div className='h-[90%] mb-4 overflow-y-scroll rounded-lg'>
+            {loading ? (
+              <div className='ml-4 mb-2'>
+                <Skeleton variant="rectangular"
+                  width="95%"
+                  height={600}
+                  {...skeletonProps}
+                />
+              </div>
+            ) : (
               <table className="w-[96%]   px-1 mx-auto border border-[#dcdcdc] rounded-2xl shadow  ">
                 {/* Table Headers */}
                 <thead>
@@ -150,12 +189,22 @@ const SSchedule = () => {
                   ))}
                 </tbody>
               </table>
+            )}
             </div>
           </div>
         </div>
         <div className='space-y-5 xl:w-[35%]'>
           <div className="bg-white w-full xl:h-[85%] h-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 text-left">Leave Request</h2>
+            {loading ? (
+              <div className='ml-4 mb-2'>
+                <Skeleton variant="rectangular"
+                  width="95%"
+                  height={670}
+                  {...skeletonProps}
+                />
+              </div>
+            ) : (
             <div >
 
               <form className='mt-10 h-full flex flex-col gap-3' >
@@ -303,6 +352,7 @@ const SSchedule = () => {
                 </div>
               </form>
             </div>
+            )}
           </div>
         </div>
       </div>
