@@ -1,4 +1,3 @@
-// store.js
 import { configureStore } from '@reduxjs/toolkit'
 import UserReducer from './slices/UserSlice.jsx'
 import OtpReducer from './slices/OtpSlice'
@@ -8,6 +7,7 @@ import ManagerReducer from './slices/ManagerSlice.jsx'
 import AdminAttendanceSlice from './slices/AdminAttendanceSlice'
 import taskReducer from './slices/TaskSlice'
 import announcementReducer from './slices/AnnouncementSlice'
+import staffReducer from "./slices/StaffSlice";
 
 const store = configureStore({
   reducer: {
@@ -18,7 +18,8 @@ const store = configureStore({
     reception: receptionReducer,
     attendance: AdminAttendanceSlice,
     tasks: taskReducer,
-    announcements: announcementReducer
+    announcements: announcementReducer,
+    staff: staffReducer,
   },
 })
 

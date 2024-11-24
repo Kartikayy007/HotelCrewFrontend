@@ -8,19 +8,16 @@ interface RoomSelection {
 }
 
 const Dashboard = () => {
-  // Data for Task Progress
   const taskData = [
     { name: 'Completed', value: 79 },
     { name: 'Remaining', value: 21 }
   ];
 
-  // Data for Attendance
   const attendanceData = [
     { name: 'Present', value: 86 },
     { name: 'Absent', value: 14 }
   ];
 
-  // Recent customers data
   const recentCustomers = [
     { profile: 'Arjun Gupta', checkIn: '29/11/24', checkOut: '-----', duration: '-----', room: '406', status: 'VIP' },
     { profile: 'Shreya Rai', checkIn: '26/11/24', checkOut: '-----', duration: '-----', room: '203', status: 'Regular' },

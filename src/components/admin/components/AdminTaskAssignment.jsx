@@ -1,127 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Clock, Check, X } from 'lucide-react';
-
-const sampleTasks = [
-  {
-    id: 1,
-    title: "Clean Room 203",
-    department: "Housekeeping",
-    status: "pending",
-    deadline: "2:00 PM",
-    description: "Deep cleaning required for VIP guest",
-    assignedBy: "John Manager",
-    lastUpdated: "11:00 AM"
-  },
-  {
-    id: 2,
-    title: "Fix AC Unit",
-    department: "Maintenance",
-    status: "in-progress",
-    deadline: "4:00 PM",
-    description: "AC not cooling in room 405",
-    assignedBy: "Sarah Supervisor",
-    lastUpdated: "1:30 PM"
-  },
-  {
-    id: 3,
-    title: "Prepare Dinner Setup",
-    department: "Kitchen",
-    status: "completed",
-    deadline: "6:00 PM",
-    completedAt: "5:45 PM",
-    description: "Evening dinner service preparation",
-    assignedBy: "Chef Michael",
-    lastUpdated: "5:45 PM"
-  },
-  {
-    id: 3,
-    title: "Prepare Dinner Setup",
-    department: "Kitchen",
-    status: "completed",
-    deadline: "6:00 PM",
-    completedAt: "5:45 PM",
-    description: "Evening dinner service preparation",
-    assignedBy: "Chef Michael",
-    lastUpdated: "5:45 PM"
-  },
-  {
-    id: 3,
-    title: "Prepare Dinner Setup",
-    department: "Kitchen",
-    status: "completed",
-    deadline: "6:00 PM",
-    completedAt: "5:45 PM",
-    description: "Evening dinner service preparation",
-    assignedBy: "Chef Michael",
-    lastUpdated: "5:45 PM"
-  },
-  {
-    id: 3,
-    title: "Prepare Dinner Setup",
-    department: "Kitchen",
-    status: "completed",
-    deadline: "6:00 PM",
-    completedAt: "5:45 PM",
-    description: "Evening dinner service preparation",
-    assignedBy: "Chef Michael",
-    lastUpdated: "5:45 PM"
-  },
-  {
-    id: 3,
-    title: "Prepare Dinner Setup",
-    department: "Kitchen",
-    status: "completed",
-    deadline: "6:00 PM",
-    completedAt: "5:45 PM",
-    description: "Evening dinner service preparation",
-    assignedBy: "Chef Michael",
-    lastUpdated: "5:45 PM"
-  },
-  {
-    id: 3,
-    title: "Prepare Dinner Setup",
-    department: "Kitchen",
-    status: "completed",
-    deadline: "6:00 PM",
-    completedAt: "5:45 PM",
-    description: "Evening dinner service preparation",
-    assignedBy: "Chef Michael",
-    lastUpdated: "5:45 PM"
-  },
-  {
-    id: 3,
-    title: "Prepare Dinner Setup",
-    department: "Kitchen",
-    status: "completed",
-    deadline: "6:00 PM",
-    completedAt: "5:45 PM",
-    description: "Evening dinner service preparation",
-    assignedBy: "Chef Michael",
-    lastUpdated: "5:45 PM"
-  },
-  {
-    id: 3,
-    title: "Prepare Dinner Setup",
-    department: "Kitchen",
-    status: "completed",
-    deadline: "6:00 PM",
-    completedAt: "5:45 PM",
-    description: "Evening dinner service preparation",
-    assignedBy: "Chef Michael",
-    lastUpdated: "5:45 PM"
-  },
-  
-  {
-    id: 4,
-    title: "Lobby Security Check",
-    department: "Security",
-    status: "pending",
-    deadline: "3:00 PM",
-    description: "Regular security rounds",
-    assignedBy: "Head of Security",
-    lastUpdated: "2:30 PM"
-  }
-];
+import { 
+  fetchTasks, 
+  selectAllTasks, 
+  selectTasksLoading, 
+  selectTasksError,
+  selectTasksByStatus
+} from '../../../redux/slices/TaskSlice';
+import LoadingAnimation from '../../common/LoadingAnimation';
 
 const getStatusColor = (status) => {
   switch(status?.toLowerCase()) {
@@ -153,47 +40,70 @@ const getStatusIcon = (status) => {
   }
 };
 
-const AdminTaskAssignment = () => {
-  const [tasks, setTasks] = useState(sampleTasks);
+const TaskColumn = ({ title, status, tasks }) => (
+  <div className="bg-gray-50 rounded-lg p-4 h-[80vh] overflow-scroll">
+    <h2 className="text-lg font-semibold mb-4 flex items-center">
+      <div className={`w-3 h-3 rounded-full ${
+        status === 'pending' ? 'bg-yellow-400' :
+        status === 'in-progress' ? 'bg-blue-400' :
+        'bg-green-400'
+      } mr-2`}></div>
+      {title}
+    </h2>
+    <div className="space-y-4">
+      {tasks.map((task, index) => (
+        <TaskCard key={`${status}-${index}`} task={task} />
+      ))}
+    </div>
+  </div>
+);
+
+const TaskCard = ({ task }) => {
+  const formattedDate = (dateString) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    });
+  };
 
   return (
-    <div className="p-6  mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Monitor Active Tasks</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-gray-50 rounded-lg p-4 h-[80vh] overflow-scroll">
-          <h2 className="text-lg font-semibold mb-4 flex items-center">
-            <div className="w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
-            Pending
-          </h2>
-          <div className="space-y-4">
-            {tasks.filter(task => task.status === 'pending').map((task, index) => (
-              <TaskCard key={`pending-${index}`} task={task} />
-            ))}
+    <div className="bg-white rounded-lg shadow p-4 border border-gray-200 hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start space-x-4">
+          <div className={`p-2 rounded-full ${getStatusColor(task.status)}`}>
+            {getStatusIcon(task.status)}
           </div>
-        </div>
-
-        <div className="bg-gray-50 rounded-lg p-4 h-[80vh] overflow-scroll">
-          <h2 className="text-lg font-semibold mb-4 flex items-center">
-            <div className="w-3 h-3 rounded-full bg-blue-400 mr-2"></div>
-            In Progress
-          </h2>
-          <div className="space-y-4">
-            {tasks.filter(task => task.status === 'in-progress').map((task, index) => (
-              <TaskCard key={`progress-${index}`} task={task} />
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-gray-50 rounded-lg p-4 h-[80vh] overflow-scroll">
-          <h2 className="text-lg font-semibold mb-4 flex items-center">
-            <div className="w-3 h-3 rounded-full bg-green-400 mr-2"></div>
-            Completed
-          </h2>
-          <div className="space-y-4">
-            {tasks.filter(task => task.status === 'completed').map((task, index) => (
-              <TaskCard key={`completed-${index}`} task={task} />
-            ))}
+          
+          <div>
+            <div className="flex items-center space-x-2">
+              <h2 className="text-lg font-semibold">{task.title}</h2>
+            </div>
+            <span className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded">
+              {task.department}
+            </span>
+            
+            <p className="text-sm text-gray-700 mt-1">
+              {task.description}
+            </p>
+            
+            <div className="text-sm text-gray-600 mt-2">
+              <div className="flex justify-between items-center mt-1">
+                {task.completed_at ? (
+                  <p>Completed: {formattedDate(task.completed_at)}</p>
+                ) : (
+                  <p>Created: {formattedDate(task.created_at)}</p>
+                )}
+              </div>
+              {task.updated_at !== task.created_at && (
+                <p className="text-xs text-gray-500">
+                  Updated: {formattedDate(task.updated_at)}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -201,47 +111,71 @@ const AdminTaskAssignment = () => {
   );
 };
 
-const TaskCard = ({ task }) => (
-  <div className="bg-white rounded-lg shadow p-4 border border-gray-200 hover:shadow-md transition-shadow">
-    <div className="flex items-start justify-between">
-      <div className="flex items-start space-x-4">
-        <div className={`p-2 rounded-full ${getStatusColor(task.status)}`}>
-          {getStatusIcon(task.status)}
-        </div>
-        
-        <div>
-          <div className="flex items-center space-x-2">
-            <h2 className="text-lg font-semibold">{task.title}</h2>
-          </div>
-            <span className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded">
-              {task.department}
-            </span>
-          
-          <p className="text-sm text-gray-600 mt-1">
-            Deadline: {task.deadline}
-          </p>
-          
-          <p className="text-sm text-gray-700 mt-1">
-            {task.description}
-          </p>
-          
-          <div className="text-sm text-gray-600 mt-2">
-            <p>Assigned by: {task.assignedBy}</p>
-            <div className="flex justify-between items-center mt-1">
-              {task.status === 'completed' ? (
-                <p>Completed: {task.completedAt}</p>
-              ) : (
-                <p>Last Updated: {task.lastUpdated}</p>
-              )}
-            </div>
-          </div>
+const AdminTaskAssignment = () => {
+  const dispatch = useDispatch();
+  const loading = useSelector(selectTasksLoading);
+  const error = useSelector(selectTasksError);
+  
+  const pendingTasks = useSelector(state => selectTasksByStatus(state, 'pending'));
+  const inProgressTasks = useSelector(state => selectTasksByStatus(state, 'in-progress'));
+  const completedTasks = useSelector(state => selectTasksByStatus(state, 'completed'));
+
+  useEffect(() => {
+    dispatch(fetchTasks());
+    
+    const interval = setInterval(() => {
+      console.log('Fetching tasks...');
+      dispatch(fetchTasks());
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
+  if (loading && !pendingTasks.length && !inProgressTasks.length && !completedTasks.length) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <LoadingAnimation size={40} color="#252941" />
+      <p>
+        Please wait...
+      </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center">
+        <div className="bg-red-50 text-red-800 p-4 rounded-lg inline-block">
+          <p className="font-medium">Error loading tasks</p>
+          <p className="text-sm mt-1">{error}</p>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Monitor Active Tasks</h1>
       
-      <button className="p-1 hover:bg-gray-100 rounded">
-      </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <TaskColumn 
+          title="Pending" 
+          status="pending" 
+          tasks={pendingTasks} 
+        />
+        <TaskColumn 
+          title="In Progress" 
+          status="in-progress" 
+          tasks={inProgressTasks} 
+        />
+        <TaskColumn 
+          title="Completed" 
+          status="completed" 
+          tasks={completedTasks} 
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default AdminTaskAssignment;

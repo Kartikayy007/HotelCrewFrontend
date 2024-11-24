@@ -8,20 +8,38 @@ const initialState = {
 };
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token');
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY';
   if (!token) {
     throw new Error('Authentication token not found');
   }
   return token;
 };
 
+export const fetchTasks = createAsyncThunk(
+  'tasks/fetchTasks',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.get(
+        'https://hotelcrew-1.onrender.com/api/taskassignment/tasks/all/',
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to fetch tasks');
+    }
+  }
+);
+
 export const createTask = createAsyncThunk(
   'tasks/createTask',
   async (taskData, { rejectWithValue }) => {
     try {
-
       const token = getAuthToken();
-
       const response = await axios.post(
         'https://hotelcrew-1.onrender.com/api/taskassignment/tasks/',
         {
@@ -46,9 +64,30 @@ export const createTask = createAsyncThunk(
 const taskSlice = createSlice({
   name: 'tasks',
   initialState,
-  reducers: {},
+  reducers: {
+    clearErrors: (state) => {
+      state.error = null;
+    },
+    clearTasks: (state) => {
+      state.tasks = [];
+    }
+  },
   extraReducers: (builder) => {
     builder
+      // Fetch tasks cases
+      .addCase(fetchTasks.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTasks.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tasks = action.payload;
+      })
+      .addCase(fetchTasks.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Create task cases
       .addCase(createTask.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -64,7 +103,14 @@ const taskSlice = createSlice({
   }
 });
 
+// Actions
+export const { clearErrors, clearTasks } = taskSlice.actions;
+
+// Selectors
+export const selectAllTasks = (state) => state.tasks.tasks;
 export const selectTasksLoading = (state) => state.tasks.loading;
 export const selectTasksError = (state) => state.tasks.error;
+export const selectTasksByStatus = (state, status) => 
+  state.tasks.tasks.filter(task => task.status === status);
 
 export default taskSlice.reducer;

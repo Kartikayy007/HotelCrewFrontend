@@ -1,4 +1,6 @@
 import React, {useState, useRef, useEffect} from "react";
+import { useSelector } from 'react-redux';
+import { selectStaffPerDepartment } from '../../redux/slices/StaffSlice';
 import StaffDB from "./DB/StaffDB";
 import CustomerDB from "./DB/CustomerDB";
 import {Search, ChevronLeft, ChevronRight} from "lucide-react";
@@ -8,6 +10,12 @@ function DataBase() {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const scrollContainerRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({
+    department: "All",
+    role: "All",
+    shift: "All"
+  });
 
   const checkScroll = () => {
     if (scrollContainerRef.current) {
@@ -35,6 +43,13 @@ function DataBase() {
       });
     }
   };
+
+  const staffPerDepartment = useSelector(selectStaffPerDepartment);
+  
+  const departments = Object.keys(staffPerDepartment).map(dept => ({
+    value: dept,
+    label: dept.charAt(0).toUpperCase() + dept.slice(1)
+  }));
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
@@ -66,23 +81,37 @@ function DataBase() {
               >
                 {activeComponent === "StaffDB" && (
                   <>
-                    <select className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full ">
-                      <option value="All">Departments</option>
-                      <option value="HR">HR</option>
-                      <option value="Finance">Finance</option>
-                      <option value="Engineering">Engineering</option>
-                      <option value="Sales">Sales</option>
+                    <select 
+                      value={filters.department}
+                      onChange={(e) => setFilters({...filters, department: e.target.value})}
+                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+                    >
+                      <option value="All">All Departments</option>
+                      {departments.map(dept => (
+                        <option key={dept.value} value={dept.value}>
+                          {dept.label}
+                        </option>
+                      ))}
                     </select>
-                    <select className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2 ">
+                    <select 
+                      value={filters.role}
+                      onChange={(e) => setFilters({...filters, role: e.target.value})}
+                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
+                    >
                       <option value="All">Role</option>
                       <option value="Manager">Manager</option>
                       <option value="Receptionist">Receptionist</option>
                       <option value="Staff">Staff</option>
                     </select>
-                    <select className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full  mr-2 ">
+                    <select
+                      value={filters.shift}
+                      onChange={(e) => setFilters({...filters, shift: e.target.value})}
+                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
+                    >
                       <option value="All">Shift</option>
                       <option value="Morning">Day Shift</option>
                       <option value="Night">Night Shift</option>
+                      <option value="evening">Evening</option>
                     </select>
                   </>
                 )}
@@ -115,6 +144,8 @@ function DataBase() {
             <div className="relative lg:w-2/6 w-full">
               <input
                 type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search..."
                 className="bg-[#F1F6FC] hover:bg-gray-300 w-full text-[#5663AC] font-medium py-2 px-4 rounded-2xl border-2 border-[#B7CBEA] pl-10"
               />
@@ -147,7 +178,14 @@ function DataBase() {
             </button>
           </div>
           <div>
-            {activeComponent === "StaffDB" ? <StaffDB /> : <CustomerDB />}
+            {activeComponent === "StaffDB" ? (
+              <StaffDB 
+                searchTerm={searchTerm}
+                filters={filters}
+              />
+            ) : (
+              <CustomerDB />
+            )}
           </div>
         </div>
       </div>

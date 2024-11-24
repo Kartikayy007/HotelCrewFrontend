@@ -4,7 +4,6 @@ import Sidebar from './components/Sidebar';
 import { setActiveComponent } from '../../redux/slices/ReceptionSlice';
 import store from '../../redux/Store';
 
-// Define RootState type from store
 type RootState = ReturnType<typeof store.getState>;
 
 const Reception: React.FC = () => {

@@ -1,9 +1,8 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useMemo} from "react";
 import {PieChart} from "@mui/x-charts/PieChart";
 import {LineChart} from "@mui/x-charts/LineChart";
 import {BarChart} from "@mui/x-charts/BarChart";
 import Box from "@mui/material/Box";
-import Slider from "@mui/material/Slider";
 import {
   Dialog,
   TextField,
@@ -21,6 +20,7 @@ import {
   createTask,
   selectTasksLoading,
   selectTasksError,
+  selectAllTasks,
 } from "../../../redux/slices/TaskSlice";
 import AdminTaskAssignment from "./AdminTaskAssignment";
 import {CreateAnnouncementBox} from "../../common/CreateAnnouncementBox";
@@ -32,6 +32,15 @@ import {
   selectAnnouncementsError,
   deleteAnnouncement,
 } from "../../../redux/slices/AnnouncementSlice";
+import {
+  fetchStaffData,
+  selectStaffPerDepartment,
+  selectStaffLoading,
+  selectDepartments,
+} from "../../../redux/slices/StaffSlice";
+import StaffMetrics from "../../common/StaffMetrics";
+import RevenueChart from "../../common/RevenueChart";
+import LoadingAnimation from "../../common/LoadingAnimation";
 
 function AdminDashboard() {
   const dispatch = useDispatch();
@@ -62,13 +71,7 @@ function AdminDashboard() {
     severity: "success",
   });
 
-  const departments = [
-    {label: "Security", value: "security"},
-    {label: "Housekeeping", value: "housekeeping"},
-    {label: "Kitchen", value: "kitchen"},
-    {label: "Front Desk", value: "frontdesk"},
-    {label: "Maintenance", value: "maintenance"},
-  ];
+  const departments = useSelector(selectDepartments);
 
   const handleSelect = (dept) => {
     setSelected(dept);
@@ -93,10 +96,8 @@ function AdminDashboard() {
       }
     }, 60000);
 
-    setTimeout(() => {
-      setTimeData(generateTimeData(currentHour));
-      setLoading(false);
-    }, 1500);
+    setTimeData(generateTimeData(currentHour));
+    setLoading(false);
 
     return () => clearInterval(interval);
   }, [currentHour]);
@@ -113,48 +114,42 @@ function AdminDashboard() {
     return performanceData;
   };
 
-  const generateMarks = () => {
-    const marks = [];
-    const maxHour = currentHour || 1;
-
-    marks.push({value: 0, label: "0h"});
-
-    if (maxHour >= 6) marks.push({value: 6, label: "6h"});
-    if (maxHour >= 12) marks.push({value: 12, label: "12h"});
-    if (maxHour >= 18) marks.push({value: 18, label: "18h"});
-    if (maxHour === 24) marks.push({value: 24, label: "24h"});
-
-    if (!marks.find((mark) => mark.value === maxHour)) {
-      marks.push({value: maxHour, label: `${maxHour}h`});
-    }
-
-    return marks;
-  };
-
-  const marks = generateMarks();
-
   const occupancyData = [
     {id: 0, value: 65, label: "Occupied", color: "#252941"},
     {id: 1, value: 135, label: "Vacant", color: "#8094D4"},
     {id: 2, value: 110, label: "On Break", color: "#6B46C1"},
   ];
 
+  const tasks = useSelector(selectAllTasks);
+  const staffPerDepartment = useSelector(selectStaffPerDepartment);
+
+  console.log("Staff per department:", staffPerDepartment);
+  console.log("All tasks:", tasks);
+
+  const totalStaff = Object.values(staffPerDepartment).reduce(
+    (sum, count) => sum + count,
+    0
+  );
+  console.log("Total staff count:", totalStaff);
+
+  const busyStaffCount = tasks.filter(
+    (task) => task.status === "pending" || task.status === "in-progress"
+  ).length;
+  console.log("Busy staff count:", busyStaffCount);
+
+  const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
+  console.log("Vacant staff count:", vacantStaffCount);
+
   const staffStatus = [
-    {id: 0, value: 45, label: "Busy", color: "#252941"},
-    {id: 1, value: 35, label: "Vacant", color: "#8094D4"},
+    {id: 0, value: busyStaffCount, label: "Busy", color: "#252941"},
+    {id: 1, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
   ];
+  console.log("Pie chart data:", staffStatus);
 
   useEffect(() => {
     dispatch(fetchAttendanceStats());
-
-    // const interval = setInterval(() => {
     dispatch(fetchAttendanceStats());
-    // }, 300000);
-
-    // return () => clearInterval(interval);
   }, [dispatch]);
-
-  // console.log(attendanceStats);
 
   const staffAttendance = [
     {
@@ -171,77 +166,29 @@ function AdminDashboard() {
     },
   ];
 
-  const getFilteredData = (range) => {
-    return timeData.slice(range[0], range[1] + 1);
-  };
+  const staffLoading = useSelector(selectStaffLoading);
 
-  const revenueData = {
-    xAxis: [
-      {
-        id: "hours",
-        data: getFilteredData(revenueRange).map((d) => d.hour),
-        scaleType: "band",
-      },
-    ],
-    series: [
-      {
-        data: getFilteredData(revenueRange).map((d) => d.revenue),
-        curve: "linear",
-        color: "#6B46C1",
-        highlightScope: {
-          highlighted: "none",
-          faded: "global",
-        },
-      },
-    ],
-  };
-
-  const performanceData = {
-    xAxis: [
-      {
-        id: "time",
-        data: getFilteredData(performanceRange).map((d) => d.hour),
-        scaleType: "band",
-      },
-    ],
-    series: [
-      {
-        data: getFilteredData(performanceRange).map((d) => d.performance),
-        curve: "linear",
-        color: "#2A2AA9",
-      },
-    ],
-  };
+  useEffect(() => {
+    dispatch(fetchStaffData());
+  }, [dispatch]);
 
   const departmentData = {
     xAxis: [
       {
         id: "departments",
-        data: [
-          "Front Desk",
-          "Housekeeping",
-          "Kitchen",
-          "Maintenance",
-          "Security",
-        ],
+        data: Object.keys(staffPerDepartment).map(
+          (dept) => dept.charAt(0).toUpperCase() + dept.slice(1)
+        ),
         scaleType: "band",
       },
     ],
     series: [
       {
         type: "bar",
-        data: [12, 25, 18, 8, 15],
+        data: Object.values(staffPerDepartment),
         color: "#4C51BF",
       },
     ],
-  };
-
-  const handlePerformanceRangeChange = (event, newValue) => {
-    setPerformanceRange(newValue);
-  };
-
-  const handleRevenueRangeChange = (event, newValue) => {
-    setRevenueRange(newValue);
   };
 
   const greeting =
@@ -272,6 +219,7 @@ function AdminDashboard() {
 
   const handleCreateAnnouncement = async (announcementData) => {
     try {
+      setLoading(true);
       await dispatch(createAnnouncement(announcementData)).unwrap();
       setShowAnnouncementBox(false);
       setSnackbar({
@@ -280,11 +228,14 @@ function AdminDashboard() {
         severity: "success",
       });
     } catch (error) {
+      console.error("Create announcement error:", error);
       setSnackbar({
         open: true,
         message: error || "Failed to create announcement",
         severity: "error",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -366,7 +317,8 @@ function AdminDashboard() {
 
       setTaskTitle("");
       setTaskDescription("");
-      setSelected({label: "Select Department", value: ""});
+      setSelected({label: "Department", label: "select Priority"});
+      setSelectedPriority("");
 
       setSnackbar({
         open: true,
@@ -402,6 +354,14 @@ function AdminDashboard() {
   const [selectedPriority, setSelectedPriority] = useState("");
 
   const [showAnnouncementBox, setShowAnnouncementBox] = useState(false);
+
+  const sortedAnnouncements = useMemo(() => {
+    if (!announcements?.length) return [];
+
+    return [...announcements].sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+  }, [announcements]);
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
@@ -480,35 +440,44 @@ function AdminDashboard() {
                       <h3 className="font-medium mb-2 text-center">
                         Staff Status
                       </h3>
-                      <PieChart
-                        series={[
-                          {
-                            data: staffStatus,
-                            highlightScope: {fade: "global", highlight: "item"},
-                            innerRadius: 45,
-                            paddingAngle: 1,
-                            cornerRadius: 1,
-                          },
-                        ]}
-                        height={220}
-                        margin={{top: 0, bottom: 40, left: 0, right: 0}}
-                        slotProps={{
-                          legend: {
-                            direction: "row",
-                            position: {
-                              vertical: "bottom",
-                              horizontal: "center",
+                      {totalStaff === 0 ? (
+                        <div className="flex items-center justify-center h-[180px] text-gray-500">
+                          No Staff Data Available
+                        </div>
+                      ) : (
+                        <PieChart
+                          series={[
+                            {
+                              data: staffStatus,
+                              highlightScope: {
+                                fade: "global",
+                                highlight: "item",
+                              },
+                              innerRadius: 45,
+                              paddingAngle: 1,
+                              cornerRadius: 1,
                             },
-                            padding: 0,
-                            markSize: 10,
-                            itemGap: 15,
-                            labelStyle: {
-                              fontSize: 15,
-                              fontWeight: 500,
+                          ]}
+                          height={220}
+                          margin={{top: 0, bottom: 40, left: 0, right: 0}}
+                          slotProps={{
+                            legend: {
+                              direction: "row",
+                              position: {
+                                vertical: "bottom",
+                                horizontal: "center",
+                              },
+                              padding: 0,
+                              markSize: 10,
+                              itemGap: 15,
+                              labelStyle: {
+                                fontSize: 15,
+                                fontWeight: 500,
+                              },
                             },
-                          },
-                        }}
-                      />
+                          }}
+                        />
+                      )}
                     </div>
 
                     <div className="flex-1 min-w-[250px]">
@@ -561,87 +530,9 @@ function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg min-h-[384px] w-full p-4">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">
-              Revenue (Hours {revenueRange[0]} - {revenueRange[1]})
-            </h2>
-            <Box sx={{width: "100%", mb: 4}}>
-              {loading ? (
-                <Skeleton
-                  variant="rectangular"
-                  width="100%"
-                  height={250}
-                  {...skeletonProps}
-                />
-              ) : (
-                <LineChart
-                  xAxis={revenueData.xAxis}
-                  series={revenueData.series}
-                  height={250}
-                  margin={{top: 20, right: 20, bottom: 30, left: 40}}
-                  sx={{
-                    ".MuiLineElement-root": {
-                      strokeWidth: 2,
-                    },
-                  }}
-                />
-              )}
-            </Box>
-            <Box sx={{width: "100%", px: 2}}>
-              <Slider
-                value={revenueRange}
-                onChange={handleRevenueRangeChange}
-                valueLabelDisplay="auto"
-                step={1}
-                marks={marks}
-                min={0}
-                max={currentHour || 1}
-                sx={{
-                  bottom: 20,
-                  height: 3,
-                  "& .MuiSlider-thumb": {
-                    height: 12,
-                    width: 12,
-                  },
-                }}
-              />
-            </Box>
-          </div>
+          <RevenueChart />
 
-          <div className="bg-white rounded-xl shadow-lg flex-1 w-full p-4">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">
-              Staff Metrics (Hours {performanceRange[0]} - {performanceRange[1]}
-              )
-            </h2>
-            <Box sx={{width: "100%", mb: 4, mt: 5}}>
-              {loading ? (
-                <Skeleton
-                  variant="rectangular"
-                  width="100%"
-                  height={250}
-                  {...skeletonProps}
-                />
-              ) : (
-                <LineChart
-                  xAxis={performanceData.xAxis}
-                  series={performanceData.series}
-                  height={250}
-                  margin={{top: 5, right: 20, bottom: 30, left: 40}}
-                />
-              )}
-            </Box>
-            <Box sx={{width: "100%", px: 2}}>
-              <Slider
-                value={performanceRange}
-                onChange={handlePerformanceRangeChange}
-                valueLabelDisplay="auto"
-                step={1}
-                marks={marks}
-                min={0}
-                max={currentHour || 1}
-              />
-            </Box>
-          </div>
+          <StaffMetrics />
         </div>
 
         <div className="flex flex-col space-y-6 w-full xl:w-[30%] mt-5 xl:mt-0">
@@ -650,7 +541,7 @@ function AdminDashboard() {
               Staff Database
             </h2>
             <Box sx={{position: "relative", height: 340}}>
-              {loading ? (
+              {staffLoading ? (
                 <Skeleton
                   variant="rectangular"
                   width="100%"
@@ -710,37 +601,32 @@ function AdminDashboard() {
                 </div>
               ) : (
                 <div className="overflow-scroll">
-                  {announcements.length > 0 ? (
-                    announcements.map((announcement) => (
-                      <div
-                        key={announcement._id}
-                        className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
-                        onClick={() => handleViewAnnouncement(announcement)}
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-semibold text-lg">
-                            {announcement.title}
-                          </h3>
-                          <span className="text-sm text-gray-500">
-                            {new Date(
-                              announcement.created_at
-                            ).toLocaleDateString("en-US", {
+                  {sortedAnnouncements.map((announcement) => (
+                    <div
+                      key={announcement._id}
+                      className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
+                      onClick={() => handleViewAnnouncement(announcement)}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-semibold text-lg">
+                          {announcement.title}
+                        </h3>
+                        <span className="text-sm text-gray-500">
+                          {new Date(announcement.created_at).toLocaleDateString(
+                            "en-US",
+                            {
                               year: "numeric",
                               month: "short",
                               day: "numeric",
                               hour: "2-digit",
                               minute: "2-digit",
-                            })}
-                          </span>
-                        </div>
-                        <p className="text-gray-600">{announcement.content}</p>
+                            }
+                          )}
+                        </span>
                       </div>
-                    ))
-                  ) : (
-                    <div className="flex justify-center mt-20 h-full text-gray-500">
-                      No announcements available
+                      <p className="text-gray-600">{announcement.content}</p>
                     </div>
-                  )}
+                  ))}
                 </div>
               )}
             </div>
@@ -900,17 +786,12 @@ function AdminDashboard() {
 
                 {isDropdownOpen && (
                   <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                    {departments.map((dept, index) => (
+                    {departments.map((dept) => (
                       <button
-                        key={index}
+                        key={dept.value}
                         type="button"
                         onClick={() => handleSelect(dept)}
-                        disabled={dept.disabled}
-                        className={`w-full text-left px-4 py-2 ${
-                          dept.disabled
-                            ? "text-gray-400 cursor-default"
-                            : "text-black hover:bg-gray-100"
-                        }`}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-100"
                       >
                         {dept.label}
                       </button>
@@ -969,15 +850,19 @@ function AdminDashboard() {
               onChange={(e) => setTaskDescription(e.target.value)}
               placeholder="Task Description"
               maxLength={350}
-              className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-[120px] h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+              className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
             />
             <div className="flex justify-end">
               <button
                 type="submit"
                 disabled={Taskloading}
-                className="h-9  w-full  bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50 shadow-xl"
+                className="h-9 w-full bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50 shadow-xl flex items-center justify-center"
               >
-                {Taskloading ? "Assigning..." : "Assign"}
+                {Taskloading ? (
+                  <LoadingAnimation size={24} color="#FFFFFF" />
+                ) : (
+                  "Assign"
+                )}
               </button>
             </div>
           </form>
