@@ -195,7 +195,7 @@ const SSchedule = () => {
         </div>
         <div className='space-y-5 xl:w-[35%]'>
           <div className="bg-white w-full xl:h-[85%] h-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
-            <h2 className="text-lg sm:text-xl font-semibold mb-3 text-left">Leave Request</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-2 text-left">Leave Request</h2>
             {loading ? (
               <div className='ml-4 mb-2'>
                 <Skeleton variant="rectangular"
@@ -207,7 +207,7 @@ const SSchedule = () => {
             ) : (
             <div >
 
-              <form className='mt-10 h-full flex flex-col gap-3' >
+              <form className='mt-8 h-full flex flex-col gap-3' >
 
                 <input
                   type="text"
