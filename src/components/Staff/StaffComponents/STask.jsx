@@ -1,4 +1,6 @@
-import React from 'react'
+import { useState, useEffect, React } from 'react'
+import { FaClock, FaCheckCircle } from 'react-icons/fa';
+import { Snackbar, Skeleton } from "@mui/material";
 
 const STask = () => {
   const demoTasks = [
@@ -20,7 +22,7 @@ const STask = () => {
       updated_at: "2024-11-24T07:50:00.000Z",
       deadline: "2024-11-24T10:00:00.000Z",
       department: "housekeeping",
-      status: "in-progress",
+      status: "pending",
       completed_at: null,
       priority: "normal"
     },
@@ -47,7 +49,7 @@ const STask = () => {
       priority: "normal"
     },
     {
-      title: "Room 405",
+      title: "Room 408",
       description: "Serve lunch - Grilled chicken and salad",
       created_at: "2024-11-24T11:00:00.000Z",
       updated_at: "2024-11-24T11:05:00.000Z",
@@ -64,7 +66,7 @@ const STask = () => {
       updated_at: "2024-11-24T06:15:00.000Z",
       deadline: "2024-11-24T08:00:00.000Z",
       department: "housekeeping",
-      status: "completed",
+      status: "pending",
       completed_at: "2024-11-24T07:45:00.000Z",
       priority: "normal"
     },
@@ -80,35 +82,83 @@ const STask = () => {
       priority: "normal"
     },
   ];
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [tasks, setTasks] = useState(demoTasks);
+  const [isStatusMenuVisible, setIsStatusMenuVisible] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [selectedTaskStatusBeforeUpdate, setSelectedTaskStatusBeforeUpdate] = useState(null);
+  const [originalStatus, setOriginalStatus] = useState(null);
+
+  useEffect(() => {
+    return () => {
+        if (selectedTask && originalStatus) {
+            restoreOriginalTask(selectedTask);
+        }
+    };
+}, [selectedTask]);
+
+
+  
+  const handleTaskClick = (task) => {
+    setSelectedTask(task);
+    setOriginalStatus(task.status);
+    const updatedTasks = tasks.filter((t) => t.title !== task.title)
+    setTasks(sortTasksByPriority(updatedTasks));
+    setPendingTasks(sortTasksByPriority(updatedTasks.filter((t) => t.status === "pending")));
+    setCompletedTasks(sortTasksByPriority(updatedTasks.filter((t) => t.status === "completed")));
+    setInProgressTasks(sortTasksByPriority(updatedTasks.filter((t) => t.status === "in-progress")));
+  }
+ 
+const restoreOriginalTask = (task) => {
+    if (originalStatus && originalStatus !== task.status) {
+        task.status = originalStatus;
+        updateTaskLists(task);
+    }
+};
+
+ 
+  const handleStatusUpdate = (newStatus) => {
+  if (newStatus === "in-progress" && inProgressTasks.length >= 2) {
+    setSnackbarMessage("Cannot move more than 2 tasks to In Progress.");
+    setSnackbarOpen(true);
+    return;
+  }
+
+ 
+  const updatedTask = { ...selectedTask, status: newStatus };
+
+  
+  const updatedTasks = [...tasks, updatedTask];
+
+ 
+  setTasks(sortTasksByPriority(updatedTasks));
+  setPendingTasks(sortTasksByPriority(updatedTasks.filter((t) => t.status === "pending")));
+  setCompletedTasks(sortTasksByPriority(updatedTasks.filter((t) => t.status === "completed")));
+  setInProgressTasks(sortTasksByPriority(updatedTasks.filter((t) => t.status === "in-progress")));
+
+  // Clear the selected task
+  setIsStatusMenuVisible(false);
+  setSelectedTask(null);
+};
+
 
   const sortTasksByPriority = (tasks) => {
-    // Define priority levels
-    const priorityOrder = { High: 1, Normal: 2 }; // High has higher priority
+   
+    const priorityOrder = { high : 1, normal: 2,High:1,Normal:2 }; // High has higher priority
 
     // Sort tasks
     return tasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
   };
-
-  //   const pendingTasks = demoTasks.filter(task => task.status === "pending");
-  // const completedTasks = demoTasks.filter(task => task.status === "completed");
-  // const inProgressTasks = demoTasks.filter(task => task.status === "in-progress");
-  const pendingTasks = sortTasksByPriority(
-    demoTasks.filter((task) => task.status === "pending")
-  );
-
-  const completedTasks = sortTasksByPriority(
-    demoTasks.filter((task) => task.status === "completed")
-  );
-
-  const inProgressTasks = sortTasksByPriority(
-    demoTasks.filter((task) => task.status === "in-progress")
-  );
+  const [pendingTasks, setPendingTasks] = useState(sortTasksByPriority(demoTasks.filter((task) => task.status === "pending")));
+  const [completedTasks, setCompletedTasks] = useState(sortTasksByPriority(demoTasks.filter((task) => task.status === "completed")));
+  const [inProgressTasks, setInProgressTasks] = useState(sortTasksByPriority(demoTasks.filter((task) => task.status === "in-progress")));
 
   const renderTaskDetails = (tasks) => {
     if (tasks.length === 0) {
       return (
         <div
-          className="flex justify-center items-center bg-[#efefef] border  my-3 mb-3 w-full h-[380px] rounded-xl border-gray-300"
+          className="flex justify-center items-center bg-[#efefef] border  my-3 mb-3 w-full xl:h-[600px] h-[200px] rounded-xl border-gray-300"
           style={{ maxWidth: "600px", margin: " auto" }}
         >
           <p className="text-xl text-gray-600">No tasks available</p>
@@ -118,11 +168,12 @@ const STask = () => {
     return tasks.map((task, index) => (
       <li
         key={index}
+        onClick={() => handleTaskClick(task)}
         className={`border my-3 rounded-xl p-3 ${task.status === "pending" ? "bg-[#efefef]" : "bg-[#ffff]"} border-gray-300`}
       >
         <h3 className="font-semibold text-lg mb-1">{task.title}</h3>
         <p className="text-md text-gray-600 mb-3">{task.description}</p>
-  
+
         <p className="text-md text-gray-600">
           <strong>Assigned at:</strong> {new Date(task.created_at).toLocaleString()}
         </p>
@@ -135,24 +186,24 @@ const STask = () => {
       </li>
     ));
   };
-  
+
   return (
     <section className=" min-h-screen py-2 mx-4 px-0 font-Montserrat overflow-auto">
       <h2 className="text-[#252941] text-3xl  my-3 pl-8 ml-5 font-semibold">Task Status</h2>
       <div className="flex flex-col  xl:flex-row gap-5 p-3 ">
 
         <div className='space-y-5 xl:w-[33%] '>
-          <div className="bg-white w-full  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow max-h-[700px] overflow-y-auto">
+          <div className="bg-white w-full xl:min-h-[715px] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow max-h-[700px] overflow-y-auto">
             <h2 className="text-lg sm:text-xl font-semibold mb-6 text-left">Pending Tasks</h2>
             <div className='my-2'>
-            <ul >{renderTaskDetails(pendingTasks)}</ul>
+              <ul >{renderTaskDetails(pendingTasks)}</ul>
             </div>
           </div>
         </div>
 
         <div className='space-y-5 xl:w-[33%] '>
 
-          <div className="bg-white w-full max-h-[700px] overflow-y-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
+          <div className="bg-white w-full xl:min-h-[715px] max-h-[700px] overflow-y-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
 
             <h2 className="text-lg sm:text-xl font-semibold mb-6 text-left">Completed Task</h2>
             <ul>{renderTaskDetails(completedTasks)}</ul>
@@ -167,14 +218,62 @@ const STask = () => {
 
               <div className="bg-white w-full min-h-[300px] overflow-y-auto   pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
                 <h2 className="text-lg sm:text-xl font-semibold mb-6 text-left">Update Task</h2>
+                <div className={'${slectedTask? "bg-[#efe6e9]":"bg-gray-400 "'}>
+                  {selectedTask ? (
+                    <>
+                      <div className={`border my-3 rounded-xl p-3 bg-[#e6efe9] border-gray-300`}>
 
+                        <h3 className="font-semibold">{selectedTask.title}</h3>
+                        <p>{selectedTask.description}</p>
+                        <p><span className='text-gray-600 font-semibold'>Assigned at : </span> {new Date(selectedTask.created_at).toLocaleString()}</p>
+                        <p><span className='text-gray-600 font-semibold'>Priority : </span> <span className={`capitalize ${selectedTask.priority === "high" ? "text-red-600 font-semibold" : "text-gray-600"}`}>
+
+                          {selectedTask.priority}
+                        </span>
+                        </p>
+                        <p>Status : <span className='capitalize'>{selectedTask.status}</span></p>
+                      </div>
+                      {!isStatusMenuVisible && (
+                        <button
+                          className="bg-[#3A426F] my-3 text-center w-full text-white p-2 rounded-lg"
+                          onClick={() => setIsStatusMenuVisible(true)} // Show status buttons
+                        >
+                          Choose Status
+                        </button>
+                      )}
+                      {isStatusMenuVisible && (
+                        <div className="mt-4 flex justify-center gap-6">
+                          <button
+                            className="bg-blue-400 text-white p-2 rounded-lg flex items-center gap-2"
+                            onClick={() => handleStatusUpdate("in-progress")}
+                          >
+                            <FaClock /> In Progress
+                          </button>
+                          <button
+                            className="bg-green-500 text-white p-3 rounded-lg flex items-center gap-2"
+                            onClick={() => handleStatusUpdate("completed")}
+                          >
+                            <FaCheckCircle /> Completed
+
+                          </button>
+
+                        </div>
+                      )}
+
+
+                    </>
+
+                  ) : (
+                    <p>Select a task to update its status.</p>
+                  )}
+                </div>
               </div>
 
             </div>
 
             <div className='min-h-[40%]'>
 
-              <div className="bg-white w-full max-h-[500px] overflow-y-auto  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
+              <div className="bg-white w-full xl:min-h[400px] max-h-[400px] overflow-y-auto  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
                 <h2 className="text-lg sm:text-xl font-semibold mb-6 text-left">Task in  Progress</h2>
                 <ul>{renderTaskDetails(inProgressTasks)}</ul>
               </div>
@@ -184,6 +283,29 @@ const STask = () => {
 
         </div>
       </div>
+      <Snackbar
+  open={snackbarOpen}
+  onClose={() => setSnackbarOpen(false)}
+  message={<span style={{ color: 'black', fontSize: '16px' }}>{snackbarMessage}</span>}
+  autoHideDuration={3000}
+  anchorOrigin={{
+    vertical: 'top',
+    horizontal: 'center',
+  }}
+  ContentProps={{
+    style: {
+      backgroundColor: 'white', // Set the background color of the Snackbar
+      color: 'black', // Ensure the text color is black
+      fontSize: '16px', // Increase the font size
+       // Adjust width for responsiveness
+      maxWidth: '600px', // Set a maximum width
+      textAlign: 'center', // Center-align text
+      borderRadius: '8px', // Add rounded corners
+      padding: '12px', // Add some padding
+      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // Optional: subtle shadow
+    },
+  }}
+/>
     </section>
 
   )
