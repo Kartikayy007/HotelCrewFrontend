@@ -3,6 +3,21 @@ import { FaClock, FaCheckCircle } from 'react-icons/fa';
 import { Snackbar, Skeleton } from "@mui/material";
 
 const STask = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+
+      setLoading(false);
+    }, 1500);
+
+  }, []);
+  const skeletonProps = {
+    animation: "wave",
+    sx: {
+      animationDuration: "0.8s",
+    },
+  };
   const demoTasks = [
     {
       title: "Room 101",
@@ -87,22 +102,19 @@ const STask = () => {
   const [isStatusMenuVisible, setIsStatusMenuVisible] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [selectedTaskStatusBeforeUpdate, setSelectedTaskStatusBeforeUpdate] = useState(null);
-  const [originalStatus, setOriginalStatus] = useState(null);
-
-  useEffect(() => {
-    return () => {
-        if (selectedTask && originalStatus) {
-            restoreOriginalTask(selectedTask);
-        }
-    };
-}, [selectedTask]);
+   const [originalStatus, setOriginalStatus] = useState(null);
 
 
   
   const handleTaskClick = (task) => {
+    if (selectedTask) {
+      setSnackbarMessage("A task is alerady selected to be updated");
+      setSnackbarOpen(true);
+      return;
+    }
+
     setSelectedTask(task);
-    setOriginalStatus(task.status);
+    
     const updatedTasks = tasks.filter((t) => t.title !== task.title)
     setTasks(sortTasksByPriority(updatedTasks));
     setPendingTasks(sortTasksByPriority(updatedTasks.filter((t) => t.status === "pending")));
@@ -110,13 +122,25 @@ const STask = () => {
     setInProgressTasks(sortTasksByPriority(updatedTasks.filter((t) => t.status === "in-progress")));
   }
  
-const restoreOriginalTask = (task) => {
-    if (originalStatus && originalStatus !== task.status) {
-        task.status = originalStatus;
-        updateTaskLists(task);
-    }
-};
 
+const handleTaskClose = () => {
+  if (!selectedTask) return;
+
+  const task = selectedTask;
+  const updatedTasks = tasks.concat(task); // Add it back to the task list
+
+  // Move the task back to its corresponding list based on its status
+  if (task.status === "pending") {
+    setPendingTasks(prev => sortTasksByPriority([...prev.filter(t => t.title !== task.title), task]));
+  } else if (task.status === "completed") {
+    setCompletedTasks(prev => sortTasksByPriority([...prev.filter(t => t.title !== task.title), task]));
+  } else if (task.status === "in-progress") {
+    setInProgressTasks(prev => sortTasksByPriority([...prev.filter(t => t.title !== task.title), task]));
+  }
+
+  setTasks(updatedTasks); // Restore the task back to the general task list
+  setSelectedTask(null); // Deselect the task
+};
  
   const handleStatusUpdate = (newStatus) => {
   if (newStatus === "in-progress" && inProgressTasks.length >= 2) {
@@ -171,6 +195,7 @@ const restoreOriginalTask = (task) => {
         onClick={() => handleTaskClick(task)}
         className={`border my-3 rounded-xl p-3 ${task.status === "pending" ? "bg-[#efefef]" : "bg-[#ffff]"} border-gray-300`}
       >
+       
         <h3 className="font-semibold text-lg mb-1">{task.title}</h3>
         <p className="text-md text-gray-600 mb-3">{task.description}</p>
 
@@ -192,38 +217,69 @@ const restoreOriginalTask = (task) => {
       <h2 className="text-[#252941] text-3xl  my-3 pl-8 ml-5 font-semibold">Task Status</h2>
       <div className="flex flex-col  xl:flex-row gap-5 p-3 ">
 
-        <div className='space-y-5 xl:w-[33%] '>
+        <div className='space-y-5 xl:w-[33%] lg:order-1 order-3'>
           <div className="bg-white w-full xl:min-h-[715px] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow max-h-[700px] overflow-y-auto">
             <h2 className="text-lg sm:text-xl font-semibold mb-6 text-left">Pending Tasks</h2>
             <div className='my-2'>
+            {loading ? (
+              <div className='ml-4 mb-2'>
+                <Skeleton variant="rectangular"
+                  width="95%"
+                  height={600}
+                  {...skeletonProps}
+                />
+              </div>
+            ) : (
               <ul >{renderTaskDetails(pendingTasks)}</ul>
+            )}
             </div>
           </div>
         </div>
 
-        <div className='space-y-5 xl:w-[33%] '>
+        <div className='space-y-5 xl:w-[33%] order-2'>
 
           <div className="bg-white w-full xl:min-h-[715px] max-h-[700px] overflow-y-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
 
             <h2 className="text-lg sm:text-xl font-semibold mb-6 text-left">Completed Task</h2>
+            {loading ? (
+              <div className='ml-4 mb-2'>
+                <Skeleton variant="rectangular"
+                  width="95%"
+                  height={600}
+                  {...skeletonProps}
+                />
+              </div>
+            ) : (
             <ul>{renderTaskDetails(completedTasks)}</ul>
+            )}
           </div>
         </div>
 
-        <div className='space-y-5 xl:w-[34%] '>
+        <div className='space-y-5 xl:w-[34%] order-1 lg:order-3'>
 
           <div className='flex flex-col gap-5'>
 
             <div className='min-h-[60%]'>
 
-              <div className="bg-white w-full min-h-[300px] overflow-y-auto   pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
+              <div className="bg-white w-full min-h-[300px] overflow-y-auto  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
                 <h2 className="text-lg sm:text-xl font-semibold mb-6 text-left">Update Task</h2>
+                {loading ? (
+              <div className='ml-4 mb-2'>
+                <Skeleton variant="rectangular"
+                  width="95%"
+                  height={250}
+                  {...skeletonProps}
+                />
+              </div>
+            ) : (
                 <div className={'${slectedTask? "bg-[#efe6e9]":"bg-gray-400 "'}>
                   {selectedTask ? (
                     <>
                       <div className={`border my-3 rounded-xl p-3 bg-[#e6efe9] border-gray-300`}>
-
+                        <div className='flex justify-between'>
                         <h3 className="font-semibold">{selectedTask.title}</h3>
+                      <button onClick={handleTaskClose}>X</button>
+                        </div>
                         <p>{selectedTask.description}</p>
                         <p><span className='text-gray-600 font-semibold'>Assigned at : </span> {new Date(selectedTask.created_at).toLocaleString()}</p>
                         <p><span className='text-gray-600 font-semibold'>Priority : </span> <span className={`capitalize ${selectedTask.priority === "high" ? "text-red-600 font-semibold" : "text-gray-600"}`}>
@@ -267,6 +323,7 @@ const restoreOriginalTask = (task) => {
                     <p>Select a task to update its status.</p>
                   )}
                 </div>
+            )}
               </div>
 
             </div>
@@ -275,7 +332,17 @@ const restoreOriginalTask = (task) => {
 
               <div className="bg-white w-full xl:min-h[400px] max-h-[400px] overflow-y-auto  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
                 <h2 className="text-lg sm:text-xl font-semibold mb-6 text-left">Task in  Progress</h2>
+                {loading ? (
+              <div className='ml-4 mb-2'>
+                <Skeleton variant="rectangular"
+                  width="95%"
+                  height={320}
+                  {...skeletonProps}
+                />
+              </div>
+            ) : (
                 <ul>{renderTaskDetails(inProgressTasks)}</ul>
+            )}
               </div>
 
             </div>
