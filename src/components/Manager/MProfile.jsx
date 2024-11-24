@@ -21,7 +21,9 @@ useEffect(() => {
   return (
     <section className=" h-screen py-2 mr-1 px-0 font-Montserrat">
       
-      <h2 className="text-[#252941] text-3xl  my-4 pl-12 font-semibold">Profile</h2>
+      <h1 className="text-[#252941] text-4xl mb-4 mt-6 pl-16 font-semibold">
+        Profile
+      </h1>
       
       {loading ? (
       <Skeleton variant="rectangular" width="100%" height="85%" sx={{ backgroundColor: 'white', margin:"16px", paddingRight:"16px"}} />

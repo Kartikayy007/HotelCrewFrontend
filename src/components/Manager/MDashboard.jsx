@@ -468,7 +468,9 @@ const MDashboard = () => {
 
   return (
     <section className=" h-screen p-2 mr-2 sm:mr-4 font-Montserrat">
-      <h2 className="text-[#252941] text-3xl my-4 pl-12 font-semibold">Dashboard</h2>
+      <h1 className="text-[#252941] text-3xl mt-6 mb-4  pl-16 font-semibold">
+        Dashboard
+      </h1>
       <div className="grid grid-cols-1 lg:grid-cols-[70%,30%] gap-5 p-3">
 
         {/* First Column */}
@@ -598,7 +600,7 @@ const MDashboard = () => {
 
           </div>
           <div className="bg-white rounded-lg shadow  w-full p-4">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">Guest Flow Overview</h2>
+          <h2 className="text-lg sm:text-xl font-semibold">Guest Flow Overview</h2>
             <Box sx={{ width: "100%" }}>
               {/* Bar Chart with Weekly Data */}
               {loading ? (
@@ -626,7 +628,7 @@ const MDashboard = () => {
                       legend: { hidden: true },
                       bar: {
                         sx: {
-                          borderRadius: "15px 15px 0px 0px", // Round the top corners of the bars
+                          borderRadius: "15px", // Round the top corners of the bars
                         },
                       },
                     }}
@@ -720,7 +722,7 @@ const MDashboard = () => {
             <div className="bg-white  h-[50%] p-4 pr-6 pl-6 shadow rounded-lg">
               <form className="flex flex-col gap-4" onSubmit={handleAssign}>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-[#3f4870] text-lg font-semibold mb-2">Task Assignment</h2>
+                <h2 className="text-lg font-semibold">Task Assignment</h2>
                   {/* <div
                   className={`cursor-pointer ${isPriority ? 'text-gold' : 'text-gray-200'}`}
                   onClick={togglePriority}
@@ -850,7 +852,7 @@ const MDashboard = () => {
             <MTaskAssignment onClose={() => setShowTaskAssignment(false)} />
           </Dialog>
           <div className="bg-white rounded-lg shadow  w-full p-4">
-            <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Announcements</h2>
+          <h2 className="text-lg font-semibold">Announcements</h2>
             {/* <div className="space-y-4">
               <div className="border-b pb-2">
                 <h3 className="font-medium">Monthly Staff Meeting</h3>
@@ -898,7 +900,7 @@ const MDashboard = () => {
                   {announcementsError}
                 </div>
               ) : (
-                <div className="overflow-auto md:h-[400px]">
+                <div className="overflow-auto h-[400px]">
                   {announcements.length > 0 ? (
                     announcements.map((announcement) => (
                       <div
@@ -1049,7 +1051,8 @@ const MDashboard = () => {
 
           </div>
           <div className="bg-white rounded-lg shadow h-auto w-full p-4">
-            <h2 className="text-[#3f4870] text-lg font-semibold mb-4">Leave Management</h2>
+            <h2 className="text-lg  font-semibold mb-1">Leave Management</h2>
+            
             <div className="grid grid-cols-2 gap-3">
               <div className="border rounded p-4">
                 <h3 className="font-medium">Pending Requests</h3>

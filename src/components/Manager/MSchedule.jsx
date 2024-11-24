@@ -7,6 +7,7 @@ function MSchedule() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedShift, setSelectedShift] = useState("All Shifts");
   const [isShiftChangeMode, setIsShiftChangeMode] = useState(false);
+  
   const [staffData, setStaffData] = useState([
     {name: "Ben Smith", department: "Kitchen", shift: "Day Shift"},
   {name: "Sarah Johnson", department: "Housekeeping", shift: "Evening Shift"},
