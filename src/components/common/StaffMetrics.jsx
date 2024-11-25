@@ -113,7 +113,7 @@ function StaffMetrics() {
       timeData[timeData.length - 1].performance.toFixed(1) : '0';
 
     return (
-      <div className="grid gap-4 md:grid-cols-3 mb-4">
+      <div className="grid gap-4 md:grid-cols-3 ">
         <div className="p-4 bg-blue-50 rounded-lg">
           <p className="text-sm text-gray-600">Total Available Staff</p>
           <p className="text-2xl font-bold">{totalAvailableStaff}</p>

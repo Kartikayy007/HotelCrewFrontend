@@ -99,7 +99,7 @@ const DepartmentPerformance = () => {
   }
 
   return (
-    <div className="w-full overflow-y-auto max-h-[440px]">
+    <div className="w-full overflow-y-auto h-[51rem] sm:h-[40rem] md:h-[45rem] lg:h-[52rem] xl:h-[51rem]">
       <div className="grid grid-cols-1 gap-2">
         {departmentMetrics.map((dept) => (
           <div 

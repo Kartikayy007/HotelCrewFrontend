@@ -2,44 +2,19 @@ import React, {useState, useEffect} from "react";
 import {
   Box,
   Skeleton,
-  Slider,
   Dialog,
   DialogContent,
-  DialogTitle,
-  DialogActions,
-  Tabs,
-  Tab,
-  Button,
 } from "@mui/material";
 import {LineChart} from "@mui/x-charts";
 import {BarChart} from "@mui/x-charts/BarChart";
-import {Radar} from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip as ChartTooltip,
-  Legend as ChartLegend,
-} from "chart.js";
 import {TrendingUp, TrendingDown, Menu, X} from "lucide-react";
 import AdminAttendanceList from "./analysis/AdminAttendanceList";
-import { useSelector, useDispatch } from 'react-redux';
-import { selectStaffList } from '../../../redux/slices/StaffSlice';
-import { fetchWeeklyAttendance } from '../../../redux/slices/AdminAttendanceSlice';
+import {useSelector, useDispatch} from "react-redux";
+import {selectStaffList} from "../../../redux/slices/StaffSlice";
+import {fetchWeeklyAttendance} from "../../../redux/slices/AdminAttendanceSlice";
 import StaffMetrics from "../../common/StaffMetrics";
-import { fetchRevenueStats } from '../../../redux/slices/revenueSlice';
+import {fetchRevenueStats} from "../../../redux/slices/revenueSlice";
 import DepartmentPerformance from "./analysis/DepartmentPerformance";
-
-ChartJS.register(
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  ChartTooltip,
-  ChartLegend
-);
 
 const AdminAnalytics = () => {
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
@@ -58,12 +33,22 @@ const AdminAnalytics = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [localLoading, setLocalLoading] = useState(true);
   const staffList = useSelector(selectStaffList);
   const totalStaff = staffList.length - 1;
   const dispatch = useDispatch();
-  const weeklyStats = useSelector(state => state.attendance.weeklyStats);
-  const loading = useSelector(state => state.attendance.loading);
-  const { dates, dailyRevenues, loading: revenueLoading } = useSelector((state) => state.revenue);
+  const weeklyStats = useSelector((state) => state.attendance.weeklyStats);
+  const loading = useSelector((state) => state.attendance.loading);
+  const {
+    dates,
+    dailyRevenues,
+    loading: revenueLoading,
+  } = useSelector((state) => state.revenue);
+
+  const checkinsData = {
+    data: weeklyStats?.total_crew_present || [], // Use actual data or fallback to empty array
+    labels: weeklyStats?.dates || [] // Use actual dates or fallback to empty array
+  };
 
   console.log(staffList, staffList.length);
 
@@ -117,7 +102,7 @@ const AdminAnalytics = () => {
       data.absent.push(totalStudents - present);
     }
 
-    console.log("this is dataatatafs", data)
+    console.log("this is dataatatafs", data);
 
     return data;
   };
@@ -127,12 +112,15 @@ const AdminAnalytics = () => {
 
     const intervalId = setInterval(() => {
       dispatch(fetchWeeklyAttendance());
-    }, 60 * 60 * 1000); 
+    }, 60 * 60 * 1000);
 
     return () => clearInterval(intervalId);
   }, [dispatch]);
 
   useEffect(() => {
+    // Set initial time data
+    setTimeData(generateTimeData(currentHour));
+    
     const interval = setInterval(() => {
       const newHour = new Date().getHours();
       if (newHour !== currentHour) {
@@ -141,11 +129,6 @@ const AdminAnalytics = () => {
         setTimeData(generateTimeData(newHour));
       }
     }, 60000);
-
-    setTimeout(() => {
-      setTimeData(generateTimeData(currentHour));
-      setLoading(false);
-    }, 1500);
 
     return () => clearInterval(interval);
   }, [currentHour]);
@@ -237,18 +220,18 @@ const AdminAnalytics = () => {
 
   const formatDates = (dateString) => {
     const date = new Date(dateString);
-    const day = date.toLocaleDateString('en-US', { weekday: 'short' });
-    const monthDay = date.toLocaleDateString('en-US', { 
-      month: 'numeric',
-      day: 'numeric'
+    const day = date.toLocaleDateString("en-US", {weekday: "short"});
+    const monthDay = date.toLocaleDateString("en-US", {
+      month: "numeric",
+      day: "numeric",
     });
     return `${day}\n${monthDay}`;
   };
 
-  // First, add a check for data availability
-  const hasAttendanceData = weeklyStats.dates.length > 0 && 
-                         weeklyStats.total_crew_present.length > 0 && 
-                         weeklyStats.total_staff_absent.length > 0;
+  const hasAttendanceData =
+    weeklyStats.dates.length > 0 &&
+    weeklyStats.total_crew_present.length > 0 &&
+    weeklyStats.total_staff_absent.length > 0;
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
@@ -311,6 +294,8 @@ const AdminAnalytics = () => {
         {showAnalytics ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
             <div className="lg:col-span-2 space-y-4">
+
+              
               <section
                 className="bg-white rounded-lg shadow-lg p-4 h-96"
                 onDoubleClick={() => setOpenDialog(true)}
@@ -328,7 +313,11 @@ const AdminAnalytics = () => {
                   <Box sx={{width: "100%", height: "90%", mt: -4}}>
                     {loading || !hasAttendanceData ? (
                       <div className="space-y-4 pt-8">
-                        <Skeleton variant="rectangular" height={250} animation="wave" />
+                        <Skeleton
+                          variant="rectangular"
+                          height={250}
+                          animation="wave"
+                        />
                         <div className="flex justify-between px-4">
                           <Skeleton variant="text" width={100} />
                           <Skeleton variant="text" width={100} />
@@ -359,13 +348,13 @@ const AdminAnalytics = () => {
                 <Dialog
                   open={openDialog}
                   onClose={() => setOpenDialog(false)}
-                  maxWidth="lg"
+                  maxWidth="md"
                   fullWidth
                   PaperProps={{
                     style: {
                       backgroundColor: "rgba(255, 255, 255, 0.9)",
                       backdropFilter: "blur(10px)",
-                      height: "80vh",
+                      height: "87vh",
                     },
                   }}
                   BackdropProps={{
@@ -375,145 +364,56 @@ const AdminAnalytics = () => {
                     },
                   }}
                 >
-                  <DialogContent>
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-lg font-semibold">Attendance</h3>
-                    </div>
-
-                    <Tabs
-                      value={activeTab}
-                      onChange={(_, newValue) => setActiveTab(newValue)}
-                      sx={{borderBottom: 1, borderColor: "divider", mb: 2}}
-                    >
-                      <Tab label="Graph" />
-                      <Tab label="Attendance List" />
-                    </Tabs>
-
-                    {activeTab === 0 && (
-                      <Box sx={{width: "100%", height: "500px"}}>
-                        <BarChart
-                          height={450}
-                          series={[
-                            {
-                              data: filteredData.present,
-                              id: "present",
-                              color: "#3331D1",
-                            },
-                            {
-                              data: filteredData.absent,
-                              id: "absent",
-                              color: "#151542",
-                            },
-                          ]}
-                          borderRadius={5}
-                          xAxis={[
-                            {data: filteredData.dates, scaleType: "band"},
-                          ]}
-                        />
-                        <Box sx={{width: "100%", px: 5, mt: 2}}>
-                          <Slider
-                            value={dateRange}
-                            onChange={(_, newValue) => setDateRange(newValue)}
-                            valueLabelDisplay="auto"
-                            min={1}
-                            max={maxDays}
-                            marks={[
-                              {value: 1, label: "1"},
-                              {value: maxDays, label: maxDays.toString()},
-                            ]}
-                          />
-                        </Box>
-                      </Box>
-                    )}
-
-                    {activeTab === 1 && (
-                      <AdminAttendanceList
-                        onBack={() => setOpenDialog(false)}
-                        dateRange={dateRange}
-                        attendanceData={filteredData}
-                      />
-                    )}
+                  <DialogContent
+                    sx={{
+                      padding: 1,
+                      "&:first-of-type": {
+                        paddingTop: 0,
+                      },
+                    }}
+                    dividers={false}
+                  >
+                    <AdminAttendanceList
+                      onBack={() => setOpenDialog(false)}
+                      dateRange={dateRange}
+                      attendanceData={filteredData}
+                    />
                   </DialogContent>
                 </Dialog>
               </section>
 
               <section
-                className="h-96"
+                className="  space-y-6 md:space-y-4 "
                 onDoubleClick={handleSectionDoubleClick}
               >
                 <StaffMetrics />
+                <section className="bg-white rounded-lg shadow-lg p-4 h-80">
+                  <div className="h-80">
+                    <h3 className="text-lg font-semibold">CheckIn Data</h3>
+                    <div className="h-64 w-full flex justify-center items-center">
+                      <LineChart
+                        height={220}
+                        series={[{
+                          data: checkinsData.data.length > 0 ? checkinsData.data : [0], // Fallback data
+                          color: "#3331D1",
+                          curve: "natural",
+                        }]}
+                        xAxis={[{
+                          data: checkinsData.labels.length > 0 ? checkinsData.labels : ["No Data"], // Fallback label
+                          scaleType: "band",
+                          tickLabelStyle: {
+                            angle: 0,
+                            textAnchor: "middle",
+                            fontSize: 12
+                          }
+                        }]}
+                        margin={{ top: 40, right: 20, bottom: 40, left: 40 }}
+                      />
+                    </div>
+                  </div>
+                </section>
               </section>
 
-              {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
-                <section className="bg-white rounded-lg shadow-lg p-4 mt-40 h-80">
-                  <div className="h-80">
-                    <h3 className="text-lg font-semibold">Department Load</h3>
-                    <div className="h-64 w-full flex justify-center items-center">
-                      <Radar
-                        data={radarData}
-                        options={{
-                          plugins: {
-                            legend: {display: false},
-                          },
-                          scales: {
-                            r: {
-                              min: 0,
-                              max: 100,
-                              beginAtZero: true,
-                              ticks: {
-                                stepSize: 25,
-                                font: {size: 14},
-                              },
-                              pointLabels: {
-                                font: {
-                                  size: 16,
-                                  weight: "bold",
-                                },
-                              },
-                            },
-                          },
-                          maintainAspectRatio: false,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </section>
-                <section className="bg-white rounded-lg shadow-lg p-4 mt-40 h-80">
-                  <div className="h-80">
-                    <h3 className="text-lg font-semibold">
-                      Departments Performance
-                    </h3>
-                    <div className="h-64 w-full flex justify-center items-center">
-                      <Radar
-                        data={radarData}
-                        options={{
-                          plugins: {
-                            legend: {display: false},
-                          },
-                          scales: {
-                            r: {
-                              min: 0,
-                              max: 100,
-                              beginAtZero: true,
-                              ticks: {
-                                stepSize: 25,
-                                font: {size: 14},
-                              },
-                              pointLabels: {
-                                font: {
-                                  size: 16,
-                                  weight: "bold",
-                                },
-                              },
-                            },
-                          },
-                          maintainAspectRatio: false,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </section>
-              </div> */}
             </div>
 
             <div className="space-y-4">
@@ -529,7 +429,7 @@ const AdminAnalytics = () => {
 
                   {revenueLoading ? (
                     <div className="h-[300px] w-full">
-                      <Skeleton 
+                      <Skeleton
                         variant="rectangular"
                         width="100%"
                         height={300}
@@ -543,7 +443,6 @@ const AdminAnalytics = () => {
                           data: dailyRevenues,
                           color: "#0B8FD9",
                           curve: "natural",
-                          // removed label property
                         },
                       ]}
                       xAxis={[
@@ -552,26 +451,26 @@ const AdminAnalytics = () => {
                           scaleType: "band",
                           tickLabelStyle: {
                             angle: 0,
-                            textAnchor: 'middle',
-                            fontSize: 12
-                          }
+                            textAnchor: "middle",
+                            fontSize: 12,
+                          },
                         },
                       ]}
                       height={300}
-                      margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+                      margin={{top: 20, right: 20, bottom: 40, left: 40}}
                     />
                   )}
                 </div>
               </section>
 
-              <section className="bg-white rounded-lg shadow-lg p-4 h-2/3">
+              <section className="bg-white rounded-lg shadow-lg p-4 ">
                 <h3 className="text-lg font-semibold">
                   Department Performance
                 </h3>
-                <div className="h-48 w-full mt-6">
-                    <DepartmentPerformance />
-                </div>
+                  <DepartmentPerformance />
+                
               </section>
+
             </div>
           </div>
         ) : (
