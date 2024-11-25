@@ -1,9 +1,8 @@
-// revenueSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const CACHE_KEY = 'revenue_stats';
-const CACHE_DURATION = 6 * 60 * 60 * 1000; 
+const CACHE_DURATION = 6 * 60 * 60 * 1000;
 
 const getAuthToken = () => {
   const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NjMwMzg3LCJpYXQiOjE3MzIwMzgzODcsImp0aSI6ImViZTM5MjA1NDU4MzQ2MjBiNGEzN2JiOGVkN2NlMGM3IiwidXNlcl9pZCI6NzZ9.G8FG8hLXSJojgblmPmWr3EOC9uS96ysnLvxIbdBNOoc';
@@ -15,10 +14,8 @@ const getCachedData = () => {
   try {
     const cached = localStorage.getItem(CACHE_KEY);
     if (!cached) return null;
-
     const { data, timestamp } = JSON.parse(cached);
     const isExpired = Date.now() - timestamp > CACHE_DURATION;
-
     return isExpired ? null : data;
   } catch (error) {
     console.error('Cache retrieval error:', error);
@@ -48,7 +45,7 @@ export const fetchRevenueStats = createAsyncThunk(
       if (cachedData) {
         return cachedData;
       }
-
+      
       const token = getAuthToken();
       const response = await axios.get('http://13.200.191.108:8000/api/hoteldetails/room-stats/', {
         headers: {
@@ -56,6 +53,8 @@ export const fetchRevenueStats = createAsyncThunk(
         }
       });
 
+      console.log('Fetched revenue stats:', response.data);
+      
       setCacheData(response.data);
       return response.data;
     } catch (error) {
@@ -69,6 +68,8 @@ const revenueSlice = createSlice({
   initialState: {
     dates: [],
     dailyRevenues: [],
+    daily_checkins: [],
+    daily_checkouts: [],
     loading: true,
     error: null,
     lastFetched: null
@@ -91,6 +92,8 @@ const revenueSlice = createSlice({
         state.loading = false;
         state.dates = action.payload.dates;
         state.dailyRevenues = action.payload.daily_revenues;
+        state.daily_checkins = action.payload.daily_checkins;
+        state.daily_checkouts = action.payload.daily_checkouts;
         state.lastFetched = Date.now();
         state.error = null;
       })
@@ -101,6 +104,12 @@ const revenueSlice = createSlice({
   },
 });
 
-export const { setInitialData } = revenueSlice.actions;
+// Selector to extract room stats
+export const selectRoomStats = (state) => ({
+  dates: state.revenue.dates,
+  daily_checkins: state.revenue.daily_checkins,
+  daily_checkouts: state.revenue.daily_checkouts
+});
 
+export const { setInitialData } = revenueSlice.actions;
 export default revenueSlice.reducer;

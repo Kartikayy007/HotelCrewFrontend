@@ -63,7 +63,7 @@ function StaffDB({ searchTerm, filters }) {
   };
 
   const handleEdit = (id) => {
-    console.log("Editing employee:", id);
+     ("Editing employee:", id);
     setAnchorEl(null);
   };
 

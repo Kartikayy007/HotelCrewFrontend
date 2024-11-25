@@ -145,14 +145,14 @@ function AdminDashboard() {
   const tasks = useSelector(selectAllTasks);
   const staffPerDepartment = useSelector(selectStaffPerDepartment);
 
-  console.log("Staff per department:", staffPerDepartment);
-  console.log("All tasks:", tasks);
+   ("Staff per department:", staffPerDepartment);
+   ("All tasks:", tasks);
 
   const totalStaff = Object.values(staffPerDepartment).reduce(
     (sum, count) => sum + count,
     0
   );
-  console.log("Total staff count:", totalStaff);
+   ("Total staff count:", totalStaff);
 
   // Calculate staff status counts
   const inProgressCount = tasks.filter(task => task.status === "in_progress").length;
@@ -173,7 +173,7 @@ function AdminDashboard() {
     {id: 2, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
   ];
 
-  console.log("Pie chart data:", staffStatus);
+   ("Pie chart data:", staffStatus);
 
   useEffect(() => {
     dispatch(fetchAttendanceStats());

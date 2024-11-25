@@ -41,7 +41,7 @@ const validatePassword = useCallback((password) => {
         const sanitizedValue = validator.escape(e.target.value.trim());
         set(sanitizedValue);
         setErrorMsg("");
-        console.log(sanitizedValue)
+         (sanitizedValue)
       } catch (error) {
         console.error("Input sanitization error:", error);
         setErrorMsg("Invalid input detected");
@@ -107,7 +107,7 @@ const validatePassword = useCallback((password) => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      console.log(error.response?.status);
+       (error.response?.status);
       if (error.response?.status === "ERR_INTERNET_DISCONNECTED") {
         setErrorMsg("No internet connection. Please try again later");
       }
@@ -181,7 +181,7 @@ const validatePassword = useCallback((password) => {
         {timeout: 10000}
       );
 
-      console.log(response);
+       (response);
 
       resetAttempts.count += 1;
       resetAttempts.timestamp = now;

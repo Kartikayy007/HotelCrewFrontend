@@ -22,7 +22,7 @@ export const fetchSchedules = createAsyncThunk(
         'Authorization': `Bearer ${token}`
       }
     })
-    console.log(response.data);
+     (response.data);
     return response.data.schedule_list;
   }
 );

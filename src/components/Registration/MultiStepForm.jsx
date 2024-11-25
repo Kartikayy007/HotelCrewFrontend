@@ -110,15 +110,15 @@ const MultiStepForm = () => {
   const handleSubmit = async () => {
     try {
       const transformedData = transformFormData();
-      console.log('Preparing to submit form data:', transformedData);
+       ('Preparing to submit form data:', transformedData);
 
       const formDataToSend = new FormData();
 
       if (formData.staff_excel_sheet instanceof File) {
         formDataToSend.append('staff_excel_sheet', formData.staff_excel_sheet);
-        console.log('Appending Excel file:', formData.staff_excel_sheet.name);
-        console.log('File type:', formData.staff_excel_sheet.type);
-        console.log('File size:', formData.staff_excel_sheet.size);
+         ('Appending Excel file:', formData.staff_excel_sheet.name);
+         ('File type:', formData.staff_excel_sheet.type);
+         ('File size:', formData.staff_excel_sheet.size);
       }
 
       Object.entries(transformedData).forEach(([key, value]) => {
@@ -132,7 +132,7 @@ const MultiStepForm = () => {
       });
 
       for (let pair of formDataToSend.entries()) {
-        console.log('FormData entry:', pair[0], pair[1]);
+         ('FormData entry:', pair[0], pair[1]);
       }
 
       const response = await axios.post(
@@ -147,7 +147,7 @@ const MultiStepForm = () => {
       );
 
       if (response.status === 201) {
-        console.log('Form submitted successfully:', response.data);
+         ('Form submitted successfully:', response.data);
         // localStorage.setItem('registrationComplete', 'true');
         localStorage.setItem('multiStepCompleted', 'true');
         alert('Hotel registered successfully!');

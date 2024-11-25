@@ -25,7 +25,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
     }
   
     const formData = { check_in_time: checkInTime, check_out_time: checkOutTime, payment_methods: paymentMethods };
-    console.log('Updating form data with:', formData); 
+     ('Updating form data with:', formData); 
     updateFormData(formData, 5); 
     onNext();
   };

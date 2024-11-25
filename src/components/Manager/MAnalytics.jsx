@@ -177,7 +177,7 @@ const MAnalytics = () => {
     absent: attendanceData.absent.slice(dateRange[0] - 1, dateRange[1]),
   };
 
-  console.log(filteredData);
+   (filteredData);
 
   const handlePerformanceRangeChange = (event, newValue) => {
     setPerformanceRange(newValue);

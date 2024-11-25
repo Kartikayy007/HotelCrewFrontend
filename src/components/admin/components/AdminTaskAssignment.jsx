@@ -122,7 +122,7 @@ const AdminTaskAssignment = () => {
     dispatch(fetchTasks());
     
     const interval = setInterval(() => {
-      console.log('Fetching tasks...');
+       ('Fetching tasks...');
       dispatch(fetchTasks());
     }, 10000);
 

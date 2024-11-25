@@ -130,7 +130,7 @@ const SignUp = () => {
 
     dispatch(registerUser({ userCredentials, rememberMe })).then((result) => {
       if (registerUser.fulfilled.match(result)) {
-        console.log("registered");
+         ("registered");
         setShowOtpInput(true);
       }
     });
@@ -144,7 +144,7 @@ const SignUp = () => {
     }
     dispatch(verifyOtp({email, otp: otp.join("")})).then((result) => {
       if (verifyOtp.fulfilled.match(result)) {
-        console.log("OTP verified");
+         ("OTP verified");
         localStorage.setItem("otpVerified", "true");
         navigate("/signup/hoteldetails");
       } else {

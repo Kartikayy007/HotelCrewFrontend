@@ -32,9 +32,9 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     ];
     
-    console.log('Validating file:', file);
-    console.log('File type:', file.type);
-    console.log('File name:', file.name);
+     ('Validating file:', file);
+     ('File type:', file.type);
+     ('File name:', file.name);
     
     if (!validTypes.includes(file.type) && 
         !file.name.endsWith('.xls') && 
@@ -61,12 +61,12 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
     if (excelFiles.length > 0) {
       const selectedFile = excelFiles[0];
       
-      console.log('Selected file:', selectedFile);
-      console.log('File type:', selectedFile.type);
-      console.log('File size:', selectedFile.size);
+       ('Selected file:', selectedFile);
+       ('File type:', selectedFile.type);
+       ('File size:', selectedFile.size);
       
       if (validateExcelFile(selectedFile)) {
-        console.log('File validation passed');
+         ('File validation passed');
         setFiles([selectedFile]);
         updateFormData({ staff_excel_sheet: selectedFile });
       }

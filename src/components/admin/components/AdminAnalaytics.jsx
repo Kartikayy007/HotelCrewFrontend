@@ -13,7 +13,7 @@ import {useSelector, useDispatch} from "react-redux";
 import {selectStaffList} from "../../../redux/slices/StaffSlice";
 import {fetchWeeklyAttendance} from "../../../redux/slices/AdminAttendanceSlice";
 import StaffMetrics from "../../common/StaffMetrics";
-import {fetchRevenueStats} from "../../../redux/slices/revenueSlice";
+import {fetchRevenueStats, selectRoomStats} from "../../../redux/slices/revenueSlice";
 import DepartmentPerformance from "./analysis/DepartmentPerformance";
 
 const AdminAnalytics = () => {
@@ -34,90 +34,62 @@ const AdminAnalytics = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [localLoading, setLocalLoading] = useState(true);
-  const staffList = useSelector(selectStaffList);
-  const totalStaff = staffList.length - 1;
+  
   const dispatch = useDispatch();
+  
+  // Selectors
+  const staffList = useSelector(selectStaffList);
   const weeklyStats = useSelector((state) => state.attendance.weeklyStats);
   const loading = useSelector((state) => state.attendance.loading);
+  const roomStats = useSelector(selectRoomStats);
   const {
     dates,
     dailyRevenues,
     loading: revenueLoading,
   } = useSelector((state) => state.revenue);
 
+  // Derived values
+  const totalStaff = staffList.length - 1;
+  const todaysRevenue = dailyRevenues[dailyRevenues.length - 1] || 1292;
+  const todaysCheckIns = roomStats?.daily_checkins[roomStats.daily_checkins.length - 1] || 423;
+  const todaysCheckOuts = roomStats?.daily_checkouts[roomStats.daily_checkouts.length - 1] || 42;
+
+  // Check-ins Data
   const checkinsData = {
-    data: weeklyStats?.total_crew_present || [], // Use actual data or fallback to empty array
-    labels: weeklyStats?.dates || [] // Use actual dates or fallback to empty array
+    data: roomStats?.daily_checkins || [], 
+    labels: roomStats?.dates || []
   };
 
-  console.log(staffList, staffList.length);
-
-  const generateTimeData = (hour) => {
-    const performanceData = [];
-    for (let i = 0; i <= hour; i++) {
-      performanceData.push({
-        hour: `${i}:00`,
-        performance: Math.floor(Math.random() * (95 - 85 + 1)) + 85,
-        revenue: Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000,
-      });
-    }
-    return performanceData;
-  };
-
-  const generateMarks = () => {
-    const marks = [];
-    const maxHour = currentHour || 1;
-
-    marks.push({value: 0, label: "0h"});
-    if (maxHour >= 6) marks.push({value: 6, label: "6h"});
-    if (maxHour >= 12) marks.push({value: 12, label: "12h"});
-    if (maxHour >= 18) marks.push({value: 18, label: "18h"});
-    if (maxHour === 24) marks.push({value: 24, label: "24h"});
-    if (!marks.find((mark) => mark.value === maxHour)) {
-      marks.push({value: maxHour, label: `${maxHour}h`});
-    }
-    return marks;
-  };
-
-  const generateAttendanceData = () => {
-    const data = {
-      dates: [],
-      present: [],
-      absent: [],
-    };
-
-    const today = new Date();
-    const currentDay = today.getDay();
-    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-    const daysToShow = currentDay + 1;
-
-    for (let i = 0; i < daysToShow; i++) {
-      const dayIndex = i;
-      data.dates.push(daysOfWeek[dayIndex]);
-
-      const totalStudents = 50;
-      const present = Math.floor(Math.random() * 10) + 40;
-      data.present.push(present);
-      data.absent.push(totalStudents - present);
-    }
-
-    console.log("this is dataatatafs", data);
-
-    return data;
-  };
+  console.log('Check-ins data:', checkinsData);
+  console.log('Revenue data:', dailyRevenues);
 
   useEffect(() => {
     dispatch(fetchWeeklyAttendance());
+    dispatch(fetchRevenueStats());
+
 
     const intervalId = setInterval(() => {
       dispatch(fetchWeeklyAttendance());
+      dispatch(fetchRevenueStats());
     }, 60 * 60 * 1000);
 
     return () => clearInterval(intervalId);
   }, [dispatch]);
 
+  // Time data generation and update
   useEffect(() => {
+    const generateTimeData = (hour) => {
+      const performanceData = [];
+      for (let i = 0; i <= hour; i++) {
+        performanceData.push({
+          hour: `${i}:00`,
+          performance: Math.floor(Math.random() * (95 - 85 + 1)) + 85,
+          revenue: Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000,
+        });
+      }
+      return performanceData;
+    };
+
     // Set initial time data
     setTimeData(generateTimeData(currentHour));
     
@@ -133,91 +105,7 @@ const AdminAnalytics = () => {
     return () => clearInterval(interval);
   }, [currentHour]);
 
-  useEffect(() => {
-    dispatch(fetchWeeklyAttendance());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(fetchRevenueStats());
-  }, [dispatch]);
-
-  const marks = generateMarks();
-
-  const getFilteredData = (range) => {
-    return timeData.slice(range[0], range[1] + 1);
-  };
-
-  const performanceData = {
-    xAxis: [
-      {
-        id: "time",
-        data: getFilteredData(performanceRange).map((d) => d.hour),
-        scaleType: "band",
-      },
-    ],
-    series: [
-      {
-        data: getFilteredData(performanceRange).map((d) => d.performance),
-        curve: "linear",
-        color: "#2A2AA9",
-      },
-    ],
-  };
-
-  const radarData = {
-    labels: [
-      "Front Desk",
-      "Housekeeping",
-      "Kitchen",
-      "Maintenance",
-      "Security",
-      "Management",
-      "Concierge",
-    ],
-    datasets: [
-      {
-        data: [85, 92, 75, 68, 88, 70, 82],
-        fill: true,
-        backgroundColor: "#0B8FD980",
-        borderColor: "#0B8FD9",
-        pointBackgroundColor: "#0B8FD9",
-        pointBorderColor: "#fff",
-        pointHoverBackgroundColor: "#fff",
-        pointHoverBorderColor: "rgb(99, 102, 241)",
-      },
-    ],
-  };
-
-  const attendanceData = generateAttendanceData();
-  const maxDays = attendanceData.dates.length;
-
-  const filteredData = {
-    dates: attendanceData.dates.slice(dateRange[0] - 1, dateRange[1]),
-    present: attendanceData.present.slice(dateRange[0] - 1, dateRange[1]),
-    absent: attendanceData.absent.slice(dateRange[0] - 1, dateRange[1]),
-  };
-
-  console.log(filteredData);
-
-  const handlePerformanceRangeChange = (event, newValue) => {
-    setPerformanceRange(newValue);
-  };
-
-  const handleChartClick = () => {
-    setOpenDialog(true);
-  };
-
-  const handleSectionDoubleClick = () => {
-    setDialogOpen(true);
-  };
-
-  const skeletonProps = {
-    animation: "wave",
-    variant: "rectangular",
-    width: "100%",
-    height: 250,
-  };
-
+  // Utility functions
   const formatDates = (dateString) => {
     const date = new Date(dateString);
     const day = date.toLocaleDateString("en-US", {weekday: "short"});
@@ -232,6 +120,19 @@ const AdminAnalytics = () => {
     weeklyStats.dates.length > 0 &&
     weeklyStats.total_crew_present.length > 0 &&
     weeklyStats.total_staff_absent.length > 0;
+
+  // Handlers
+  const handlePerformanceRangeChange = (event, newValue) => {
+    setPerformanceRange(newValue);
+  };
+
+  const handleChartClick = () => {
+    setOpenDialog(true);
+  };
+
+  const handleSectionDoubleClick = () => {
+    setDialogOpen(true);
+  };
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
@@ -250,10 +151,10 @@ const AdminAnalytics = () => {
 
           <section className="w-full sm:w-1/2 xl:w-1/4 px-2 mb-4">
             <div className="bg-white rounded-lg shadow-lg p-4 transform transition-transform duration-300 delay-1000 hover:scale-105">
-              <h3 className="text-lg font-semibold">Todays Revenue</h3>
+              <h3 className="text-lg font-semibold">Today's Revenue</h3>
               <div className="flex items-center gap-2">
-                <p className="text-3xl font-semibold">$1,292</p>
-                {1292 > 1200 ? (
+                <p className="text-3xl font-semibold">${todaysRevenue.toLocaleString()}</p>
+                {todaysRevenue > 1200 ? (
                   <TrendingUp className="text-green-500" size={24} />
                 ) : (
                   <TrendingDown className="text-red-500" size={24} />
@@ -264,10 +165,10 @@ const AdminAnalytics = () => {
 
           <section className="w-full sm:w-1/2 xl:w-1/4 px-2 mb-4">
             <div className="bg-white rounded-lg shadow-lg p-4 transform transition-transform duration-300 delay-1000 hover:scale-105">
-              <h3 className="text-lg font-semibold">Todays Check-Ins</h3>
+              <h3 className="text-lg font-semibold">Today's Check-Ins</h3>
               <div className="flex items-center gap-2">
-                <p className="text-3xl font-semibold">423</p>
-                {423 > 400 ? (
+                <p className="text-3xl font-semibold">{todaysCheckIns}</p>
+                {todaysCheckIns > 400 ? (
                   <TrendingUp className="text-green-500" size={24} />
                 ) : (
                   <TrendingDown className="text-red-500" size={24} />
@@ -280,8 +181,8 @@ const AdminAnalytics = () => {
             <div className="bg-white rounded-lg shadow-lg p-4 transform transition-transform duration-300 delay-1000 hover:scale-105">
               <h3 className="text-lg font-semibold">Total Check-Outs</h3>
               <div className="flex items-center gap-2">
-                <p className="text-3xl font-semibold">42</p>
-                {42 > 38 ? (
+                <p className="text-3xl font-semibold">{todaysCheckOuts}</p>
+                {todaysCheckOuts > 38 ? (
                   <TrendingUp className="text-green-500" size={24} />
                 ) : (
                   <TrendingDown className="text-red-500" size={24} />
@@ -294,8 +195,6 @@ const AdminAnalytics = () => {
         {showAnalytics ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
             <div className="lg:col-span-2 space-y-4">
-
-              
               <section
                 className="bg-white rounded-lg shadow-lg p-4 h-96"
                 onDoubleClick={() => setOpenDialog(true)}
@@ -376,35 +275,43 @@ const AdminAnalytics = () => {
                     <AdminAttendanceList
                       onBack={() => setOpenDialog(false)}
                       dateRange={dateRange}
-                      attendanceData={filteredData}
                     />
                   </DialogContent>
                 </Dialog>
               </section>
 
               <section
-                className="  space-y-6 md:space-y-4 "
+                className="space-y-6 md:space-y-4"
                 onDoubleClick={handleSectionDoubleClick}
               >
                 <StaffMetrics />
                 <section className="bg-white rounded-lg shadow-lg p-4 h-80">
                   <div className="h-80">
-                    <h3 className="text-lg font-semibold">CheckIn Data</h3>
+                    <h3 className="text-lg font-semibold">Check-In Data</h3>
                     <div className="h-64 w-full flex justify-center items-center">
                       <LineChart
                         height={220}
                         series={[{
-                          data: checkinsData.data.length > 0 ? checkinsData.data : [0], // Fallback data
+                          data: checkinsData.data.length > 0 
+                            ? checkinsData.data 
+                            : [0], 
                           color: "#3331D1",
                           curve: "natural",
                         }]}
                         xAxis={[{
-                          data: checkinsData.labels.length > 0 ? checkinsData.labels : ["No Data"], // Fallback label
+                          data: checkinsData.labels.length > 0 
+                            ? checkinsData.labels.map(date => 
+                                new Date(date).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric' 
+                                })
+                              ) 
+                            : ["No Data"], 
                           scaleType: "band",
                           tickLabelStyle: {
-                            angle: 0,
-                            textAnchor: "middle",
-                            fontSize: 12
+                            angle: -45,
+                            textAnchor: "end",
+                            fontSize: 10
                           }
                         }]}
                         margin={{ top: 40, right: 20, bottom: 40, left: 40 }}
@@ -413,11 +320,9 @@ const AdminAnalytics = () => {
                   </div>
                 </section>
               </section>
-
             </div>
 
             <div className="space-y-4">
-              {/* Revenue Chart */}
               <section className="flex-1">
                 <div
                   className="bg-white rounded-lg shadow-lg p-4 h-96"
@@ -463,21 +368,18 @@ const AdminAnalytics = () => {
                 </div>
               </section>
 
-              <section className="bg-white rounded-lg shadow-lg p-4 ">
-                <h3 className="text-lg font-semibold">
+              <section className="bg-white rounded-lg shadow-lg p-4">
+              <h3 className="text-lg font-semibold">
                   Department Performance
                 </h3>
-                  <DepartmentPerformance />
-                
+                <DepartmentPerformance />
               </section>
-
             </div>
           </div>
         ) : (
           <AdminAttendanceList
             onBack={() => setShowAnalytics(true)}
             dateRange={dateRange}
-            attendanceData={filteredData}
           />
         )}
       </div>

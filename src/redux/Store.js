@@ -12,7 +12,7 @@ import hotelCheckInReducer from './slices/hotelCheckInSlice'
 import revenueReducer from './slices/revenueSlice' 
 import scheduleReducer from './slices/scheduleSlice';
 import leaveReducer from './slices/leaveSlice';
-
+import customerReducer from './slices/customerSlice';
 
 const store = configureStore({
   reducer: {
@@ -29,6 +29,7 @@ const store = configureStore({
     revenue: revenueReducer, 
     schedule: scheduleReducer,
     leave: leaveReducer,
+    customers: customerReducer,
   },
 })
 

@@ -49,7 +49,7 @@ export const fetchTodayAttendanceList = createAsyncThunk(
           }
         }
       );
-      console.log('Today\'s attendance list:', response.data);
+       ('Today\'s attendance list:', response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch today\'s attendance');

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllTasks, fetchTasks } from '../../../../redux/slices/TaskSlice';
+import { fetchStaffData, selectDepartments } from '../../../../redux/slices/StaffSlice';
 
 const DepartmentSkeleton = () => {
   return (
@@ -27,19 +28,25 @@ const DepartmentSkeleton = () => {
 const DepartmentPerformance = () => {
   const dispatch = useDispatch();
   const tasks = useSelector(selectAllTasks);
-  const loading = useSelector(state => state.tasks.loading);
+  const departments = useSelector(selectDepartments);
+  const loading = useSelector(state => state.tasks.loading || state.staff.loading);
 
   useEffect(() => {
     dispatch(fetchTasks());
+    dispatch(fetchStaffData());
   }, [dispatch]);
 
   const departmentMetrics = React.useMemo(() => {
-    const defaultDepartments = {
-      housekeeping: { total: 0, completed: 0, inProgress: 0, pending: 0 },
-      frontdesk: { total: 0, completed: 0, inProgress: 0, pending: 0 },
-      maintenance: { total: 0, completed: 0, inProgress: 0, pending: 0 },
-      kitchen: { total: 0, completed: 0, inProgress: 0, pending: 0 }
-    };
+    // Create a default object for all departments
+    const defaultDepartments = departments.reduce((acc, dept) => {
+      acc[dept.value.toLowerCase()] = { 
+        total: 0, 
+        completed: 0, 
+        inProgress: 0, 
+        pending: 0 
+      };
+      return acc;
+    }, {});
 
     const departmentGroups = tasks.reduce((acc, task) => {
       const dept = task.department?.toLowerCase() || 'other';
@@ -72,19 +79,22 @@ const DepartmentPerformance = () => {
       return acc;
     }, defaultDepartments);
 
-    return Object.entries(departmentGroups).map(([dept, stats]) => ({
-      department: dept.charAt(0).toUpperCase() + dept.slice(1),
-      performance: Math.min(((stats.completed + stats.inProgress * 0.5) / Math.max(stats.total, 1) * 100), 100).toFixed(1),
-      total: stats.total,
-      completed: stats.completed,
-      inProgress: stats.inProgress,
-      pending: stats.pending
-    }));
-  }, [tasks]);
+    return Object.entries(departmentGroups)
+      .filter(([dept]) => dept !== 'other')
+      .map(([dept, stats]) => ({
+        department: dept.charAt(0).toUpperCase() + dept.slice(1),
+        performance: Math.min(((stats.completed + stats.inProgress * 0.5) / Math.max(stats.total, 1) * 100), 100).toFixed(1),
+        total: stats.total,
+        completed: stats.completed,
+        inProgress: stats.inProgress,
+        pending: stats.pending
+      }))
+      .sort((a, b) => parseFloat(b.performance) - parseFloat(a.performance)); 
+  }, [tasks, departments]);
 
   if (loading) {
     return (
-      <div className="w-full overflow-y-auto max-h-[440px]">
+      <div className="w-full overflow-y-auto h-[51rem]">
         <div className="grid grid-cols-1 gap-2">
           {[...Array(4)].map((_, index) => (
             <DepartmentSkeleton key={index} />

@@ -14,7 +14,7 @@ export const loginUser = createAsyncThunk(
           }
         }
       );
-      console.log(request);
+       (request);
       const response = await request.data;
       if(rememberMe)
         localStorage.setItem('rememberMe', true);
@@ -30,7 +30,7 @@ export const loginUser = createAsyncThunk(
       
       return response;
     } catch (error) {
-      console.log(error)
+       (error)
       return rejectWithValue(error.response?.data || { message: 'Login failed' });
     }
   }
@@ -50,7 +50,7 @@ export const registerUser = createAsyncThunk(
         }
       );
       const response = await request.data;
-      console.log(request)
+       (request)
       // localStorage.setItem('registrationStarted', 'true');
       // const storageMethod = rememberMe ? localStorage : sessionStorage;
       // storageMethod.setItem('userEmail', userCredentials.email);

@@ -10,7 +10,7 @@ export const verifyOtp = createAsyncThunk(
         otp: otp.toString(),
       };
 
-      console.log("Sending payload:", payload);
+       ("Sending payload:", payload);
 
       const response = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/register/",
@@ -22,7 +22,7 @@ export const verifyOtp = createAsyncThunk(
         }
       );
       
-      console.log("Response:", response.data);
+       ("Response:", response.data);
       localStorage.setItem("id", response.data.user_id);
       localStorage.setItem("token", response.data.access_token);
       return response.data;
@@ -45,7 +45,7 @@ export const resendOtp = createAsyncThunk(
   "otp/resendOtp",
   async (userCredentials, {rejectWithValue}) => {
     try {
-      console.log("Sending payload:", userCredentials);
+       ("Sending payload:", userCredentials);
 
       const response = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/registrationOTP/",
@@ -57,7 +57,7 @@ export const resendOtp = createAsyncThunk(
         }
       );
 
-      console.log("Response:", response.data);
+       ("Response:", response.data);
       return response.data;
     } catch (error) {
       if (!error.response) {

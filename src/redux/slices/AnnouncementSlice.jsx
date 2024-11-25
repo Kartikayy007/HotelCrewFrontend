@@ -24,7 +24,7 @@ export const createAnnouncement = createAsyncThunk(
         urgency: announcementData.urgency || 'urgent'
       };
 
-      console.log('Sending formatted announcement data:', formattedData);
+       ('Sending formatted announcement data:', formattedData);
       
       const config = {
         headers: {
@@ -34,7 +34,7 @@ export const createAnnouncement = createAsyncThunk(
       };
 
       const response = await axios.post(BASE_URL, formattedData, config);
-      console.log('Announcement created response:', response.data);
+       ('Announcement created response:', response.data);
       
       return response.data;
     } catch (error) {
@@ -63,7 +63,7 @@ export const fetchAnnouncements = createAsyncThunk(
       
       const response = await axios.get(BASE_URL, config);
       
-      console.log(response.data)
+       (response.data)
 
       return response.data;
     } catch (error) {
@@ -86,7 +86,7 @@ export const deleteAnnouncement = createAsyncThunk(
 
       const URL = `${BASE_URL}${id}/`;
 
-      console.log('Deleting announcement with ID:', id);
+       ('Deleting announcement with ID:', id);
       const response = await axios.delete(URL, config);
 
       if (response.status === 204) {

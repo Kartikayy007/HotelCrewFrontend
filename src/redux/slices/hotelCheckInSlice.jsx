@@ -34,7 +34,7 @@ export const createCheckIn = createAsyncThunk(
     try {
       const response = await axios.post('http://hotelcrew-1.onrender.com/api/hoteldetails/book/', checkInData);
 
-      console.log(response.data);
+       (response.data);
 
       return response.data;
     } catch (error) {

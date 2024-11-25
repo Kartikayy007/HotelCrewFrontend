@@ -69,7 +69,7 @@ const Verify = ({email}) => {
           otp: otp.join(""),
         }
       );
-      console.log("OTP verified:", response);
+       ("OTP verified:", response);
       setShowOtpInput(false);
     } catch (err) {
       if (!err.response) {
@@ -94,7 +94,7 @@ const Verify = ({email}) => {
           email,
         }
       );
-      console.log("OTP resent");
+       ("OTP resent");
       setTimeLeft(30);
       setIsResendDisabled(true);
       setSuccessMessage("OTP resent successfully");
@@ -136,7 +136,7 @@ const Verify = ({email}) => {
           confirm_password: confirmPassword,
         }
       );
-      console.log("Response:", response);
+       ("Response:", response);
       window.location.reload();
     } catch (err) {
       if (!err.response) {
