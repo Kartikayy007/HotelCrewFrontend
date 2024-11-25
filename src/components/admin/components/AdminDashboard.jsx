@@ -10,6 +10,7 @@ import {
   Snackbar,
   Alert,
   IconButton,
+  Slider,
 } from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
 import {useDispatch, useSelector} from "react-redux";
@@ -39,8 +40,13 @@ import {
   selectDepartments,
 } from "../../../redux/slices/StaffSlice";
 import StaffMetrics from "../../common/StaffMetrics";
-import RevenueChart from "../../common/RevenueChart";
 import LoadingAnimation from "../../common/LoadingAnimation";
+import { 
+  fetchTodayRevenue, 
+  selectTodayRevenue,
+  selectCheckIns 
+} from "../../../redux/slices/hotelCheckInSlice";
+import { fetchTasks } from "../../../redux/slices/TaskSlice";
 
 function AdminDashboard() {
   const dispatch = useDispatch();
@@ -55,7 +61,7 @@ function AdminDashboard() {
     0,
     currentHour || 1,
   ]);
-  const [revenueRange, setRevenueRange] = useState([0, currentHour || 1]);
+  const [revenueRange, setRevenueRange] = useState([0, 23]); // 24 hours
   const [timeData, setTimeData] = useState([]);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,6 +78,8 @@ function AdminDashboard() {
   });
 
   const departments = useSelector(selectDepartments);
+  const todayRevenue = useSelector(selectTodayRevenue);
+  const checkIns = useSelector(selectCheckIns);
 
   const handleSelect = (dept) => {
     setSelected(dept);
@@ -102,16 +110,30 @@ function AdminDashboard() {
     return () => clearInterval(interval);
   }, [currentHour]);
 
+
   const generateTimeData = (hour) => {
-    const performanceData = [];
+    const timeData = [];
+    const hourlyRevenue = new Array(24).fill(0);
+
+    // Aggregate actual revenue by hour
+    checkIns?.forEach(checkin => {
+      const checkinTime = new Date(checkin.check_in_time);
+      const checkinHour = checkinTime.getHours();
+      hourlyRevenue[checkinHour] += parseFloat(checkin.price || 0);
+    });
+
+    // Generate data points up to current hour
     for (let i = 0; i <= hour; i++) {
-      performanceData.push({
+      timeData.push({
         hour: `${i}:00`,
-        performance: Math.floor(Math.random() * (95 - 85 + 1)) + 85,
-        revenue: Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000,
+        revenue: hourlyRevenue[i] || 0
       });
     }
-    return performanceData;
+    return timeData;
+  };
+
+  const getFilteredRevenueData = () => {
+    return timeData.slice(revenueRange[0], revenueRange[1] + 1);
   };
 
   const occupancyData = [
@@ -132,24 +154,34 @@ function AdminDashboard() {
   );
   console.log("Total staff count:", totalStaff);
 
-  const busyStaffCount = tasks.filter(
-    (task) => task.status === "pending" || task.status === "in-progress"
-  ).length;
-  console.log("Busy staff count:", busyStaffCount);
-
+  // Calculate staff status counts
+  const inProgressCount = tasks.filter(task => task.status === "in_progress").length;
+  const pendingCount = tasks.filter(task => task.status === "pending").length;
+  const busyStaffCount = inProgressCount + pendingCount; // Combined count for busy staff
   const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
-  console.log("Vacant staff count:", vacantStaffCount);
 
+  // Simple pie chart data (Busy vs Vacant)
   const staffStatus = [
     {id: 0, value: busyStaffCount, label: "Busy", color: "#252941"},
     {id: 1, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
   ];
+
+  // Detailed breakdown including in-progress and pending separately
+  const detailedStaffStatus = [
+    {id: 0, value: inProgressCount, label: "In Progress", color: "#252941"},
+    {id: 1, value: pendingCount, label: "Pending", color: "#6B46C1"},
+    {id: 2, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
+  ];
+
   console.log("Pie chart data:", staffStatus);
 
   useEffect(() => {
     dispatch(fetchAttendanceStats());
-    dispatch(fetchAttendanceStats());
+    dispatch(fetchStaffData());
+    dispatch(fetchTodayRevenue());
+    dispatch(fetchTasks());
   }, [dispatch]);
+
 
   const staffAttendance = [
     {
@@ -314,6 +346,8 @@ function AdminDashboard() {
           priority: selectedPriority,
         })
       ).unwrap();
+
+    dispatch(fetchTasks());
 
       setTaskTitle("");
       setTaskDescription("");
@@ -530,7 +564,68 @@ function AdminDashboard() {
             </div>
           </div>
 
-          <RevenueChart />
+          <div className="bg-white rounded-xl shadow-lg w-full p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg sm:text-xl font-semibold">Revenue Overview</h2>
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Today's Total Revenue</p>
+                <p className="text-xl font-bold">
+                  ₹{todayRevenue?.toFixed(2) || '0.00'}
+                </p>
+              </div>
+            </div>
+            
+            {loading ? (
+              <Skeleton variant="rectangular" width="100%" height={300} {...skeletonProps} />
+            ) : (
+              <>
+                <LineChart
+                  height={300}
+                  series={[
+                    {
+                      data: getFilteredRevenueData().map(data => data.revenue),
+                      color: '#4C51BF',
+                      area: true,
+                    }
+                  ]}
+                  xAxis={[{
+                    data: getFilteredRevenueData().map(data => data.hour),
+                    scaleType: 'band',
+                  }]}
+                  sx={{
+                    '.MuiLineElement-root': {
+                      strokeWidth: 2,
+                    },
+                    '.MuiAreaElement-root': {
+                      fillOpacity: 0.1,
+                    }
+                  }}
+                />
+                <div className="mt-4 px-4">
+                  <Slider
+                    value={revenueRange}
+                    onChange={(_, newValue) => setRevenueRange(newValue)}
+                    valueLabelDisplay="auto"
+                    min={0}
+                    max={23}
+                    marks={[
+                      { value: 0, label: '00:00' },
+                      { value: 23, label: '23:00' }
+                    ]}
+                    sx={{
+                      color: '#4C51BF',
+                      '& .MuiSlider-thumb': {
+                        backgroundColor: '#4C51BF',
+                      },
+                      '& .MuiSlider-track': {
+                        backgroundColor: '#4C51BF',
+                      }
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
 
           <StaffMetrics />
         </div>
@@ -594,10 +689,6 @@ function AdminDashboard() {
                     height={60}
                     {...skeletonProps}
                   />
-                </div>
-              ) : announcementsError ? (
-                <div className="text-red-500 text-center mt-4">
-                  {announcementsError}
                 </div>
               ) : (
                 <div className="overflow-scroll">

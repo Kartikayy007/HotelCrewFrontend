@@ -25,6 +25,12 @@ import {
 } from "chart.js";
 import {TrendingUp, TrendingDown, Menu, X} from "lucide-react";
 import AdminAttendanceList from "./analysis/AdminAttendanceList";
+import { useSelector, useDispatch } from 'react-redux';
+import { selectStaffList } from '../../../redux/slices/StaffSlice';
+import { fetchWeeklyAttendance } from '../../../redux/slices/AdminAttendanceSlice';
+import StaffMetrics from "../../common/StaffMetrics";
+import { fetchRevenueStats } from '../../../redux/slices/revenueSlice';
+import DepartmentPerformance from "./analysis/DepartmentPerformance";
 
 ChartJS.register(
   RadialLinearScale,
@@ -36,7 +42,6 @@ ChartJS.register(
 );
 
 const AdminAnalytics = () => {
-  const [loading, setLoading] = useState(true);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [performanceRange, setPerformanceRange] = useState([
     0,
@@ -53,6 +58,14 @@ const AdminAnalytics = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const staffList = useSelector(selectStaffList);
+  const totalStaff = staffList.length - 1;
+  const dispatch = useDispatch();
+  const weeklyStats = useSelector(state => state.attendance.weeklyStats);
+  const loading = useSelector(state => state.attendance.loading);
+  const { dates, dailyRevenues, loading: revenueLoading } = useSelector((state) => state.revenue);
+
+  console.log(staffList, staffList.length);
 
   const generateTimeData = (hour) => {
     const performanceData = [];
@@ -104,8 +117,20 @@ const AdminAnalytics = () => {
       data.absent.push(totalStudents - present);
     }
 
+    console.log("this is dataatatafs", data)
+
     return data;
   };
+
+  useEffect(() => {
+    dispatch(fetchWeeklyAttendance());
+
+    const intervalId = setInterval(() => {
+      dispatch(fetchWeeklyAttendance());
+    }, 60 * 60 * 1000); 
+
+    return () => clearInterval(intervalId);
+  }, [dispatch]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -124,6 +149,14 @@ const AdminAnalytics = () => {
 
     return () => clearInterval(interval);
   }, [currentHour]);
+
+  useEffect(() => {
+    dispatch(fetchWeeklyAttendance());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchRevenueStats());
+  }, [dispatch]);
 
   const marks = generateMarks();
 
@@ -202,55 +235,20 @@ const AdminAnalytics = () => {
     height: 250,
   };
 
-  const StaffMetricsDialog = () => (
-    <Dialog
-      open={dialogOpen}
-      onClose={() => setDialogOpen(false)}
-      maxWidth="lg"
-      fullWidth
-      BackdropProps={{
-        sx: {
-          backgroundColor: "rgba(0, 0, 0, 0.4)",
-          backdropFilter: "blur(5px)",
-        },
-      }}
-    >
-      <DialogTitle>
-        Staff Metrics (Hours {performanceRange[0]} - {performanceRange[1]})
-      </DialogTitle>
-      <DialogContent>
-        <Box sx={{width: "100%", mb: 4}}>
-          {loading ? (
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={400}
-              {...skeletonProps}
-            />
-          ) : (
-            <LineChart
-              xAxis={performanceData.xAxis}
-              series={performanceData.series}
-              height={400}
-              margin={{top: 10, right: 20, bottom: 30, left: 40}}
-            />
-          )}
-        </Box>
-        <Box sx={{width: "100%", px: 5}}>
-          <Slider
-            value={performanceRange}
-            onChange={handlePerformanceRangeChange}
-            valueLabelDisplay="auto"
-            step={1}
-            marks={marks}
-            min={0}
-            max={currentHour || 1}
-            sx={{mt: -2}}
-          />
-        </Box>
-      </DialogContent>
-    </Dialog>
-  );
+  const formatDates = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.toLocaleDateString('en-US', { weekday: 'short' });
+    const monthDay = date.toLocaleDateString('en-US', { 
+      month: 'numeric',
+      day: 'numeric'
+    });
+    return `${day}\n${monthDay}`;
+  };
+
+  // First, add a check for data availability
+  const hasAttendanceData = weeklyStats.dates.length > 0 && 
+                         weeklyStats.total_crew_present.length > 0 && 
+                         weeklyStats.total_staff_absent.length > 0;
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
@@ -259,12 +257,11 @@ const AdminAnalytics = () => {
       </h1>
 
       <div>
-        {/* Metrics Section */}
         <div className="flex flex-wrap -mx-2 p-3 sm:p-4">
           <section className="w-full sm:w-1/2 xl:w-1/4 px-2 mb-4">
             <div className="bg-white rounded-lg shadow-lg p-4 transform transition-transform duration-300 delay-1000 hover:scale-105">
               <h3 className="text-lg font-semibold">Total Staff</h3>
-              <p className="text-3xl font-semibold">136</p>
+              <p className="text-3xl font-semibold">{totalStaff}</p>
             </div>
           </section>
 
@@ -311,17 +308,14 @@ const AdminAnalytics = () => {
           </section>
         </div>
 
-        {/* Charts and Analytics Section */}
         {showAnalytics ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
-            {/* Left Column */}
             <div className="lg:col-span-2 space-y-4">
-              {/* Attendance Chart */}
               <section
                 className="bg-white rounded-lg shadow-lg p-4 h-96"
                 onDoubleClick={() => setOpenDialog(true)}
               >
-                <div className=" h-96">
+                <div className="h-96">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-semibold">Attendance</h3>
                     <button
@@ -331,29 +325,37 @@ const AdminAnalytics = () => {
                       ⋯
                     </button>
                   </div>
-                  {/* Original chart content */}
-                  <Box sx={{width: "100%", height: "90%", mt: -7}}>
-                    <BarChart
-                      height={330}
-                      series={[
-                        {
-                          data: filteredData.present,
-                          id: "present",
-                          color: "#3331D1",
-                        },
-                        {
-                          data: filteredData.absent,
-                          id: "absent",
-                          color: "#151542",
-                        },
-                      ]}
-                      borderRadius={5}
-                      xAxis={[{data: filteredData.dates, scaleType: "band"}]}
-                    />
+                  <Box sx={{width: "100%", height: "90%", mt: -4}}>
+                    {loading || !hasAttendanceData ? (
+                      <div className="space-y-4 pt-8">
+                        <Skeleton variant="rectangular" height={250} animation="wave" />
+                        <div className="flex justify-between px-4">
+                          <Skeleton variant="text" width={100} />
+                          <Skeleton variant="text" width={100} />
+                        </div>
+                      </div>
+                    ) : (
+                      <BarChart
+                        height={330}
+                        series={[
+                          {
+                            data: weeklyStats.total_crew_present,
+                            id: "present",
+                            color: "#3331D1",
+                          },
+                          {
+                            data: weeklyStats.total_staff_absent,
+                            id: "absent",
+                            color: "#151542",
+                          },
+                        ]}
+                        borderRadius={5}
+                        xAxis={[{data: weeklyStats.dates, scaleType: "band"}]}
+                      />
+                    )}
                   </Box>
                 </div>
 
-                {/* Enhanced Dialog with Tabs */}
                 <Dialog
                   open={openDialog}
                   onClose={() => setOpenDialog(false)}
@@ -439,47 +441,12 @@ const AdminAnalytics = () => {
                 className="h-96"
                 onDoubleClick={handleSectionDoubleClick}
               >
-                <div className="bg-white rounded-lg shadow-lg p-4 h-96">
-                  <h2 className="text-lg sm:text-xl font-semibold mb-4">
-                    Staff Metrics (Hours {performanceRange[0]} -{" "}
-                    {performanceRange[1]})
-                  </h2>
-                  <Box sx={{width: "100%", mb: 4}}>
-                    {loading ? (
-                      <Skeleton
-                        variant="rectangular"
-                        width="100%"
-                        height={250}
-                        {...skeletonProps}
-                      />
-                    ) : (
-                      <LineChart
-                        xAxis={performanceData.xAxis}
-                        series={performanceData.series}
-                        height={250}
-                        margin={{top: 10, right: 20, bottom: 30, left: 40}}
-                      />
-                    )}
-                  </Box>
-                  <Box sx={{width: "100%", px: 5}}>
-                    <Slider
-                      value={performanceRange}
-                      onChange={handlePerformanceRangeChange}
-                      valueLabelDisplay="auto"
-                      step={1}
-                      marks={marks}
-                      min={0}
-                      max={currentHour || 1}
-                      sx={{mt: -2}}
-                    />
-                  </Box>
-                </div>
-                <StaffMetricsDialog />
+                <StaffMetrics />
               </section>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <section className="bg-white rounded-lg shadow-lg p-4 h-80">
-                  <div className="h-80 ">
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+                <section className="bg-white rounded-lg shadow-lg p-4 mt-40 h-80">
+                  <div className="h-80">
                     <h3 className="text-lg font-semibold">Department Load</h3>
                     <div className="h-64 w-full flex justify-center items-center">
                       <Radar
@@ -511,7 +478,7 @@ const AdminAnalytics = () => {
                     </div>
                   </div>
                 </section>
-                <section className="bg-white rounded-lg shadow-lg p-4 h-80">
+                <section className="bg-white rounded-lg shadow-lg p-4 mt-40 h-80">
                   <div className="h-80">
                     <h3 className="text-lg font-semibold">
                       Departments Performance
@@ -546,12 +513,12 @@ const AdminAnalytics = () => {
                     </div>
                   </div>
                 </section>
-              </div>
+              </div> */}
             </div>
 
             <div className="space-y-4">
               {/* Revenue Chart */}
-              <section className="h-96">
+              <section className="flex-1">
                 <div
                   className="bg-white rounded-lg shadow-lg p-4 h-96"
                   onDoubleClick={() => setRevenueDialogOpen(true)}
@@ -560,173 +527,49 @@ const AdminAnalytics = () => {
                     <h3 className="text-lg font-semibold">Total Revenue</h3>
                   </div>
 
-                  <LineChart
-                    series={[
-                      {
-                        data: [65, 59, 80, 81, 56, 55, 40],
-                        color: "#0B8FD9",
-                        curve: "natural",
-                      },
-                    ]}
-                    xAxis={[
-                      {
-                        data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                        scaleType: "band",
-                      },
-                    ]}
-                    height={300}
-                    margin={{top: 20, right: 20, bottom: 30, left: 40}}
-                  />
-
-                  <div
-                    className={`flex items-center gap-2 ${
-                      30 > 25 ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {30 > 25 ? (
-                      <TrendingUp size={20} />
-                    ) : (
-                      <TrendingDown size={20} />
-                    )}
-                    <span className="font-medium">
-                      {30 > 25 ? "+5%" : "-5%"} from last week
-                    </span>
-                  </div>
-                </div>
-                <Dialog
-                  open={revenueDialogOpen}
-                  onClose={() => setRevenueDialogOpen(false)}
-                  maxWidth="md"
-                  fullWidth
-                  BackdropProps={{
-                    sx: {
-                      backgroundColor: "rgba(0, 0, 0, 0.4)",
-                      backdropFilter: "blur(5px)",
-                    },
-                  }}
-                >
-                  <DialogTitle>Total Revenue Details</DialogTitle>
-                  <DialogContent>
-                    <div className="flex justify-between items-center mb-4">
-                      <select
-                        className="border rounded-md px-3 py-1 text-sm bg-gray-50"
-                        value={dialogTimeRange}
-                        onChange={(e) => setDialogTimeRange(e.target.value)}
-                      >
-                        <option value="day">Today</option>
-                        <option value="week">This Week</option>
-                      </select>
+                  {revenueLoading ? (
+                    <div className="h-[300px] w-full">
+                      <Skeleton 
+                        variant="rectangular"
+                        width="100%"
+                        height={300}
+                        animation="wave"
+                      />
                     </div>
-
+                  ) : (
                     <LineChart
                       series={[
                         {
-                          data: [65, 59, 80, 81, 56, 55, 40],
+                          data: dailyRevenues,
                           color: "#0B8FD9",
                           curve: "natural",
+                          // removed label property
                         },
                       ]}
                       xAxis={[
                         {
-                          data: [
-                            "Mon",
-                            "Tue",
-                            "Wed",
-                            "Thu",
-                            "Fri",
-                            "Sat",
-                            "Sun",
-                          ],
+                          data: dates.map(formatDates),
                           scaleType: "band",
+                          tickLabelStyle: {
+                            angle: 0,
+                            textAnchor: 'middle',
+                            fontSize: 12
+                          }
                         },
                       ]}
                       height={300}
-                      margin={{top: 20, right: 20, bottom: 30, left: 40}}
+                      margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
                     />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={() => setRevenueDialogOpen(false)}>
-                      Close
-                    </Button>
-                  </DialogActions>
-                </Dialog>
+                  )}
+                </div>
               </section>
 
-              <section className="bg-white rounded-lg shadow-lg p-4 h-[45rem]">
+              <section className="bg-white rounded-lg shadow-lg p-4 h-2/3">
                 <h3 className="text-lg font-semibold">
-                  Monthly Revenue Analysis
+                  Department Performance
                 </h3>
                 <div className="h-48 w-full mt-6">
-                  <LineChart
-                    height={400}
-                    series={[
-                      {
-                        data: [
-                          42000, 48000, 55000, 58000, 62000, 68000, 72000,
-                          75000, 71000, 68000, 65000, 70000,
-                        ],
-                        label: "2024",
-                        color: "#2563eb",
-                        showMark: true,
-                      },
-                      {
-                        data: [
-                          38000, 42000, 48000, 50000, 54000, 59000, 65000,
-                          68000, 64000, 60000, 58000, 63000,
-                        ],
-                        label: "2023",
-                        color: "#94a3b8",
-                        showMark: false,
-                        style: {
-                          strokeDasharray: "5 5",
-                        },
-                      },
-                    ]}
-                    xAxis={[
-                      {
-                        data: [
-                          "Jan",
-                          "Feb",
-                          "Mar",
-                          "Apr",
-                          "May",
-                          "Jun",
-                          "Jul",
-                          "Aug",
-                          "Sep",
-                          "Oct",
-                          "Nov",
-                          "Dec",
-                        ],
-                        scaleType: "band",
-                      },
-                    ]}
-                    yAxis={[
-                      {
-                        label: "Revenue ($)",
-                      },
-                    ]}
-                    sx={{
-                      ".MuiLineElement-root": {
-                        strokeWidth: 2,
-                      },
-                      ".MuiMarkElement-root": {
-                        stroke: "#fff",
-                        scale: "1.2",
-                      },
-                    }}
-                    margin={{top: 20, right: 20, bottom: 30, left: 70}}
-                  />
-                </div>
-                <div className="mt-4 flex justify-between text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-                    <span>Current Year</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-                    <span>Previous Year</span>
-                  </div>
+                    <DepartmentPerformance />
                 </div>
               </section>
             </div>

@@ -7,7 +7,12 @@ import ManagerReducer from './slices/ManagerSlice.jsx'
 import AdminAttendanceSlice from './slices/AdminAttendanceSlice'
 import taskReducer from './slices/TaskSlice'
 import announcementReducer from './slices/AnnouncementSlice'
-import staffReducer from "./slices/StaffSlice";
+import staffReducer from "./slices/StaffSlice"
+import hotelCheckInReducer from './slices/hotelCheckInSlice'
+import revenueReducer from './slices/revenueSlice' 
+import scheduleReducer from './slices/scheduleSlice';
+import leaveReducer from './slices/leaveSlice';
+
 
 const store = configureStore({
   reducer: {
@@ -20,6 +25,10 @@ const store = configureStore({
     tasks: taskReducer,
     announcements: announcementReducer,
     staff: staffReducer,
+    hotelCheckIn: hotelCheckInReducer,
+    revenue: revenueReducer, 
+    schedule: scheduleReducer,
+    leave: leaveReducer,
   },
 })
 

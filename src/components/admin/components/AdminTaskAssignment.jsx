@@ -14,12 +14,10 @@ const getStatusColor = (status) => {
   switch(status?.toLowerCase()) {
     case 'completed':
       return 'bg-green-100 text-green-800';
-    case 'in-progress':
+    case 'in_progress': 
       return 'bg-blue-100 text-blue-800';
     case 'pending':
       return 'bg-yellow-100 text-yellow-800';
-    case 'cancelled':
-      return 'bg-red-100 text-red-800';
     default:
       return 'bg-gray-100 text-gray-800';
   }
@@ -29,7 +27,7 @@ const getStatusIcon = (status) => {
   switch(status?.toLowerCase()) {
     case 'completed':
       return <Check className="w-4 h-4 text-green-600" />;
-    case 'in-progress':
+    case 'in_progress': 
       return <Clock className="w-4 h-4 text-blue-600" />;
     case 'pending':
       return <Clock className="w-4 h-4 text-yellow-600" />;
@@ -45,7 +43,7 @@ const TaskColumn = ({ title, status, tasks }) => (
     <h2 className="text-lg font-semibold mb-4 flex items-center">
       <div className={`w-3 h-3 rounded-full ${
         status === 'pending' ? 'bg-yellow-400' :
-        status === 'in-progress' ? 'bg-blue-400' :
+        status === 'in_progress' ? 'bg-blue-400' :
         'bg-green-400'
       } mr-2`}></div>
       {title}
@@ -117,7 +115,7 @@ const AdminTaskAssignment = () => {
   const error = useSelector(selectTasksError);
   
   const pendingTasks = useSelector(state => selectTasksByStatus(state, 'pending'));
-  const inProgressTasks = useSelector(state => selectTasksByStatus(state, 'in-progress'));
+  const inProgressTasks = useSelector(state => selectTasksByStatus(state, 'in_progress')); // Updated
   const completedTasks = useSelector(state => selectTasksByStatus(state, 'completed'));
 
   useEffect(() => {
@@ -165,7 +163,7 @@ const AdminTaskAssignment = () => {
         />
         <TaskColumn 
           title="In Progress" 
-          status="in-progress" 
+          status="in_progress" // Fixed to match API
           tasks={inProgressTasks} 
         />
         <TaskColumn 

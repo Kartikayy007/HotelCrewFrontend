@@ -15,6 +15,29 @@ const getAuthToken = () => {
   return token;
 };
 
+// Helper function to capitalize department name
+const capitalizeDepartment = (department) => {
+  return department.charAt(0).toUpperCase() + department.slice(1).toLowerCase();
+};
+
+// When sending the task data, transform the department field
+const sendTaskData = async (taskData) => {
+  const modifiedData = {
+    ...taskData,
+    department: capitalizeDepartment(taskData.department)
+  };
+
+  const response = await fetch('https://hotelcrew-1.onrender.com/api/taskassignment/tasks/all', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(modifiedData)
+  });
+  
+  return response.json();
+};
+
 export const fetchTasks = createAsyncThunk(
   'tasks/fetchTasks',
   async (_, { rejectWithValue }) => {
@@ -45,7 +68,7 @@ export const createTask = createAsyncThunk(
         {
           title: taskData.title,
           description: taskData.description,
-          department: taskData.department
+          department: capitalizeDepartment(taskData.department)
         },
         {
           headers: {
@@ -111,6 +134,17 @@ export const selectAllTasks = (state) => state.tasks.tasks;
 export const selectTasksLoading = (state) => state.tasks.loading;
 export const selectTasksError = (state) => state.tasks.error;
 export const selectTasksByStatus = (state, status) => 
-  state.tasks.tasks.filter(task => task.status === status);
+  state.tasks.tasks.filter(task => {
+    switch(status) {
+      case 'pending':
+        return task.status === 'pending';
+      case 'in_progress': // Fixed to match API
+        return task.status === 'in_progress';
+      case 'completed':
+        return task.status === 'completed';
+      default:
+        return false;
+    }
+  });
 
 export default taskSlice.reducer;

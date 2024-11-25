@@ -18,6 +18,7 @@ import AdminLeaveManagment from './AdminLeaveManagment';
 import AdminSettings from './AdminSettings';
 import AdminScheduleStatus from './AdminScheduleStatus';
 
+
 const AdminSidebar = ({ onMenuItemClick }) => {
   const [isOpen, setIsOpen] = useState(false);
 
