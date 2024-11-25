@@ -10,12 +10,20 @@ const CHECK_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/ch
 // const api = axios.create({
 //   baseURL: 'https://hotelcrew-1.onrender.com',
 // });
+// localStorage.setItem('accessToken','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY4MTQ3LCJpYXQiOjE3MzE2NzYxNDcsImp0aSI6IjUyZTJkNDc4NTYxYzRhMmM4ZGIxNDRmMjVkZWYxMjJmIiwidXNlcl9pZCI6NDV9.p4LuZecKhv6K5dVs-9f1lNFxprEdi-_j7wcoR4Zbscs')
 
-
+console.log(localStorage.accessToken)
 const getAuthHeaders = () => {
   const token = localStorage.getItem('accessToken');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  if (!token) {
+    throw new Error('Authentication token not found');
+  }
+  return {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
 };
+
 
 
 
