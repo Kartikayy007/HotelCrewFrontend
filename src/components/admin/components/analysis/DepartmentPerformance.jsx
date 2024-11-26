@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllTasks, fetchTasks } from '../../../../redux/slices/TaskSlice';
 import { fetchStaffData, selectDepartments } from '../../../../redux/slices/StaffSlice';
@@ -36,22 +36,14 @@ const DepartmentPerformance = () => {
     dispatch(fetchStaffData());
   }, [dispatch]);
 
-  const departmentMetrics = React.useMemo(() => {
-    // Create a default object for all departments
-    const defaultDepartments = departments.reduce((acc, dept) => {
-      acc[dept.value.toLowerCase()] = { 
-        total: 0, 
-        completed: 0, 
-        inProgress: 0, 
-        pending: 0 
-      };
-      return acc;
-    }, {});
+   console.log(tasks, departments);
 
-    const departmentGroups = tasks.reduce((acc, task) => {
+  const departmentMetrics = useMemo(() => {
+    // First, group tasks by department
+    const departmentGroups = tasks.reduce((groups, task) => {
       const dept = task.department?.toLowerCase() || 'other';
-      if (!acc[dept]) {
-        acc[dept] = {
+      if (!groups[dept]) {
+        groups[dept] = {
           total: 0,
           completed: 0,
           inProgress: 0,
@@ -59,38 +51,43 @@ const DepartmentPerformance = () => {
         };
       }
       
-      acc[dept].total += 1;
+      // Increment total
+      groups[dept].total += 1;
       
-      switch(task.status) {
+      // Count by status
+      switch (task.status.toLowerCase()) {
         case 'completed':
-          acc[dept].completed += 1;
+          groups[dept].completed += 1;
           break;
-        case 'in-progress':
-          acc[dept].inProgress += 1;
+        case 'in_progress':
+          groups[dept].inProgress += 1;
           break;
         case 'pending':
-          acc[dept].pending += 1;
+          groups[dept].pending += 1;
           break;
         default:
-          acc[dept].pending += 1;
           break;
       }
       
-      return acc;
-    }, defaultDepartments);
+      return groups;
+    }, {});
 
+    // Convert to array and calculate performance
     return Object.entries(departmentGroups)
       .filter(([dept]) => dept !== 'other')
       .map(([dept, stats]) => ({
         department: dept.charAt(0).toUpperCase() + dept.slice(1),
-        performance: Math.min(((stats.completed + stats.inProgress * 0.5) / Math.max(stats.total, 1) * 100), 100).toFixed(1),
+        performance: Math.min(
+          ((stats.completed + stats.inProgress * 0.5) / Math.max(stats.total, 1) * 100),
+          100
+        ).toFixed(1),
         total: stats.total,
         completed: stats.completed,
         inProgress: stats.inProgress,
         pending: stats.pending
       }))
-      .sort((a, b) => parseFloat(b.performance) - parseFloat(a.performance)); 
-  }, [tasks, departments]);
+      .sort((a, b) => parseFloat(b.performance) - parseFloat(a.performance));
+  }, [tasks]);
 
   if (loading) {
     return (

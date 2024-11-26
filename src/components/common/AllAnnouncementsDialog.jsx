@@ -51,6 +51,12 @@ export const AllAnnouncementsDialog = ({ open, onClose }) => {
       onClose={onClose}
       maxWidth="md" 
       fullWidth
+      BackdropProps={{
+        sx: {
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
+          backdropFilter: "blur(5px)",
+        },
+      }}
     >
       <div className="p-6">
         <div className="flex justify-between items-center mb-4">

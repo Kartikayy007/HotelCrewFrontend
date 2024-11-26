@@ -77,6 +77,7 @@ const TaskDetailDialog = ({ task, open, onClose }) => {
       onClose={onClose}
       maxWidth="md"
       fullWidth
+      
     >
       <div className="p-6">
         <div className="flex justify-between items-start">

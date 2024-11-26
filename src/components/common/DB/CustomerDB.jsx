@@ -37,12 +37,12 @@ function CustomerDB() {
   };
 
   const handleView = (id) => {
-    console.log("Viewing customer:", id);
+     ("Viewing customer:", id);
     handleMenuClose();
   };
 
   const handleEdit = (id) => {
-    console.log("Editing customer:", id);
+     ("Editing customer:", id);
     handleMenuClose();
   };
 

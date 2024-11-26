@@ -59,11 +59,11 @@ export const fetchStaffData = createAsyncThunk(
       };
 
       const response = await axios.get(API_URL, config);
-      console.log('Fetched staff data:', response.data);
+       ('Fetched staff data:', response.data);
       return response.data;
       
     } catch (error) {
-      console.log('Failed to fetch staff data:');
+       ('Failed to fetch staff data:');
       return rejectWithValue(error.response?.data || "Failed to fetch staff data");
     }
   }

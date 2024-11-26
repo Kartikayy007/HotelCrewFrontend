@@ -20,7 +20,7 @@ export const fetchCustomers = createAsyncThunk(
         'Authorization': `Bearer ${token}`
       }
     });
-    console.log('Fetched customers:', data);
+     ('Fetched customers:', data);
     return data;
   }
 );

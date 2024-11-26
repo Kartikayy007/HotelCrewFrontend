@@ -52,8 +52,8 @@ export const fetchRevenueStats = createAsyncThunk(
           'Content-Type': 'application/json'
         }
       });
-      // console.log('Fetched revenue stats:', response.data);
-      console.log('Fetched revenue stats:', response.data.daily_revenues);
+      //  ('Fetched revenue stats:', response.data);
+       ('Fetched revenue stats:', response.data.daily_revenues);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch revenue stats');
@@ -113,7 +113,7 @@ export const selectLatestRevenue = (state) => {
   return dailyRevenues[dailyRevenues.length - 1] || 0;
 };
 
-console.log('revenueSlice:', revenueSlice);
+ ('revenueSlice:', revenueSlice);
 
 
 export const { setInitialData } = revenueSlice.actions;

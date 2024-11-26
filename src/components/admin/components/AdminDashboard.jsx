@@ -94,7 +94,7 @@ function AdminDashboard() {
     return () => clearInterval(interval);
   }, [dispatch]);
 
-  console.log(latestRevenue);
+   (latestRevenue);
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -154,7 +154,7 @@ function AdminDashboard() {
   };
 
   const getFilteredRevenueData = () => {
-    console.log("timeData:", timeData);
+     ("timeData:", timeData);
     return timeData.slice(revenueRange[0], revenueRange[1] + 1);
   };
 
@@ -817,6 +817,12 @@ function AdminDashboard() {
               onClose={handleViewClose}
               maxWidth="sm"
               fullWidth
+              BackdropProps={{
+                sx: {
+                  backgroundColor: "rgba(0, 0, 0, 0.4)",
+                  backdropFilter: "blur(5px)",
+                },
+              }}
             >
               <div className="p-6">
                 <h2 className="text-xl font-semibold mb-4">
@@ -1030,6 +1036,12 @@ function AdminDashboard() {
         onClose={() => setShowTaskAssignment(false)}
         maxWidth="lg"
         fullWidth
+        BackdropProps={{
+          sx: {
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            backdropFilter: "blur(5px)",
+          },
+        }}
       >
         <AdminTaskAssignment onClose={() => setShowTaskAssignment(false)} />
       </Dialog>
