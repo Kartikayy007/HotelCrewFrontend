@@ -4,7 +4,8 @@ import axios from 'axios';
 const BASE_URL = 'https://hotelcrew-1.onrender.com/api/taskassignment/announcements/';
 
 const getAuthToken = () => {
-  const token = ' eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY';
+  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MTg3MDQ2LCJpYXQiOjE3MzI1OTUwNDYsImp0aSI6Ijc1Y2Q2MzZkYTk5MTQ5ZWFiMjA2ZjBlNjZhODMwZTY2IiwidXNlcl9pZCI6MTA5fQ.xIQKLkKU6TMTbqBlw8f4GGxhpWJt6U9FA7RVfMPGSwQ';
+
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -131,7 +132,7 @@ const announcementSlice = createSlice({
       })
       .addCase(fetchAnnouncements.fulfilled, (state, action) => {
         state.loading = false;
-        state.announcements = action.payload;
+        state.announcements = action.payload.results;
       })
       .addCase(fetchAnnouncements.rejected, (state, action) => {
         state.loading = false;

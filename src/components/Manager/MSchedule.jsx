@@ -85,36 +85,71 @@ if(!scheduleList) return <div>no data in scgedulelist</div>;
   };
   
   
+  // const handleDrop = (e, newShift) => {
+  //   e.preventDefault();
+  
+  //   if (draggedStaff && isShiftChangeMode) {
+  //     setTargetShift(newShift);
+  
+      
+  //     if (!draggedStaff || !Array.isArray(scheduleList)) {
+  //       console.error("Invalid data: draggedStaff or scheduleList is undefined");
+  //       return;
+  //     }
+      
+  //     dispatch(updateShift({ userId: draggedStaff.id, shift: newShift }));
+  
+  //     // Optionally show a success snackbar
+  //     setSnackbarOpen(true);
+  //     const updatedFilteredStaff = scheduleList.map(staff => 
+  //       staff.id === draggedStaff.id ? { ...staff, shift: newShift } : staff
+  //     );
+  
+  //     // Update shift state based on the new filtered list
+  //     setDayShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "morning"));
+  //     setEveningShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "evening"));
+  //     setNightShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "night"));
+  
+  //     console.log("dragged: ",draggedStaff)
+      
+  //     setDraggedStaff(null);
+  //   }
+  // };
   const handleDrop = (e, newShift) => {
     e.preventDefault();
   
     if (draggedStaff && isShiftChangeMode) {
       setTargetShift(newShift);
-  
-      
-      if (!draggedStaff || !Array.isArray(scheduleList)) {
-        console.error("Invalid data: draggedStaff or scheduleList is undefined");
-        return;
-      }
-      
-      dispatch(updateShift({ userId: draggedStaff.id, shift: newShift }));
-  
-      // Optionally show a success snackbar
-      setSnackbarOpen(true);
-      const updatedFilteredStaff = scheduleList.map(staff => 
+      const updatedFilteredStaff = scheduleList.map(staff =>
         staff.id === draggedStaff.id ? { ...staff, shift: newShift } : staff
       );
   
-      // Update shift state based on the new filtered list
+      setFilteredStaff(updatedFilteredStaff);
       setDayShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "morning"));
       setEveningShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "evening"));
       setNightShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "night"));
   
-      console.log("dragged: ",draggedStaff)
+  
+      dispatch(updateShift({ userId: draggedStaff.id, shift: newShift }))
+        .then(() => {
+          // Fetch the updated schedule list after backend update
+          dispatch(fetchShifts());
+        })
+        .catch((error) => {
+          console.error("Failed to update shift:", error);
+          // Revert the optimistic update if the backend call fails
+        setFilteredStaff(scheduleList);
+        setDayShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === "morning"));
+        setEveningShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === "evening"));
+        setNightShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === "night"));
       
+        });
+  
       setDraggedStaff(null);
+      setSnackbarOpen(true);
     }
   };
+  
   
  
   const handleSnackbarClose = () => {
@@ -132,33 +167,36 @@ if(!scheduleList) return <div>no data in scgedulelist</div>;
 const [dayShiftStaff, setDayShiftStaff] = useState([]);
 const [eveningShiftStaff, setEveningShiftStaff] = useState([]);
 const [nightShiftStaff, setNightShiftStaff] = useState([]);
-
+console.log("M",dayShiftStaff);
+console.log("E",eveningShiftStaff);
+console.log("N",nightShiftStaff);
   
-  useEffect(() => {
+useEffect(() => {
+  // Only update shifts from scheduleList if not in drag-and-drop mode
+  if (!isShiftChangeMode) {
     if (Array.isArray(scheduleList)) {
       const updatedFilteredStaff = scheduleList.filter((staff) => {
         const departmentMatch =
           activeFilter === "All" || staff.department.toLowerCase() === activeFilter.toLowerCase();
-  
+
         const searchMatch = staff.user_name
           ? staff.user_name.toLowerCase().includes(searchTerm.toLowerCase())
           : false;
-  
+
         const shiftMatch =
           selectedShift === "All Shifts" || staff.shift?.toLowerCase() === selectedShift.toLowerCase();
-  
+
         return departmentMatch && searchMatch && shiftMatch;
       });
-  
+
       setFilteredStaff(updatedFilteredStaff);
-  
-      console.log()
       setDayShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "morning"));
       setEveningShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "evening"));
       setNightShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "night"));
-     ;
     }
-  }, [scheduleList, activeFilter, searchTerm,selectedShift]);
+  }
+}, [scheduleList, activeFilter, searchTerm, selectedShift, isShiftChangeMode]);
+
 
 
   const ShiftSection = ({ title, staff, shiftType }) => (

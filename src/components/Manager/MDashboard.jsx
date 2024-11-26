@@ -13,14 +13,16 @@ import { CreateAnnouncementBox } from "../reusable components/CreateAnnouncement
 import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError, deleteAnnouncement } from '../../redux/slices/AnnouncementSlice';
 import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";
+import { fetchGuestData } from '../../redux/slices/GuestSlice';
 import { Skeleton } from "@mui/material";
 import Box from "@mui/material/Box";
 import MTaskAssignment from "./MTaskAssignment";
-
+import { fetchLeaveRequests,fetchLeaveCount } from "../../redux/slices/LeaveSlice";
+ 
 const MDashboard = () => {
   const dispatch = useDispatch();
   // const [loading,setloading]=useState(false);
-  const [isPriority, setIsPriority] = useState(false);
+  // const [isPriority, setIsPriority] = useState(false);
   const [isPriorityDropdownOpen, setPriorityDropdownOpen] = useState(false);
   const [selectedPriority, setSelectedPriority] = useState("");
   const [timeData, setTimeData] = useState([]);
@@ -43,15 +45,121 @@ const MDashboard = () => {
     message: "",
     severity: "success",
   });
-
+  const { leaveRequests,leaveLoading, leaveError,leaveCount} = useSelector((state) => state.leave);
   // const [taskData, setTaskData] = useState({
   //   title: '',
   //   description: '',
   //   department: '',
   //   // priority: false, // For priority status
   // });
+  const { dates, checkins, checkouts, guestloading, guesterror } = useSelector((state) => state.attendance);
+  const [sliderValue, setSliderValue] = useState([0, 6]);
+  const [inOutData, setInOutData] = useState({
+    xAxis: [
+      {
+        data: [],
+        scaleType: 'band',
+        categoryGapRatio: 0.5,
+      },
+    ],
+    series: [
+      {
+        id: 'checkin',
+        type: 'bar',
+        data: [],
+        color: '#8094D4',
+        label: 'Check-in',
+      },
+      {
+        id: 'checkout',
+        type: 'bar',
+        data: [],
+        color: '#2A2AA9',
+        label: 'Check-out',
+      },
+    ],
+  });
+
+  useEffect(() => {
+    dispatch(fetchGuestData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Ensure dates, checkins, and checkouts are arrays (default to empty arrays)
+    if (Array.isArray(dates) && dates.length > 0) {
+      setInOutData({
+        xAxis: [
+          {
+            data: dates, // Use actual dates here
+            scaleType: 'band',
+            categoryGapRatio: 0.5,
+          },
+        ],
+        series: [
+          {
+            id: 'checkin',
+            type: 'bar',
+            data: checkins,
+            color: '#8094D4',
+            label: 'Check-in',
+          },
+          {
+            id: 'checkout',
+            type: 'bar',
+            data: checkouts,
+            color: '#2A2AA9',
+            label: 'Check-out',
+          },
+        ],
+      });
+    }
+  }, [dates, checkins, checkouts]);
+
+  const filteredData = {
+    xAxis: [inOutData.xAxis[0].data.slice(sliderValue[0], sliderValue[1] + 1)],
+    series: inOutData.series.map((s) => ({
+      ...s,
+      data: s.data.slice(sliderValue[0], sliderValue[1] + 1),
+    })),
+  };
+
+  const handleSliderChange = (event, newValue) => {
+    setSliderValue(newValue);
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const currentDate = new Date().toISOString().slice(0, 10); // Get today's date in YYYY-MM-DD format
+      const currentIndex = dates.findIndex((date) => date === currentDate);
+      if (currentIndex !== -1) {
+        setSliderValue([currentIndex, currentIndex + 6]); // Move the slider
+      }
+    }, 86400000); // Update the slider every day
+
+    return () => clearInterval(intervalId);
+  }, [dates]);
 
 
+  useEffect(() => {
+    // Define the date for fetchLeaveCount
+    const currentDate = new Date().toISOString().split("T")[0]; // Format as "YYYY-MM-DD"
+
+    // Function to fetch data
+    const fetchData = () => {
+      dispatch(fetchLeaveRequests());
+      dispatch(fetchLeaveCount(currentDate));
+      dispatch(fetchAttendanceStats());
+    };
+
+    // Fetch immediately on mount
+    fetchData();
+
+    // Set up interval to fetch every 4 minutes (240,000 ms)
+    const intervalId = setInterval(fetchData, 240000);
+
+    // Clear the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [dispatch]);
 
   const skeletonProps = {
     animation: "wave",
@@ -81,15 +189,15 @@ const MDashboard = () => {
   const [selected, setSelected] = useState({ label: 'Department', value: '' });
 
   const { stats, error } = useSelector((state) => state.attendance);
-  useEffect(() => {
-    dispatch(fetchAttendanceStats());
+  // useEffect(() => {
+  //   dispatch(fetchAttendanceStats());
 
-    const interval = setInterval(() => {
-      dispatch(fetchAttendanceStats());
-    }, 300000);
+  //   const interval = setInterval(() => {
+  //     dispatch(fetchAttendanceStats());
+  //   }, 300000);
 
-    return () => clearInterval(interval);
-  }, [dispatch]);
+  //   return () => clearInterval(interval);
+  // }, [dispatch]);
 
   const occupancyData = [
     { id: 0, value: 60, label: "Occupied", color: "#252941" },
@@ -129,36 +237,36 @@ const MDashboard = () => {
   ];
 
 
-  const sampleInOutData = {
-    xAxis: [
-      {
-        data: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-        scaleType: "band",
-        categoryGapRatio: 0.5,
-      },
-    ],
-    series: [
-      {
-        id: "checkin",
-        type: "bar",
-        data: [40, 92, 85, 60, 58, 60, 90],
-        color: "#8094D4",
-        label: "Check-in",
+  // const sampleInOutData = {
+  //   xAxis: [
+  //     {
+  //       data: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  //       scaleType: "band",
+  //       categoryGapRatio: 0.5,
+  //     },
+  //   ],
+  //   series: [
+  //     {
+  //       id: "checkin",
+  //       type: "bar",
+  //       data: [40, 92, 85, 60, 58, 60, 90],
+  //       color: "#8094D4",
+  //       label: "Check-in",
 
-      },
-      {
-        id: "checkout",
-        type: "bar",
-        data: [70, 40, 49, 25, 89, 50, 70],
-        color: "#2A2AA9",
-        label: "Check-out",
+  //     },
+  //     {
+  //       id: "checkout",
+  //       type: "bar",
+  //       data: [70, 40, 49, 25, 89, 50, 70],
+  //       color: "#2A2AA9",
+  //       label: "Check-out",
 
-      },
-    ],
-  };
-  const [inOutData, setInOutData] = useState(sampleInOutData);
+  //     },
+  //   ],
+  // };
+  // const [inOutData, setInOutData] = useState(sampleInOutData);
 
-  const [sliderValue, setSliderValue] = useState([0, 6]);
+  // const [sliderValue, setSliderValue] = useState([0, 6]);
 
 
 
@@ -188,28 +296,28 @@ const MDashboard = () => {
   };
 
 
-  useEffect(() => {
-    const currentDayIndex = getCurrentDayIndex();
-    const rotatedData = rotateWeeklyData(sampleInOutData, currentDayIndex);
-    setInOutData(rotatedData);
+  // useEffect(() => {
+  //   const currentDayIndex = getCurrentDayIndex();
+  //   const rotatedData = rotateWeeklyData(sampleInOutData, currentDayIndex);
+  //   setInOutData(rotatedData);
 
 
-    setSliderValue([0, 6]);
-  }, []);
+  //   setSliderValue([0, 6]);
+  // }, []);
 
 
 
 
-  const handleSliderChange = (e, newValue) => {
-    setSliderValue(newValue); // Dynamically update slider range
-  };
-  const filteredData = {
-    xAxis: [inOutData.xAxis[0].data.slice(sliderValue[0], sliderValue[1] + 1)],
-    series: inOutData.series.map((s) => ({
-      ...s,
-      data: s.data.slice(sliderValue[0], sliderValue[1] + 1),
-    })),
-  };
+  // const handleSliderChange = (e, newValue) => {
+  //   setSliderValue(newValue); // Dynamically update slider range
+  // };
+  // const filteredData = {
+  //   xAxis: [inOutData.xAxis[0].data.slice(sliderValue[0], sliderValue[1] + 1)],
+  //   series: inOutData.series.map((s) => ({
+  //     ...s,
+  //     data: s.data.slice(sliderValue[0], sliderValue[1] + 1),
+  //   })),
+  // };
 
 
 
@@ -462,6 +570,9 @@ const MDashboard = () => {
     }
   };
 
+  const pendingLeavesCount = leaveRequests.filter(
+    (leave) => leave.status === "Pending"
+  ).length;
 
 
 
@@ -851,7 +962,7 @@ const MDashboard = () => {
           >
             <MTaskAssignment onClose={() => setShowTaskAssignment(false)} />
           </Dialog>
-          <div className="bg-white rounded-lg shadow  w-full p-4">
+          <div className="bg-white rounded-lg flex flex-col shadow xl:min-h-[515px] w-full p-4">
           <h2 className="text-lg font-semibold">Announcements</h2>
             {/* <div className="space-y-4">
               <div className="border-b pb-2">
@@ -1056,11 +1167,11 @@ const MDashboard = () => {
             <div className="grid grid-cols-2 gap-3">
               <div className="border rounded p-4">
                 <h3 className="font-medium">Pending Requests</h3>
-                <p className="text-2xl font-bold mt-2">5</p>
+                <p className="text-2xl font-bold mt-2">{pendingLeavesCount}</p>
               </div>
               <div className="border rounded p-4">
                 <h3 className="font-medium">Approved Leaves</h3>
-                <p className="text-2xl font-bold mt-2">12</p>
+                <p className="text-2xl font-bold mt-2">{leaveCount}</p>
               </div>
             </div>
           </div>

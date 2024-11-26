@@ -3,7 +3,7 @@ import axios from 'axios';
 
 
 const FETCH_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/list/';
-const UPDATE_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/change/42/';
+const UPDATE_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/change';
 const FETCH_ATTENDANCE_STATS_URL = 'https://hotelcrew-1.onrender.com/api/attendance/stats/'; 
 const CHECK_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/check/'; 
 
@@ -12,15 +12,16 @@ const CHECK_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/ch
 // });
 // localStorage.setItem('accessToken','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY4MTQ3LCJpYXQiOjE3MzE2NzYxNDcsImp0aSI6IjUyZTJkNDc4NTYxYzRhMmM4ZGIxNDRmMjVkZWYxMjJmIiwidXNlcl9pZCI6NDV9.p4LuZecKhv6K5dVs-9f1lNFxprEdi-_j7wcoR4Zbscs')
 
-console.log(localStorage.accessToken)
+
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('accessToken');
+  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MTg3MDQ2LCJpYXQiOjE3MzI1OTUwNDYsImp0aSI6Ijc1Y2Q2MzZkYTk5MTQ5ZWFiMjA2ZjBlNjZhODMwZTY2IiwidXNlcl9pZCI6MTA5fQ.xIQKLkKU6TMTbqBlw8f4GGxhpWJt6U9FA7RVfMPGSwQ';
+
   if (!token) {
-    throw new Error('Authentication token not found');
+    throw new Error("Authentication token not found");
   }
+
   return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`, // Return the headers with the token
   };
 };
 
@@ -43,8 +44,8 @@ export const updateAttendance = createAsyncThunk(
   'attendance/updateAttendance',
   async (id) => {
     const response = await axios.post(
-      UPDATE_ATTENDANCE_URL,
-      { id },
+      `${UPDATE_ATTENDANCE_URL}/${id}/`,
+      {},
       { headers: getAuthHeaders() }
     );
     console.log(response.data);

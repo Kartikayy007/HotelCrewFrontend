@@ -3,6 +3,12 @@ import { useState, useEffect } from 'react';
 import { Maximize2, X } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAttendance, updateAttendance, checkAttendance } from '../../redux/slices/AttendanceSlice';
+import {
+  fetchLeaveRequests,
+  updateLeaveStatus,
+  clearUpdateStatus,
+  clearError,
+} from "../../redux/slices/LeaveSlice";
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -17,6 +23,7 @@ import {
   Alert,
 } from "@mui/material";
 import { Calendar, Check, Clock } from "lucide-react";
+
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 
@@ -24,13 +31,16 @@ const AttendanceDashboard = () => {
   const [department, setDepartment] = useState([]);
   // const [loading, setLoading] = useState(true);
   // const [filteredStaffList, setFilteredStaffList] = useState([]);
+  const dispatch = useDispatch();
   const [selectedDepartments, setSelectedDepartments] = useState(['All']);
+  const { leaveRequests,leaveLoading, leaveError, updateStatus } = useSelector((state) => state.leave);
+  // const leaveRequests = useSelector((state) => state.leave.leaveRequests || []);
 
-  const [leaveRequests, setLeaveRequests] = useState([
-    { id: 1, name: "John Doe", department: "Reception", duration: "2 days", date: "2024-11-20 to 2024-11-21", type: "Sick Leave", status: null, description: "Planned time off for personal matters.", },
-    { id: 2, name: "Jane Smith", department: "Kitchen", duration: "5 days", date: "2024-11-20 to 2024-11-24", type: "Vacation Leave", status: null, description: "Planned time off for personal matters.", },
-    { id: 3, name: "Alice Brown", department: "Security", duration: "2 days", date: "2024-11-20 to 2024-11-22", type: "Personal Leave", status: null, description: "Planned time off for personal matters.", },
-  ]);
+  // const [leaveRequests, setLeaveRequests] = useState([
+  //   { id: 1, name: "John Doe", department: "Reception", duration: "2 days", date: "2024-11-20 to 2024-11-21", type: "Sick Leave", status: null, description: "Planned time off for personal matters.", },
+  //   { id: 2, name: "Jane Smith", department: "Kitchen", duration: "5 days", date: "2024-11-20 to 2024-11-24", type: "Vacation Leave", status: null, description: "Planned time off for personal matters.", },
+  //   { id: 3, name: "Alice Brown", department: "Security", duration: "2 days", date: "2024-11-20 to 2024-11-22", type: "Personal Leave", status: null, description: "Planned time off for personal matters.", },
+  // ]);
 
   const [isTableExpanded, setIsTableExpanded] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -41,10 +51,11 @@ const AttendanceDashboard = () => {
     message: "",
     severity: "success",
   });
-  const handleOpenModal = (staff) => {
-    setSelectedStaff(staff);
-    setOpenModal(true);
-  };
+  const
+    handleOpenModal = (staff) => {
+      setSelectedStaff(staff);
+      setOpenModal(true);
+    };
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -67,7 +78,6 @@ const AttendanceDashboard = () => {
   const [approvedLeaves, setApprovedLeaves] = useState([]);
   const [rejectedLeaves, setRejectedLeaves] = useState([]);
   const { staff, loading, error } = useSelector((state) => state.attendance);
-  const dispatch = useDispatch();
 
   const demoStaff = [
     { id: 1, user_name: "John Doe", email: "john.doe@example.com", department: "Kitchen", current_attendance: "Present", description: "Annual leave request for vacation planning.", },
@@ -81,18 +91,19 @@ const AttendanceDashboard = () => {
 
   const dataToUse = demoMode ? demoStaff : staff;
 
-  useEffect(() => {
-    dispatch(fetchAttendance());
-  }, [dispatch]);
-
   // useEffect(() => {
-  //   const fetchData = () => {
-  //     dispatch(fetchAttendance());
-  //   };
-  //   fetchData();
-  //   const intervalId = setInterval(fetchData, 900000);
-  //   return () => clearInterval(intervalId);
+  //   dispatch(fetchLeaveRequests());
+   
   // }, [dispatch]);
+
+  useEffect(() => {
+    const fetchData = () => {
+      dispatch(fetchAttendance());
+    };
+    fetchData();
+    const intervalId = setInterval(fetchData, 900000);
+    return () => clearInterval(intervalId);
+  }, [dispatch]);
 
 
   useEffect(() => {
@@ -110,55 +121,113 @@ const AttendanceDashboard = () => {
     dispatch(updateAttendance(id));
   };
 
+
+  useEffect(() => {
+    // Fetch leave requests on component mount
+    console.log("Fetching leave requests on mount");
+    dispatch(fetchLeaveRequests());
+
+    // Set an interval to fetch leave requests every 10 minutes
+    const interval = setInterval(() => {
+      dispatch(fetchLeaveRequests());
+    }, 10 * 60 * 1000); // 10 minutes in milliseconds
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
   // if (loading) {
 
   //   return <p>Loading attendance...</p>;
   // }
 
-  if (error) {
-    <div className="flex justify-center text-2xl items-center h-full">
-      return <p>Error loading attendance: {error}</p>;
-    </div>
-  }
+  // if (error) {
+  //   <div className="flex justify-center text-2xl items-center h-full">
+  //     return <p>Error loading attendance: {error}</p>;
+  //   </div>
+  // }
 
-  if (error) {
-    return (
-      console.log({error}),
-      <div className="flex justify-center text-2xl items-center h-full">    
-        <p >No data Available</p>
-      </div>
-    );
-  }
-  // localStorage.clear
+  // if (error) {
+  //   return (
+  //     console.log({error}),
+  //     <div className="flex justify-center text-2xl items-center h-full">    
+  //       <p >No data Available</p>
+  //     </div>
+  //   );
+  // }
+  // 
 
 
   // Handle approve/reject
+  // const handleLeaveAction = (id, action) => {
+  //   setLeaveRequests((prevRequests) =>
+  //     prevRequests.map((request) =>
+  //       request.id === id ? { ...request, status: action } : request
+  //     )
+  //   );
+
+  //   if (action === "approved") {
+  //     const approvedLeave = leaveRequests.find((request) => request.id === id);
+  //     setApprovedLeaves((prevApprovedLeaves) => [...prevApprovedLeaves, approvedLeave]);
+
+  //     setSnackbar({
+  //       open: true,
+  //       message: "Leave request approved successfully",
+  //       severity: "success",
+  //     });
+  //   }
+  //   if (action === "rejected") {
+  //     const rejectedLeave = leaveRequests.find((request) => request.id === id);
+  //     setRejectedLeaves((prevRejectedLeaves) => [...prevRejectedLeaves, rejectedLeave]);
+  //     setSnackbar({
+  //       open: true,
+  //       message: "Leave request rejected",
+  //       severity: "error",
+  //     });
+  //   }
+  // };
   const handleLeaveAction = (id, action) => {
-    setLeaveRequests((prevRequests) =>
-      prevRequests.map((request) =>
-        request.id === id ? { ...request, status: action } : request
-      )
-    );
+    // Dispatch function to interact with the Redux store
+    // const dispatch = useDispatch();
 
-    if (action === "approved") {
-      const approvedLeave = leaveRequests.find((request) => request.id === id);
-      setApprovedLeaves((prevApprovedLeaves) => [...prevApprovedLeaves, approvedLeave]);
+    // API call to update leave status
+    dispatch(updateLeaveStatus({ leaveId: id, status: action }))
+      .unwrap() // Unwrap the promise to handle resolved or rejected cases
+      .then(() => {
+        // setLeaveRequests((prevRequests) =>
+        //   prevRequests.map((request) =>
+        //     request.id === id ? { ...request, status: action } : request
+        //   )
+        // );
 
-      setSnackbar({
-        open: true,
-        message: "Leave request approved successfully",
-        severity: "success",
+        if (action === "approved") {
+          const approvedLeave = leaveRequests.find((request) => request.id === id);
+          setApprovedLeaves((prevApprovedLeaves) => [...prevApprovedLeaves, approvedLeave]);
+
+          setSnackbar({
+            open: true,
+            message: "Leave request approved successfully",
+            severity: "success",
+          });
+        } else if (action === "rejected") {
+          const rejectedLeave = leaveRequests.find((request) => request.id === id);
+          setRejectedLeaves((prevRejectedLeaves) => [...prevRejectedLeaves, rejectedLeave]);
+
+          setSnackbar({
+            open: true,
+            message: "Leave request rejected",
+            severity: "error",
+          });
+        }
+      })
+      .catch((error) => {
+        // Show error in case of API failure
+        setSnackbar({
+          open: true,
+          message: `Failed to ${action} leave request: ${error}`,
+          severity: "error",
+        });
       });
-    }
-    if (action === "rejected") {
-      const rejectedLeave = leaveRequests.find((request) => request.id === id);
-      setRejectedLeaves((prevRejectedLeaves) => [...prevRejectedLeaves, rejectedLeave]);
-      setSnackbar({
-        open: true,
-        message: "Leave request rejected",
-        severity: "error",
-      });
-    }
   };
 
   const handleSnackbarClose = () => {
@@ -168,10 +237,10 @@ const AttendanceDashboard = () => {
     }));
   };
 
-  const 
-  filteredStaff = selectedDepartments.includes("All")
-  ? staff
-  : staff.filter((member) => selectedDepartments.includes(member.department));
+  const
+    filteredStaff = selectedDepartments.includes("All")
+      ? staff
+      : staff.filter((member) => selectedDepartments.includes(member.department));
 
   // const filteredStaff = selectedDepartments.includes("All")
   //   ? dataToUse
@@ -187,6 +256,18 @@ const AttendanceDashboard = () => {
     //   }
     // });
 
+  };
+  const calculateDuration = (fromDate, toDate) => {
+    const start = new Date(fromDate);
+    const end = new Date(toDate);
+
+    // Calculate the difference in milliseconds
+    const differenceInMilliseconds = end - start;
+
+    // Convert milliseconds to days
+    const durationInDays = differenceInMilliseconds / (1000 * 60 * 60 * 24);
+
+    return durationInDays + 1; // Include the start day in the count
   };
   return (
     <section className=" h-screen p-2 mr-1 font-Montserrat">
@@ -214,7 +295,7 @@ const AttendanceDashboard = () => {
               />
             )}
           </div>
-          <div className="md:hidden p-4 flex items-center justify-center">
+          {/* <div className="md:hidden p-4 flex items-center justify-center">
             <select
               className="py-2 px-4 w-full  border border-gray-300 rounded-3xl"
               onChange={(e) => toggleDepartmentSelection(e.target.value)}
@@ -230,14 +311,14 @@ const AttendanceDashboard = () => {
               ))}
 
             </select>
-          </div>
-          <div className=" hidden md:flex mb-2 pl-7 pb-2 gap-4 rounded-3xl pr-9">
+          </div> */}
+          <div className=" flex mb-2 pl-7 pb-2 gap-4 rounded-3xl pr-9 overflow-x-auto">
             {/* "All" Button */}
 
             <button
               key="all"
               onClick={() => toggleDepartmentSelection('All')}
-              className={`px-4 py-1 w-[150px] rounded-3xl font-semibold  border-none ${selectedDepartments.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
+              className={`px-4 py-1 xl:w-[150px] rounded-3xl font-semibold  border-none ${selectedDepartments.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
                 }`}
             >
               All
@@ -248,7 +329,7 @@ const AttendanceDashboard = () => {
               <button
                 key={dept}
                 onClick={() => toggleDepartmentSelection(dept)}
-                className={`px-4 py-1 w-[150px]  rounded-3xl border-none font-semibold ${selectedDepartments.includes(dept)
+                className={`px-4 py-1xl: w-[150px]  rounded-3xl border-none font-semibold ${selectedDepartments.includes(dept)
                   ? "bg-[#6675C5] text-white"
                   : "bg-[#E6EEF9] text-[#252941] "
                   }`}
@@ -360,7 +441,7 @@ const AttendanceDashboard = () => {
           <h2 className="text-xl pl-6 mt-4 mb-0 font-semibold">Leave Requests</h2>
           <div className="px-6 mt-4 space-y-4">
             {/* Check if data is still loading */}
-            {loading ? (
+            {leaveLoading ? (
               // Render skeletons when loading
               Array.from({ length: 5 }).map((_, index) => (
                 <div
@@ -383,22 +464,23 @@ const AttendanceDashboard = () => {
             ) : (
               // Render actual leave requests when data is loaded
               leaveRequests
-                .filter((request) => request.status === null)
+                .filter((request) => request.status === "Pending")
                 .map((request) => (
                   <div
                     key={request.id}
-                    onClick={() => handleOpenModal(request)}
+                    onDoubleClick={() => handleOpenModal(request)}
                     className="flex justify-between items-center p-4 bg-[#E6EEF9] rounded-xl shadow-sm"
                   >
+
                     <div className="w-max">
-                      <p className="font-semibold text-[#252941]">{request.name}</p>
-                      <p className="text-sm text-gray-600">{request.department}</p>
-                      <p className="text-sm text-gray-600">Type: {request.type}</p>
-                      <p className="text-sm text-gray-600">Duration: {request.duration}</p>
-                      <p className="text-sm text-gray-600">Date: {request.date}</p>
+                      <p className="font-semibold text-[#252941]">{request.user_name}</p>
+                      <p className="text-sm text-gray-600">{request.from_date} to {request.to_date}</p>
+                      <p className="text-sm text-gray-600">Type: {request.leave_type}</p>
+                      <p className="text-sm text-gray-600">Duration: {calculateDuration(request.from_date, request.to_date)} days</p>
+                      {/* <p className="text-sm text-gray-600">Date: {request.date}</p> */}
                     </div>
-                    <div className="flex flex-col gap-2 ">
-                      {/* <button
+                    {/* <div className="flex flex-col gap-2 "> 
+                      <button
               className="px-4 w-full py-1 text-white bg-[#252941] rounded-full hover:bg-[#202338]"
               onClick={() => {handleLeaveAction(request.id, "approved");
                 handleCloseModal();
@@ -413,14 +495,14 @@ const AttendanceDashboard = () => {
               }}
             >
               Reject
-            </button> */}
-                    </div>
+            </button> 
+                    </div>*/}
                   </div>
                 ))
             )}
 
             {/* Display a message when no leave requests are pending */}
-            {leaveRequests.filter((request) => request.status === null).length === 0 && !loading && (
+            {leaveRequests.filter((request) => request.status === 'Pending').length === 0 &&(
               <p className="text-gray-600 font-semibold">No leave requests pending.</p>
             )}
           </div>
@@ -429,12 +511,12 @@ const AttendanceDashboard = () => {
         {/* Approved Leaves */}
         <div className="bg-white w-full max-h-[375px] overflow-y-auto pb-7 py-2 rounded-xl shadow scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-200">
           <div className='flex '>
-          {/* <img src="/status.svg" alt="" className=' px-3 mt-1 ' /> */}
-          <h2 className="text-xl pl-6 mt-4 font-semibold">Approved Leaves</h2>
+            {/* <img src="/status.svg" alt="" className=' px-3 mt-1 ' /> */}
+            <h2 className="text-xl pl-6 mt-4 font-semibold">Approved Leaves</h2>
 
           </div>
           <div className="m-6 h-[88%] rounded-xl bg-white mt-4 space-y-4">
-            {loading ? (
+            {leaveLoading ? (
               // Show Skeletons while loading
               Array.from({ length: 5 }).map((_, index) => (
                 <div
@@ -454,11 +536,11 @@ const AttendanceDashboard = () => {
                   key={leave.id}
                   className="p-4 bg-[#E6EEF9] rounded-lg shadow-sm"
                 >
-                  <p className="font-semibold text-[#252941]">{leave.name}</p>
-                  <p className="text-sm text-gray-600">{leave.department}</p>
-                  <p className="text-sm text-gray-600">Type: {leave.type}</p>
-                  <p className="text-sm text-gray-600">Duration: {leave.duration}</p>
-                  <p className="text-sm text-gray-600">Date: {leave.date}</p>
+                  <p className="font-semibold text-[#252941]">{leave.user_name}</p>
+                  {/* <p className="text-sm text-gray-600">{leave.department}</p> */}
+                  <p className="text-sm text-gray-600">Type: {leave.leave_type}</p>
+                  <p className="text-sm text-gray-600">Duration: {calculateDuration(request.from_date, request.to_date)}</p>
+                  <p className="text-sm text-gray-600">Date: {leave.from_date} to {leave.to_date}</p>
                 </div>
               ))
             ) : (
@@ -470,7 +552,7 @@ const AttendanceDashboard = () => {
         <div className="bg-white w-full max-h-[375px] overflow-y-auto pb-7 py-2 rounded-xl shadow scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-200">
           <h2 className=" text-xl pl-6 mt-4 font-semibold">Rejected Leaves</h2>
           <div className="m-6 h-[88%] rounded-xl bg-white mt-4 space-y-4">
-            {loading ? (
+            {leaveLoading ? (
               // Show Skeletons while loading
               Array.from({ length: 5 }).map((_, index) => (
                 <div
@@ -490,11 +572,11 @@ const AttendanceDashboard = () => {
                   key={leave.id}
                   className="p-4 bg-[#efefef] rounded-lg shadow-sm"
                 >
-                  <p className="font-semibold text-[#252941]">{leave.name}</p>
-                  <p className="text-sm text-gray-600">{leave.department}</p>
-                  <p className="text-sm text-gray-600">Type: {leave.type}</p>
-                  <p className="text-sm text-gray-600">Duration: {leave.duration}</p>
-                  <p className="text-sm text-gray-600">Date: {leave.date}</p>
+                  <p className="font-semibold text-[#252941]">{leave.user_name}</p>
+                  {/* <p className="text-sm text-gray-600">{leave.department}</p> */}
+                  <p className="text-sm text-gray-600">Type: {leave.leave_type}</p>
+                  <p className="text-sm text-gray-600">Date: {leave.from_date} to {leave.to_date}</p>
+                  <p className="text-sm text-gray-600">Duration: {calculateDuration(leave.from_date, leave.to_date)}</p>
                 </div>
               ))
             ) : (
@@ -516,30 +598,30 @@ const AttendanceDashboard = () => {
                 component="h2"
                 className="mb-4 text-center"
               >
-                {selectedStaff?.name}
+                {selectedStaff?.user_name}
               </Typography>
               <Divider className="my-4" />
               <div className="space-y-3">
-                <div>
+                {/* <div>
                   <Typography variant="subtitle2" color="text.secondary">
                     Department
                   </Typography>
                   <Typography variant="body1">
                     {selectedStaff?.department}
                   </Typography>
-                </div>
-                <div>
+                </div> */}
+                {/* <div>
                   <Typography variant="subtitle2" color="text.secondary">
                     Description
                   </Typography>
                   <Typography variant="body1">
                     {selectedStaff?.description}
                   </Typography>
-                </div>
+                </div> */}
                 <div>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  {/* <Typography variant="subtitle2" color="text.secondary">
                     Current Leave Status
-                  </Typography>
+                  </Typography> */}
                   <div className="flex items-center space-x-4 mt-2">
                     <button
                       className="px-4 w-full py-1 text-white bg-[#252941] rounded-full hover:bg-[#202338]"
@@ -566,9 +648,10 @@ const AttendanceDashboard = () => {
                     Leave Duration
                   </Typography>
                   <Typography variant="body1">
-                    {selectedStaff?.date} (
-                    {selectedStaff?.days} days)
+                    {selectedStaff?.from_date} to {selectedStaff?.to_date} (
+                    {calculateDuration(selectedStaff?.from_date, selectedStaff?.to_date)} days)
                   </Typography>
+
                 </div>
               </div>
             </div>
