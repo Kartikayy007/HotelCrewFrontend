@@ -2,8 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const API_URL = "https://hotelcrew-1.onrender.com/api/edit/list/";
-const CACHE_KEY = 'staffData';
-const CACHE_DURATION = 24 * 60 * 60 * 1000;
+// const CACHE_KEY = 'staffData';
+// const CACHE_DURATION = 1 * 60 * 60 * 1000; 
 
 const getAuthToken = () => {
   const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
@@ -13,6 +13,7 @@ const getAuthToken = () => {
   return token;
 };
 
+/* Cached version
 const getCachedData = () => {
   try {
     const cached = localStorage.getItem(CACHE_KEY);
@@ -42,17 +43,13 @@ const setCachedData = (data) => {
   } catch (error) {
     console.error('Error writing to cache:', error);
   }
-};
+}; */
 
+// Direct fetch without caching
 export const fetchStaffData = createAsyncThunk(
   "staff/fetchStaffData",
   async (_, { rejectWithValue }) => {
     try {
-      const cachedData = getCachedData();
-      if (cachedData) {
-        return cachedData;
-      }
-
       const token = getAuthToken();
       const config = {
         headers: {
@@ -60,15 +57,11 @@ export const fetchStaffData = createAsyncThunk(
           'Content-Type': 'application/json'
         }
       };
-      
 
       const response = await axios.get(API_URL, config);
-      
       console.log('Fetched staff data:', response.data);
-
-      setCachedData(response.data);
-      
       return response.data;
+      
     } catch (error) {
       console.log('Failed to fetch staff data:');
       return rejectWithValue(error.response?.data || "Failed to fetch staff data");

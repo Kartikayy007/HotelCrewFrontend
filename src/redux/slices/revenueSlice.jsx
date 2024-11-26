@@ -1,8 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+/* Cached version
 const CACHE_KEY = 'revenue_stats';
 const CACHE_DURATION = 6 * 60 * 60 * 1000;
+*/
 
 const getAuthToken = () => {
   const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
@@ -10,6 +12,7 @@ const getAuthToken = () => {
   return token;
 };
 
+/* Cached version functions
 const getCachedData = () => {
   try {
     const cached = localStorage.getItem(CACHE_KEY);
@@ -35,30 +38,25 @@ const setCacheData = (data) => {
   } catch (error) {
     console.error('Cache setting error:', error);
   }
-};
+}; */
 
+// Direct fetch without caching
 export const fetchRevenueStats = createAsyncThunk(
   'revenue/fetchStats',
   async (_, { rejectWithValue }) => {
     try {
-      const cachedData = getCachedData();
-      if (cachedData) {
-        return cachedData;
-      }
-      
       const token = getAuthToken();
       const response = await axios.get('https://hotelcrew-1.onrender.com/api/hoteldetails/room-stats/', {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
-
-      console.log('Fetched revenue stats:', response.data);
-      
-      setCacheData(response.data);
+      // console.log('Fetched revenue stats:', response.data);
+      console.log('Fetched revenue stats:', response.data.daily_revenues);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data || 'Failed to fetch revenue stats');
     }
   }
 );
@@ -104,12 +102,19 @@ const revenueSlice = createSlice({
   },
 });
 
-// Selector to extract room stats
 export const selectRoomStats = (state) => ({
   dates: state.revenue.dates,
   daily_checkins: state.revenue.daily_checkins,
   daily_checkouts: state.revenue.daily_checkouts
 });
+
+export const selectLatestRevenue = (state) => {
+  const dailyRevenues = state.revenue.dailyRevenues;
+  return dailyRevenues[dailyRevenues.length - 1] || 0;
+};
+
+console.log('revenueSlice:', revenueSlice);
+
 
 export const { setInitialData } = revenueSlice.actions;
 export default revenueSlice.reducer;

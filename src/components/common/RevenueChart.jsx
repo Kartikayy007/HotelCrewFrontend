@@ -3,39 +3,31 @@ import {LineChart} from "@mui/x-charts/LineChart";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import Skeleton from "@mui/material/Skeleton";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchRevenueStats } from "../../redux/slices/revenueSlice";
 
 function RevenueChart() {
+  const dispatch = useDispatch();
+  const { daily_revenues: dailyRevenues, dates, loading } = useSelector(state => state.revenue);
+  
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [revenueRange, setRevenueRange] = useState([0, currentHour || 1]);
-  const [timeData, setTimeData] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  const generateTimeData = (hour) => {
-    const data = [];
-    for (let i = 0; i <= hour; i++) {
-      data.push({
-        hour: `${i}:00`,
-        revenue: Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000,
-      });
-    }
-    return data;
-  };
-
+  // Fetch revenue stats every hour
   useEffect(() => {
+    dispatch(fetchRevenueStats());
+
     const interval = setInterval(() => {
       const newHour = new Date().getHours();
       if (newHour !== currentHour) {
         setCurrentHour(newHour);
         setRevenueRange([0, newHour || 1]);
-        setTimeData(generateTimeData(newHour));
+        dispatch(fetchRevenueStats());
       }
-    }, 60000);
-
-    setTimeData(generateTimeData(currentHour));
-    setLoading(false);
+    }, 60000); // Check every minute
 
     return () => clearInterval(interval);
-  }, [currentHour]);
+  }, [dispatch, currentHour]);
 
   const generateMarks = () => {
     const marks = [];
@@ -52,29 +44,31 @@ function RevenueChart() {
     return marks;
   };
 
-  const getFilteredData = (range) => {
-    return timeData.slice(range[0], range[1] + 1);
+  const getFilteredData = () => {
+    return dates.slice(revenueRange[0], revenueRange[1] + 1).map((date, index) => ({
+      date,
+      revenue: dailyRevenues[index] || 0
+    }));
   };
 
   const revenueData = {
-    xAxis: [
-      {
-        id: "hours",
-        data: getFilteredData(revenueRange).map((d) => d.hour),
-        scaleType: "band",
+    xAxis: [{
+      id: "dates",
+      data: getFilteredData().map(d => new Date(d.date).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      })),
+      scaleType: "band",
+    }],
+    series: [{
+      data: getFilteredData().map(d => d.revenue),
+      curve: "linear",
+      color: "#6B46C1",
+      highlightScope: {
+        highlighted: "none",
+        faded: "global",
       },
-    ],
-    series: [
-      {
-        data: getFilteredData(revenueRange).map((d) => d.revenue),
-        curve: "linear",
-        color: "#6B46C1",
-        highlightScope: {
-          highlighted: "none",
-          faded: "global",
-        },
-      },
-    ],
+    }],
   };
 
   const handleRevenueRangeChange = (event, newValue) => {
@@ -84,7 +78,7 @@ function RevenueChart() {
   return (
     <div className="bg-white rounded-xl shadow-lg min-h-[384px] w-full p-4">
       <h2 className="text-lg sm:text-xl font-semibold mb-4">
-        Revenue (Hours {revenueRange[0]} - {revenueRange[1]})
+        Revenue Trend (Last {revenueRange[1] - revenueRange[0] + 1} Days)
       </h2>
       <Box sx={{width: "100%", mb: 4}}>
         {loading ? (
@@ -117,7 +111,7 @@ function RevenueChart() {
           step={1}
           marks={generateMarks()}
           min={0}
-          max={currentHour || 1}
+          max={6} // 7 days of data, 0-6 index
           sx={{
             bottom: 20,
             height: 3,

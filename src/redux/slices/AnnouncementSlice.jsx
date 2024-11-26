@@ -48,23 +48,24 @@ export const createAnnouncement = createAsyncThunk(
   }
 );
 
+// Update fetchAnnouncements in AnnouncementSlice.jsx
 export const fetchAnnouncements = createAsyncThunk(
   'announcements/fetchAll',
-  async (_, { rejectWithValue }) => {
+  async (queryString = '', { rejectWithValue }) => {
     try {
       const token = getAuthToken();
-
       const config = {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
-      }
+      };
       
-      const response = await axios.get(BASE_URL, config);
+      const response = await axios.get(
+        `https://hotelcrew-1.onrender.com/api/taskassignment/announcements/${queryString}`, 
+        config
+      );
       
-       (response.data)
-
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch announcements');
@@ -142,7 +143,9 @@ const announcementSlice = createSlice({
       })
       .addCase(fetchAnnouncements.fulfilled, (state, action) => {
         state.loading = false;
-        state.announcements = action.payload;
+        if (action.payload.results) {
+          state.announcements = [...state.announcements, ...action.payload.results];
+        }
       })
       .addCase(fetchAnnouncements.rejected, (state, action) => {
         state.loading = false;

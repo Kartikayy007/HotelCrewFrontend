@@ -39,7 +39,10 @@ function StaffMetrics() {
         task => task.status === 'completed' || task.status === 'in-progress'
       ).length;
 
-      const performanceRate = (workedAndCompletedStaff / totalAvailableStaff) * 100;
+      const performanceRate = Math.min(
+        (workedAndCompletedStaff / totalAvailableStaff) * 100,
+        100
+      );
 
       performanceData.push({
         hour: `${i}:00`,

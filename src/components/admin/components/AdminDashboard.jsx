@@ -16,13 +16,11 @@ import Skeleton from "@mui/material/Skeleton";
 import {useDispatch, useSelector} from "react-redux";
 import {fetchAttendanceStats} from "../../../redux/slices/AdminAttendanceSlice";
 import {FaChevronUp, FaChevronDown} from "react-icons/fa";
-import {BsThreeDots} from "react-icons/bs";
 import {
   createTask,
   selectTasksLoading,
   selectTasksError,
   selectAllTasks,
-  selectPagination,
 } from "../../../redux/slices/TaskSlice";
 import AdminTaskAssignment from "./AdminTaskAssignment";
 import {CreateAnnouncementBox} from "../../common/CreateAnnouncementBox";
@@ -42,21 +40,23 @@ import {
 } from "../../../redux/slices/StaffSlice";
 import StaffMetrics from "../../common/StaffMetrics";
 import LoadingAnimation from "../../common/LoadingAnimation";
-import { 
-  fetchTodayRevenue, 
-  selectTodayRevenue,
-  selectCheckIns 
-} from "../../../redux/slices/hotelCheckInSlice";
-import { fetchTasks } from "../../../redux/slices/TaskSlice";
-import { 
-  fetchHotelDetails, 
-  selectTotalRooms, 
-  selectAvailableRooms 
-} from '../../../redux/slices/HotelDetailsSlice';
-import { 
-  fetchCheckIns, 
-  selectOccupiedRooms 
-} from '../../../redux/slices/CheckInSlice';
+import {fetchTasks} from "../../../redux/slices/TaskSlice";
+import {
+  fetchHotelDetails,
+  selectTotalRooms,
+  selectAvailableRooms,
+} from "../../../redux/slices/HotelDetailsSlice";
+import {
+  fetchCheckIns,
+  selectOccupiedRooms,
+} from "../../../redux/slices/CheckInSlice";
+import {MoreVertical} from "lucide-react";
+import {AllAnnouncementsDialog} from "../../common/AllAnnouncementsDialog";
+import {
+  selectLatestRevenue,
+  fetchRevenueStats,
+  selectRoomStats,
+} from "../../../redux/slices/revenueSlice";
 
 function AdminDashboard() {
   const dispatch = useDispatch();
@@ -71,7 +71,7 @@ function AdminDashboard() {
     0,
     currentHour || 1,
   ]);
-  const [revenueRange, setRevenueRange] = useState([0, 23]); // 24 hours
+  const [revenueRange, setRevenueRange] = useState([0, currentHour]);
   const [timeData, setTimeData] = useState([]);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -81,6 +81,21 @@ function AdminDashboard() {
     value: "",
   });
 
+  const latestRevenue = useSelector(selectLatestRevenue);
+  const revenueLoading = useSelector((state) => state.revenue.loading);
+
+  useEffect(() => {
+    dispatch(fetchRevenueStats());
+  
+    const interval = setInterval(() => {
+      dispatch(fetchRevenueStats());
+    }, 3600000); 
+  
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
+  console.log(latestRevenue);
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -88,9 +103,6 @@ function AdminDashboard() {
   });
 
   const departments = useSelector(selectDepartments);
-  const todayRevenue = useSelector(selectTodayRevenue);
-  const checkIns = useSelector(selectCheckIns);
-  const totalRooms = useSelector(selectTotalRooms);
   const availableRooms = useSelector(selectAvailableRooms);
   const occupiedRooms = useSelector(selectOccupiedRooms);
 
@@ -116,72 +128,71 @@ function AdminDashboard() {
         setTimeData(generateTimeData(newHour));
       }
     }, 60000);
-
+  
     setTimeData(generateTimeData(currentHour));
     setLoading(false);
-
+  
     return () => clearInterval(interval);
-  }, [currentHour]);
-
+  }, [currentHour, latestRevenue]); 
 
   const generateTimeData = (hour) => {
+    const hourlyRevenues = new Array(24).fill(0);
+    
+    if (latestRevenue) {
+      hourlyRevenues[hour] = parseFloat(latestRevenue);
+    }
+  
     const timeData = [];
-    const hourlyRevenue = new Array(24).fill(0);
-
-    // Aggregate actual revenue by hour
-    checkIns?.forEach(checkin => {
-      const checkinTime = new Date(checkin.check_in_time);
-      const checkinHour = checkinTime.getHours();
-      hourlyRevenue[checkinHour] += parseFloat(checkin.price || 0);
-    });
-
-    // Generate data points up to current hour
     for (let i = 0; i <= hour; i++) {
       timeData.push({
         hour: `${i}:00`,
-        revenue: hourlyRevenue[i] || 0
+        revenue: hourlyRevenues[i]
       });
     }
+  
     return timeData;
   };
 
   const getFilteredRevenueData = () => {
+    console.log("timeData:", timeData);
     return timeData.slice(revenueRange[0], revenueRange[1] + 1);
   };
 
   const occupancyData = [
-    { 
-      id: 0, 
-      value: occupiedRooms, 
-      label: "Occupied", 
-      color: "#252941" 
+    {
+      id: 0,
+      value: occupiedRooms,
+      label: "Occupied",
+      color: "#252941",
     },
-    { 
-      id: 1, 
-      value: availableRooms, 
-      label: "Vacant", 
-      color: "#8094D4" 
-    }
+    {
+      id: 1,
+      value: availableRooms,
+      label: "Vacant",
+      color: "#8094D4",
+    },
   ];
 
   const tasks = useSelector(selectAllTasks);
   const staffPerDepartment = useSelector(selectStaffPerDepartment);
 
-   ("Staff per department:", staffPerDepartment);
-   ("All tasks:", tasks);
+  "Staff per department:", staffPerDepartment;
+  "All tasks:", tasks;
 
   const totalStaff = Object.values(staffPerDepartment).reduce(
     (sum, count) => sum + count,
     0
   );
-   ("Total staff count:", totalStaff);
+  "Total staff count:", totalStaff;
 
-  const inProgressCount = Array.isArray(tasks) ? 
-  tasks.filter(task => task.status.toLowerCase() === "in_progress").length : 0;
-const pendingCount = Array.isArray(tasks) ? 
-  tasks.filter(task => task.status.toLowerCase() === "pending").length : 0;
-const busyStaffCount = inProgressCount + pendingCount;
-const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
+  const inProgressCount = Array.isArray(tasks)
+    ? tasks.filter((task) => task.status.toLowerCase() === "in_progress").length
+    : 0;
+  const pendingCount = Array.isArray(tasks)
+    ? tasks.filter((task) => task.status.toLowerCase() === "pending").length
+    : 0;
+  const busyStaffCount = inProgressCount + pendingCount;
+  const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
 
   // Simple pie chart data (Busy vs Vacant)
   const staffStatus = [
@@ -195,17 +206,16 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
     {id: 2, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
   ];
 
-   ("Pie chart data:", staffStatus);
+  "Pie chart data:", staffStatus;
 
   useEffect(() => {
     dispatch(fetchAttendanceStats());
     dispatch(fetchStaffData());
-    dispatch(fetchTodayRevenue());
     dispatch(fetchTasks());
     dispatch(fetchHotelDetails());
     dispatch(fetchCheckIns());
+    dispatch(fetchRevenueStats());
   }, [dispatch]);
-
 
   const staffAttendance = [
     {
@@ -278,14 +288,14 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
       setLoading(true);
       const enrichedData = {
         ...announcementData,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
-      
+
       await dispatch(createAnnouncement(enrichedData)).unwrap();
       setShowAnnouncementBox(false);
-      
+
       await dispatch(fetchAnnouncements());
-      
+
       setSnackbar({
         open: true,
         message: "Announcement created successfully",
@@ -379,7 +389,7 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
         })
       ).unwrap();
 
-    dispatch(fetchTasks());
+      dispatch(fetchTasks());
 
       setTaskTitle("");
       setTaskDescription("");
@@ -420,19 +430,18 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
   const [selectedPriority, setSelectedPriority] = useState("");
 
   const [showAnnouncementBox, setShowAnnouncementBox] = useState(false);
+  const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
 
   const sortedAnnouncements = useMemo(() => {
     if (!announcements?.length) return [];
 
     return [...announcements].sort((a, b) => {
-      // Ensure we have valid dates before comparing
       const dateA = a.created_at ? new Date(a.created_at) : null;
       const dateB = b.created_at ? new Date(b.created_at) : null;
-      
-      // Handle cases where dates might be invalid
+
       if (!dateA || isNaN(dateA.getTime())) return 1;
       if (!dateB || isNaN(dateB.getTime())) return -1;
-      
+
       return dateB - dateA;
     });
   }, [announcements]);
@@ -480,15 +489,15 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
                         Occupancy Rate
                       </h3>
                       <PieChart
-      series={[
-        {
-          data: occupancyData,
-          highlightScope: { fade: "global", highlight: "item" },
-          innerRadius: 45,
-          paddingAngle: 1,
-          cornerRadius: 1,
-        },
-      ]}
+                        series={[
+                          {
+                            data: occupancyData,
+                            highlightScope: {fade: "global", highlight: "item"},
+                            innerRadius: 45,
+                            paddingAngle: 1,
+                            cornerRadius: 1,
+                          },
+                        ]}
                         height={220}
                         margin={{top: 0, bottom: 40, left: 0, right: 0}}
                         slotProps={{
@@ -606,39 +615,46 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
 
           <div className="bg-white rounded-xl shadow-lg w-full p-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg sm:text-xl font-semibold">Revenue Overview</h2>
+              <h2 className="text-lg sm:text-xl font-semibold">
+                Revenue Overview
+              </h2>
               <div className="text-right">
                 <p className="text-sm text-gray-500">Today's Total Revenue</p>
-                <p className="text-xl font-bold">
-                  ₹{todayRevenue?.toFixed(2) || '0.00'}
-                </p>
+                <p className="text-xl font-bold">₹{latestRevenue || "0.00"}</p>
               </div>
             </div>
-            
-            {loading ? (
-              <Skeleton variant="rectangular" width="100%" height={300} {...skeletonProps} />
+
+            {revenueLoading ? (
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height={300}
+                {...skeletonProps}
+              />
             ) : (
               <>
                 <LineChart
                   height={300}
                   series={[
                     {
-                      data: getFilteredRevenueData().map(data => data.revenue),
-                      color: '#4C51BF',
+                      data: getFilteredRevenueData().map((data) => data.revenue),
+                      color: "#4C51BF",
                       area: true,
-                    }
+                    },
                   ]}
-                  xAxis={[{
-                    data: getFilteredRevenueData().map(data => data.hour),
-                    scaleType: 'band',
-                  }]}
+                  xAxis={[
+                    {
+                      data: getFilteredRevenueData().map((data) => data.hour),
+                      scaleType: "band",
+                    },
+                  ]}
                   sx={{
-                    '.MuiLineElement-root': {
+                    ".MuiLineElement-root": {
                       strokeWidth: 2,
                     },
-                    '.MuiAreaElement-root': {
+                    ".MuiAreaElement-root": {
                       fillOpacity: 0.1,
-                    }
+                    },
                   }}
                 />
                 <div className="mt-4 px-4">
@@ -647,19 +663,19 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
                     onChange={(_, newValue) => setRevenueRange(newValue)}
                     valueLabelDisplay="auto"
                     min={0}
-                    max={23}
+                    max={currentHour}
                     marks={[
-                      { value: 0, label: '00:00' },
-                      { value: 23, label: '23:00' }
+                      {value: 0, label: "00:00"},
+                      {value: currentHour, label: `${currentHour}:00`},
                     ]}
                     sx={{
-                      color: '#4C51BF',
-                      '& .MuiSlider-thumb': {
-                        backgroundColor: '#4C51BF',
+                      color: "#4C51BF",
+                      "& .MuiSlider-thumb": {
+                        backgroundColor: "#4C51BF",
                       },
-                      '& .MuiSlider-track': {
-                        backgroundColor: '#4C51BF',
-                      }
+                      "& .MuiSlider-track": {
+                        backgroundColor: "#4C51BF",
+                      },
                     }}
                   />
                 </div>
@@ -705,9 +721,15 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
           </div>
 
           <div className="bg-white rounded-xl shadow-lg w-full p-4 flex flex-col h-[40rem] xl:h-[calc(40vh)] ">
-            <h2 className="text-lg sm:text-xl font-semibold mb-2">
-              Announcements
-            </h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Today's Announcements</h2>
+              <button
+                onClick={() => setShowAllAnnouncements(true)}
+                className="p-1 hover:bg-gray-100 rounded-full"
+              >
+                <MoreVertical className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
             <div className="flex-1 overflow-y-auto mb-4">
               {announcementsLoading ? (
                 <div className="space-y-4">
@@ -743,8 +765,11 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
                           {announcement.title}
                         </h3>
                         <span className="text-sm text-gray-500">
-                          {announcement.created_at && !isNaN(new Date(announcement.created_at))
-                            ? new Date(announcement.created_at).toLocaleDateString("en-US", {
+                          {announcement.created_at &&
+                          !isNaN(new Date(announcement.created_at))
+                            ? new Date(
+                                announcement.created_at
+                              ).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
@@ -875,6 +900,7 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
               </div>
             </Dialog>
           </div>
+
           <form
             onSubmit={handleAssign}
             className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg lg:flex-1"
@@ -886,7 +912,7 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
                 size="small"
                 className="text-gray-600"
               >
-                <BsThreeDots />
+                <MoreVertical />
               </IconButton>
             </div>
 
@@ -1023,6 +1049,10 @@ const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
           {snackbar.message}
         </Alert>
       </Snackbar>
+      <AllAnnouncementsDialog
+        open={showAllAnnouncements}
+        onClose={() => setShowAllAnnouncements(false)}
+      />
     </section>
   );
 }
