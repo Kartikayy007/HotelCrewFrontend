@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  LayoutDashboard,
-  Menu,
-  X,
-  Settings,
-  Calendar,
-  UserSquare2,
-  Hotel
-} from 'lucide-react';
+import { LayoutDashboard, Settings, Calendar, Menu, X } from 'lucide-react';
 import Dashboard from './Dashboard';
 import GuestRequest from './GuestRequest';
 import RoomManagement from './RoomManagement';
@@ -26,7 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onMenuItemClick }) => {
     { icon: <img src="/guestreq.svg" alt="" />, label: 'Guest Request', component: GuestRequest },
     { icon: <img src="/roommanagment.svg" alt="" />, label: 'Room Management', component: RoomManagement },
     { icon: <Calendar size={20} />, label: 'Schedule', component: Schedule },
-    {icon: <Settings size={20} />, label: 'Profile', component: Profile}
+    { icon: <Settings size={20} />, label: 'Profile', component: Profile }
   ];
 
   const handleMenuClick = (component: React.ComponentType) => {
@@ -68,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onMenuItemClick }) => {
               className="w-full h-full object-cover"
             />
           </div>
-          <h2 className="text-xl font-semibold">Kartikay</h2>
+          <h2 className="text-xl font-semibold">User Name</h2>
         </div>
 
         <ul className="flex-1 space-y-4 px-6 py-4">

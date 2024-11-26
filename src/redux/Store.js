@@ -13,6 +13,8 @@ import revenueReducer from './slices/revenueSlice'
 import scheduleReducer from './slices/scheduleSlice';
 import leaveReducer from './slices/leaveSlice';
 import customerReducer from './slices/customerSlice';
+import hotelDetailsReducer from './slices/HotelDetailsSlice'
+import checkInReducer from './slices/CheckInSlice'
 
 const store = configureStore({
   reducer: {
@@ -30,6 +32,8 @@ const store = configureStore({
     schedule: scheduleReducer,
     leave: leaveReducer,
     customers: customerReducer,
+    hotelDetails: hotelDetailsReducer,
+    checkIns: checkInReducer,
   },
 })
 

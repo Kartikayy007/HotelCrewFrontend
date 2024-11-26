@@ -528,23 +528,6 @@ const Profile = () => {
                 />
               </div>
 
-              <h2 className="text-[#000000] text-xl  font-semibold">
-                Account Details
-              </h2>
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="accountNumber"
-                  className="font-semibold text-sm"
-                >
-                  Account Number
-                </label>
-                <input
-                  type="text"
-                  id="accountNumber"
-                  className="border border-gray-400 rounded-[4px] px-2 focus:outline-none"
-                />
-              </div>
-
               <div className="flex lg:justify-end justify-center">
                 <button
                   type="submit"

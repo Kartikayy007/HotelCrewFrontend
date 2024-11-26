@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const BASE_URL = 'https://hotelcrew-1.onrender.com/api/taskassignment/announcements/';
+const BASE_URL = 'https://hotelcrew-1.onrender.com/api/taskassignment/announcements/day/  ';
 
 const getAuthToken = () => {
-  const token = ' eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -21,7 +21,7 @@ export const createAnnouncement = createAsyncThunk(
         title: announcementData.title,
         description: announcementData.description,
         department: announcementData.department === 'all' ? 'All' : announcementData.department,
-        urgency: announcementData.urgency || 'urgent'
+        urgency: announcementData.urgency ? announcementData.urgency.charAt(0).toUpperCase() + announcementData.urgency.slice(1) : 'Normal'
       };
 
        ('Sending formatted announcement data:', formattedData);

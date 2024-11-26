@@ -4,47 +4,26 @@ import axios from 'axios';
 const initialState = {
   tasks: [],
   loading: false,
-  error: null
+  error: null,
+  pagination: {
+    count: 0,
+    next: null,
+    previous: null
+  }
 };
 
 const getAuthToken = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY';
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
   return token;
-};
-
-// Helper function to capitalize department name
-const capitalizeDepartment = (department) => {
-  return department.charAt(0).toUpperCase() + department.slice(1).toLowerCase();
-};
-
-// When sending the task data, transform the department field
-const sendTaskData = async (taskData) => {
-  const modifiedData = {
-    ...taskData,
-    department: capitalizeDepartment(taskData.department)
-  };
-
-  const response = await fetch('https://hotelcrew-1.onrender.com/api/taskassignment/tasks/all', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(modifiedData)
-  });
-  
-  return response.json();
 };
 
 export const fetchTasks = createAsyncThunk(
   'tasks/fetchTasks',
-  async (_, { rejectWithValue }) => {
+  async (pageParam = '', { rejectWithValue }) => {
     try {
       const token = getAuthToken();
       const response = await axios.get(
-        'https://hotelcrew-1.onrender.com/api/taskassignment/tasks/all/',
+        `https://hotelcrew-1.onrender.com/api/taskassignment/tasks/all/${pageParam}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -65,26 +44,24 @@ export const createTask = createAsyncThunk(
       const token = getAuthToken();
       const response = await axios.post(
         'https://hotelcrew-1.onrender.com/api/taskassignment/tasks/',
-        {
-          title: taskData.title,
-          description: taskData.description,
-          department: capitalizeDepartment(taskData.department)
-        },
+        taskData,
         {
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
         }
       );
+      console.log('Created task:', response.data);
       return response.data;
     } catch (error) {
+      console.error('Create task error:', error);
       return rejectWithValue(error.response?.data || 'Failed to create task');
     }
   }
 );
 
-const taskSlice = createSlice({
+export const taskSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
@@ -93,24 +70,33 @@ const taskSlice = createSlice({
     },
     clearTasks: (state) => {
       state.tasks = [];
+      state.pagination = {
+        count: 0,
+        next: null,
+        previous: null
+      };
     }
   },
   extraReducers: (builder) => {
     builder
-      // Fetch tasks cases
       .addCase(fetchTasks.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.loading = false;
-        state.tasks = action.payload;
+        // Update tasks with new page data
+        state.tasks = action.payload.results;
+        state.pagination = {
+          count: action.payload.count,
+          next: action.payload.next,
+          previous: action.payload.previous
+        };
       })
       .addCase(fetchTasks.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      // Create task cases
       .addCase(createTask.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -118,6 +104,7 @@ const taskSlice = createSlice({
       .addCase(createTask.fulfilled, (state, action) => {
         state.loading = false;
         state.tasks.push(action.payload);
+        state.pagination.count += 1;
       })
       .addCase(createTask.rejected, (state, action) => {
         state.loading = false;
@@ -126,25 +113,28 @@ const taskSlice = createSlice({
   }
 });
 
-// Actions
-export const { clearErrors, clearTasks } = taskSlice.actions;
-
-// Selectors
 export const selectAllTasks = (state) => state.tasks.tasks;
 export const selectTasksLoading = (state) => state.tasks.loading;
 export const selectTasksError = (state) => state.tasks.error;
+export const selectPagination = (state) => state.tasks.pagination;
 export const selectTasksByStatus = (state, status) => 
   state.tasks.tasks.filter(task => {
     switch(status) {
       case 'pending':
-        return task.status === 'pending';
-      case 'in_progress': // Fixed to match API
-        return task.status === 'in_progress';
+        return task.status.toLowerCase() === 'pending';
+      case 'in_progress': 
+        return task.status.toLowerCase() === 'in_progress';
       case 'completed':
-        return task.status === 'completed';
+        return task.status.toLowerCase() === 'completed';
       default:
         return false;
     }
   });
+
+// const tasks = useSelector(selectAllTasks);
+// const inProgressCount = tasks.filter(task => task.status === "in_progress").length;
+// const pendingCount = tasks.filter(task => task.status === "pending").length;
+// const busyStaffCount = inProgressCount + pendingCount;
+// const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
 
 export default taskSlice.reducer;

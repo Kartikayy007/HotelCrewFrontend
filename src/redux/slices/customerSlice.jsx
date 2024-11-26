@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const getAuthToken = () => {
-  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MDY0NDY4LCJpYXQiOjE3MzI0NzI0NjgsImp0aSI6IjhlM2RmNDk5ZWRiZDRlNWRhNTBlNWFmNmEyMDE3YzFjIiwidXNlcl9pZCI6NzZ9.RHOCY0OHncrdSUhpGn8Bd2FtK3OAHhqjLebegI2w73w'
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs'
 
   if (!token) throw new Error('Authentication token not found');
   return token;
@@ -15,7 +15,7 @@ export const fetchCustomers = createAsyncThunk(
 
     const token = getAuthToken();
 
-    const { data } = await axios.get('http://hotelcrew-1.onrender.com/api/hoteldetails/all-customers/', {
+    const { data } = await axios.get('https://hotelcrew-1.onrender.com/api/hoteldetails/all-customers/', {
       headers: {
         'Authorization': `Bearer ${token}`
       }

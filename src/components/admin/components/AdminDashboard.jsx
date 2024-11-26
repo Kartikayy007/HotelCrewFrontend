@@ -22,6 +22,7 @@ import {
   selectTasksLoading,
   selectTasksError,
   selectAllTasks,
+  selectPagination,
 } from "../../../redux/slices/TaskSlice";
 import AdminTaskAssignment from "./AdminTaskAssignment";
 import {CreateAnnouncementBox} from "../../common/CreateAnnouncementBox";
@@ -47,6 +48,15 @@ import {
   selectCheckIns 
 } from "../../../redux/slices/hotelCheckInSlice";
 import { fetchTasks } from "../../../redux/slices/TaskSlice";
+import { 
+  fetchHotelDetails, 
+  selectTotalRooms, 
+  selectAvailableRooms 
+} from '../../../redux/slices/HotelDetailsSlice';
+import { 
+  fetchCheckIns, 
+  selectOccupiedRooms 
+} from '../../../redux/slices/CheckInSlice';
 
 function AdminDashboard() {
   const dispatch = useDispatch();
@@ -80,6 +90,9 @@ function AdminDashboard() {
   const departments = useSelector(selectDepartments);
   const todayRevenue = useSelector(selectTodayRevenue);
   const checkIns = useSelector(selectCheckIns);
+  const totalRooms = useSelector(selectTotalRooms);
+  const availableRooms = useSelector(selectAvailableRooms);
+  const occupiedRooms = useSelector(selectOccupiedRooms);
 
   const handleSelect = (dept) => {
     setSelected(dept);
@@ -137,9 +150,18 @@ function AdminDashboard() {
   };
 
   const occupancyData = [
-    {id: 0, value: 65, label: "Occupied", color: "#252941"},
-    {id: 1, value: 135, label: "Vacant", color: "#8094D4"},
-    {id: 2, value: 110, label: "On Break", color: "#6B46C1"},
+    { 
+      id: 0, 
+      value: occupiedRooms, 
+      label: "Occupied", 
+      color: "#252941" 
+    },
+    { 
+      id: 1, 
+      value: availableRooms, 
+      label: "Vacant", 
+      color: "#8094D4" 
+    }
   ];
 
   const tasks = useSelector(selectAllTasks);
@@ -154,11 +176,12 @@ function AdminDashboard() {
   );
    ("Total staff count:", totalStaff);
 
-  // Calculate staff status counts
-  const inProgressCount = tasks.filter(task => task.status === "in_progress").length;
-  const pendingCount = tasks.filter(task => task.status === "pending").length;
-  const busyStaffCount = inProgressCount + pendingCount; // Combined count for busy staff
-  const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
+  const inProgressCount = Array.isArray(tasks) ? 
+  tasks.filter(task => task.status.toLowerCase() === "in_progress").length : 0;
+const pendingCount = Array.isArray(tasks) ? 
+  tasks.filter(task => task.status.toLowerCase() === "pending").length : 0;
+const busyStaffCount = inProgressCount + pendingCount;
+const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
 
   // Simple pie chart data (Busy vs Vacant)
   const staffStatus = [
@@ -166,7 +189,6 @@ function AdminDashboard() {
     {id: 1, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
   ];
 
-  // Detailed breakdown including in-progress and pending separately
   const detailedStaffStatus = [
     {id: 0, value: inProgressCount, label: "In Progress", color: "#252941"},
     {id: 1, value: pendingCount, label: "Pending", color: "#6B46C1"},
@@ -180,6 +202,8 @@ function AdminDashboard() {
     dispatch(fetchStaffData());
     dispatch(fetchTodayRevenue());
     dispatch(fetchTasks());
+    dispatch(fetchHotelDetails());
+    dispatch(fetchCheckIns());
   }, [dispatch]);
 
 
@@ -252,8 +276,16 @@ function AdminDashboard() {
   const handleCreateAnnouncement = async (announcementData) => {
     try {
       setLoading(true);
-      await dispatch(createAnnouncement(announcementData)).unwrap();
+      const enrichedData = {
+        ...announcementData,
+        created_at: new Date().toISOString()
+      };
+      
+      await dispatch(createAnnouncement(enrichedData)).unwrap();
       setShowAnnouncementBox(false);
+      
+      await dispatch(fetchAnnouncements());
+      
       setSnackbar({
         open: true,
         message: "Announcement created successfully",
@@ -392,9 +424,17 @@ function AdminDashboard() {
   const sortedAnnouncements = useMemo(() => {
     if (!announcements?.length) return [];
 
-    return [...announcements].sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
+    return [...announcements].sort((a, b) => {
+      // Ensure we have valid dates before comparing
+      const dateA = a.created_at ? new Date(a.created_at) : null;
+      const dateB = b.created_at ? new Date(b.created_at) : null;
+      
+      // Handle cases where dates might be invalid
+      if (!dateA || isNaN(dateA.getTime())) return 1;
+      if (!dateB || isNaN(dateB.getTime())) return -1;
+      
+      return dateB - dateA;
+    });
   }, [announcements]);
 
   return (
@@ -440,15 +480,15 @@ function AdminDashboard() {
                         Occupancy Rate
                       </h3>
                       <PieChart
-                        series={[
-                          {
-                            data: occupancyData,
-                            highlightScope: {fade: "global", highlight: "item"},
-                            innerRadius: 45,
-                            paddingAngle: 1,
-                            cornerRadius: 1,
-                          },
-                        ]}
+      series={[
+        {
+          data: occupancyData,
+          highlightScope: { fade: "global", highlight: "item" },
+          innerRadius: 45,
+          paddingAngle: 1,
+          cornerRadius: 1,
+        },
+      ]}
                         height={220}
                         margin={{top: 0, bottom: 40, left: 0, right: 0}}
                         slotProps={{
@@ -703,16 +743,15 @@ function AdminDashboard() {
                           {announcement.title}
                         </h3>
                         <span className="text-sm text-gray-500">
-                          {new Date(announcement.created_at).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
+                          {announcement.created_at && !isNaN(new Date(announcement.created_at))
+                            ? new Date(announcement.created_at).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "Date not available"}
                         </span>
                       </div>
                       <p className="text-gray-600">{announcement.content}</p>

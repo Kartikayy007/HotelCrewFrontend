@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = "http://13.200.191.108:8000/api/edit/list/";
+const API_URL = "https://hotelcrew-1.onrender.com/api/edit/list/";
 const CACHE_KEY = 'staffData';
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
 const getAuthToken = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTk5ODM1LCJpYXQiOjE3MzIwMDc4MzUsImp0aSI6ImYxYzFkODE1NTU3NTQzYjhiNWRlMzYzOTNmOTAxYThmIiwidXNlcl9pZCI6NjR9.dxiN8N9Cf7EWpg33MgjluaCfemeRxMytdD613bDhzWc';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -61,13 +61,16 @@ export const fetchStaffData = createAsyncThunk(
         }
       };
       
+
       const response = await axios.get(API_URL, config);
       
-      // Cache the response
+      console.log('Fetched staff data:', response.data);
+
       setCachedData(response.data);
       
       return response.data;
     } catch (error) {
+      console.log('Failed to fetch staff data:');
       return rejectWithValue(error.response?.data || "Failed to fetch staff data");
     }
   }

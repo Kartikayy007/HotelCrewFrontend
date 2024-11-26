@@ -1,6 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCheckIns, fetchCheckIns } from '../../../redux/slices/CheckInSlice';
 import { PieChart, Pie, Cell } from 'recharts';
 import { Dialog, DialogContent, DialogActions, Button } from '@mui/material';
+import NewCustomerForm from './NewCustomerForm'; 
+import { 
+  selectAllTasks, 
+  fetchTasks, 
+  selectTasksByStatus 
+} from '../../../redux/slices/TaskSlice';
 
 interface RoomSelection {
   type: string;
@@ -8,28 +16,72 @@ interface RoomSelection {
 }
 
 const Dashboard = () => {
-  const taskData = [
-    { name: 'Completed', value: 79 },
-    { name: 'Remaining', value: 21 }
+  // Dummy check-in data
+  const checkIns = [
+    {
+      name: "John Doe",
+      check_in_time: "2024-03-20T10:00:00",
+      check_out_time: "2024-03-22T12:00:00",
+      room_number: "101",
+      status: "VIP"
+    },
+    {
+      name: "Jane Smith",
+      check_in_time: "2024-03-19T14:00:00",
+      check_out_time: "2024-03-21T11:00:00",
+      room_number: "102",
+      status: "REGULAR"
+    }
   ];
+
+  // Dummy task data
+  const allTasks = [
+    { id: 1, status: 'completed' },
+    { id: 2, status: 'pending' },
+    { id: 3, status: 'in_progress' },
+    { id: 4, status: 'completed' }
+  ];
+
+  const completedTasks = allTasks.filter(task => task.status === 'completed');
+  const pendingTasks = allTasks.filter(task => task.status === 'pending');
+  const inProgressTasks = allTasks.filter(task => task.status === 'in_progress');
+
+  const recentCustomers = checkIns
+    .sort((a, b) => new Date(b.check_in_time).getTime() - new Date(a.check_in_time).getTime())
+    .slice(0, 50)
+    .map(checkIn => ({
+      profile: checkIn.name,
+      checkIn: new Date(checkIn.check_in_time).toLocaleDateString(),
+      checkOut: checkIn.check_out_time ? new Date(checkIn.check_out_time).toLocaleDateString() : '-----',
+      duration: checkIn.check_out_time ? 
+        Math.ceil((new Date(checkIn.check_out_time) - new Date(checkIn.check_in_time)) / (1000 * 60 * 60 * 24)) : 
+        '-----',
+      room: checkIn.room_number || '---',
+      status: checkIn.status
+    }));
+
+  // Calculate task statistics
+  const calculateTaskStats = () => {
+    const total = allTasks.length;
+    if (total === 0) return [
+      { name: 'Completed', value: 0 },
+      { name: 'Remaining', value: 0 }
+    ];
+
+    const completed = completedTasks.length;
+    const remaining = total - completed;
+
+    return [
+      { name: 'Completed', value: Math.round((completed / total) * 100) },
+      { name: 'Remaining', value: Math.round((remaining / total) * 100) }
+    ];
+  };
+
+  const taskData = calculateTaskStats();
 
   const attendanceData = [
     { name: 'Present', value: 86 },
     { name: 'Absent', value: 14 }
-  ];
-
-  const recentCustomers = [
-    { profile: 'Arjun Gupta', checkIn: '29/11/24', checkOut: '-----', duration: '-----', room: '406', status: 'VIP' },
-    { profile: 'Shreya Rai', checkIn: '26/11/24', checkOut: '-----', duration: '-----', room: '203', status: 'Regular' },
-    { profile: 'Shreya Rai', checkIn: '25/11/24', checkOut: '30/11/24', duration: '5', room: '306', status: 'Regular' },
-    { profile: 'Shreya Rai', checkIn: '25/11/24', checkOut: '28/11/24', duration: '3', room: '102', status: 'Regular' },
-    { profile: 'Shreya Rai', checkIn: '25/11/24', checkOut: '30/11/24', duration: '5', room: '306', status: 'Regular' },
-    { profile: 'Shreya Rai', checkIn: '25/11/24', checkOut: '28/11/24', duration: '3', room: '102', status: 'Regular' },
-    { profile: 'Shreya Rai', checkIn: '25/11/24', checkOut: '30/11/24', duration: '5', room: '306', status: 'Regular' },
-    { profile: 'Shreya Rai', checkIn: '25/11/24', checkOut: '28/11/24', duration: '3', room: '102', status: 'Regular' },
-    { profile: 'Shreya Rai', checkIn: '25/11/24', checkOut: '30/11/24', duration: '5', room: '306', status: 'Regular' },
-    { profile: 'Shreya Rai', checkIn: '25/11/24', checkOut: '30/11/24', duration: '5', room: '306', status: 'Regular' },
-    { profile: 'Shreya Rai', checkIn: '25/11/24', checkOut: '28/11/24', duration: '3', room: '102', status: 'Regular' }
   ];
 
   const COLORS = {
@@ -38,14 +90,14 @@ const Dashboard = () => {
   };
 
   return (
-    <section className="bg-[#E6EEF9] min-h-screen w-full p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
       <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">Dashboard</h1>
       
       <div className="grid  grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-xl p-6">
+        <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Recent Customers</h2>
           <div className="overflow-x-auto">
-            <div className="max-h-80 overflow-y-auto">
+            <div className="max-h-80 overflow-y-auto ">
               <table className="w-full">
                 <thead className="bg-[#252941] text-white sticky top-0 z-10">
                   <tr>
@@ -82,7 +134,7 @@ const Dashboard = () => {
 
         <NewCustomerForm />
 
-        <div className="bg-white rounded-lg p-6">
+        <div className="bg-white rounded-lg p-6 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Task Progress</h2>
           <div className="flex justify-center">
             <PieChart width={200} height={200}>
@@ -100,12 +152,12 @@ const Dashboard = () => {
             </PieChart>
           </div>
           <div className="mt-4 text-center">
-            <p>On-going tasks: 23</p>
-            <p>Completed tasks: 40</p>
+            <p>On-going tasks: {inProgressTasks.length}</p>
+            <p>Completed tasks: {completedTasks.length}</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-6">
+        <div className="bg-white rounded-lg p-6 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Attendance</h2>
           <div className="flex justify-center">
             <PieChart width={200} height={200}>
@@ -127,7 +179,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-6">
+        <div className="bg-white rounded-lg p-6 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Announcement Channel</h2>
           <div className="p-4 bg-gray-50 rounded">
             <h3 className="font-medium">Important Announcement from Admin to All Staff</h3>
@@ -138,146 +190,6 @@ const Dashboard = () => {
         </div>
       </div>
     </section>
-  );
-};
-
-const NewCustomerForm = () => {
-  const [openRoomDialog, setOpenRoomDialog] = useState(false);
-  const [roomSelections, setRoomSelections] = useState<RoomSelection[]>([]);
-  const [showAddRoom, setShowAddRoom] = useState(false);
-  
-  const roomTypes = ["Single Room", "Double Room", "Suite"];
-
-  const addRoomSelection = (type: string, quantity: number) => {
-    setRoomSelections([...roomSelections, { type, quantity }]);
-    setOpenRoomDialog(false);
-    setShowAddRoom(false);
-  };
-
-  const removeRoomSelection = (index: number) => {
-    setRoomSelections(roomSelections.filter((_, i) => i !== index));
-  };
-
-  return (
-    <div className="bg-white rounded-lg p-6">
-      <h2 className="text-xl font-semibold mb-4">New Customer</h2>
-      <form className="space-y-4">
-        <input
-          type="text"
-          placeholder="Name"
-          className="w-full p-2 rounded border"
-        />
-        <input
-          type="email"
-          placeholder="E-mail"
-          className="w-full p-2 rounded border"
-        />
-        <input
-          type="tel"
-          placeholder="Contact Number"
-          className="w-full p-2 rounded border"
-        />
-
-        <div className="border rounded p-2">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">
-              {roomSelections.length ? 
-                `${roomSelections.length} room(s) selected` : 
-                'No rooms selected'}
-            </span>
-            <button
-              type="button"
-              onClick={() => setOpenRoomDialog(true)}
-              className="text-[#5663AC] text-sm hover:underline"
-            >
-              {roomSelections.length ? 'Edit Rooms' : 'Add Rooms'}
-            </button>
-          </div>
-        </div>
-
-        <select className="w-full p-2 rounded border">
-          <option value="">Status</option>
-          <option value="regular">Regular</option>
-          <option value="vip">VIP</option>
-        </select>
-
-        <button 
-          type="submit"
-          className="w-full p-2 bg-[#5663AC] text-white rounded hover:bg-[#4A5899]"
-        >
-          Add Customer
-        </button>
-      </form>
-
-      <Dialog 
-        open={openRoomDialog} 
-        onClose={() => setOpenRoomDialog(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogContent>
-          <h3 className="font-semibold mb-4">Add Rooms</h3>
-          <div className="space-y-4">
-            <div className="max-h-[200px] overflow-y-auto">
-              {roomSelections.map((room, index) => (
-                <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded mb-2">
-                  <span>{room.quantity}x {room.type}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeRoomSelection(index)}
-                    className="ml-auto text-red-500 hover:text-red-700"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <select 
-                className="p-2 rounded border"
-                id="roomType"
-              >
-                <option value="">Select Room Type</option>
-                {roomTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-              <input
-                type="number"
-                min="1"
-                max="5"
-                placeholder="Quantity"
-                className="p-2 rounded border"
-                id="quantity"
-              />
-            </div>
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button 
-            onClick={() => setOpenRoomDialog(false)}
-            variant="outlined"
-            sx={{ borderColor: '#252941', color: '#252941' }}
-          >
-            Done
-          </Button>
-          <Button
-            onClick={() => {
-              const typeEl = document.getElementById('roomType') as HTMLSelectElement;
-              const quantityEl = document.getElementById('quantity') as HTMLInputElement;
-              if (typeEl.value && quantityEl.value) {
-                addRoomSelection(typeEl.value, parseInt(quantityEl.value));
-              }
-            }}
-            variant="contained"
-            sx={{ bgcolor: '#252941', '&:hover': { bgcolor: '#1A1F35' } }}
-          >
-            Add Room
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
   );
 };
 

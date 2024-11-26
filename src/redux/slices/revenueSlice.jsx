@@ -5,7 +5,7 @@ const CACHE_KEY = 'revenue_stats';
 const CACHE_DURATION = 6 * 60 * 60 * 1000;
 
 const getAuthToken = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NjMwMzg3LCJpYXQiOjE3MzIwMzgzODcsImp0aSI6ImViZTM5MjA1NDU4MzQ2MjBiNGEzN2JiOGVkN2NlMGM3IiwidXNlcl9pZCI6NzZ9.G8FG8hLXSJojgblmPmWr3EOC9uS96ysnLvxIbdBNOoc';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
   if (!token) throw new Error('Authentication token not found');
   return token;
 };
@@ -47,7 +47,7 @@ export const fetchRevenueStats = createAsyncThunk(
       }
       
       const token = getAuthToken();
-      const response = await axios.get('http://13.200.191.108:8000/api/hoteldetails/room-stats/', {
+      const response = await axios.get('https://hotelcrew-1.onrender.com/api/hoteldetails/room-stats/', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

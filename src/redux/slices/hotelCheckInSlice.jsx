@@ -3,7 +3,7 @@ import axios from 'axios';
 
 
 const getAuthToken = () => {
-  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MDY0NDY4LCJpYXQiOjE3MzI0NzI0NjgsImp0aSI6IjhlM2RmNDk5ZWRiZDRlNWRhNTBlNWFmNmEyMDE3YzFjIiwidXNlcl9pZCI6NzZ9.RHOCY0OHncrdSUhpGn8Bd2FtK3OAHhqjLebegI2w73w';
+  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MTg0NjkyLCJpYXQiOjE3MzI1OTI2OTIsImp0aSI6IjNlNmY5MWJkMDc4NzRlOTQ5NjJlM2VhYmNjY2QwMGM2IiwidXNlcl9pZCI6OTB9.RPTv22z2mUg1uRrNrxUUSvv2RzCwGajbwPPONZkEE_Q';
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -18,7 +18,7 @@ export const fetchTodayRevenue = createAsyncThunk(
 
       const token = getAuthToken();
 
-      const response = await axios.get('http://hotelcrew-1.onrender.com/api/hoteldetails/book/');
+      const response = await axios.get('https://hotelcrew-1.onrender.com/api/hoteldetails/book/');
       
       return response.data;
     } catch (error) {
@@ -32,7 +32,7 @@ export const createCheckIn = createAsyncThunk(
   'hotelCheckin/createCheckIn',
   async (checkInData, { rejectWithValue }) => {
     try {
-      const response = await axios.post('http://hotelcrew-1.onrender.com/api/hoteldetails/book/', checkInData);
+      const response = await axios.post('https://hotelcrew-1.onrender.com/api/hoteldetails/book/', checkInData);
 
        (response.data);
 

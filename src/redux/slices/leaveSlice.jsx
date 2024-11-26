@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const getAuthToken = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTk5ODM1LCJpYXQiOjE3MzIwMDc4MzUsImp0aSI6ImYxYzFkODE1NTU3NTQzYjhiNWRlMzYzOTNmOTAxYThmIiwidXNlcl9pZCI6NjR9.dxiN8N9Cf7EWpg33MgjluaCfemeRxMytdD613bDhzWc';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -13,7 +13,7 @@ export const fetchLeaveRequests = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
-      const response = await fetch('http://13.200.191.108:8000/api/attendance/leave_list/', {
+      const response = await fetch('https://hotelcrew-1.onrender.com/api/attendance/leave_list/', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -39,7 +39,7 @@ export const updateLeaveStatus = createAsyncThunk(
   async ({ id, status }, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
-      const response = await fetch(`http://13.200.191.108:8000/api/attendance/leave_approve/${id}/`, {
+      const response = await fetch(`https://hotelcrew-1.onrender.com/api/attendance/leave_approve/${id}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
