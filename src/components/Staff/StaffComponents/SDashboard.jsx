@@ -1,12 +1,34 @@
 import { useState, useEffect, React } from 'react'
+import { useDispatch,useSelector } from 'react-redux';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card, CardContent, Typography, Paper, Container, Box, Skeleton, Slider } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
-
+import { fetchAnnouncements,selectAllAnnouncements,selectAnnouncementsError,selectAnnouncementsLoading } from '../../../redux/slices/AnnouncementSlice';
 const SDashboard = () => {
+  const dispatch = useDispatch();
 
+  // Select announcements, loading, and error states from the store
+  const announcements = useSelector(selectAllAnnouncements);
+  const AnnLoading = useSelector(selectAnnouncementsLoading);
+  const AnnError = useSelector(selectAnnouncementsError);
   const today = new Date();
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Function to fetch announcements
+    const fetchData = () => {
+      dispatch(fetchAnnouncements());
+    };
+
+    // Initial fetch on render
+    fetchData();
+
+    // Fetch every 2 minutes (120,000 ms)
+    const interval = setInterval(fetchData, 120000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, [dispatch]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -22,67 +44,67 @@ const SDashboard = () => {
     },
   };
 
-  const announcements = [
-    {
-      id: 2,
-      title: "Fire Drill Reminder",
-      description: "A fire drill is scheduled for all staff next Monday at 10 AM.",
-      created_at: "2024-11-19T09:45:00.456789Z",
-      assigned_by: "manager@hotelxyz.com (Manager)",
-      department: "All",
-      urgency: "urgent",
-    },
-    {
-      id: 1,
-      title: "System Maintenance",
-      description: "The system will be under maintenance tomorrow.",
-      created_at: "2024-11-18T21:14:23.162456Z",
-      // "assigned_to": [
-      //     "kfbwidfciwen544@jncnsd.com (Staff) (kitchen) (night)",
-      //     "bjkhjbbjb@gmail.com (Staff) (maintenance) (evening)"
-      // ],
-      assigned_by: "cawifon795@cpaurl.com (Admin)",
-      department: "All",
-      urgency: "normal",
-      // "hotel": "Hotel raj",
-    },
-    {
-      id: 3,
-      title: "Kitchen Staff Meeting",
-      description: "Kitchen staff meeting at 4 PM in the main conference room.",
-      created_at: "2024-11-20T14:30:12.897654Z",
-      assigned_by: "chef@hotelxyz.com (Manager)",
-      department: "Kitchen",
-      urgency: "normal",
-    },
-    {
-      id: 4,
-      title: "Guest Complaint Follow-Up",
-      description: "A guest complaint requires immediate attention by the reception staff.",
-      created_at: "2024-11-21T11:00:32.456123Z",
-      assigned_by: "reception@hotelxyz.com ( Reception)",
-      department: "Reception",
-      urgency: "urgent",
-    },
-    {
-      id: 5,
-      title: "Inventory Check",
-      description: "Please ensure all inventory lists are updated by end of day.",
-      created_at: "2024-11-22T17:10:45.123789Z",
-      assigned_by: "stockmanager@hotelxyz.com (Manager)",
-      department: "Maintenance",
-      urgency: "urgent",
-    },
-    {
-      id: 6,
-      title: "New Policy Update",
-      description: "A new policy regarding overtime has been published. Please review.",
-      created_at: "2024-11-23T10:05:15.654321Z",
-      assigned_by: "hr@hotelxyz.com (Manager)",
-      department: "All",
-      urgency: "normal",
-    }
-  ];
+  // const announcements = [
+  //   {
+  //     id: 2,
+  //     title: "Fire Drill Reminder",
+  //     description: "A fire drill is scheduled for all staff next Monday at 10 AM.",
+  //     created_at: "2024-11-19T09:45:00.456789Z",
+  //     assigned_by: "manager@hotelxyz.com (Manager)",
+  //     department: "All",
+  //     urgency: "urgent",
+  //   },
+  //   {
+  //     id: 1,
+  //     title: "System Maintenance",
+  //     description: "The system will be under maintenance tomorrow.",
+  //     created_at: "2024-11-18T21:14:23.162456Z",
+  //     // "assigned_to": [
+  //     //     "kfbwidfciwen544@jncnsd.com (Staff) (kitchen) (night)",
+  //     //     "bjkhjbbjb@gmail.com (Staff) (maintenance) (evening)"
+  //     // ],
+  //     assigned_by: "cawifon795@cpaurl.com (Admin)",
+  //     department: "All",
+  //     urgency: "normal",
+  //     // "hotel": "Hotel raj",
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Kitchen Staff Meeting",
+  //     description: "Kitchen staff meeting at 4 PM in the main conference room.",
+  //     created_at: "2024-11-20T14:30:12.897654Z",
+  //     assigned_by: "chef@hotelxyz.com (Manager)",
+  //     department: "Kitchen",
+  //     urgency: "normal",
+  //   },
+  //   {
+  //     id: 4,
+  //     title: "Guest Complaint Follow-Up",
+  //     description: "A guest complaint requires immediate attention by the reception staff.",
+  //     created_at: "2024-11-21T11:00:32.456123Z",
+  //     assigned_by: "reception@hotelxyz.com ( Reception)",
+  //     department: "Reception",
+  //     urgency: "urgent",
+  //   },
+  //   {
+  //     id: 5,
+  //     title: "Inventory Check",
+  //     description: "Please ensure all inventory lists are updated by end of day.",
+  //     created_at: "2024-11-22T17:10:45.123789Z",
+  //     assigned_by: "stockmanager@hotelxyz.com (Manager)",
+  //     department: "Maintenance",
+  //     urgency: "urgent",
+  //   },
+  //   {
+  //     id: 6,
+  //     title: "New Policy Update",
+  //     description: "A new policy regarding overtime has been published. Please review.",
+  //     created_at: "2024-11-23T10:05:15.654321Z",
+  //     assigned_by: "hr@hotelxyz.com (Manager)",
+  //     department: "All",
+  //     urgency: "normal",
+  //   }
+  // ];
 
   const demoTasks = [
     { day: 0, tasksCompleted: 4, averageDuration: 29 },  // Sunday
@@ -299,7 +321,7 @@ const SDashboard = () => {
         <div className="space-y-5 h-[725px]  ">
           <div className='bg-white w-full mb-4 h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow'>
             <h2 className="text-lg sm:text-xl font-semibold text-left mt-3 mb-4">Announcements</h2>
-            {loading ? (
+            {AnnLoading ? (
               <div className='ml-4 mb-2'>
                 <Skeleton
                   variant="rectangular"
@@ -328,7 +350,7 @@ const SDashboard = () => {
                       <h2 className="text-lg font-semibold text-gray-800">{announcement.title}</h2>
                       <p className="text-gray-600 mt-2">{announcement.description}</p>
                       <p className="text-sm text-gray-500 mt-1">
-                        <strong>Created At:</strong> {formattedDate}  {formattedTime}
+                        <strong>Created At:</strong> {formattedDate} , {formattedTime}
                       </p>
                       <p className="text-sm text-gray-500">
                         <strong>Assigned By:</strong> {announcement.assigned_by}

@@ -63,27 +63,27 @@ const SSchedule = () => {
     setFileName(''); // Clear the file name when "X" is clicked
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      // Validate file type
-      const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
-      if (allowedTypes.includes(file.type)) {
-        setSelectedFile(file);
-        setSnackbar({ open: true, message: "File uploaded successfully.", severity: "success" });
-        setFileName(file.name);
-        setTimeout(() => {
-          handleCloseSnackbar(); // Close snackbar after 3 seconds
-        }, 3000);
-      } else {
-        setSnackbar({ open: true, message: "Invalid file type. Please upload a PDF, JPG, or PNG file.", severity: "error" });
-        event.target.value = ""; // Clear the input
-        setTimeout(() => {
-          handleCloseSnackbar(); // Close snackbar after 3 seconds
-        }, 3000);
-      }
-    }
-  };
+  // const handleFileChange = (event) => {
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //     // Validate file type
+  //     const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
+  //     if (allowedTypes.includes(file.type)) {
+  //       setSelectedFile(file);
+  //       setSnackbar({ open: true, message: "File uploaded successfully.", severity: "success" });
+  //       setFileName(file.name);
+  //       setTimeout(() => {
+  //         handleCloseSnackbar(); // Close snackbar after 3 seconds
+  //       }, 3000);
+  //     } else {
+  //       setSnackbar({ open: true, message: "Invalid file type. Please upload a PDF, JPG, or PNG file.", severity: "error" });
+  //       event.target.value = ""; // Clear the input
+  //       setTimeout(() => {
+  //         handleCloseSnackbar(); // Close snackbar after 3 seconds
+  //       }, 3000);
+  //     }
+  //   }
+  // };
 
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
@@ -117,7 +117,7 @@ const SSchedule = () => {
     { date: "11/11/24", current_attendance: "Present" },
   ]
   return (
-    <section className=" min-h-screen py-2 mx-4 px-0 font-Montserrat overflow-auto">
+    <section className=" h-screen  font-Montserrat  overflow-y-auto ">
       <h2 className="text-[#252941] text-3xl  my-3 pl-8 ml-5 font-semibold">Schedule Status</h2>
       {/* <div className="grid grid-cols-1  xl:grid-cols-[40%,35%,25%] gap-5 p-3 "> */}
       <div className="flex flex-col  xl:flex-row gap-5 p-3 ">
@@ -140,14 +140,14 @@ const SSchedule = () => {
             )}
           </div>
 
-          <div className="bg-white w-full h-[70%] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
+          <div className="bg-white w-full h-[62%] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 text-left">Attendance</h2>
             <div className='h-[90%] mb-4 overflow-y-scroll rounded-lg'>
             {loading ? (
               <div className='ml-4 mb-2'>
                 <Skeleton variant="rectangular"
                   width="95%"
-                  height={600}
+                  height={400}
                   {...skeletonProps}
                 />
               </div>
@@ -194,13 +194,13 @@ const SSchedule = () => {
           </div>
         </div>
         <div className='space-y-5 xl:w-[35%]'>
-          <div className="bg-white w-full xl:h-[85%] h-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
+          <div className="bg-white w-full xl:h-[77%] h-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-2 text-left">Leave Request</h2>
             {loading ? (
               <div className='ml-4 mb-2'>
                 <Skeleton variant="rectangular"
                   width="95%"
-                  height={670}
+                  height={400}
                   {...skeletonProps}
                 />
               </div>
@@ -230,7 +230,7 @@ const SSchedule = () => {
                     >
                       {startDate
                         ? `Start :  ${startDate.toLocaleDateString()}`
-                        : "Select a start date"}
+                        : "Start date"}
                       {isStartDropdownOpen ? (
                         <FaChevronUp className="text-gray-600" />
                       ) : (
@@ -265,7 +265,7 @@ const SSchedule = () => {
                     >
                       {endDate
                         ? `End :  ${endDate.toLocaleDateString()}`
-                        : "Select an end date"}
+                        : "End date  "}
                       {isEndDropdownOpen ? (
                         <FaChevronUp className="text-gray-600" />
                       ) : (
@@ -290,7 +290,7 @@ const SSchedule = () => {
                   </div>
 
                 </div>
-                <div className="flex flex-col gap-4 mt-3">
+                {/* <div className="flex flex-col gap-4 mt-3">
                   <button
                     type="button"
                     onClick={handleFileButtonClick}
@@ -311,7 +311,7 @@ const SSchedule = () => {
                       {/* ) : ( */}
                         {/* 'Attach File' */}
                       {/* )} */}
-                    </span>
+                    {/* </span>
                     {fileName? (<button
                             type="button"
                             onClick={handleRemoveFile} // Remove the file when clicked
@@ -321,15 +321,15 @@ const SSchedule = () => {
                     ):(<FaPaperclip className="text-gray-500 h-6" />)
                     }
                     
-                  </button>
-                  <input
+                  </button> */}
+                  {/* <input
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileChange}
                     className="hidden" // Hidden input field
                     accept=".pdf,.jpg,.jpeg,.png"
-                  />
-                </div>
+                  /> */}
+                {/* </div> */}
                 <div className='relative h-full'>
                   <textarea
                     // value={taskDescription}
