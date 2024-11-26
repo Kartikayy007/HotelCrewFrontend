@@ -3,6 +3,7 @@ import { useDispatch,useSelector } from 'react-redux';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card, CardContent, Typography, Paper, Container, Box, Skeleton, Slider } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
+import { getStaffLeaveHistory } from '../../../redux/slices/StaffLeaveSlice';
 import { fetchAnnouncements,selectAllAnnouncements,selectAnnouncementsError,selectAnnouncementsLoading } from '../../../redux/slices/AnnouncementSlice';
 const SDashboard = () => {
   const dispatch = useDispatch();
@@ -13,11 +14,24 @@ const SDashboard = () => {
   const AnnError = useSelector(selectAnnouncementsError);
   const today = new Date();
   const [loading, setLoading] = useState(true);
+  const {
+    fetchHistoryLoading,
+    fetchHistoryError,
+    leaveHistory,
+  } = useSelector((state) => state.leave);
+  
+  // const leaveStatus = useSelector((state) => state.leave.leaveStatus);
+
+ // Fetch leave history on initial mount
+
+
+ 
 
   useEffect(() => {
     // Function to fetch announcements
     const fetchData = () => {
       dispatch(fetchAnnouncements());
+      dispatch(getStaffLeaveHistory());
     };
 
     // Initial fetch on render
@@ -37,6 +51,8 @@ const SDashboard = () => {
     }, 1500);
 
   }, []);
+
+
   const skeletonProps = {
     animation: "wave",
     sx: {
@@ -116,36 +132,36 @@ const SDashboard = () => {
     { day: 6, tasksCompleted: 8, averageDuration: 51 }, // Saturday
   ];
 
-  const demoLeave = [
-    {
-      id: 1,
-      leave_type: 'Sick',
-      description: 'Annual Leave Request for vacation plannig',
-      from_date: "2024-11-20",
-      to_date: "2024-11-24",
-      created_at: "2024-11-15",
-      status: "Pending"
+  // const demoLeave = [
+  //   {
+  //     id: 1,
+  //     leave_type: 'Sick',
+  //     description: 'Annual Leave Request for vacation plannig',
+  //     from_date: "2024-11-20",
+  //     to_date: "2024-11-24",
+  //     created_at: "2024-11-15",
+  //     status: "Pending"
 
-    },
-    {
-      id: 2,
-      leave_type: 'Sick',
-      description: 'Annual Leave Request for vacation plannig',
-      from_date: "2024-11-20",
-      to_date: "2024-11-23",
-      created_at: "2024-11-15",
-      status: "Pending"
-    },
-    {
-      id: 3,
-      leave_type: 'Sick',
-      description: 'Annual Leave Request for vacation plannig',
-      from_date: "2024-11-25",
-      to_date: "2024-11-30",
-      created_at: "2024-11-15",
-      status: "Pending"
-    }
-  ]
+  //   },
+  //   {
+  //     id: 2,
+  //     leave_type: 'Sick',
+  //     description: 'Annual Leave Request for vacation plannig',
+  //     from_date: "2024-11-20",
+  //     to_date: "2024-11-23",
+  //     created_at: "2024-11-15",
+  //     status: "Pending"
+  //   },
+  //   {
+  //     id: 3,
+  //     leave_type: 'Sick',
+  //     description: 'Annual Leave Request for vacation plannig',
+  //     from_date: "2024-11-25",
+  //     to_date: "2024-11-30",
+  //     created_at: "2024-11-15",
+  //     status: "Pending"
+  //   }
+  // ]
 
 
   const averageDurations = demoTasks.map(task => task.averageDuration);
@@ -176,7 +192,7 @@ const SDashboard = () => {
   return (
     <section className=" h-screen py-2 mx-4 px-0 font-Montserrat ">
       <h2 className="text-[#252941] text-3xl  my-3 pl-8 ml-5 font-semibold">Dashboard</h2>
-      <div className="grid grid-cols-1 h-full xl:grid-cols-[70%,30%] gap-5 p-3 ">
+      <div className="grid grid-cols-1 h-[96%] xl:grid-cols-[70%,30%] gap-5 p-3 ">
 
         {/* First Column */}
         <div className="space-y-5 h-full">
@@ -285,7 +301,7 @@ const SDashboard = () => {
             </div>
             <div className="bg-white w-full h-[315px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
               <h2 className="text-lg sm:text-xl font-semibold mb-3">Leave Request Status</h2>
-              {loading ? (
+              {fetchHistoryLoading ? (
                 <div className='ml-4 mb-2'>
                   <Skeleton
                     variant="rectangular"
@@ -296,18 +312,19 @@ const SDashboard = () => {
                 </div>
               ) : (
                 <div className='h-[80%] my-2 overflow-y-auto flex flex-col scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent'>
-                  {demoLeave.map((leave) => {
-                    const fromDate = new Date(leave.from_date);
-                    const toDate = new Date(leave.to_date);
-                    const durationInMillis = toDate - fromDate;
-                    const durationInDays = durationInMillis / (1000 * 3600 * 24) + 1;
+                  {leaveHistory.map((leave) => {
+                    // const fromDate = new Date(leave.from_date);
+                    // const toDate = new Date(leave.to_date);
+                    // const durationInMillis = toDate - fromDate;
+                    // const durationInDays = durationInMillis / (1000 * 3600 * 24) + 1;
                     return (
                       <div key={leave.id} className='bg-[#e6efe9] font-sans my-4 p-3 rounded-lg flex flex-col '>
                         {/* <p className="text-md text-gray-500">{leave.created_at}</p> */}
                         <p className="text-md ">{leave.description}</p>
+
                         <p className="text-md text-gray-500">Type: {leave.leave_type}</p>
                         <p className="text-md text-gray-500">Date: {leave.from_date} to {leave.to_date}</p>
-                        <p className="text-md text-gray-500">Duration: {durationInDays} days</p>
+                        <p className="text-md text-gray-500">Duration: {leave.duration} days</p>
                         <p className="text-md text-gray-500 font-semibold">Status: {leave.status} </p>
                       </div>
                     )

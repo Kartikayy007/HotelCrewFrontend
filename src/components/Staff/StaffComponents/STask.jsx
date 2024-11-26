@@ -203,9 +203,9 @@ const STask = () => {
   return (
     <section className=" min-h-screen py-2 mx-4 px-0 font-Montserrat overflow-auto">
       <h2 className="text-[#252941] text-3xl  my-3 pl-8 ml-5 font-semibold">Task Status</h2>
-      <div className="flex flex-col  xl:flex-row gap-5 p-3 ">
+      <div className="flex h-[97%] flex-col  xl:flex-row gap-5 p-3  ">
 
-        <div className='space-y-5 xl:w-[33%] xl:order-1 order-3'>
+        <div className='space-y-5 xl:w-[33%]  xl:order-1 order-3'>
           <div className="bg-white w-full xl:min-h-[715px] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow max-h-[700px] overflow-y-auto">
             <h2 className="text-lg sm:text-xl font-semibold mb-6 text-left">Pending Tasks</h2>
             <div className='my-2'>

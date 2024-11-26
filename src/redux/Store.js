@@ -7,6 +7,7 @@ import AttendanceReducer from './slices/AttendanceSlice.jsx'
 import TaskReducer from'./slices/TaskSlice.jsx'
 import taskReducer from './slices/StaffTaskSlice.jsx'
 import announcementReducer from './slices/AnnouncementSlice'
+import leaveReducer from './slices/StaffLeaveSlice.jsx'
 export const store = configureStore({
   reducer: {
     user: UserReducer,
@@ -16,7 +17,8 @@ export const store = configureStore({
     attendance: AttendanceReducer,
     tasks: TaskReducer,
     stafftasks:taskReducer,
-    announcements: announcementReducer
+    announcements: announcementReducer,
+    leave: leaveReducer,
   },
 })
 

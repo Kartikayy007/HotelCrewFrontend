@@ -1,21 +1,27 @@
 import { useState, React, useRef,useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaChevronDown, FaChevronUp, FaPaperclip, FaCalendarAlt } from "react-icons/fa";
 import { Snackbar,Skeleton, Alert } from "@mui/material";
+import {staffLeaveApply} from '../../../redux/slices/StaffLeaveSlice'
+
 
 const SSchedule = () => {
+  const dispatch=useDispatch();
   const [isStartDropdownOpen, setIsStartDropdownOpen] = useState(false);
   const [isEndDropdownOpen, setIsEndDropdownOpen] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
+  // const [selectedFile, setSelectedFile] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-  const fileInputRef = useRef(null);
+  // const fileInputRef = useRef(null);
   const [fileName, setFileName] = useState("");
   const [loading,setLoading]=useState(true);
   const today = new Date();
-
+  const appliedLeave = useSelector((state) => state.leave.leaveStatus);
+  const applyLeaveError = useSelector((state) => state.leave.applyLeaveError);
+  const  leaveLoading  = useSelector((state) => state.leave.applyLeaveLoading);
   useEffect(() => {
     setTimeout(() => {
 
@@ -23,12 +29,59 @@ const SSchedule = () => {
     }, 1500);
 
   }, []);
+
   const skeletonProps = {
     animation: "wave",
     sx: {
       animationDuration: "0.8s",
     },
   };
+
+  const [leaveDetails, setLeaveDetails] = useState({
+    from_date: "",
+  to_date: "",
+  leave_type: ""
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setLeaveDetails((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const { from_date, to_date, leave_type } = leaveDetails;
+  if (!from_date ) {
+    setSnackbar({
+      open: true,
+      message: "From Date is required.",
+      severity: "error"
+    });
+    return;
+  }
+  if ( !to_date ) {
+    setSnackbar({
+      open: true,
+      message: "End Date is required.",
+      severity: "error"
+    });
+    return;
+  }
+  if ( !leave_type) {
+    setSnackbar({
+      open: true,
+      message: "Leave Type is required.",
+      severity: "error"
+    });
+    return;
+  }
+    dispatch(staffLeaveApply(leaveDetails));
+    console.log(appliedLeave);
+  };
+
 
   const toggleStartDropdown = () => {
     setIsStartDropdownOpen((prev) => !prev);
@@ -43,25 +96,50 @@ const SSchedule = () => {
       setIsStartDropdownOpen(false); // Close start date if end is opened
     }
   };
+
+  const formatDate = (date) => {
+    // Format date as 'YYYY-MM-DD'
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
+    const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
+    return `${year}-${month}-${day}`;
+  };
+
   const handleStartDateChange = (date) => {
     setStartDate(date);
     if (endDate && date > endDate) {
       setEndDate(null); // Reset the end date if it's before the new start date
     }
+    // setLeaveDetails((prev) => ({
+    //   ...prev,
+    //   from_date: date ? date.toLocaleDateString() : "", // Set the formatted date
+    // }));
+    setLeaveDetails((prev) => ({
+      ...prev,
+      from_date: date ? formatDate(date) : "", // Set the formatted date
+    }));
     setIsStartDropdownOpen(false); // Close the dropdown
   };
 
   const handleEndDateChange = (date) => {
     setEndDate(date);
+    // setLeaveDetails((prev) => ({
+    //   ...prev,
+    //   to_date: date ? date.toLocaleDateString() : "", // Set the formatted date
+    // }));
+    setLeaveDetails((prev) => ({
+      ...prev,
+      to_date: date ? formatDate(date) : "", // Set the formatted date
+    }));
     setIsEndDropdownOpen(false); // Close the dropdown
   };
 
-  const handleFileButtonClick = () => {
-    fileInputRef.current.click(); // Trigger the hidden file input click
-  };
-  const handleRemoveFile = () => {
-    setFileName(''); // Clear the file name when "X" is clicked
-  };
+  // const handleFileButtonClick = () => {
+  //   fileInputRef.current.click(); // Trigger the hidden file input click
+  // };
+  // const handleRemoveFile = () => {
+  //   setFileName(''); // Clear the file name when "X" is clicked
+  // };
 
   // const handleFileChange = (event) => {
   //   const file = event.target.files[0];
@@ -84,6 +162,33 @@ const SSchedule = () => {
   //     }
   //   }
   // };
+  useEffect(() => {
+    if (appliedLeave) {
+      setSnackbar({
+        open: true,
+        message: 'Leave Request Submitted Successfully!',
+        type: 'success',
+      });
+      setLeaveDetails({
+        from_date: '',
+        to_date: '',
+        leave_type: '', // Reset any other form fields as needed
+      });
+      setStartDate(null);
+      setEndDate(null);
+      
+    }
+    
+    if (applyLeaveError) {
+      console.log(applyLeaveError);
+      setSnackbar({
+        open: true,
+        message: 'Error submitting leave request. Please try again.',
+        type: 'error',
+      });
+    }
+  }, [appliedLeave, applyLeaveError]);
+
 
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
@@ -120,8 +225,8 @@ const SSchedule = () => {
     <section className=" h-screen  font-Montserrat  overflow-y-auto ">
       <h2 className="text-[#252941] text-3xl  my-3 pl-8 ml-5 font-semibold">Schedule Status</h2>
       {/* <div className="grid grid-cols-1  xl:grid-cols-[40%,35%,25%] gap-5 p-3 "> */}
-      <div className="flex flex-col  xl:flex-row gap-5 p-3 ">
-        <div className="space-y-5 xl:w-[40%]">
+      <div className="flex flex-col  xl:flex-row gap-5 p-3 h-[92%]">
+        <div className="space-y-5 xl:w-[40%] ">
           <div className="bg-white w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 text-left">Shift Schedule</h2>
             {loading ? (
@@ -140,7 +245,7 @@ const SSchedule = () => {
             )}
           </div>
 
-          <div className="bg-white w-full h-[62%] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
+          <div className="bg-white w-full h-[80%] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 text-left">Attendance</h2>
             <div className='h-[90%] mb-4 overflow-y-scroll rounded-lg'>
             {loading ? (
@@ -193,8 +298,8 @@ const SSchedule = () => {
             </div>
           </div>
         </div>
-        <div className='space-y-5 xl:w-[35%]'>
-          <div className="bg-white w-full xl:h-[77%] h-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
+        <div className='space-y-5 xl:w-[35%] '>
+          <div className="bg-white w-full xl:h-[99%] h-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-2 text-left">Leave Request</h2>
             {loading ? (
               <div className='ml-4 mb-2'>
@@ -207,12 +312,15 @@ const SSchedule = () => {
             ) : (
             <div >
 
-              <form className='mt-8 h-full flex flex-col gap-3' >
+              <form className='mt-8 h-full flex flex-col gap-3' onSubmit={handleSubmit}>
 
                 <input
                   type="text"
                   placeholder="Specify leave type"
                   maxLength={30}
+                  value={leaveDetails.leave_type}
+                   name="leave_type"
+                onChange={handleChange}
                   // value={taskTitle}
                   // onChange={(e) => setTaskTitle(e.target.value)}
                   className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
@@ -224,6 +332,7 @@ const SSchedule = () => {
 
                     <button
                       type="button"
+                      
                       onClick={toggleStartDropdown}
                       className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${startDate ? "text-black" : "text-gray-400"
                         } focus:outline-none flex justify-between items-center`}
@@ -243,6 +352,7 @@ const SSchedule = () => {
                       <div className="absolute  z-50 ">
                         <DatePicker
                           selected={startDate}
+                          
                           onChange={handleStartDateChange}
                           inline
                           selectsStart
@@ -342,18 +452,37 @@ const SSchedule = () => {
                 <div className="flex justify-end mb-2">
                   <button
                     type="submit"
-                    // disabled={Taskloading}
+                    disabled={leaveLoading}
                     //onclick()=>{handleRequestSubmit}
                     className="h-9  w-full  bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white  shadow-xl"
                   >
-                    Request
-                    {/* {Taskloading ? "Assigning..." : "Assign"} */}
+                    {/* Request */}
+                    {leaveLoading ? "Submiting..." : "Submit"}
                   </button>
                 </div>
               </form>
             </div>
             )}
           </div>
+          {/* {snackbar.open && (
+        <div
+          className={`snackbar ${snackbar.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white p-3 rounded-md fixed bottom-4 right-4`}
+        >
+          <p>{snackbar.message}</p>
+          <button onClick={handleCloseSnackbar} className="absolute top-1 right-2 text-xl">×</button>
+        </div>
+      )} */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        message={snackbar.message}
+        ContentProps={{
+          style: {
+            backgroundColor: snackbar.severity === "success" ? "green" : "red"
+          }
+        }}
+      />
         </div>
       </div>
     </section>
