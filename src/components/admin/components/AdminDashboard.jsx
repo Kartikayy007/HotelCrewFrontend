@@ -44,12 +44,7 @@ import {fetchTasks} from "../../../redux/slices/TaskSlice";
 import {
   fetchHotelDetails,
   selectTotalRooms,
-  selectAvailableRooms,
 } from "../../../redux/slices/HotelDetailsSlice";
-import {
-  fetchCheckIns,
-  selectOccupiedRooms,
-} from "../../../redux/slices/CheckInSlice";
 import {MoreVertical} from "lucide-react";
 import {AllAnnouncementsDialog} from "../../common/AllAnnouncementsDialog";
 import {
@@ -57,6 +52,11 @@ import {
   fetchRevenueStats,
   selectRoomStats,
 } from "../../../redux/slices/revenueSlice";
+import { 
+  fetchRoomStats, 
+  selectOccupiedRooms, 
+  selectAvailableRooms 
+} from '../../../redux/slices/OcupancyRateSlice';
 
 function AdminDashboard() {
   const dispatch = useDispatch();
@@ -133,7 +133,7 @@ function AdminDashboard() {
     setLoading(false);
   
     return () => clearInterval(interval);
-  }, [currentHour]); 
+  }, [currentHour, latestRevenue]); 
 
   const generateTimeData = (hour) => {
     // Initialize 24 hour array with 0 revenues
@@ -144,7 +144,6 @@ function AdminDashboard() {
       hourlyRevenues[hour] = parseFloat(latestRevenue);
     }
   
-    // Create time data array up to current hour
     const timeData = [];
     for (let i = 0; i <= hour; i++) {
       timeData.push({
@@ -157,7 +156,6 @@ function AdminDashboard() {
   };
 
   const getFilteredRevenueData = () => {
-    console.log("timeData:", timeData);
     return timeData.slice(revenueRange[0], revenueRange[1] + 1);
   };
 
@@ -209,15 +207,20 @@ function AdminDashboard() {
     {id: 2, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
   ];
 
-  "Pie chart data:", staffStatus;
 
   useEffect(() => {
     dispatch(fetchAttendanceStats());
     dispatch(fetchStaffData());
     dispatch(fetchTasks());
     dispatch(fetchHotelDetails());
-    dispatch(fetchCheckIns());
     dispatch(fetchRevenueStats());
+    dispatch(fetchRoomStats());
+    
+    const interval = setInterval(() => {
+      dispatch(fetchRoomStats());
+    }, 30 * 60 * 1000);
+    
+    return () => clearInterval(interval);
   }, [dispatch]);
 
   const staffAttendance = [
@@ -875,12 +878,10 @@ function AdminDashboard() {
                     <div className="text-sm text-gray-500">
                       <span className="font-medium">Assigned To:</span>
                       <ul className="list-disc pl-5 mt-1">
-                        {selectedAnnouncement?.assigned_to.map(
-                          (person, index) => (
-                            <li key={index}>{person}</li>
-                          )
-                        )}
-                      </ul>
+  {selectedAnnouncement?.assigned_to?.map((person, index) => (
+    <li key={index}>{person}</li>
+  )) || []}
+</ul>
                     </div>
                   </div>
                   <div className="flex justify-end gap-2 mt-4">

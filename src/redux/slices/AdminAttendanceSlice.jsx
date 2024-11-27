@@ -45,11 +45,9 @@ export const fetchTodayAttendanceList = createAsyncThunk(
         {
           headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
           }
         }
       );
-       ('Today\'s attendance list:', response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch today\'s attendance');
@@ -92,61 +90,70 @@ const setCacheData = (data) => {
 };
 
 // Update fetchWeeklyAttendance thunk
+const WEEKLY_STATS_URL = 'https://hotelcrew-1.onrender.com/api/attendance/week-stats/';
+
 export const fetchWeeklyAttendance = createAsyncThunk(
   'attendance/fetchWeekly',
-  async (_, { dispatch }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      // Check cache first
-      const cachedData = getCachedData();
-      if (cachedData) {
-        // Return cached data with a flag
-        return { data: cachedData, fromCache: true };
+      const token = getAuthToken();
+      const response = await axios.get(WEEKLY_STATS_URL, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // Validate response structure
+      const { dates, total_crew_present, total_staff_absent } = response.data;
+      if (!Array.isArray(dates) || 
+          !Array.isArray(total_crew_present) || 
+          !Array.isArray(total_staff_absent)) {
+        throw new Error('Invalid response format');
       }
 
-      // If no cache, fetch from API
-      const token = getAuthToken();
-      const response = await axios.get(
-        'https://hotelcrew-1.onrender.com/api/attendance/week-stats/',
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      
-      // Cache the new data
-      setCacheData(response.data);
-      return { data: response.data, fromCache: false };
+      return {
+        dates,
+        total_crew_present,
+        total_staff_absent
+      };
     } catch (error) {
-      throw error;
+      return rejectWithValue(error.response?.data || 'Failed to fetch weekly attendance');
     }
   }
 );
 
-const AdminAttendanceSlice = createSlice({
-  name: 'attendance',
-  initialState: {
-    stats: {
-      total_crew: 0,
-      total_present: 0,
-      days_with_records_this_month: 0,
-      total_present_month: 0
-    },
-    todayList: [],
-    weeklyStats: {
-      dates: [],
-      total_crew_present: [],
-      total_staff_absent: []
-    },
-    lastWeeklyFetch: null,
+const initialState = {
+  stats: {
+    total_crew: 0,
+    total_present: 0,
+    days_with_records_this_month: 0,
+    total_present_month: 0
+  },
+  todayList: [],
+  weeklyStats: {
+    dates: [],
+    total_crew_present: [],
+    total_staff_absent: [],
     loading: false,
     error: null,
     lastFetched: null
   },
+  lastWeeklyFetch: null,
+  loading: false,
+  error: null,
+  lastFetched: null
+};
+
+const adminAttendanceSlice = createSlice({
+  name: 'attendance',
+  initialState,
   reducers: {
     clearError: (state) => {
       state.error = null;
+    },
+    clearWeeklyStats: (state) => {
+      state.weeklyStats = initialState.weeklyStats;
     }
   },
   extraReducers: (builder) => {
@@ -178,22 +185,28 @@ const AdminAttendanceSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(fetchWeeklyAttendance.pending, (state) => {
-        if (!state.weeklyStats.dates.length) {
-          state.loading = true;
-        }
+        state.weeklyStats.loading = true;
+        state.weeklyStats.error = null;
       })
       .addCase(fetchWeeklyAttendance.fulfilled, (state, action) => {
-        state.loading = false;
-        state.weeklyStats = action.payload.data;
-        state.lastFetched = Date.now();
-        state.error = null;
+        state.weeklyStats = {
+          ...action.payload,
+          loading: false,
+          error: null,
+          lastFetched: new Date().toISOString()
+        };
       })
       .addCase(fetchWeeklyAttendance.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.weeklyStats.loading = false;
+        state.weeklyStats.error = action.payload;
       });
   }
 });
 
-export const { clearError } = AdminAttendanceSlice.actions;
-export default AdminAttendanceSlice.reducer;
+// Selectors
+export const selectWeeklyStats = (state) => state.attendance.weeklyStats;
+export const selectWeeklyStatsLoading = (state) => state.attendance.weeklyStats.loading;
+export const selectWeeklyStatsError = (state) => state.attendance.weeklyStats.error;
+
+export const { clearError, clearWeeklyStats } = adminAttendanceSlice.actions;
+export default adminAttendanceSlice.reducer;

@@ -13,7 +13,7 @@ const TableRowSkeleton = () => (
     <td className="p-4"><Skeleton variant="text" width={150} /></td>
     <td className="p-4"><Skeleton variant="text" width={150} /></td>
     <td className="p-4"><Skeleton variant="text" width={80} /></td>
-  </tr>
+  </tr> 
 );
 
 function CustomerDB() {

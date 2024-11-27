@@ -7,7 +7,7 @@ import {
   selectTasksLoading, 
   selectTasksError,
   selectTasksByStatus,
-  selectPagination
+  selectTaskMetrics,
 } from '../../../redux/slices/TaskSlice';
 import LoadingAnimation from '../../common/LoadingAnimation';
 import { Button, Dialog, DialogTitle, DialogContent } from '@mui/material';
@@ -68,7 +68,7 @@ const TaskDetailDialog = ({ task, open, onClose }) => {
       hour: 'numeric',
       minute: 'numeric',
       hour12: true
-    });
+    }); 
   };
 
   return (
@@ -221,36 +221,21 @@ const AdminTaskAssignment = ({ onClose }) => {
   const dispatch = useDispatch();
   const loading = useSelector(selectTasksLoading);
   const error = useSelector(selectTasksError);
+  const metrics = useSelector(selectTaskMetrics);
   
   const pendingTasks = useSelector(state => selectTasksByStatus(state, 'pending'));
-  const inProgressTasks = useSelector(state => selectTasksByStatus(state, 'in_progress')); // Updated
+  const inProgressTasks = useSelector(state => selectTasksByStatus(state, 'in_progress'));
   const completedTasks = useSelector(state => selectTasksByStatus(state, 'completed'));
-  const pagination = useSelector(selectPagination);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [tasksPerPage] = useState(10);
 
   useEffect(() => {
-    // Remove the interval to prevent interference with pagination
-    dispatch(fetchTasks(`?page=${currentPage}`));
-  }, [dispatch, currentPage]);
-
-  const handlePageChange = async (newPage) => {
-    setCurrentPage(newPage);
-    try {
-      await dispatch(fetchTasks(`?page=${newPage}`)).unwrap();
-    } catch (error) {
-      console.error('Error changing page:', error);
-    }
-  };
+    dispatch(fetchTasks()); // Removed pagination parameter
+  }, [dispatch]);
 
   if (loading && !pendingTasks.length && !inProgressTasks.length && !completedTasks.length) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <LoadingAnimation size={40} color="#252941" />
-      <p>
-        Please wait...
-      </p>
+        <p>Please wait...</p>
       </div>
     );
   }
@@ -270,6 +255,21 @@ const AdminTaskAssignment = ({ onClose }) => {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Monitor Active Tasks</h1>
       
+      <div className="mb-4 grid grid-cols-3 gap-4">
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <h3 className="text-blue-800 font-semibold">Total Tasks</h3>
+          <p className="text-2xl font-bold text-blue-600">{metrics.total}</p>
+        </div>
+        <div className="bg-green-50 p-4 rounded-lg">
+          <h3 className="text-green-800 font-semibold">Completed</h3>
+          <p className="text-2xl font-bold text-green-600">{metrics.completed}</p>
+        </div>
+        <div className="bg-yellow-50 p-4 rounded-lg">
+          <h3 className="text-yellow-800 font-semibold">Pending</h3>
+          <p className="text-2xl font-bold text-yellow-600">{metrics.pending}</p>
+        </div>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
         <TaskColumn 
           title="Pending" 
@@ -278,7 +278,7 @@ const AdminTaskAssignment = ({ onClose }) => {
         />
         <TaskColumn 
           title="In Progress" 
-          status="in_progress" // Fixed to match API
+          status="in_progress"
           tasks={inProgressTasks} 
         />
         <TaskColumn 
@@ -287,39 +287,8 @@ const AdminTaskAssignment = ({ onClose }) => {
           tasks={completedTasks} 
         />
       </div>
-
-      <div className="flex justify-between items-center mt-4 p-4">
-        <div className="text-sm text-gray-500">
-          Total Tasks: {pagination.count}
-        </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="contained"
-            disabled={!pagination.previous}
-            onClick={() => handlePageChange(currentPage - 1)}
-            sx={{
-              backgroundColor: "#3A426F",
-              "&:hover": {backgroundColor: "#3A426F"},
-            }}
-          >
-            Previous
-          </Button>
-          <span className="mx-2 flex items-center">
-            Page {currentPage}
-          </span>
-          <Button 
-            variant="contained"
-            disabled={!pagination.next}
-            onClick={() => handlePageChange(currentPage + 1)}
-            sx={{
-              backgroundColor: "#3A426F",
-              "&:hover": {backgroundColor: "#3A426F"},
-            }}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      
+      {/* Removed pagination UI */}
     </div>
   );
 };

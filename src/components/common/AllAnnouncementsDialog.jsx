@@ -1,4 +1,3 @@
-// 1. Create new AllAnnouncementsDialog.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogTitle } from '@mui/material';
 import { X } from 'lucide-react';
@@ -97,10 +96,10 @@ export const AllAnnouncementsDialog = ({ open, onClose }) => {
                 <p className="text-sm text-gray-500">Hotel: {announcement.hotel}</p>
                 <details className="mt-2">
                   <summary className="text-sm text-blue-600 cursor-pointer">
-                    Assigned To ({announcement.assigned_to.length})
+                    Assigned To ({announcement.assigned_to?.length || 0})
                   </summary>
                   <ul className="mt-1 ml-4 text-sm text-gray-500">
-                    {announcement.assigned_to.map((person, idx) => (
+                    {(announcement.assigned_to || []).map((person, idx) => (
                       <li key={idx}>{person}</li>
                     ))}
                   </ul>

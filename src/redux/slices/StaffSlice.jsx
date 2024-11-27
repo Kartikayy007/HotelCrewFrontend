@@ -171,4 +171,13 @@ export const selectDepartments = (state) => {
   return departments;
 };
 
+// In StaffSlice.jsx, add this selector:
+export const selectTotalStaff = (state) => {
+  const staffPerDept = state.staff.staffPerDepartment;
+  if (!staffPerDept || typeof staffPerDept !== 'object') {
+    return 0;
+  }
+  return Object.values(staffPerDept).reduce((sum, count) => sum + (Number(count) || 0), 0);
+};
+
 export default staffSlice.reducer;

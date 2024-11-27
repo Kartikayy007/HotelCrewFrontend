@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllTasks, fetchTasks } from '../../../../redux/slices/TaskSlice';
-import { fetchStaffData, selectDepartments } from '../../../../redux/slices/StaffSlice';
+import { fetchStaffData, selectStaffPerDepartment } from '../../../../redux/slices/StaffSlice';
 
 const DepartmentSkeleton = () => {
   return (
@@ -10,9 +10,7 @@ const DepartmentSkeleton = () => {
         <div className="h-4 w-24 bg-gray-200 rounded"></div>
         <div className="h-4 w-12 bg-gray-200 rounded"></div>
       </div>
-      
       <div className="w-full h-2 bg-gray-200 rounded-full mt-2"></div>
-      
       <div className="mt-3 grid grid-cols-3 gap-1">
         {[...Array(3)].map((_, i) => (
           <div key={i} className="text-center">
@@ -28,7 +26,7 @@ const DepartmentSkeleton = () => {
 const DepartmentPerformance = () => {
   const dispatch = useDispatch();
   const tasks = useSelector(selectAllTasks);
-  const departments = useSelector(selectDepartments);
+  const staffPerDepartment = useSelector(selectStaffPerDepartment);
   const loading = useSelector(state => state.tasks.loading || state.staff.loading);
 
   useEffect(() => {
@@ -36,58 +34,45 @@ const DepartmentPerformance = () => {
     dispatch(fetchStaffData());
   }, [dispatch]);
 
-   console.log(tasks, departments);
-
   const departmentMetrics = useMemo(() => {
-    // First, group tasks by department
-    const departmentGroups = tasks.reduce((groups, task) => {
-      const dept = task.department?.toLowerCase() || 'other';
-      if (!groups[dept]) {
-        groups[dept] = {
-          total: 0,
-          completed: 0,
-          inProgress: 0,
-          pending: 0
-        };
-      }
-      
-      // Increment total
-      groups[dept].total += 1;
-      
-      // Count by status
-      switch (task.status.toLowerCase()) {
-        case 'completed':
-          groups[dept].completed += 1;
-          break;
-        case 'in_progress':
-          groups[dept].inProgress += 1;
-          break;
-        case 'pending':
-          groups[dept].pending += 1;
-          break;
-        default:
-          break;
-      }
-      
-      return groups;
-    }, {});
+    if (!tasks?.length) return [];
 
-    // Convert to array and calculate performance
-    return Object.entries(departmentGroups)
-      .filter(([dept]) => dept !== 'other')
-      .map(([dept, stats]) => ({
-        department: dept.charAt(0).toUpperCase() + dept.slice(1),
-        performance: Math.min(
-          ((stats.completed + stats.inProgress * 0.5) / Math.max(stats.total, 1) * 100),
-          100
-        ).toFixed(1),
-        total: stats.total,
-        completed: stats.completed,
-        inProgress: stats.inProgress,
-        pending: stats.pending
-      }))
-      .sort((a, b) => parseFloat(b.performance) - parseFloat(a.performance));
-  }, [tasks]);
+    // Create metrics for each department
+    const metrics = Object.keys(staffPerDepartment).map(dept => {
+      const deptTasks = tasks.filter(task => 
+        task?.department?.toLowerCase() === dept.toLowerCase()
+      );
+
+      const completed = deptTasks.filter(task => 
+        task?.status?.toLowerCase() === 'completed'
+      ).length;
+
+      const pending = deptTasks.filter(task => 
+        task?.status?.toLowerCase() === 'pending'
+      ).length;
+
+      const inProgress = deptTasks.filter(task => 
+        task?.status?.toLowerCase() === 'in_progress'
+      ).length;
+
+      const total = deptTasks.length;
+      const performance = total ? 
+        ((completed + (inProgress * 0.5)) / total * 100).toFixed(1) : 
+        0;
+
+      return {
+        department: dept,
+        staffCount: staffPerDepartment[dept] || 0,
+        total,
+        completed,
+        inProgress,
+        pending,
+        performance
+      };
+    });
+
+    return metrics.sort((a, b) => parseFloat(b.performance) - parseFloat(a.performance));
+  }, [tasks, staffPerDepartment]);
 
   if (loading) {
     return (
@@ -101,12 +86,12 @@ const DepartmentPerformance = () => {
     );
   }
 
-  if (!tasks.length) {
-    return <div className="text-center text-gray-500">No tasks available</div>;
+  if (!departmentMetrics.length) {
+    return <div className="text-center text-gray-500">No departments available</div>;
   }
 
   return (
-    <div className="w-full overflow-y-auto h-[51rem] sm:h-[40rem] md:h-[45rem] lg:h-[52rem] xl:h-[51rem]">
+    <div className="w-full overflow-y-auto h-[51rem]">
       <div className="grid grid-cols-1 gap-2">
         {departmentMetrics.map((dept) => (
           <div 
@@ -114,9 +99,14 @@ const DepartmentPerformance = () => {
             className="bg-white rounded-lg p-2 shadow-sm border border-gray-100"
           >
             <div className="flex justify-between items-center mb-1">
-              <h3 className="text-sm font-medium text-gray-800">
-                {dept.department}
-              </h3>
+              <div>
+                <h3 className="text-sm font-medium text-gray-800">
+                  {dept.department}
+                </h3>
+                <span className="text-xs text-gray-500">
+                  {dept.staffCount} staff members
+                </span>
+              </div>
               <span className="text-sm font-semibold text-blue-600">
                 {dept.performance}%
               </span>

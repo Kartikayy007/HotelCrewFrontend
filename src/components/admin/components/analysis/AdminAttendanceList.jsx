@@ -1,18 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Select, MenuItem, Skeleton } from '@mui/material';
-import { fetchTodayAttendanceList, fetchAttendanceStats } from './../../../../redux/slices/AdminAttendanceSlice';
+import { 
+  fetchTodayAttendanceList, 
+  fetchAttendanceStats,
+  fetchWeeklyAttendance,
+  selectWeeklyStats 
+} from './../../../../redux/slices/AdminAttendanceSlice';
 
 const AdminAttendanceList = ({ onBack }) => {
   const dispatch = useDispatch();
   const [timeFilter, setTimeFilter] = useState('daily');
   
   const { todayList, stats, loading } = useSelector(state => state.attendance);
+  const weeklyStats = useSelector(selectWeeklyStats);
 
   useEffect(() => {
     dispatch(fetchTodayAttendanceList());
     dispatch(fetchAttendanceStats());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (timeFilter === 'weekly') {
+      dispatch(fetchWeeklyAttendance());
+    }
+  }, [dispatch, timeFilter]);
 
   const dummyHistoricalData = {
     dates: ['2024-03-01', '2024-03-08', '2024-03-15', '2024-03-22'],
@@ -92,24 +104,31 @@ const AdminAttendanceList = ({ onBack }) => {
         };
 
       case 'weekly':
-        return dummyHistoricalData.dates.reduce((acc, date, index) => {
-          const week = `Week ${Math.ceil(new Date(date).getDate() / 7)}`;
-          if (!acc[week]) acc[week] = { 
-            present: dummyHistoricalData.present[index], 
-            absent: dummyHistoricalData.absent[index],
+        if (!weeklyStats.dates) return {};
+        
+        const dateStats = weeklyStats.dates.map((date, index) => ({
+          date,
+          formattedDate: new Date(date).toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+          }),
+          present: weeklyStats.total_crew_present[index],
+          absent: weeklyStats.total_staff_absent[index]
+        }));
+
+        // Sort in reverse chronological order
+        dateStats.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Convert to required format
+        return dateStats.reduce((acc, stat) => {
+          acc[stat.formattedDate] = {
+            present: stat.present,
+            absent: stat.absent,
             showColumns: false
           };
           return acc;
         }, {});
-
-      case 'monthly':
-        return {
-          'March 2024': {
-            present: stats.total_present_month,
-            absent: stats.total_crew * stats.days_with_records_this_month - stats.total_present_month,
-            showColumns: false
-          }
-        };
 
       default:
         return {};
@@ -163,7 +182,6 @@ const AdminAttendanceList = ({ onBack }) => {
             >
               <MenuItem value="daily">Today</MenuItem>
               <MenuItem value="weekly">Weekly</MenuItem>
-              <MenuItem value="monthly">Monthly</MenuItem>
             </Select>
             <button
               onClick={onBack}

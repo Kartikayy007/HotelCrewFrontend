@@ -3,13 +3,13 @@ import axios from 'axios';
 
 const initialState = {
   tasks: [],
+  metrics: {
+    total: 0,
+    completed: 0,
+    pending: 0
+  },
   loading: false,
-  error: null,
-  pagination: {
-    count: 0,
-    next: null,
-    previous: null
-  }
+  error: null
 };
 
 const getAuthToken = () => {
@@ -19,21 +19,30 @@ const getAuthToken = () => {
 
 export const fetchTasks = createAsyncThunk(
   'tasks/fetchTasks',
-  async (pageParam = '', { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
       const response = await axios.get(
-        `https://hotelcrew-1.onrender.com/api/taskassignment/tasks/all/${pageParam}`,
+        'https://hotelcrew-1.onrender.com/api/taskassignment/tasks/day/',
         {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         }
       );
-      return response.data;
+      console.log('Fetched tasks:', response.data.tasks);
+      // Extract tasks array from response
+      return {
+        tasks: Array.isArray(response.data.tasks) ? response.data.tasks : [],
+        metrics: {
+          total: response.data.totaltask || 0,
+          completed: response.data.taskcompleted || 0,
+          pending: response.data.taskpending || 0
+        }
+      };
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch tasks');
-    }
+    } 
   }
 );
 
@@ -52,10 +61,8 @@ export const createTask = createAsyncThunk(
           }
         }
       );
-       ('Created task:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Create task error:', error);
       return rejectWithValue(error.response?.data || 'Failed to create task');
     }
   }
@@ -70,11 +77,7 @@ export const taskSlice = createSlice({
     },
     clearTasks: (state) => {
       state.tasks = [];
-      state.pagination = {
-        count: 0,
-        next: null,
-        previous: null
-      };
+      state.metrics = initialState.metrics;
     }
   },
   extraReducers: (builder) => {
@@ -85,13 +88,8 @@ export const taskSlice = createSlice({
       })
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.loading = false;
-        // Update tasks with new page data
-        state.tasks = action.payload.results;
-        state.pagination = {
-          count: action.payload.count,
-          next: action.payload.next,
-          previous: action.payload.previous
-        };
+        state.tasks = action.payload.tasks;
+        state.metrics = action.payload.metrics;
       })
       .addCase(fetchTasks.rejected, (state, action) => {
         state.loading = false;
@@ -103,8 +101,9 @@ export const taskSlice = createSlice({
       })
       .addCase(createTask.fulfilled, (state, action) => {
         state.loading = false;
-        state.tasks.push(action.payload);
-        state.pagination.count += 1;
+        state.tasks = Array.isArray(state.tasks) 
+          ? [...state.tasks, action.payload]
+          : [action.payload];
       })
       .addCase(createTask.rejected, (state, action) => {
         state.loading = false;
@@ -113,12 +112,19 @@ export const taskSlice = createSlice({
   }
 });
 
-export const selectAllTasks = (state) => state.tasks.tasks;
-export const selectTasksLoading = (state) => state.tasks.loading;
-export const selectTasksError = (state) => state.tasks.error;
-export const selectPagination = (state) => state.tasks.pagination;
-export const selectTasksByStatus = (state, status) => 
-  state.tasks.tasks.filter(task => {
+// Updated selectors with type checking
+export const selectAllTasks = (state) => {
+  return Array.isArray(state?.tasks?.tasks) ? state.tasks.tasks : [];
+};
+
+export const selectTasksLoading = (state) => state?.tasks?.loading || false;
+export const selectTasksError = (state) => state?.tasks?.error || null;
+
+export const selectTasksByStatus = (state, status) => {
+  const tasks = selectAllTasks(state);
+  return tasks.filter(task => {
+    if (!task?.status) return false;
+    
     switch(status) {
       case 'pending':
         return task.status.toLowerCase() === 'pending';
@@ -130,11 +136,9 @@ export const selectTasksByStatus = (state, status) =>
         return false;
     }
   });
+};
 
-// const tasks = useSelector(selectAllTasks);
-// const inProgressCount = tasks.filter(task => task.status === "in_progress").length;
-// const pendingCount = tasks.filter(task => task.status === "pending").length;
-// const busyStaffCount = inProgressCount + pendingCount;
-// const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
+export const selectTaskMetrics = (state) => state?.tasks?.metrics || initialState.metrics;
 
+export const { clearErrors, clearTasks } = taskSlice.actions;
 export default taskSlice.reducer;

@@ -21,11 +21,11 @@ export const createAnnouncement = createAsyncThunk(
         title: announcementData.title,
         description: announcementData.description,
         department: announcementData.department === 'all' ? 'All' : announcementData.department,
-        urgency: announcementData.urgency ? announcementData.urgency.charAt(0).toUpperCase() + announcementData.urgency.slice(1) : 'Normal'
+        urgency: announcementData.urgency ? announcementData.urgency.charAt(0).toUpperCase() + announcementData.urgency.slice(1) : 'Normal',
+        created_at: new Date().toISOString(), // Add current date
+        assigned_to: announcementData.assigned_to || [] // Ensure assigned_to is always an array
       };
 
-       ('Sending formatted announcement data:', formattedData);
-      
       const config = {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -33,9 +33,7 @@ export const createAnnouncement = createAsyncThunk(
         }
       };
 
-      const response = await axios.post(BASE_URL, formattedData, config);
-       ('Announcement created response:', response.data);
-      
+      const response = await axios.post('https://hotelcrew-1.onrender.com/api/taskassignment/announcements/', formattedData, config);
       return response.data;
     } catch (error) {
       console.error('Create announcement error:', error.response?.data || error);
@@ -48,7 +46,6 @@ export const createAnnouncement = createAsyncThunk(
   }
 );
 
-// Update fetchAnnouncements in AnnouncementSlice.jsx
 export const fetchAnnouncements = createAsyncThunk(
   'announcements/fetchAll',
   async (queryString = '', { rejectWithValue }) => {

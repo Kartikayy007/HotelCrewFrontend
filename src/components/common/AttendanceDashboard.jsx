@@ -2,10 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Maximize2, X } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAttendance, updateAttendance, checkAttendance } from '../../redux/slices/AttendanceSlice';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import Skeleton from '@mui/material/Skeleton';
 
 const AttendanceDashboard = () => {
