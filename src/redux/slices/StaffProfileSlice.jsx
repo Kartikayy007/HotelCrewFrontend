@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Function to retrieve the authentication token
 const getAuthToken = () => {
-    const token  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDExLCJpYXQiOjE3MzI2MTM0MTEsImp0aSI6ImI2MzkyNjAwNTU3ZDQ0YTQ5MWE5NTA4ZDlkN2M0OWM4IiwidXNlcl9pZCI6MTQ5fQ.8sZK2idIczWT3l-EAEmGWLGIKMaXwR5eOKXApDf_Kik'; // Replace with actual token
+    const token  ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MzI2OTkxLCJpYXQiOjE3MzI3MzQ5OTEsImp0aSI6IjNmMTM5OTIyZmYzZjQ5ZDhiOWYyOGM5ZWM1NTAzODBkIiwidXNlcl9pZCI6MTc1fQ.xn3Xra_d-fyzTxUhJFG8GpruS2scKPP2V0XmtaNT8kA';
     if (!token) {
       throw new Error('Authentication token not found');
     }
@@ -18,7 +18,7 @@ export const getStaffProfile = createAsyncThunk(
     try {
       const token = getAuthToken(); // Retrieve auth token
       const response = await axios.get(
-       'http://hotelcrew-1.onrender.com/api/edit/user_profile/', // API endpoint for fetching staff profile
+       'https://hotelcrew-1.onrender.com/api/edit/user_profile/', // API endpoint for fetching staff profile
         {
           headers: {
             Authorization: `Bearer ${token}`, // Attach token in headers

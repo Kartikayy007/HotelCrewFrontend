@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Function to retrieve the authentication token
 const getAuthToken = () => {
-  const token  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDExLCJpYXQiOjE3MzI2MTM0MTEsImp0aSI6ImI2MzkyNjAwNTU3ZDQ0YTQ5MWE5NTA4ZDlkN2M0OWM4IiwidXNlcl9pZCI6MTQ5fQ.8sZK2idIczWT3l-EAEmGWLGIKMaXwR5eOKXApDf_Kik'; // Replace with actual token
+  const token  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MzI2OTkxLCJpYXQiOjE3MzI3MzQ5OTEsImp0aSI6IjNmMTM5OTIyZmYzZjQ5ZDhiOWYyOGM5ZWM1NTAzODBkIiwidXNlcl9pZCI6MTc1fQ.xn3Xra_d-fyzTxUhJFG8GpruS2scKPP2V0XmtaNT8kA';
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -17,7 +17,7 @@ export const getMonthlyAttendance = createAsyncThunk(
       try {
         const token = getAuthToken(); // Retrieve auth token
         const response = await axios.get(
-          `https://hotelcrew-1.onrender.com/api/attendance/month/`,
+          `https://hotelcrew-1.onrender.com/api/attendance/month-check/`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -104,5 +104,10 @@ const attendanceSlice = createSlice({
       });
   },
 });
-
+export const selectMonthlyAttendance = (state) => state.staffAttendance.monthlyAttendance;
+export const selectMonthlyLoading = (state) => state.staffAttendance.monthlyLoading;
+export const selectMonthlyError = (state) => state.staffAttendance.monthlyError;
+export const selectAttendanceStats = (state) => state.staffAttendance.attendanceStats;
+export const selectStatsLoading = (state) => state.staffAttendance.statsLoading;
+export const selectStatsError = (state) => state.staffAttendance.statsError;
 export default attendanceSlice.reducer;

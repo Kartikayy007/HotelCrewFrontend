@@ -4,8 +4,12 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaChevronDown, FaChevronUp, FaPaperclip, FaCalendarAlt } from "react-icons/fa";
 import { Snackbar, Skeleton, Alert } from "@mui/material";
-import { staffLeaveApply } from '../../../redux/slices/StaffLeaveSlice'
+import { staffLeaveApply,resetLeaveStatus, resetApplyLeaveError } from '../../../redux/slices/StaffLeaveSlice'
 import { getMonthlyAttendance } from '../../../redux/slices/StaffAttendanceSlice';
+import MuiAlert from "@mui/material/Alert";
+import InfoIcon from "@mui/icons-material/Info";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 import { Dialog, Box } from "@mui/material";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -15,6 +19,8 @@ import dayjs from "dayjs";
 
 const SSchedule = () => {
   const dispatch = useDispatch();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [isStartDropdownOpen, setIsStartDropdownOpen] = useState(false);
   const [isEndDropdownOpen, setIsEndDropdownOpen] = useState(false);
   const [startDate, setStartDate] = useState(null);
@@ -24,11 +30,21 @@ const SSchedule = () => {
   // const fileInputRef = useRef(null);
   const [fileName, setFileName] = useState("");
   const [loading, setLoading] = useState(true);
-  const today = new Date();
+
 
   const appliedLeave = useSelector((state) => state.leave.leaveStatus);
   const applyLeaveError = useSelector((state) => state.leave.applyLeaveError);
   const leaveLoading = useSelector((state) => state.leave.applyLeaveLoading);
+  useEffect(() => {
+    // Auto-close Snackbar after a delay if needed
+    if (snackbar.open) {
+      const timer = setTimeout(() => {
+        setSnackbar((prev) => ({ ...prev, open: false }));
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [snackbar.open, setSnackbar]);
+
   useEffect(() => {
     setTimeout(() => {
 
@@ -47,7 +63,8 @@ const SSchedule = () => {
   const [leaveDetails, setLeaveDetails] = useState({
     from_date: "",
     to_date: "",
-    leave_type: ""
+    reason:"",
+    leave_type: "",
   });
 
   const handleChange = (e) => {
@@ -60,7 +77,7 @@ const SSchedule = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { from_date, to_date, leave_type } = leaveDetails;
+    const { from_date, to_date,leave_type, reason} = leaveDetails;
     if (!from_date) {
       setSnackbar({
         open: true,
@@ -83,6 +100,16 @@ const SSchedule = () => {
         message: "Leave Type is required.",
         severity: "error"
       });
+      
+      return;
+    }
+    if (!reason) {
+      setSnackbar({
+        open: true,
+        message: "Description is required.",
+        severity: "error"
+      });
+      
       return;
     }
     dispatch(staffLeaveApply(leaveDetails));
@@ -126,37 +153,14 @@ const SSchedule = () => {
   // };
 
 
-  const closeCalendar = () => {
-    setIsCalendarOpen(null); // Close both calendars
-    setIsStartDropdownOpen(false); // Close start date dropdown
-    setIsEndDropdownOpen(false); // Close end date dropdown
-  };
 
   const toggleEndDropdown = () => {
     setIsEndDropdownOpen((prev) => !prev);
     if (!isEndDropdownOpen) {
       setIsStartDropdownOpen(false); // Close start date if end is opened
     }
-    // if (isCalendarOpen === "startDate") {
-    //   setIsCalendarOpen(null); // Close start date calendar
-    //   setIsStartDropdownOpen(false); // Close start date dropdown
-    // }
-    // // Toggle end date calendar
-    // setIsEndDropdownOpen((prev) => !prev);
-    // if (!isEndDropdownOpen) {
-    //   setIsCalendarOpen("endDate"); // Open the end date calendar
-    // } else {
-    //   setIsCalendarOpen(null); // Close the end date calendar
-    // }
   };
 
-  // const formatDate = (date) => {
-  //   // Format date as 'YYYY-MM-DD'
-  //   const year = date.getFullYear();
-  //   const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
-  //   const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
-  //   return `${year}-${month}-${day}`;
-  // };
   const formatDate = (date) => date.format("YYYY-MM-DD");
 
   const handleStartDateChange = (date) => {
@@ -228,21 +232,25 @@ const SSchedule = () => {
   //     }
   //   }
   // };
+
+ 
+
   useEffect(() => {
     if (appliedLeave) {
       setSnackbar({
         open: true,
         message: 'Leave Request Submitted Successfully!',
-        type: 'success',
+        severity: 'success',
       });
       setLeaveDetails({
         from_date: '',
         to_date: '',
-        leave_type: '', // Reset any other form fields as needed
+        leave_type: '',
+        reason:'' // Reset any other form fields as needed
       });
       setStartDate(null);
       setEndDate(null);
-
+      dispatch(resetLeaveStatus()); 
     }
 
     if (applyLeaveError) {
@@ -250,8 +258,9 @@ const SSchedule = () => {
       setSnackbar({
         open: true,
         message: 'Error submitting leave request. Please try again.',
-        type: 'error',
+        severity: 'error',
       });
+      dispatch(resetApplyLeaveError());
     }
   }, [appliedLeave, applyLeaveError]);
 
@@ -291,7 +300,7 @@ const SSchedule = () => {
     <section className=" h-screen  font-Montserrat  overflow-y-auto ">
       <h2 className="text-[#252941] text-3xl mt-5  my-3 pl-11 ml-5 font-semibold">Schedule Status</h2>
       {/* <div className="grid grid-cols-1  xl:grid-cols-[40%,35%,25%] gap-5 p-3 "> */}
-      <div className="flex flex-col  xl:flex-row gap-5 p-3 h-[92%]">
+      <div className="flex flex-col  xl:flex-row xl:gap-5 gap-14 p-3 h-[92%]">
         <div className="space-y-5 xl:w-[40%] ">
           <div className="bg-white w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 text-left">Shift Schedule</h2>
@@ -313,7 +322,7 @@ const SSchedule = () => {
 
           <div className="bg-white w-full h-[80%] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 text-left">Attendance</h2>
-            <div className='h-[90%] mb-4 overflow-y-scroll rounded-lg'>
+            <div className='h-[90%] mb-4 overflow-y-auto rounded-lg'>
               {loading ? (
                 <div className='ml-4 mb-2'>
                   <Skeleton variant="rectangular"
@@ -323,7 +332,7 @@ const SSchedule = () => {
                   />
                 </div>
               ) : (
-                <table className="w-[96%]   px-1 mx-auto border border-[#dcdcdc] rounded-2xl shadow  ">
+                <table className="w-[96%]  px-1 mx-auto border border-[#dcdcdc] rounded-2xl shadow  ">
                   {/* Table Headers */}
                   <thead>
                     <tr className="bg-[#3F4870] text-[#E6EEF9] rounded-xl">
@@ -371,7 +380,7 @@ const SSchedule = () => {
           </div>
         </div>
         <div className='space-y-5 xl:w-[35%] gap-5 sm:mt-0 mt-11'>
-          <div className="bg-white w-full xl:h-[99%] h-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
+          <div className="bg-white w-full xl:h-[99%] max-h[693px] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-2 text-left">Leave Request</h2>
             {loading ? (
               <div className='ml-4 mb-2'>
@@ -466,7 +475,7 @@ const SSchedule = () => {
                           } focus:outline-none flex justify-between items-center`}
                       >
                         {endDate
-                          ? `End: ${dayjs(startDate).format("MM/DD/YYYY")}` // Format as per your needs
+                          ? `End: ${dayjs(endDate).format("MM/DD/YYYY")}` // Format as per your needs
                           : "End date"}
                         {isEndDropdownOpen ? (
                           <FaChevronUp className="text-gray-600" />
@@ -552,7 +561,9 @@ const SSchedule = () => {
                   {/* </div> */}
                   <div className='relative h-full'>
                     <textarea
-                      // value={taskDescription}
+                      value={leaveDetails.reason}
+                      name='reason'
+                      onChange={handleChange}
                       // onChange={(e) => setTaskDescription(e.target.value)}
                       placeholder="State reason for leave  ..."
                       maxLength={400}
@@ -582,17 +593,25 @@ const SSchedule = () => {
           <button onClick={handleCloseSnackbar} className="absolute top-1 right-2 text-xl">×</button>
         </div>
       )} */}
-          <Snackbar
-            open={snackbar.open}
-            autoHideDuration={4000}
-            onClose={handleCloseSnackbar}
-            message={snackbar.message}
-            ContentProps={{
-              style: {
-                backgroundColor: snackbar.severity === "success" ? "green" : "red"
-              }
-            }}
-          />
+         <Snackbar
+  open={snackbar.open}
+  autoHideDuration={4000}
+  onClose={handleCloseSnackbar}
+  // onClose={() => setSnackbar({ ...snackbar, open: false })} // Close Snackbar
+  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+  ContentProps={{
+    style: {
+      backgroundColor: snackbar.severity === "success" ? "green" : "red",
+    },
+  }}
+  message={
+    <span style={{ display: "flex", alignItems: "center" }}>
+      <InfoIcon style={{ marginRight: 8 }} />
+      {snackbar.message}
+    </span>
+  }
+/>
+    
         </div>
       </div>
     </section>

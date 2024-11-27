@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const getAuthToken = () => {
     // const token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1MjM5LCJpYXQiOjE3MzI2MTMyMzksImp0aSI6ImUwMzMyNjRkYjk0OTQ5YzI5YjNhM2EzNjgxZGZhNDUzIiwidXNlcl9pZCI6MTIwfQ.ITV01RFPWCfFAVu6YJWZqjRCExMYpMw8DKf3xAvzL0w';
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDExLCJpYXQiOjE3MzI2MTM0MTEsImp0aSI6ImI2MzkyNjAwNTU3ZDQ0YTQ5MWE5NTA4ZDlkN2M0OWM4IiwidXNlcl9pZCI6MTQ5fQ.8sZK2idIczWT3l-EAEmGWLGIKMaXwR5eOKXApDf_Kik';
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MzI2OTkxLCJpYXQiOjE3MzI3MzQ5OTEsImp0aSI6IjNmMTM5OTIyZmYzZjQ5ZDhiOWYyOGM5ZWM1NTAzODBkIiwidXNlcl9pZCI6MTc1fQ.xn3Xra_d-fyzTxUhJFG8GpruS2scKPP2V0XmtaNT8kA';
     if (!token) {
       throw new Error('Authentication token not found');
     }
@@ -68,7 +68,15 @@ const leaveSlice = createSlice({
     fetchHistoryError: null,  // Error state for fetching leave history
     fetchHistoryLoading: false,   // Loading state for async operations
   },
-  reducers: {},
+  reducers: {
+    resetApplyLeaveError: (state) => {
+      state.applyLeaveError = null;
+      state.applyLeaveLoading = false;
+    },
+    resetLeaveStatus: (state) => {
+      state.leaveStatus = '';
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Handle the leave apply request
@@ -101,5 +109,5 @@ const leaveSlice = createSlice({
   },
 });
 
-// Export the actions (if any)
+export const { resetApplyLeaveError, resetLeaveStatus } = leaveSlice.actions;
 export default leaveSlice.reducer;

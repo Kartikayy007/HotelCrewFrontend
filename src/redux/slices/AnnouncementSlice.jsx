@@ -5,7 +5,7 @@ const BASE_URL = 'https://hotelcrew-1.onrender.com/api/taskassignment/announceme
 
 const getAuthToken = () => {
   // const token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1MjM5LCJpYXQiOjE3MzI2MTMyMzksImp0aSI6ImUwMzMyNjRkYjk0OTQ5YzI5YjNhM2EzNjgxZGZhNDUzIiwidXNlcl9pZCI6MTIwfQ.ITV01RFPWCfFAVu6YJWZqjRCExMYpMw8DKf3xAvzL0w';
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDExLCJpYXQiOjE3MzI2MTM0MTEsImp0aSI6ImI2MzkyNjAwNTU3ZDQ0YTQ5MWE5NTA4ZDlkN2M0OWM4IiwidXNlcl9pZCI6MTQ5fQ.8sZK2idIczWT3l-EAEmGWLGIKMaXwR5eOKXApDf_Kik';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MzI2OTkxLCJpYXQiOjE3MzI3MzQ5OTEsImp0aSI6IjNmMTM5OTIyZmYzZjQ5ZDhiOWYyOGM5ZWM1NTAzODBkIiwidXNlcl9pZCI6MTc1fQ.xn3Xra_d-fyzTxUhJFG8GpruS2scKPP2V0XmtaNT8kA';
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -101,7 +101,10 @@ const announcementSlice = createSlice({
     announcements: [],
     loading: false,
     error: null,
-    currentAnnouncement: null
+    currentAnnouncement: null,
+    nextPage: null,
+    previousPage: null,
+    totalCount: 0,
   },
   reducers: {
     clearError: (state) => {
@@ -109,7 +112,12 @@ const announcementSlice = createSlice({
     },
     setCurrentAnnouncement: (state, action) => {
       state.currentAnnouncement = action.payload;
-    }
+    },
+    setPagination: (state, action) => {
+      state.nextPage = action.payload.next;
+      state.previousPage = action.payload.previous;
+      state.totalCount = action.payload.count;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -133,6 +141,9 @@ const announcementSlice = createSlice({
       .addCase(fetchAnnouncements.fulfilled, (state, action) => {
         state.loading = false;
         state.announcements = action.payload.results;
+        state.nextPage = action.payload.next;
+        state.previousPage = action.payload.previous;
+        state.totalCount = action.payload.count;
       })
       .addCase(fetchAnnouncements.rejected, (state, action) => {
         state.loading = false;
@@ -156,11 +167,16 @@ const announcementSlice = createSlice({
   }
 });
 
-export const { clearError, setCurrentAnnouncement } = announcementSlice.actions;
+export const { clearError, setCurrentAnnouncement, setPagination  } = announcementSlice.actions;
 
 export const selectAllAnnouncements = state => state.announcements.announcements;
 export const selectAnnouncementsLoading = state => state.announcements.loading;
 export const selectAnnouncementsError = state => state.announcements.error;
 export const selectCurrentAnnouncement = state => state.announcements.currentAnnouncement;
+export const selectPagination = (state) => ({
+  nextPage: state.announcements.nextPage,
+  previousPage: state.announcements.previousPage,
+  totalCount: state.announcements.totalCount,
+});
 
 export default announcementSlice.reducer;

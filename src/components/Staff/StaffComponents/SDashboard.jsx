@@ -4,7 +4,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card, CardContent, Typography, Paper, Container, Box, Skeleton, Slider } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { getStaffLeaveHistory } from '../../../redux/slices/StaffLeaveSlice';
-import { getAttendanceStats } from '../../../redux/slices/StaffAttendanceSlice';
+import { getAttendanceStats,selectAttendanceStats,selectStatsLoading,selectStatsError } from '../../../redux/slices/StaffAttendanceSlice';
 import { fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsError, selectAnnouncementsLoading } from '../../../redux/slices/AnnouncementSlice';
 const SDashboard = () => {
   const dispatch = useDispatch();
@@ -13,6 +13,7 @@ const SDashboard = () => {
   const announcements = useSelector(selectAllAnnouncements);
   const AnnLoading = useSelector(selectAnnouncementsLoading);
   const AnnError = useSelector(selectAnnouncementsError);
+  
   const today = new Date();
   const [loading, setLoading] = useState(true);
   const {
@@ -20,15 +21,17 @@ const SDashboard = () => {
     fetchHistoryError,
     leaveHistory,
   } = useSelector((state) => state.leave);
-  const {
-    attendanceStats,
-    statsLoading,
-    statsError
-  } = useSelector((state) => state.attendance)
+  // const {
+  //   attendanceStats,
+  //   statsLoading,
+  //   statsError
+  // } = useSelector((state) => state.attendance)
   // const leaveStatus = useSelector((state) => state.leave.leaveStatus);
 
   // Fetch leave history on initial mount
-
+  const attendanceStats = useSelector(selectAttendanceStats);
+  const statsLoading = useSelector(selectStatsLoading);
+  const statsError = useSelector(selectStatsError);
 
 
 
@@ -342,7 +345,7 @@ const SDashboard = () => {
                       </Box>
                     </Box>
                   ) : (
-                    <div>Data not available</div>
+                    <div>Data not available{AttendanceData.total_days_up_to_today}</div>
                   )}
 
                   {AttendanceData && AttendanceData.length > 0 && (
@@ -377,10 +380,16 @@ const SDashboard = () => {
                         {/* <p className="text-md text-gray-500">{leave.created_at}</p> */}
                         <p className="text-md ">{leave.description}</p>
 
-                        <p className="text-md text-gray-500">Type: {leave.leave_type}</p>
-                        <p className="text-md text-gray-500">Date: {leave.from_date} to {leave.to_date}</p>
-                        <p className="text-md text-gray-500">Duration: {leave.duration} days</p>
-                        <p className="text-md text-gray-500 font-semibold">Status: {leave.status} </p>
+                        <p className="text-md text-gray-700">Type: {leave.leave_type}</p>
+                        <p className="text-md text-gray-700">Date: {leave.from_date} to {leave.to_date}</p>
+                        <p className="text-md text-gray-700">Duration: {leave.duration} days</p>
+                        <p className=' mt-2 text-md font-semibold'>Status: <span className={`text-white  px-2 py-1 rounded ${leave.status === "Approved"
+                            ? "bg-green-500"
+                            : leave.status === "Rejected"
+                              ? "bg-red-500"
+                              : "bg-gray-300"
+                          }`}
+                        >{leave.status}</span> </p>
                       </div>
                     )
                   })}
@@ -392,7 +401,7 @@ const SDashboard = () => {
         </div>
         <div className="space-y-5 h-[725px]  ">
           <div className='bg-white w-full mb-4 h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow'>
-            <h2 className="text-lg sm:text-xl font-semibold text-left mt-3 mb-4">Announcements</h2>
+            
             {AnnLoading ? (
               <div className='ml-4 mb-2'>
                 <Skeleton
@@ -402,7 +411,16 @@ const SDashboard = () => {
                   {...skeletonProps}
                 />
               </div>
-            ) : (
+            ) : announcements.length === 0 ? (
+              <>
+              <h2 className="text-lg sm:text-xl font-semibold text-left mt-3 mb-4">Announcements (0)</h2>
+              <div className="text-center mt-10 text-gray-500">
+                <p>No announcements available.</p>
+              </div>
+              </>
+              ) : (
+                <>
+                <h2 className="text-lg sm:text-xl font-semibold text-left mt-3 mb-4">Announcements {announcements.count}</h2>
               <div className='h-[90%] my-4 overflow-y-auto flex flex-col scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent'>
                 {announcements.map((announcement) => {
                   // Format the created_at date
@@ -437,6 +455,7 @@ const SDashboard = () => {
                   )
                 })}
               </div>
+            </>
             )}
           </div>
         </div>
