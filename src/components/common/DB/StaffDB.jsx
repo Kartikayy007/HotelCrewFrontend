@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import {MoreVertical, Edit2, Trash2, Eye, X} from "lucide-react";
 import {
   Menu,
@@ -14,12 +14,17 @@ import {
   Typography,
   Grid,
   Divider,
+  TextField,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {
   fetchStaffData,
   selectStaffList,
   selectStaffLoading,
+  editStaff,
+  deleteStaff
 } from "../../../redux/slices/StaffSlice";
 
 const TableRowSkeleton = () => (
@@ -44,6 +49,112 @@ const TableRowSkeleton = () => (
   ))
 );
 
+// Update EditDialog component
+const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
+  const [formData, setFormData] = useState(() => ({
+    ...staff
+  }));
+
+  useEffect(() => {
+    if (open) {
+      setFormData({ ...staff });
+    }
+  }, [open, staff]);
+
+  const handleChange = React.useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }, []);
+
+  const handleSave = React.useCallback(async () => {
+    await onSave(formData);
+  }, [formData, onSave]);
+
+  return (
+    <Dialog 
+      open={open} 
+      onClose={onClose}
+      disableBackdropClick
+      BackdropProps={{
+        sx: {
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
+          backdropFilter: "blur(5px)",
+        },
+      }}
+    >
+      <DialogTitle>Edit Staff</DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          margin="dense"
+          name="user_name"
+          label="Name"
+          fullWidth
+          value={formData.user_name || ''}
+          onChange={handleChange}
+          onClick={e => e.stopPropagation()}
+        />
+        <TextField
+          margin="dense"
+          name="email"
+          label="Email"
+          fullWidth
+          value={formData.email || ''}
+          onChange={handleChange}
+        />
+        <TextField
+          margin="dense"
+          name="department"
+          label="Department"
+          fullWidth
+          value={formData.department || ''}
+          onChange={handleChange}
+        />
+        <TextField
+          margin="dense"
+          name="role"
+          label="Role"
+          fullWidth
+          value={formData.role || ''}
+          onChange={handleChange}
+        />
+        <TextField
+          margin="dense"
+          name="shift"
+          label="Shift"
+          fullWidth
+          value={formData.shift || ''}
+          onChange={handleChange}
+        />
+        <TextField
+          margin="dense"
+          name="salary"
+          label="Salary"
+          fullWidth
+          value={formData.salary || ''}
+          onChange={handleChange}
+          type="number"
+        />
+        <TextField
+          margin="dense"
+          name="upi_id"
+          label="UPI ID"
+          fullWidth
+          value={formData.upi_id || ''}
+          onChange={handleChange}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleSave}>Save</Button>
+      </DialogActions>
+    </Dialog>
+  );
+});
+
 function StaffDB({ searchTerm, filters }) {
   const dispatch = useDispatch();
   const employees = useSelector(selectStaffList);
@@ -52,6 +163,15 @@ function StaffDB({ searchTerm, filters }) {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
   const [viewDialog, setViewDialog] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({});
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
 
   useEffect(() => {
     dispatch(fetchStaffData());
@@ -62,20 +182,71 @@ function StaffDB({ searchTerm, filters }) {
     setAnchorEl(null);
   };
 
-  const handleEdit = (id) => {
-     ("Editing employee:", id);
-    setAnchorEl(null);
-  };
+  const handleEdit = useCallback((staff) => {
+    setSelectedStaff(staff);
+    setOpenDialog(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setOpenDialog(false);
+    setSelectedStaff(null);
+  }, []);
+
+  const handleSave = useCallback(async (updatedData) => {
+    try {
+      await dispatch(editStaff({
+        employeeId: selectedStaff.id,
+        updatedData: {
+          user_name: updatedData.user_name,
+          email: updatedData.email,
+          department: updatedData.department,
+          role: updatedData.role,
+          shift: updatedData.shift,
+          salary: updatedData.salary,
+          upi_id: updatedData.upi_id
+        }
+      })).unwrap();
+      
+      await dispatch(fetchStaffData());
+      
+      handleClose();
+      setSnackbar({
+        open: true,
+        message: 'Employee updated successfully',
+        severity: 'success'
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error.message || 'Failed to update employee',
+        severity: 'error'
+      });
+    }
+  }, [dispatch, selectedStaff, handleClose]);
 
   const initiateDelete = (employee) => {
     setDeleteConfirmation(employee);
     setAnchorEl(null);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteConfirmation) {
-      setEmployees(employees.filter((emp) => emp.id !== deleteConfirmation.id));
-      setDeleteConfirmation(null);
+      try {
+        await dispatch(deleteStaff(deleteConfirmation.id)).unwrap();
+        setSnackbar({
+          open: true,
+          message: 'Employee deleted successfully',
+          severity: 'success'
+        });
+        setDeleteConfirmation(null);
+        dispatch(fetchStaffData()); // Refresh the list
+      } catch (error) {
+        setSnackbar({
+          open: true,
+          message: error.message || 'Failed to delete employee',
+          severity: 'error'
+        });
+      }
     }
   };
 
@@ -87,6 +258,44 @@ function StaffDB({ searchTerm, filters }) {
   const handleMenuClose = () => {
     setAnchorEl(null);
     setSelectedEmployee(null);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await dispatch(editStaff({
+        employeeId: editFormData.id,
+        updatedData: editFormData
+      })).unwrap();
+      
+      setSnackbar({
+        open: true,
+        message: 'Employee updated successfully',
+        severity: 'success'
+      });
+      setEditDialogOpen(false);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error.message || 'Failed to update employee',
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleEditInputChange = (e) => {
+    setEditFormData({
+      ...editFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const filteredEmployees = employees.filter(employee => {
@@ -216,6 +425,27 @@ function StaffDB({ searchTerm, filters }) {
   return (
     <section className="w-full bg-white rounded-lg shadow-lg">
       <EmployeeDetailsDialog />
+      <EditDialog
+        open={openDialog}
+        onClose={handleClose}
+        staff={selectedStaff}
+        onSave={handleSave}
+      />
+      <Snackbar
+  open={snackbar.open}  
+  autoHideDuration={6000}
+  onClose={() => setSnackbar({...snackbar, open: false})}
+  anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+
+>
+  <Alert 
+    variant="filled"
+    severity={snackbar.severity}
+    onClose={() => setSnackbar({...snackbar, open: false})}
+  >
+    {snackbar.message}
+  </Alert>
+</Snackbar>
       <div className="max-h-[calc(100vh-260px)] overflow-auto">
         <table className="w-full rounded-tr-lg overflow-hidden">
           <thead className="sticky top-0 bg-[#252941] shadow-sm z-20">
@@ -256,7 +486,11 @@ function StaffDB({ searchTerm, filters }) {
                       </span>
                     </div>
                   </td>
-                  <td className="p-4 text-gray-700">{employee.email}</td>
+                  <td className="p-4 text-gray-700">
+                    <div className="max-w-[200px] truncate" title={employee.email}>
+                      {employee.email}
+                    </div>
+                  </td>
                   <td className="p-4 text-gray-700">
                     {employee.department || "N/A"}
                   </td>
@@ -265,7 +499,11 @@ function StaffDB({ searchTerm, filters }) {
                   <td className="p-4 font-medium text-gray-900">
                     ₹{employee.salary}
                   </td>
-                  <td className="p-4 text-gray-700">{employee.upi_id}</td>
+                  <td className="p-4 text-gray-700">
+                    <div className="max-w-[150px] truncate" title={employee.upi_id}>
+                      {employee.upi_id}
+                    </div>
+                  </td>
                   <td className="p-4 relative">
                     <button
                       onClick={(e) => handleMenuOpen(e, employee)}
@@ -287,21 +525,11 @@ function StaffDB({ searchTerm, filters }) {
                         vertical: "bottom",
                       }}
                     >
-                      <MenuItem
-                        onClick={() => {
-                          handleView(selectedEmployee?.id);
-                          handleMenuClose();
-                        }}
-                      >
-                        <ListItemIcon>
-                          <Eye className="h-4 w-4" />
-                        </ListItemIcon>
-                        <ListItemText>View Details</ListItemText>
-                      </MenuItem>
+                      
 
                       <MenuItem
                         onClick={() => {
-                          handleEdit(selectedEmployee?.id);
+                          handleEdit(selectedEmployee);
                           handleMenuClose();
                         }}
                       >
@@ -376,4 +604,4 @@ function StaffDB({ searchTerm, filters }) {
   );
 }
 
-export default StaffDB;
+export default React.memo(StaffDB);

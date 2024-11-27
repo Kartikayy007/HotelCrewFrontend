@@ -2,8 +2,9 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const API_URL = "https://hotelcrew-1.onrender.com/api/edit/list/";
-// const CACHE_KEY = 'staffData';
-// const CACHE_DURATION = 1 * 60 * 60 * 1000; 
+const EDIT_STAFF_URL = "https://hotelcrew-1.onrender.com/api/edit/update/";
+const CACHE_KEY = 'staffData';
+const DELETE_STAFF_URL = "https://hotelcrew-1.onrender.com/api/edit/delete/";
 
 const getAuthToken = () => {
   const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
@@ -13,39 +14,6 @@ const getAuthToken = () => {
   return token;
 };
 
-/* Cached version
-const getCachedData = () => {
-  try {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      const { data, timestamp } = JSON.parse(cached);
-      const now = new Date().getTime();
-      
-      if (now - timestamp < CACHE_DURATION) {
-        return data;
-      }
-      localStorage.removeItem(CACHE_KEY);
-    }
-  } catch (error) {
-    console.error('Error reading from cache:', error);
-    localStorage.removeItem(CACHE_KEY);
-  }
-  return null;
-};
-
-const setCachedData = (data) => {
-  try {
-    const cacheData = {
-      data,
-      timestamp: new Date().getTime()
-    };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-  } catch (error) {
-    console.error('Error writing to cache:', error);
-  }
-}; */
-
-// Direct fetch without caching
 export const fetchStaffData = createAsyncThunk(
   "staff/fetchStaffData",
   async (_, { rejectWithValue }) => {
@@ -57,14 +25,60 @@ export const fetchStaffData = createAsyncThunk(
           'Content-Type': 'application/json'
         }
       };
-
       const response = await axios.get(API_URL, config);
-       ('Fetched staff data:', response.data);
+      console.log('Fetched staff data:', response.data);
       return response.data;
-      
     } catch (error) {
-       ('Failed to fetch staff data:');
+      console.error('Failed to fetch staff data:');
       return rejectWithValue(error.response?.data || "Failed to fetch staff data");
+    }
+  }
+);
+
+export const editStaff = createAsyncThunk(
+  "staff/editStaff",
+  async ({ employeeId, updatedData }, { rejectWithValue, dispatch, getState }) => {
+    const previousState = getState().staff.staffList;
+    
+    try {
+      const token = getAuthToken();
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      const response = await axios.put(
+        `${EDIT_STAFF_URL}${employeeId}/`, 
+        updatedData, 
+        config
+      );
+
+      return { employeeId, updatedData: response.data };
+    } catch (error) {
+      dispatch(setStaffList(previousState));
+      return rejectWithValue(error.response?.data || "Failed to edit staff");
+    }
+  }
+);
+
+export const deleteStaff = createAsyncThunk(
+  "staff/deleteStaff",
+  async (employeeId, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+      await axios.delete(`${DELETE_STAFF_URL}${employeeId}/`, config);
+      return employeeId;
+    } catch (error) {
+      console.error('Failed to delete staff:', error);
+      return rejectWithValue(error.response?.data || "Failed to delete staff");
     }
   }
 );
@@ -75,6 +89,8 @@ const initialState = {
   staffList: [],
   loading: false,
   error: null,
+  editLoading: false,
+  editError: null,
 };
 
 const staffSlice = createSlice({
@@ -86,6 +102,10 @@ const staffSlice = createSlice({
       state.staffPerDepartment = {};
       state.totalDepartments = 0;
       state.staffList = [];
+    },
+    resetEditState: (state) => {
+      state.editLoading = false;
+      state.editError = null;
     }
   },
   extraReducers: (builder) => {
@@ -103,16 +123,42 @@ const staffSlice = createSlice({
       .addCase(fetchStaffData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(editStaff.pending, (state) => {
+        state.editLoading = true;
+        state.editError = null;
+      })
+      .addCase(editStaff.fulfilled, (state, action) => {
+        state.editLoading = false;
+      })
+      .addCase(editStaff.rejected, (state, action) => {
+        state.editLoading = false;
+        state.editError = action.payload;
+      })
+      .addCase(deleteStaff.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteStaff.fulfilled, (state, action) => {
+        state.loading = false;
+        state.staffList = state.staffList.filter(staff => staff.id !== action.payload);
+      })
+      .addCase(deleteStaff.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { clearStaffCache } = staffSlice.actions;
+export const { clearStaffCache, resetEditState } = staffSlice.actions;
 
 export const selectStaffPerDepartment = (state) => state.staff.staffPerDepartment;
 export const selectStaffList = (state) => state.staff.staffList;
 export const selectStaffLoading = (state) => state.staff.loading;
 export const selectStaffError = (state) => state.staff.error;
+export const selectEditLoading = (state) => state.staff.editLoading;
+export const selectEditError = (state) => state.staff.editError;
+
 export const selectDepartments = (state) => {
   const departments = state.staff.staffList
     .map(staff => staff.department)

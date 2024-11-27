@@ -94,7 +94,7 @@ function AdminDashboard() {
     return () => clearInterval(interval);
   }, [dispatch]);
 
-   (latestRevenue);
+  console.log(latestRevenue);
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -133,15 +133,18 @@ function AdminDashboard() {
     setLoading(false);
   
     return () => clearInterval(interval);
-  }, [currentHour, latestRevenue]); 
+  }, [currentHour]); 
 
   const generateTimeData = (hour) => {
+    // Initialize 24 hour array with 0 revenues
     const hourlyRevenues = new Array(24).fill(0);
     
+    // If we have revenue, add it to the current hour
     if (latestRevenue) {
       hourlyRevenues[hour] = parseFloat(latestRevenue);
     }
   
+    // Create time data array up to current hour
     const timeData = [];
     for (let i = 0; i <= hour; i++) {
       timeData.push({
@@ -154,7 +157,7 @@ function AdminDashboard() {
   };
 
   const getFilteredRevenueData = () => {
-     ("timeData:", timeData);
+    console.log("timeData:", timeData);
     return timeData.slice(revenueRange[0], revenueRange[1] + 1);
   };
 
