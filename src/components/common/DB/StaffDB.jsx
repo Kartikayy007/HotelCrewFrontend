@@ -28,25 +28,29 @@ import {
 } from "../../../redux/slices/StaffSlice";
 
 const TableRowSkeleton = () => (
-  Array(5).fill(0).map((_, index) => (
-    <tr key={index} className="border-b animate-pulse">
-      <td className="p-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-          <div className="h-4 bg-gray-200 rounded w-32"></div>
-        </div>
-      </td>
-      <td className="p-4"><div className="h-4 bg-gray-200 rounded w-40"></div></td>
-      <td className="p-4"><div className="h-4 bg-gray-200 rounded w-24"></div></td>
-      <td className="p-4"><div className="h-4 bg-gray-200 rounded w-20"></div></td>
-      <td className="p-4"><div className="h-4 bg-gray-200 rounded w-16"></div></td>
-      <td className="p-4"><div className="h-4 bg-gray-200 rounded w-20"></div></td>
-      <td className="p-4"><div className="h-4 bg-gray-200 rounded w-32"></div></td>
-      <td className="p-4">
-        <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-      </td>
-    </tr>
-  ))
+  <tr className="border-b">
+    <td className="p-4"><Skeleton variant="text" width={150} /></td>
+    <td className="p-4"><Skeleton variant="text" width={100} /></td>
+    <td className="p-4"><Skeleton variant="text" width={150} /></td>
+    <td className="p-4"><Skeleton variant="text" width={100} /></td>
+    <td className="p-4"><Skeleton variant="text" width={100} /></td>
+    <td className="p-4"><Skeleton variant="text" width={100} /></td>
+    <td className="p-4"><Skeleton variant="text" width={80} /></td>
+  </tr>
+);
+
+const NoResults = () => (
+  <tr>
+    <td colSpan="8" className="text-center p-8">
+      <div className="flex flex-col items-center justify-center text-gray-500">
+        <svg className="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p className="text-lg font-medium">No matching results found</p>
+        <p className="text-sm">Try adjusting your search or filters</p>
+      </div>
+    </td>
+  </tr>
 );
 
 // Update EditDialog component
@@ -462,15 +466,11 @@ function StaffDB({ searchTerm, filters }) {
           </thead>
           <tbody>
             {loading ? (
-              <TableRowSkeleton />
+              [...Array(5)].map((_, index) => (
+                <TableRowSkeleton key={index} />
+              ))
             ) : filteredEmployees.length === 0 ? (
-              <tr>
-                <td colSpan="8" className="text-center py-4 text-gray-500">
-                  {searchTerm || filters.department !== "All" || filters.role !== "All" || filters.shift !== "All" 
-                    ? "No matching results found"
-                    : "No employees found"}
-                </td>
-              </tr>
+              <NoResults />
             ) : (
               filteredEmployees.map((employee) => (
                 <tr

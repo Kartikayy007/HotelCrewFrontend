@@ -10,9 +10,15 @@ const getAuthToken = () => {
   return token;
 };
 
+const initialState = {
+  customers: [],
+  loading: false,
+  error: null
+};
+
 export const fetchCustomers = createAsyncThunk(
   'customers/fetchCustomers',
-  async (page = 1, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
       const config = {
@@ -20,25 +26,15 @@ export const fetchCustomers = createAsyncThunk(
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        params: {
-          page: page // Fixed parameter
-        },
-        withCredentials: false // Change to false since we're using token auth
+        withCredentials: false
       };
       
       const response = await axios.get(
-        'https://hotelcrew-1.onrender.com/api/hoteldetails/all-customers',
+        'https://hotelcrew-1.onrender.com/api/hoteldetails/all-customers/',
         config
       );
-      console.log('response', response.data);
       return response.data;
     } catch (error) {
-      if (error.response?.status === 404) {
-        return rejectWithValue('Resource not found');
-      }
-      if (error.message === 'Network Error') {
-        return rejectWithValue('CORS error - please check server configuration');
-      }
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch customers');
     }
   }
@@ -46,16 +42,10 @@ export const fetchCustomers = createAsyncThunk(
 
 const customerSlice = createSlice({
   name: 'customers',
-  initialState: {
-    customers: [],
-    loading: false,
-    error: null,
-    count: 0,
-    next: null,
-    previous: null,
-    currentPage: 1
+  initialState,
+  reducers: {
+    resetCustomers: (state) => initialState
   },
-  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchCustomers.pending, (state) => {
@@ -64,10 +54,7 @@ const customerSlice = createSlice({
       })
       .addCase(fetchCustomers.fulfilled, (state, action) => {
         state.loading = false;
-        state.customers = action.payload.results;
-        state.count = action.payload.count;
-        state.next = action.payload.next;
-        state.previous = action.payload.previous;
+        state.customers = action.payload;
         state.error = null;
       })
       .addCase(fetchCustomers.rejected, (state, action) => {
@@ -77,4 +64,8 @@ const customerSlice = createSlice({
   },
 });
 
+// Add the selector
+export const selectCustomers = (state) => state.customers.customers;
+
+export const { resetCustomers } = customerSlice.actions;
 export default customerSlice.reducer;

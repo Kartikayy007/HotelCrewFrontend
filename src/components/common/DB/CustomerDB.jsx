@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { MoreVertical, Edit2, Eye } from "lucide-react";
-import { Menu, MenuItem, ListItemIcon, ListItemText, Skeleton, Pagination, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import { Skeleton, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { fetchCustomers } from '../../../redux/slices/customerSlice';
 
 const TableRowSkeleton = () => (
@@ -16,26 +15,75 @@ const TableRowSkeleton = () => (
   </tr> 
 );
 
-function CustomerDB() {
+const NoResults = () => (
+  <tr>
+    <td colSpan="9" className="text-center p-8">
+      <div className="flex flex-col items-center justify-center text-gray-500">
+        <svg className="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p className="text-lg font-medium">No matching results found</p>
+        <p className="text-sm">Try adjusting your search or filters</p>
+      </div>
+    </td>
+  </tr>
+);
+
+function CustomerDB({ searchTerm = "", filters }) {
   const dispatch = useDispatch();
-  const { customers, loading, count } = useSelector((state) => state.customers);
-  const [page, setPage] = React.useState(1);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const { customers = [], loading } = useSelector((state) => state.customers);
   const [selectedCustomer, setSelectedCustomer] = React.useState(null);
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   useEffect(() => {
-    dispatch(fetchCustomers(1))  }, [dispatch, page]);
+    dispatch(fetchCustomers());
+  }, [dispatch]);
 
+  const handleDialogOpen = (customer) => {
+    setSelectedCustomer(customer);
+    setDialogOpen(true);
+  };
 
   const handleDialogClose = () => {
     setDialogOpen(false);
     setSelectedCustomer(null);
   };
 
-  const handlePageChange = (event, value) => {
-    setPage(value);
-  };
+  if (loading) {
+    return (
+      <section className="w-full bg-white rounded-lg shadow-lg">
+        <div className="max-h-[calc(100vh-260px)] overflow-auto">
+          <table className="w-full rounded-tr-lg overflow-hidden">
+            <tbody>
+              {[...Array(5)].map((_, index) => (
+                <TableRowSkeleton key={index} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    );
+  }
+
+  const customersList = Array.isArray(customers) ? customers : [];
+
+  const filteredCustomers = customersList.filter(customer => {
+    // Search filter
+    const searchMatch = !searchTerm || 
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.phone_number.includes(searchTerm);
+
+    // Customer type filter
+    const typeMatch = filters.customerType === "All" || 
+      customer.status === filters.customerType;
+
+    // Room type filter
+    const roomTypeMatch = filters.roomType === "All" ||
+      customer.room_type === filters.roomType;
+
+    return searchMatch && typeMatch && roomTypeMatch;
+  });
 
   return (
     <>
@@ -56,12 +104,8 @@ function CustomerDB() {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
-                [...Array(5)].map((_, index) => (
-                  <TableRowSkeleton key={index} />
-                ))
-              ) : (
-                customers.map((customer, index) => (
+              {filteredCustomers.length > 0 ? (
+                filteredCustomers.map((customer, index) => (
                   <tr
                     key={customer.id}
                     className={`border-b hover:bg-gray-50 transition-colors ${
@@ -87,22 +131,13 @@ function CustomerDB() {
                     <td className="p-4 text-gray-700">
                       {new Date(customer.check_out_time).toLocaleString()}
                     </td>
-                    
                   </tr>
                 ))
+              ) : (
+                <NoResults />
               )}
             </tbody>
           </table>
-        </div>
-        <div className="p-4 flex justify-center">
-          <Pagination 
-            count={Math.ceil(count / 10)} 
-            page={page}
-            onChange={handlePageChange}
-            color="primary"
-            showFirstButton 
-            showLastButton
-          />
         </div>
       </section>
 
@@ -149,6 +184,9 @@ function CustomerDB() {
             </div>
           )}
         </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose}>Close</Button>
+        </DialogActions>
       </Dialog>
     </>
   );

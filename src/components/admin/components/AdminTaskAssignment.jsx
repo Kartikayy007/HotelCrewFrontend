@@ -171,7 +171,7 @@ const TaskCard = ({ task }) => {
               {getStatusIcon(task.status)}
             </div>
             
-            <div className="min-w-0 flex-1"> {/* Add min-w-0 to allow truncation */}
+            <div className="min-w-0 flex-1">
               <div className="flex items-center space-x-2">
                 <h2 className="text-lg font-semibold truncate" title={task.title}>
                   {task.title}
@@ -185,14 +185,20 @@ const TaskCard = ({ task }) => {
                 {task.description}
               </p>
               
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 space-y-1">
+                {task.deadline && (
+                  <p className="text-red-600 font-medium flex items-center">
+                    <Clock className="w-4 h-4 mr-1" />
+                    Due: {formattedDate(task.deadline)}
+                  </p>
+                )}
                 <div className="flex justify-between items-center">
                   {task.completed_at ? (
-                    <p className="truncate">
+                    <p className="truncate text-xs">
                       Completed: {formattedDate(task.completed_at)}
                     </p>
                   ) : (
-                    <p className="truncate">
+                    <p className="truncate text-xs">
                       Created: {formattedDate(task.created_at)}
                     </p>
                   )}
@@ -228,7 +234,7 @@ const AdminTaskAssignment = ({ onClose }) => {
   const completedTasks = useSelector(state => selectTasksByStatus(state, 'completed'));
 
   useEffect(() => {
-    dispatch(fetchTasks()); // Removed pagination parameter
+    dispatch(fetchTasks()); 
   }, [dispatch]);
 
   if (loading && !pendingTasks.length && !inProgressTasks.length && !completedTasks.length) {

@@ -82,9 +82,9 @@ const AdminAnalytics = () => {
 
   // Derived values
   const totalStaff = useSelector(selectTotalStaff);
-  const todaysRevenue = dailyRevenues[dailyRevenues.length - 1] || 1292;
-  const todaysCheckIns = roomStats?.daily_checkins[roomStats.daily_checkins.length - 1] || 423;
-  const todaysCheckOuts = roomStats?.daily_checkouts[roomStats.daily_checkouts.length - 1] || 42;
+  const todaysRevenue = dailyRevenues[dailyRevenues.length - 1] || 0;
+  const todaysCheckIns = roomStats?.daily_checkins[roomStats.daily_checkins.length - 1] || 0;
+  const todaysCheckOuts = roomStats?.daily_checkouts[roomStats.daily_checkouts.length - 1] || 0;
 
   console.log("todays revenue:", todaysRevenue);
 
@@ -185,7 +185,7 @@ const AdminAnalytics = () => {
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
-      <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
+      <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12</div>">
         Analytics
       </h1>
 
@@ -196,7 +196,7 @@ const AdminAnalytics = () => {
               <h3 className="text-lg font-semibold">Total Staff</h3>
               <p className="text-3xl font-semibold">
                 {loading ? (
-                  <Skeleton variant="text" width={80} />
+                  <Skeleton variant="te</div>xt" width={80} />
                 ) : (
                   animatedStaff
                 )}
@@ -208,7 +208,7 @@ const AdminAnalytics = () => {
             <div className="bg-white rounded-lg shadow-lg p-4 transform transition-transform duration-300 delay-1000 hover:scale-105">
               <h3 className="text-lg font-semibold">Today's Revenue</h3>
               <div className="flex items-center gap-2">
-                <p className="text-3xl font-semibold">${animatedRevenue.toLocaleString()}</p>
+                <p className="text-3xl font-semibold">₹{animatedRevenue.toLocaleString()}</p>
                 {todaysRevenue > (getLastTwoValues(dailyRevenues)[0] || 0) ? (
                   <TrendingUp className="text-green-500" size={24} />
                 ) : (
@@ -234,7 +234,7 @@ const AdminAnalytics = () => {
 
           <section className="w-full sm:w-1/2 xl:w-1/4 px-2 mb-4">
             <div className="bg-white rounded-lg shadow-lg p-4 transform transition-transform duration-300 delay-1000 hover:scale-105">
-              <h3 className="text-lg font-semibold">Total Check-Outs</h3>
+              <h3 className="text-lg font-semibold">Todays Check-Outs</h3>
               <div className="flex items-center gap-2">
                 <p className="text-3xl font-semibold">{animatedCheckOuts}</p>
                 {todaysCheckOuts > (getLastTwoValues(daily_checkouts)[0] || 0) ? (

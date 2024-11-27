@@ -16,6 +16,7 @@ import {
 } from '../../../redux/slices/userProfileSlice';
 import docupload from "/docupload.svg";
 import { toast } from 'react-toastify';
+import axios from "axios";
 
 const BasicInfo = () => {
   const dispatch = useDispatch();
@@ -839,9 +840,9 @@ const Profile = () => {
   const dispatch = useDispatch();
   const profile = useSelector(selectUserProfile);
   const loading = useSelector(selectUserProfileLoading);
-  const error = useSelector(selectUserProfileError);
   
-  const [profileImage, setProfileImage] = useState("");
+  const [profileImage, setProfileImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState("");
   const [formData, setFormData] = useState({
     user_name: ''
   });
@@ -856,7 +857,7 @@ const Profile = () => {
       setFormData({
         user_name: profile.user_name || ''
       });
-      setProfileImage(profile.user_profile || '');
+      setPreviewImage(profile.user_profile || '');
     }
   }, [profile]);
 
@@ -869,6 +870,15 @@ const Profile = () => {
     setIsDirty(true);
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImage(file);
+      setPreviewImage(URL.createObjectURL(file));
+      setIsDirty(true);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -877,19 +887,39 @@ const Profile = () => {
       return;
     }
 
+    const getAuthToken = () => {
+      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
+      if (!token) throw new Error('Authentication token not found');
+      return token;
+    }
+    
+
     try {
-      console.log('Updating profile with:', formData); // Debug log
-      
-      const result = await dispatch(updateUserProfile({
-        user_name: formData.user_name.trim()
-      })).unwrap();
-      
-      console.log('Update response:', result); // Debug log
+      // Create form data for profile picture update
+      const profileFormData = new FormData();
+      if (profileImage) {
+        profileFormData.append('user_profile', profileImage);
+      }
+      profileFormData.append('user_name', formData.user_name.trim());
+
+      // Update profile picture and name
+      await axios.put(
+        'https://hotelcrew-1.onrender.com/api/edit/user_profile/',
+        profileFormData,
+        {
+          headers: {
+            'Authorization': `Bearer ${getAuthToken()}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
       toast.success('Profile updated successfully');
       setIsDirty(false);
+      dispatch(fetchUserProfile()); // Refresh profile data
     } catch (error) {
-      console.error('Profile update error:', error); // Debug log
-      toast.error(error?.response?.data?.message || error?.message || 'Failed to update profile');
+      console.error('Profile update error:', error);
+      toast.error(error?.response?.data?.message || 'Failed to update profile');
     }
   };
 
@@ -897,12 +927,26 @@ const Profile = () => {
     <section className="lg:h-[75vh] h-full p-2 mr-4 font-Montserrat">
       <div className="lg:mt-1 mt-2 ml-4 mr-2 pt-2 pb-1 pr-7 pl-7 rounded-lg">
         <div className="lg:flex-row flex-col flex w-full lg:items-start items-center lg:justify-evenly">
-          <div className="relative mt-4 w-48 h-48 lg:w-60 lg:h-60 lg:top-14 rounded-full border border-gray-400">
-            <img
-              src={profileImage || "/default-profile.png"}
-              alt="profile"
-              className="w-full h-full rounded-full object-cover"
-            />
+          <div className="relative mt-4 w-48 h-48 lg:w-60 lg:h-60 lg:top-14">
+            <div className="relative w-full h-full rounded-full border border-gray-400">
+              <img
+                src={previewImage || "/default-profile.png"}
+                alt="profile"
+                className="w-full h-full rounded-full object-cover"
+              />
+              <label className="absolute bottom-0 right-0 bg-gray-800 rounded-full p-2 cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </label>
+            </div>
           </div>
           
           <div className="relative w-full lg:w-auto pl-4 lg:pl-8 mt-4">

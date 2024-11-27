@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   LayoutDashboard,
   Database,
@@ -17,10 +18,16 @@ import AdminAnalaytics from './AdminAnalaytics';
 import AdminLeaveManagment from './AdminLeaveManagment';
 import AdminSettings from './AdminSettings';
 import AdminScheduleStatus from './AdminScheduleStatus';
+import { selectUserProfile, fetchUserProfile } from '../../../redux/slices/userProfileSlice';
 
- 
 const AdminSidebar = ({ onMenuItemClick }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch();
+  const userProfile = useSelector(selectUserProfile);
+
+  useEffect(() => {
+    dispatch(fetchUserProfile());
+  }, [dispatch]);
 
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', component: AdminDashboard },
@@ -61,17 +68,17 @@ const AdminSidebar = ({ onMenuItemClick }) => {
           w-64 bg-[#252941] text-white flex flex-col
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full 2xl:translate-x-0'}
-        `}
+        `} 
       >
         <div className="flex flex-col items-center py-8 space-y-4">
           <div className="w-24 h-24 rounded-full overflow-hidden">
             <img
-              src=""
+              src={userProfile?.user_profile || "/default-profile.png"}
               alt="Profile"
               className="w-full h-full object-cover"
             />
           </div>
-          <h2 className="text-xl font-semibold">Kartikay</h2>
+          <h2 className="text-xl font-semibold">{userProfile?.user_name || 'User'}</h2>
         </div>
 
         <ul className="flex-1 space-y-4 px-6 py-4">

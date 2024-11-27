@@ -52,11 +52,12 @@ import {
   fetchRevenueStats,
   selectRoomStats,
 } from "../../../redux/slices/revenueSlice";
-import { 
-  fetchRoomStats, 
-  selectOccupiedRooms, 
-  selectAvailableRooms 
-} from '../../../redux/slices/OcupancyRateSlice';
+import {
+  fetchRoomStats,
+  selectOccupiedRooms,
+  selectAvailableRooms,
+} from "../../../redux/slices/OcupancyRateSlice";
+
 
 function AdminDashboard() {
   const dispatch = useDispatch();
@@ -86,11 +87,26 @@ function AdminDashboard() {
 
   useEffect(() => {
     dispatch(fetchRevenueStats());
-  
+
     const interval = setInterval(() => {
       dispatch(fetchRevenueStats());
-    }, 3600000); 
-  
+    }, 3600000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchAttendanceStats());
+    dispatch(fetchStaffData());
+    dispatch(fetchTasks());
+    dispatch(fetchHotelDetails());
+    dispatch(fetchRevenueStats());
+    dispatch(fetchRoomStats());
+
+    const interval = setInterval(() => {
+      dispatch(fetchRoomStats());
+    }, 30 * 60 * 1000);
+
     return () => clearInterval(interval);
   }, [dispatch]);
 
@@ -118,42 +134,90 @@ function AdminDashboard() {
     },
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newHour = new Date().getHours();
-      if (newHour !== currentHour) {
-        setCurrentHour(newHour);
-        setPerformanceRange([0, newHour || 1]);
-        setRevenueRange([0, newHour || 1]);
-        setTimeData(generateTimeData(newHour));
-      }
-    }, 60000);
-  
-    setTimeData(generateTimeData(currentHour));
-    setLoading(false);
-  
-    return () => clearInterval(interval);
-  }, [currentHour, latestRevenue]); 
+const [cumulativeRevenue, setCumulativeRevenue] = useState(0);
 
-  const generateTimeData = (hour) => {
-    // Initialize 24 hour array with 0 revenues
-    const hourlyRevenues = new Array(24).fill(0);
+const STORAGE_KEY = 'hourlyRevenueData';
+const HOURS_IN_DAY = 24;
+
+const [hourlyRevenues, setHourlyRevenues] = useState(() => {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  const initial = new Array(HOURS_IN_DAY).fill(0);
+  if (stored) {
+    return JSON.parse(stored);
+  }
+  const currentHour = new Date().getHours();
+  if (latestRevenue) {
+    initial[currentHour] = parseFloat(latestRevenue) - cumulativeRevenue;
+  }
+  return initial;
+});
+
+useEffect(() => {
+  if (latestRevenue) {
+    const currentHour = new Date().getHours();
+    setHourlyRevenues(prev => {
+      const updated = [...prev];
+      updated[currentHour] = parseFloat(latestRevenue) - cumulativeRevenue;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }
+}, []);
+
+useEffect(() => {
+  const midnightClear = setInterval(() => {
+    const now = new Date();
+    if (now.getHours() === 0 && now.getMinutes() === 0) {
+      localStorage.removeItem(STORAGE_KEY);
+      setHourlyRevenues(new Array(HOURS_IN_DAY).fill(0));
+      setCumulativeRevenue(0);
+    }
+  }, 60000);
+
+  const revenueUpdate = setInterval(() => {
+    const newHour = new Date().getHours();
     
-    // If we have revenue, add it to the current hour
-    if (latestRevenue) {
-      hourlyRevenues[hour] = parseFloat(latestRevenue);
+    if (newHour !== currentHour) {
+      if (latestRevenue) {
+        const newRevenue = parseFloat(latestRevenue);
+        setHourlyRevenues((prev) => {
+          const updated = [...prev];
+          updated[currentHour] = newRevenue - cumulativeRevenue;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+          return updated;
+        });
+        setCumulativeRevenue(newRevenue);
+      }
+      
+      setCurrentHour(newHour);
+      setPerformanceRange([0, newHour || 1]);
+      setRevenueRange([0, newHour || 1]);
+      dispatch(fetchRevenueStats());
+      setTimeData(generateTimeData());
     }
-  
-    const timeData = [];
-    for (let i = 0; i <= hour; i++) {
-      timeData.push({
-        hour: `${i}:00`,
-        revenue: hourlyRevenues[i]
-      });
-    }
-  
-    return timeData;
+  }, 60000);
+
+  setTimeData(generateTimeData());
+  setLoading(false);
+
+  return () => {
+    clearInterval(revenueUpdate);
+    clearInterval(midnightClear);
   };
+}, [currentHour, latestRevenue, cumulativeRevenue]);
+
+const generateTimeData = () => {
+  const timeData = [];
+  for (let i = 0; i <= currentHour; i++) {
+    timeData.push({
+      hour: `${i}:00`,
+      revenue: hourlyRevenues[i],
+      cumulative: i === 0 ? hourlyRevenues[0] : 
+        timeData[i-1].cumulative + hourlyRevenues[i]
+    });
+  }
+  return timeData;
+};
 
   const getFilteredRevenueData = () => {
     return timeData.slice(revenueRange[0], revenueRange[1] + 1);
@@ -195,7 +259,7 @@ function AdminDashboard() {
   const busyStaffCount = inProgressCount + pendingCount;
   const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
 
-  // Simple pie chart data (Busy vs Vacant)
+
   const staffStatus = [
     {id: 0, value: busyStaffCount, label: "Busy", color: "#252941"},
     {id: 1, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
@@ -207,21 +271,7 @@ function AdminDashboard() {
     {id: 2, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
   ];
 
-
-  useEffect(() => {
-    dispatch(fetchAttendanceStats());
-    dispatch(fetchStaffData());
-    dispatch(fetchTasks());
-    dispatch(fetchHotelDetails());
-    dispatch(fetchRevenueStats());
-    dispatch(fetchRoomStats());
-    
-    const interval = setInterval(() => {
-      dispatch(fetchRoomStats());
-    }, 30 * 60 * 1000);
-    
-    return () => clearInterval(interval);
-  }, [dispatch]);
+ 
 
   const staffAttendance = [
     {
@@ -249,9 +299,22 @@ function AdminDashboard() {
       {
         id: "departments",
         data: Object.keys(staffPerDepartment).map(
-          (dept) => dept.charAt(0).toUpperCase() + dept.slice(1)
+          (dept) =>
+            dept.charAt(0).toUpperCase() +
+            dept.slice(1, 6) +
+            (dept.length > 6 ? "..." : "")
         ),
         scaleType: "band",
+        labelStyle: {
+          fontSize: 10,
+          angle: 0,
+          textAnchor: "end",
+          dominantBaseline: "central",
+        },
+        tickLabelStyle: {
+          angle: 0,
+          fontSize: 10,
+        },
       },
     ],
     series: [
@@ -386,12 +449,18 @@ function AdminDashboard() {
     }
 
     try {
+      const today = new Date();
+      today.setHours(parseInt(selectedHour, 10));
+      today.setMinutes(parseInt(selectedMinute, 10));
+      today.setSeconds(0);
+
+      const formattedDeadline = today.toISOString();
       await dispatch(
         createTask({
           title: taskTitle.trim(),
           description: taskDescription.trim(),
           department: selected.value,
-          priority: selectedPriority,
+          deadline: formattedDeadline,
         })
       ).unwrap();
 
@@ -399,8 +468,9 @@ function AdminDashboard() {
 
       setTaskTitle("");
       setTaskDescription("");
-      setSelected({label: "Department", label: "select Priority"});
-      setSelectedPriority("");
+      setSelected({value: "", label: "Department"}); 
+      setSelectedHour("09");
+      setSelectedMinute("00");
 
       setSnackbar({
         open: true,
@@ -432,8 +502,16 @@ function AdminDashboard() {
     handleDotsClose();
   };
 
-  const [isPriorityDropdownOpen, setPriorityDropdownOpen] = useState(false);
-  const [selectedPriority, setSelectedPriority] = useState("");
+  const [deadline, setDeadline] = useState("");
+  const [selectedHour, setSelectedHour] = useState("09");
+  const [selectedMinute, setSelectedMinute] = useState("00");
+
+  const hours = Array.from({length: 24}, (_, i) =>
+    i.toString().padStart(2, "0")
+  );
+  const minutes = Array.from({length: 60}, (_, i) =>
+    i.toString().padStart(2, "0")
+  );
 
   const [showAnnouncementBox, setShowAnnouncementBox] = useState(false);
   const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
@@ -443,7 +521,7 @@ function AdminDashboard() {
 
     return [...announcements].sort((a, b) => {
       const dateA = a.created_at ? new Date(a.created_at) : null;
-      const dateB = b.created_at ? new Date(b.created_at) : null;
+      const dateB = b.created_at ? new Date(a.created_at) : null;
 
       if (!dateA || isNaN(dateA.getTime())) return 1;
       if (!dateB || isNaN(dateB.getTime())) return -1;
@@ -451,6 +529,14 @@ function AdminDashboard() {
       return dateB - dateA;
     });
   }, [announcements]);
+
+
+  const formatDataForGraph = () => {
+    return revenueData.map((point) => ({
+      time: `${point.hour}:${point.minute}`,
+      revenue: point.revenue,
+    }));
+  };
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
@@ -643,7 +729,9 @@ function AdminDashboard() {
                   height={300}
                   series={[
                     {
-                      data: getFilteredRevenueData().map((data) => data.revenue),
+                      data: getFilteredRevenueData().map(
+                        (data) => data.revenue
+                      ),
                       color: "#4C51BF",
                       area: true,
                     },
@@ -878,10 +966,10 @@ function AdminDashboard() {
                     <div className="text-sm text-gray-500">
                       <span className="font-medium">Assigned To:</span>
                       <ul className="list-disc pl-5 mt-1">
-  {selectedAnnouncement?.assigned_to?.map((person, index) => (
-    <li key={index}>{person}</li>
-  )) || []}
-</ul>
+                        {selectedAnnouncement?.assigned_to?.map(
+                          (person, index) => <li key={index}>{person}</li>
+                        ) || []}
+                      </ul>
                     </div>
                   </div>
                   <div className="flex justify-end gap-2 mt-4">
@@ -965,50 +1053,34 @@ function AdminDashboard() {
                   </div>
                 )}
               </div>
-              <div className="relative w-full">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setPriorityDropdownOpen(!isPriorityDropdownOpen)
-                  }
-                  className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
-                    selectedPriority ? "text-black" : "text-gray-400"
-                  } focus:outline-none flex justify-between  items-center`}
+            </div>
+            <div className="relative w-full mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Task Time
+              </label>
+              <div className="flex space-x-2">
+                <select
+                  value={selectedHour}
+                  onChange={(e) => setSelectedHour(e.target.value)}
+                  className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
                 >
-                  {selectedPriority || "Select Priority"}
-                  {isPriorityDropdownOpen ? (
-                    <FaChevronUp className="text-gray-600" />
-                  ) : (
-                    <FaChevronDown className="text-gray-600" />
-                  )}
-                </button>
-
-                {isPriorityDropdownOpen && (
-                  <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                    {["High", "Medium", "Low"].map((priority) => (
-                      <button
-                        key={priority}
-                        type="button"
-                        onClick={() => {
-                          setSelectedPriority(priority);
-                          setPriorityDropdownOpen(false);
-                        }}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                      >
-                        <span
-                          className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                            priority === "High"
-                              ? "bg-red-500"
-                              : priority === "Medium"
-                              ? "bg-yellow-500"
-                              : "bg-green-500"
-                          }`}
-                        ></span>
-                        {priority}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                  {hours.map((hour) => (
+                    <option key={hour} value={hour}>
+                      {hour}:00
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={selectedMinute}
+                  onChange={(e) => setSelectedMinute(e.target.value)}
+                  className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                >
+                  {minutes.map((minute) => (
+                    <option key={minute} value={minute}>
+                      {minute}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <textarea

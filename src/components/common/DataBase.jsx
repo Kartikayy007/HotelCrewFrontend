@@ -1,6 +1,7 @@
 import React, {useState, useRef, useEffect} from "react";
 import { useSelector } from 'react-redux';
 import { selectStaffPerDepartment } from '../../redux/slices/StaffSlice';
+import { selectCustomers } from '../../redux/slices/customerSlice'; // Adjust path as needed
 import StaffDB from "./DB/StaffDB";
 import CustomerDB from "./DB/CustomerDB";
 import {Search, ChevronLeft, ChevronRight} from "lucide-react";
@@ -12,9 +13,13 @@ function DataBase() {
   const scrollContainerRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
+    // Staff filters
     department: "All",
     role: "All",
-    shift: "All"
+    shift: "All",
+    // Customer filters
+    customerType: "All",
+    roomType: "All"  // Replace bookingStatus with roomType
   });
 
   const checkScroll = () => {
@@ -45,6 +50,7 @@ function DataBase() {
   };
 
   const staffPerDepartment = useSelector(selectStaffPerDepartment);
+  const customers = useSelector(selectCustomers);
   
   const departments = Object.keys(staffPerDepartment).map(dept => ({
     value: dept,
@@ -117,15 +123,27 @@ function DataBase() {
                 )}
                 {activeComponent === "CustomerDB" && (
                   <>
-                    <select className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full ">
+                    <select 
+                      value={filters.customerType}
+                      onChange={(e) => setFilters({...filters, customerType: e.target.value})}
+                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+                    >
                       <option value="All">Customer Type</option>
                       <option value="Regular">Regular</option>
                       <option value="VIP">VIP</option>
                     </select>
-                    <select className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full border-2 mr-2 ">
-                      <option value="All">Booking Status</option>
-                      <option value="Confirmed">Active Customer</option>
-                      <option value="past">Past Customer</option>
+                    <select 
+                      value={filters.roomType}
+                      onChange={(e) => setFilters({...filters, roomType: e.target.value})}
+                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full border-2 mr-2"
+                    >
+                      <option value="All">Room Type</option>
+                      {customers && Array.from(new Set(customers.map(c => c.room_type)))
+                        .filter(Boolean)
+                        .map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))
+                      }
                     </select>
                   </>
                 )}
@@ -184,7 +202,10 @@ function DataBase() {
                 filters={filters}
               />
             ) : (
-              <CustomerDB />
+              <CustomerDB 
+                searchTerm={searchTerm}
+                filters={filters}
+              />
             )}
           </div>
         </div>
