@@ -8,6 +8,12 @@ import {
   selectHotelUpdateError,
   massCreateStaff
 } from '../../../redux/slices/HotelDetailsSlice';
+import { 
+  selectUserProfile, 
+  selectUserProfileLoading, 
+  selectUserProfileError,
+  fetchUserProfile 
+} from '../../../redux/slices/userProfileSlice';
 import docupload from "/docupload.svg";
 import { toast } from 'react-toastify';
 
@@ -830,16 +836,60 @@ const StaffData = () => {
 };
 
 const Profile = () => {
+  const dispatch = useDispatch();
+  const profile = useSelector(selectUserProfile);
+  const loading = useSelector(selectUserProfileLoading);
+  const error = useSelector(selectUserProfileError);
+  
   const [profileImage, setProfileImage] = useState("");
+  const [formData, setFormData] = useState({
+    user_name: ''
+  });
+  const [isDirty, setIsDirty] = useState(false);
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfileImage(e.target.result);
-      };
-      reader.readAsDataURL(file);
+  useEffect(() => {
+    dispatch(fetchUserProfile());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        user_name: profile.user_name || ''
+      });
+      setProfileImage(profile.user_profile || '');
+    }
+  }, [profile]);
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+    setIsDirty(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.user_name.trim()) {
+      toast.error('Username cannot be empty');
+      return;
+    }
+
+    try {
+      console.log('Updating profile with:', formData); // Debug log
+      
+      const result = await dispatch(updateUserProfile({
+        user_name: formData.user_name.trim()
+      })).unwrap();
+      
+      console.log('Update response:', result); // Debug log
+      toast.success('Profile updated successfully');
+      setIsDirty(false);
+    } catch (error) {
+      console.error('Profile update error:', error); // Debug log
+      toast.error(error?.response?.data?.message || error?.message || 'Failed to update profile');
     }
   };
 
@@ -847,75 +897,42 @@ const Profile = () => {
     <section className="lg:h-[75vh] h-full p-2 mr-4 font-Montserrat">
       <div className="lg:mt-1 mt-2 ml-4 mr-2 pt-2 pb-1 pr-7 pl-7 rounded-lg">
         <div className="lg:flex-row flex-col flex w-full lg:items-start items-center lg:justify-evenly">
-          <div
-            className="relative mt-4 w-48 h-48 lg:w-60 lg:h-60 lg:top-14 rounded-full border border-gray-400 cursor-pointer"
-            style={{padding: "6.18px"}}
-            onClick={() => document.getElementById("imageUpload").click()}
-          >
+          <div className="relative mt-4 w-48 h-48 lg:w-60 lg:h-60 lg:top-14 rounded-full border border-gray-400">
             <img
               src={profileImage || "/default-profile.png"}
               alt="profile"
               className="w-full h-full rounded-full object-cover"
             />
-            <img
-              src="/tabler_edit.svg"
-              alt="edit"
-              className="absolute bottom-3 right-8 lg:w-10 lg:h-10 w-7 h-7 cursor-pointer z-10"
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              style={{display: "none"}}
-              id="imageUpload"
-            />
           </div>
-          <div className="relative w-full lg:w-auto  pl-4 lg:pl-8 mt-4">
+          
+          <div className="relative w-full lg:w-auto pl-4 lg:pl-8 mt-4">
             <h2 className="text-[#000000] text-xl mt-5 font-semibold">
               Personal Details
             </h2>
 
-            <form className="lg:mt-10 mt-8 flex flex-col gap-6 lg:gap-10">
-              <div className="flex lg:flex-row flex-col gap-5">
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="firstName" className="font-semibold text-sm">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    id="firstName"
-                    className="border border-gray-400 rounded-[4px] px-2 focus:outline-none"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="lastName" className="font-semibold text-sm">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    className="border border-gray-400 rounded-[4px] px-2 focus:outline-none"
-                  />
-                </div>
-              </div>
-
+            <form onSubmit={handleSubmit} className="lg:mt-10 mt-8 flex flex-col gap-6">
               <div className="flex flex-col gap-2">
-                <label htmlFor="email" className="font-semibold text-sm">
-                  E-mail
+                <label htmlFor="user_name" className="font-semibold text-sm">
+                  User Name*
                 </label>
                 <input
                   type="text"
-                  id="email"
-                  className="border border-gray-400 rounded-[4px] px-2 focus:outline-none"
+                  id="user_name"
+                  value={formData.user_name}
+                  onChange={handleInputChange}
+                  required
+                  className="border border-gray-400 rounded-[4px] px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div className="flex lg:justify-end justify-center">
                 <button
                   type="submit"
-                  className="mt-2 mb-6 w-[195px] rounded-2xl text-white font-semibold  p-1 bg-[#3F4870]"
+                  disabled={!isDirty || loading}
+                  className={`mt-2 mb-6 w-[195px] rounded-2xl text-white font-semibold p-1 bg-[#3F4870] 
+                    ${(!isDirty || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  Save Changes
+                  {loading ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </form>
@@ -925,6 +942,7 @@ const Profile = () => {
     </section>
   );
 };
+
 
 const AdminSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
