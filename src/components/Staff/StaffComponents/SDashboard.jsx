@@ -1,10 +1,11 @@
 import { useState, useEffect, React } from 'react'
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card, CardContent, Typography, Paper, Container, Box, Skeleton, Slider } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { getStaffLeaveHistory } from '../../../redux/slices/StaffLeaveSlice';
-import { fetchAnnouncements,selectAllAnnouncements,selectAnnouncementsError,selectAnnouncementsLoading } from '../../../redux/slices/AnnouncementSlice';
+import { getAttendanceStats } from '../../../redux/slices/StaffAttendanceSlice';
+import { fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsError, selectAnnouncementsLoading } from '../../../redux/slices/AnnouncementSlice';
 const SDashboard = () => {
   const dispatch = useDispatch();
 
@@ -19,19 +20,24 @@ const SDashboard = () => {
     fetchHistoryError,
     leaveHistory,
   } = useSelector((state) => state.leave);
-  
+  const {
+    attendanceStats,
+    statsLoading,
+    statsError
+  } = useSelector((state) => state.attendance)
   // const leaveStatus = useSelector((state) => state.leave.leaveStatus);
 
- // Fetch leave history on initial mount
+  // Fetch leave history on initial mount
 
 
- 
+
 
   useEffect(() => {
     // Function to fetch announcements
     const fetchData = () => {
       dispatch(fetchAnnouncements());
       dispatch(getStaffLeaveHistory());
+      dispatch(getAttendanceStats());
     };
 
     // Initial fetch on render
@@ -166,16 +172,58 @@ const SDashboard = () => {
 
   const averageDurations = demoTasks.map(task => task.averageDuration);
 
-  const totalDays = 300;
-  const presentDays = 280;
-  const absentDays = totalDays - presentDays;
-  const presentPercentage = ((presentDays / totalDays) * 100).toFixed(2);
-  const AttendanceData = [
-    { name: "Present", value: presentDays, label: "Present", color: "#2A2AA9" },
-    { name: "Absent", value: absentDays, label: "Absent", color: " #A1B7FF" },
+  // const totalDays = 300;
+  // const presentDays = 280;
+  // const absentDays = totalDays - presentDays;
+  // const presentPercentage = ((presentDays / totalDays) * 100).toFixed(2);
+  // const AttendanceData = [
+  //   { name: "Present", value: presentDays, label: "Present", color: "#2A2AA9" },
+  //   { name: "Absent", value: absentDays, label: "Absent", color: " #A1B7FF" },
 
-  ];
+  // ];
 
+  const [AttendanceData, setAttendanceData] = useState([]);
+  const [presentPercentage, setPresentPercentage] = useState("0.00");
+  const totalDays = attendanceStats?.total_days_up_to_today || 0;
+
+
+  useEffect(() => {
+    if (attendanceStats) {
+      const presentDays = attendanceStats?.days_present || 0;
+      const leaveDays = attendanceStats?.leaves || 0;
+      const absentDays = totalDays - presentDays - leaveDays;
+
+      const presentPercent = totalDays > 0
+        ? ((presentDays / totalDays) * 100).toFixed(2)
+        : "0.00";
+
+      const data = [
+        { name: "Present", value: presentDays, label: "Present", color: "#2A2AA9" },
+        { name: "Absent", value: absentDays, label: "Absent", color: "#A1B7FF" },
+        { name: "Leave", value: leaveDays, label: "Leave", color: "#FFB700" },
+      ];
+
+      setPresentPercentage(presentPercent);
+      setAttendanceData(data);
+    }
+  }, [attendanceStats, totalDays]);
+
+
+  // const totalDays = attendanceStats?.total_days_up_to_today || 0;
+  // console.log("tot",totalDays)
+  // const presentDays = attendanceStats?.days_present || 0;
+  // const leaveDays = attendanceStats?.leaves || 0;
+  // console.log("ll",leaveDays)
+  // const absentDays = totalDays - presentDays - leaveDays; // Remaining days are absences
+
+  // const presentPercentage = ((presentDays / totalDays) * 100).toFixed(2);
+  // const AttendanceData = [
+  //   { name: 'Present', value: presentDays, label: 'Present', color: '#2A2AA9' },
+  //   { name: 'Absent', value: absentDays, label: 'Absent', color: '#A1B7FF' },
+  //   { name: 'Leave', value: leaveDays, label: 'Leave', color: '#FFB700' },
+  // ];
+  // console.log("Attendance Stats:", attendanceStats);
+  // console.log("Attendance Data:", AttendanceData);
 
 
   const getUrgencyClass = (urgency) => {
@@ -235,7 +283,7 @@ const SDashboard = () => {
           <div className="flex lg:flex-row flex-col gap-4">
             <div className="bg-white w-full  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
               <h2 className="text-lg sm:text-xl font-semibold text-left">Your Attendance</h2>
-              {loading ? (
+              {statsLoading ? (
                 <div className='ml-4 mb-2'>
                   <Skeleton
                     variant="rectangular"
@@ -246,55 +294,62 @@ const SDashboard = () => {
                 </div>
               ) : (
                 <>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      flexDirection: 'column',
-                      position: 'relative',
-                    }}
-                  >
-
-
-                    <ResponsiveContainer width="100%" height={230}>
-                      <PieChart>
-                        <Pie
-                          data={AttendanceData}
-                          dataKey="value"
-                          nameKey="label"
-                          cx="50%"
-                          cy="50%"
-                          outerRadius="80%"
-                          innerRadius="55%"
-                          paddingAngle={5}
-                          labelLine={false}
-                        >
-                          {AttendanceData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-
-
+                  {AttendanceData && AttendanceData.length > 0 ? (
                     <Box
                       sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '51%',
-                        transform: 'translate(-50%, -50%)',
-                        // Ensure it's on top of the Pie chart
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'column',
+                        position: 'relative',
                       }}
                     >
-                      <h2 className="text-[28px] mt-0  font-semibold">
-                        {`${presentPercentage}%`}
-                      </h2>
 
+                      <ResponsiveContainer width="100%" height={230}>
+                        <PieChart>
+                          <Pie
+                            data={AttendanceData}
+                            dataKey="value"
+                            nameKey="label"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius="80%"
+                            innerRadius="55%"
+                            paddingAngle={5}
+                            labelLine={false}
+                          >
+                            {AttendanceData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '51%',
+                          transform: 'translate(-50%, -50%)',
+                          // Ensure it's on top of the Pie chart
+                        }}
+                      >
+                        <h2 className="text-[28px] mt-0  font-semibold">
+                          {`${presentPercentage}%`}
+                        </h2>
+
+                      </Box>
                     </Box>
-                  </Box>
-                  <h2 className="text-lg sm:text-xl font-semibold mb-2 text-center">Attendance : {AttendanceData[0].value}/{totalDays}</h2>
+                  ) : (
+                    <div>Data not available</div>
+                  )}
+
+                  {AttendanceData && AttendanceData.length > 0 && (
+                    <h2 className="text-lg sm:text-xl font-semibold mb-2 text-center">
+                      Attendance: {AttendanceData[0]?.value || 0}/{totalDays}
+                    </h2>
+                  )}
                 </>
               )}
 
@@ -383,7 +438,7 @@ const SDashboard = () => {
                 })}
               </div>
             )}
-            </div>
+          </div>
         </div>
       </div>
     </section>

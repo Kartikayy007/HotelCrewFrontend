@@ -1,9 +1,19 @@
 import React, { useEffect,useState } from 'react'
 import { Skeleton } from '@mui/material'
-
+import { useDispatch, useSelector } from 'react-redux';
+import { getStaffProfile, selectStaffProfile, selectStaffProfileLoading, selectStaffProfileError } from '../../../redux/slices/StaffProfileSlice';
 
 const SProfile = ()=>{
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const profile = useSelector(selectStaffProfile);
+  const loading = useSelector(selectStaffProfileLoading);
+  const error = useSelector(selectStaffProfileError);
+
+  useEffect(() => {
+    dispatch(getStaffProfile());
+  }, [dispatch]);
+
+  // const [loading, setLoading] = useState(true);
   const [image, setImage] = useState('/profile.png');
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -12,12 +22,12 @@ const SProfile = ()=>{
         setImage(imageUrl);
     }
 }
-useEffect(() => {
+// useEffect(() => {
   
-  setTimeout(() => {
-    setLoading(false);  
-  }, 500); 
-}, []);
+//   setTimeout(() => {
+//     setLoading(false);  
+//   }, 500); 
+// }, []);
   return (
     <section className=" h-screen py-2 mr-1 px-0 font-Montserrat">
       
