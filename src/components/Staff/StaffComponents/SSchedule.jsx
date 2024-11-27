@@ -6,6 +6,12 @@ import { FaChevronDown, FaChevronUp, FaPaperclip, FaCalendarAlt } from "react-ic
 import { Snackbar, Skeleton, Alert } from "@mui/material";
 import { staffLeaveApply } from '../../../redux/slices/StaffLeaveSlice'
 import { getMonthlyAttendance } from '../../../redux/slices/StaffAttendanceSlice';
+import { Dialog, Box } from "@mui/material";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import dayjs from "dayjs";
+
 
 const SSchedule = () => {
   const dispatch = useDispatch();
@@ -94,12 +100,36 @@ const SSchedule = () => {
 
   }, [dispatch]);
 
+  const [isCalendarOpen, setIsCalendarOpen] = useState(null);
+
 
   const toggleStartDropdown = () => {
     setIsStartDropdownOpen((prev) => !prev);
     if (!isStartDropdownOpen) {
       setIsEndDropdownOpen(false); // Close end date if start is opened
     }
+    // if (isCalendarOpen === "endDate") {
+    //   setIsCalendarOpen(null); // Close end date calendar
+    //   setIsEndDropdownOpen(false); // Close end date dropdown
+    // }
+    // // Toggle start date calendar
+    // setIsStartDropdownOpen((prev) => !prev);
+    // if (!isStartDropdownOpen) {
+    //   setIsCalendarOpen("startDate"); // Open the start date calendar
+    // } else {
+    //   setIsCalendarOpen(null); // Close the start date calendar
+    // }
+  };
+
+  // const toggleStartDropdown = () => {
+  //   setIsStartDropdownOpen(!isStartDropdownOpen);
+  // };
+
+
+  const closeCalendar = () => {
+    setIsCalendarOpen(null); // Close both calendars
+    setIsStartDropdownOpen(false); // Close start date dropdown
+    setIsEndDropdownOpen(false); // Close end date dropdown
   };
 
   const toggleEndDropdown = () => {
@@ -107,21 +137,40 @@ const SSchedule = () => {
     if (!isEndDropdownOpen) {
       setIsStartDropdownOpen(false); // Close start date if end is opened
     }
+    // if (isCalendarOpen === "startDate") {
+    //   setIsCalendarOpen(null); // Close start date calendar
+    //   setIsStartDropdownOpen(false); // Close start date dropdown
+    // }
+    // // Toggle end date calendar
+    // setIsEndDropdownOpen((prev) => !prev);
+    // if (!isEndDropdownOpen) {
+    //   setIsCalendarOpen("endDate"); // Open the end date calendar
+    // } else {
+    //   setIsCalendarOpen(null); // Close the end date calendar
+    // }
   };
 
-  const formatDate = (date) => {
-    // Format date as 'YYYY-MM-DD'
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
-    const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
-    return `${year}-${month}-${day}`;
-  };
+  // const formatDate = (date) => {
+  //   // Format date as 'YYYY-MM-DD'
+  //   const year = date.getFullYear();
+  //   const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
+  //   const day = date.getDate().toString().padStart(2, '0'); // Add leading zero if needed
+  //   return `${year}-${month}-${day}`;
+  // };
+  const formatDate = (date) => date.format("YYYY-MM-DD");
 
   const handleStartDateChange = (date) => {
-    setStartDate(date);
-    if (endDate && date > endDate) {
-      setEndDate(null); // Reset the end date if it's before the new start date
+    if (!date) {
+      setStartDate(null);
+      return;
     }
+    setStartDate(date);
+    if (endDate && dayjs(date).isAfter(endDate)) {
+      setEndDate(null); // Reset the end date if start date is after end date
+    }
+    // if (endDate && date > endDate) {
+    //   setEndDate(null); // Reset the end date if it's before the new start date
+    // }
     // setLeaveDetails((prev) => ({
     //   ...prev,
     //   from_date: date ? date.toLocaleDateString() : "", // Set the formatted date
@@ -134,6 +183,10 @@ const SSchedule = () => {
   };
 
   const handleEndDateChange = (date) => {
+    if (!date) {
+      setEndDate(null);
+      return;
+    }
     setEndDate(date);
     // setLeaveDetails((prev) => ({
     //   ...prev,
@@ -144,6 +197,7 @@ const SSchedule = () => {
       to_date: date ? formatDate(date) : "", // Set the formatted date
     }));
     setIsEndDropdownOpen(false); // Close the dropdown
+    // setIsCalendarOpen(null);
   };
 
   // const handleFileButtonClick = () => {
@@ -346,6 +400,7 @@ const SSchedule = () => {
 
                   <div className="flex lg:justify-between mt-3 gap-3">
 
+
                     <div className="relative lg:w-50 w-full">
 
                       <button
@@ -356,7 +411,7 @@ const SSchedule = () => {
                           } focus:outline-none flex justify-between items-center`}
                       >
                         {startDate
-                          ? `Start :  ${startDate.toLocaleDateString()}`
+                          ? `Start: ${dayjs(startDate).format("MM/DD/YYYY")}` // Format as per your needs
                           : "Start date"}
                         {isStartDropdownOpen ? (
                           <FaChevronUp className="text-gray-600" />
@@ -367,19 +422,38 @@ const SSchedule = () => {
                       </button>
 
                       {isStartDropdownOpen && (
-                        <div className="absolute  z-50 ">
-                          <DatePicker
-                            selected={startDate}
+                        // <div className="absolute  z-50 ">
+                        //   <DatePicker
+                        //     selected={startDate}
 
-                            onChange={handleStartDateChange}
-                            inline
-                            selectsStart
-                            dateFormat="dd/MM/yyyy"
-                            minDate={today}
-                            startDate={startDate}
-                            endDate={endDate}
-                          />
-                        </div>
+                        //     onChange={handleStartDateChange}
+                        //     inline
+                        //     selectsStart
+                        //     dateFormat="dd/MM/yyyy"
+                        //     minDate={today}
+                        //     startDate={startDate}
+                        //     endDate={endDate}
+                        //   />
+                        // </div>
+                        <Dialog
+                          // open={!!isCalendarOpen && isCalendarOpen === "startDate"}
+                          open={isStartDropdownOpen}
+                          // onClose={closeCalendar} // Close the calendar if clicked outside
+                          onClose={toggleStartDropdown}
+                          maxWidth="xs"
+                          fullWidth
+                        >
+                          <Box p={2} >
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                              <DateCalendar
+                                value={startDate}
+                                onChange={handleStartDateChange}
+                                // minDate={new Date()} // Prevent selecting dates before today
+                                minDate={dayjs()}
+                              />
+                            </LocalizationProvider>
+                          </Box>
+                        </Dialog>
                       )}
                     </div>
 
@@ -392,8 +466,8 @@ const SSchedule = () => {
                           } focus:outline-none flex justify-between items-center`}
                       >
                         {endDate
-                          ? `End :  ${endDate.toLocaleDateString()}`
-                          : "End date  "}
+                          ? `End: ${dayjs(startDate).format("MM/DD/YYYY")}` // Format as per your needs
+                          : "End date"}
                         {isEndDropdownOpen ? (
                           <FaChevronUp className="text-gray-600" />
                         ) : (
@@ -403,7 +477,7 @@ const SSchedule = () => {
 
                       {isEndDropdownOpen && (
                         <div className="absolute  z-50 pr-4 mr-5">
-                          <DatePicker
+                          {/* <DatePicker
                             selected={endDate}
                             onChange={handleEndDateChange}
                             inline
@@ -412,7 +486,25 @@ const SSchedule = () => {
                             startDate={startDate}
                             endDate={endDate}
                             minDate={startDate || today} // Prevent selection of dates before the start date
-                          />
+                          /> */}
+                          <Dialog
+                            // open={!!isCalendarOpen && isCalendarOpen === "endDate"}
+                            open={isEndDropdownOpen}
+                            // onClose={closeCalendar} // Close the calendar if clicked outside
+                            onClose={toggleEndDropdown}
+                            maxWidth="xs"
+                            fullWidth
+                          >
+                            <Box p={2}>
+                              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DateCalendar
+                                  value={endDate}
+                                  onChange={handleEndDateChange}
+                                  minDate={startDate || dayjs()} // Prevent selecting dates before the start date
+                                />
+                              </LocalizationProvider>
+                            </Box>
+                          </Dialog>
                         </div>
                       )}
                     </div>
