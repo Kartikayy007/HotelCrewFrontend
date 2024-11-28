@@ -15,7 +15,7 @@ const getAuthToken = () => {
   
 // Thunk to apply leave
 export const staffLeaveApply = createAsyncThunk(
-  'leave/staffLeaveApply',
+  'leavestaff/staffLeaveApply',
   async (leaveData, { rejectWithValue }) => {
     try {
       const token = getAuthToken(); // Get the auth token
@@ -37,7 +37,7 @@ export const staffLeaveApply = createAsyncThunk(
 
 // Thunk to fetch the staff's applied leaves
 export const getStaffLeaveHistory = createAsyncThunk(
-  'leave/getStaffLeaveHistory',
+  'leavestaff/getStaffLeaveHistory',
   async (_, { rejectWithValue }) => {
     try {
       const token = getAuthToken(); // Retrieve the auth token
@@ -59,7 +59,7 @@ export const getStaffLeaveHistory = createAsyncThunk(
 
 
 const leaveSlice = createSlice({
-  name: 'leave',
+  name: 'leavestaff',
   initialState: {
     leaveHistory: [],   // Stores the leave history
     leaveStatus: '',    // Stores the leave status message

@@ -7,7 +7,7 @@ import AttendanceReducer from './slices/AttendanceSlice.jsx'
 import TaskReducer from'./slices/TaskSlice.jsx'
 import taskReducer from './slices/StaffTaskSlice.jsx'
 import announcementReducer from './slices/AnnouncementSlice.jsx'
-import leaveReducer from './slices/StaffLeaveSlice.jsx'
+import staffleaveReducer from './slices/StaffLeaveSlice.jsx'
 import attendanceReducer from './slices/StaffAttendanceSlice.jsx'
 import staffProfileReducer from './slices/StaffProfileSlice.jsx'
 
@@ -27,8 +27,8 @@ export const store = configureStore({
     tasks: TaskReducer,
     stafftasks:taskReducer,
     announcements: announcementReducer,
-    leave: leaveReducer,
-    staffProfile: staffProfileReducer,,
+    leavestaff: staffleaveReducer,
+    staffProfile: staffProfileReducer,
     shifts: shiftReducer,
     leave: leaveReducer,
     guest: guestReducer,
