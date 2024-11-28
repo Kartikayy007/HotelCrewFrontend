@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const RevealLinks = () => {
   return (
-    <section className="flex justify-center gap-6  py-12 text-white font-Montserrat">
+    <section className="flex flex-wrap justify-center gap-6  py-12 text-white font-Montserrat">
       <FlipLink href="#">Twitter</FlipLink>
       <FlipLink href="#">Linkedin</FlipLink>
       <FlipLink href="#">Facebook</FlipLink>

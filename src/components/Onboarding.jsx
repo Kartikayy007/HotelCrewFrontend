@@ -32,7 +32,7 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="font-Montserrat backdrop-blur-lg bg-white bg-opacity-75">
+    <div className="font-Montserrat backdrop-blur-xl bg-white bg-opacity-75">
       <nav className="font-bold text-xl backdrop-blur-xl bg-white bg-opacity-75 sticky top-0 z-50">
         <div className="max-w-full mx-auto">
           <div className="flex justify-between items-center">
@@ -95,48 +95,48 @@ const Onboarding = () => {
           </div>
 
           <div
-            className={`${
-              isOpen ? "block" : "hidden"
-            } md:hidden bg-white border-t`}
-          >
-            <div className="flex flex-col px-4 py-2 space-y-2">
-              <Link
-                to="/"
-                className="py-2 hover:text-[#5663AC] transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Home
-              </Link>
-              <Link
-                to="/#services"
-                className="py-2 hover:text-[#5663AC] transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Features
-              </Link>
-              <Link
-                to="/#about"
-                className="py-2 hover:text-[#5663AC] transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                About
-              </Link>
-              <Link
-                to="/login"
-                className="py-2 hover:text-[#5663AC] transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Login
-              </Link>
-              <Link
-                to="/signup"
-                className="inline-block px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] text-center mb-2 "
-                onClick={() => setIsOpen(false)}
-              >
-                Get Started
-              </Link>
-            </div>
-          </div>
+  className={`${
+    isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+  } md:hidden backdrop-blur-xl border-t transition-all duration-300 ease-in-out overflow-hidden`}
+>
+  <div className="flex flex-col px-4 py-2 space-y-2">
+    <Link
+      to="/"
+      className="py-2 hover:text-[#5663AC] transition-colors"
+      onClick={() => setIsOpen(false)}
+    >
+      Home
+    </Link>
+    <Link
+      to="/#services"
+      className="py-2 hover:text-[#5663AC] transition-colors"
+      onClick={() => setIsOpen(false)}
+    >
+      Features
+    </Link>
+    <Link
+      to="/#about"
+      className="py-2 hover:text-[#5663AC] transition-colors"
+      onClick={() => setIsOpen(false)}
+    >
+      About
+    </Link>
+    <Link
+      to="/login"
+      className="py-2 hover:text-[#5663AC] transition-colors"
+      onClick={() => setIsOpen(false)}
+    >
+      Login
+    </Link>
+    <Link
+      to="/signup"
+      className="inline-block px-6 py-2 font-medium rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] text-center mb-2  w-[10.3rem]"
+      onClick={() => setIsOpen(false)}
+    >
+      Get Started
+    </Link>
+  </div>
+</div>
         </div>
       </nav>
 
@@ -165,13 +165,13 @@ const Onboarding = () => {
               <div className="flex justify-center items-center gap-8 sm:gap-16 lg:gap-44 pt-4">
                 <Link
                   to="/login"
-                  className="px-8 py-3 font-semibold rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] min-w-[128px] z-10 flex items-center justify-center w-64 h-14 text-2xl"
+                  className="px-8 py-3 font-semibold rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] min-w-[128px] z-10 flex items-center justify-center w-64 h-14 lg:text-2xl text-xl"
                 >
                   Login
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-8 py-3 font-semibold rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] min-w-[128px] w-64 h-14 z-10 flex items-center justify-center text-2xl"
+                  className="px-8 py-3 font-semibold rounded bg-[#5663AC] text-white transition-all shadow-[3px_3px_0px_black] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] min-w-[128px] w-64 h-14 z-10 flex items-center justify-center lg:text-2xl text-xl"
                 >
                   Sign Up
                 </Link>
@@ -387,7 +387,7 @@ const Onboarding = () => {
                 className="w-40 mx-auto"
               />
               <RevealLinks />
-              <p className="mt-4">© 2023 HotelCrew. All rights reserved.</p>
+              <p className="mt-4">© 2024 HotelCrew. All rights reserved.</p>
             </div>
           </div>
         </footer>

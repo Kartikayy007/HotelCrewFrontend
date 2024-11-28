@@ -6,13 +6,15 @@ import './index.css'
 import App from './App.jsx'
 import MSideBar from './components/Manager/MSideBar.jsx'
 import MainLayout from './components/Manager/MainLayout.jsx'
+import SLayout from './components/Staff/SLayout.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
       {/* <App /> */}
       {/* <MSideBar /> */}
-      <MainLayout />
+      {/* <MainLayout /> */}
+      <SLayout />
     </ Provider>
   </StrictMode>,
 )
