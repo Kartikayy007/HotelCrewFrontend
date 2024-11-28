@@ -40,18 +40,18 @@ export const createAnnouncement = createAsyncThunk(
 
 export const fetchAnnouncements = createAsyncThunk(
   'announcements/fetchAll',
-  async (_, { rejectWithValue }) => {
+  async (url = BASE_URL, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
 
       const config = {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
+          'Content-Type': 'application/json',
+        },
+      };
       
-      const response = await axios.get(BASE_URL, config);
+      const response = await axios.get(url, config);
       
       console.log(response.data)
 

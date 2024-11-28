@@ -38,7 +38,7 @@ const SDashboard = () => {
   useEffect(() => {
     // Function to fetch announcements
     const fetchData = () => {
-      dispatch(fetchAnnouncements());
+      // dispatch(fetchAnnouncements());
       dispatch(getStaffLeaveHistory());
       dispatch(getAttendanceStats());
     };
@@ -130,6 +130,48 @@ const SDashboard = () => {
   //     urgency: "normal",
   //   }
   // ];
+
+  const [nextUrl, setNextUrl] = useState('https://hotelcrew-1.onrender.com/api/taskassignment/announcements/?page=1'); // Initial URL (page 1)
+  const [previousUrl, setPreviousUrl] = useState(null); // URL for previous page
+  const [reachedEnd, setReachedEnd] = useState(false); // Flag to check if we have reached the end
+
+
+  const loadMoreAnnouncements = (url) => {
+    if (!AnnLoading && url) {
+      dispatch(fetchAnnouncements(url))
+        .then((response) => {
+          if (response.meta.requestStatus === 'fulfilled') {
+            // Update the URLs based on the response
+            setNextUrl(response.payload.next); // URL for next set of announcements
+            setPreviousUrl(response.payload.previous); // URL for previous set of announcements
+
+            // If there is no 'next' URL, it means we've reached the end of the list
+            if (!response.payload.next) {
+              setReachedEnd(true); // Mark that the end is reached
+            }
+          }
+        });
+    }
+  };
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+
+    // If user scrolls to the bottom, load more announcements
+    if (scrollHeight === scrollTop + clientHeight && !reachedEnd) {
+      loadMoreAnnouncements(nextUrl);
+    }
+
+    // If user scrolls to the top, load previous announcements
+    if (scrollTop === 0 && previousUrl) {
+      loadMoreAnnouncements(previousUrl);
+    }
+  };
+
+  // useEffect(() => {
+  //   // Fetch initial set of announcements
+  //   loadMoreAnnouncements(nextUrl);
+  // }, []);
 
   const demoTasks = [
     { day: 0, tasksCompleted: 4, averageDuration: 29 },  // Sunday
@@ -400,7 +442,7 @@ const SDashboard = () => {
           </div>
         </div>
         <div className="space-y-5 h-[725px]  ">
-          <div className='bg-white w-full mb-4 h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow'>
+          <div className='bg-white    w-full mb-4 h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow'>
             
             {AnnLoading ? (
               <div className='ml-4 mb-2'>
@@ -421,7 +463,7 @@ const SDashboard = () => {
               ) : (
                 <>
                 <h2 className="text-lg sm:text-xl font-semibold text-left mt-3 mb-4">Announcements {announcements.count}</h2>
-              <div className='h-[90%] my-4 overflow-y-auto flex flex-col scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent'>
+              <div onScroll={handleScroll} className='h-[90%] my-4 overflow-y-auto flex flex-col scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent'>
                 {announcements.map((announcement) => {
                   // Format the created_at date
                   const createdDate = new Date(announcement.created_at);
@@ -464,4 +506,8 @@ const SDashboard = () => {
   )
 }
 
-export default SDashboard
+export default SDashboard;
+//announcement pagination
+//error handling
+//staff performance
+//task testing
