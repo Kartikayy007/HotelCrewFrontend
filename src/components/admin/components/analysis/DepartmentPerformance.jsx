@@ -114,7 +114,7 @@ const DepartmentPerformance = () => {
             
             <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
               <div 
-                className="absolute top-0 left-0 h-full bg-blue-500 rounded-full transition-all duration-500"
+                className="absolute top-0 left-0 h-full bg-green-500 rounded-full transition-all duration-500"
                 style={{ width: `${dept.performance}%` }}
               />
             </div>

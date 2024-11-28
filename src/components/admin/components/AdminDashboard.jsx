@@ -734,6 +734,7 @@ const generateTimeData = () => {
                       ),
                       color: "#4C51BF",
                       area: true,
+                      curve: "linear",
                     },
                   ]}
                   xAxis={[

@@ -17,6 +17,8 @@ import {
 import docupload from "/docupload.svg";
 import { toast } from 'react-toastify';
 import axios from "axios";
+import { Snackbar, Alert } from '@mui/material';
+import LoadingAnimation from '../../common/LoadingAnimation';
 
 const BasicInfo = () => {
   const dispatch = useDispatch();
@@ -847,6 +849,12 @@ const Profile = () => {
     user_name: ''
   });
   const [isDirty, setIsDirty] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
 
   useEffect(() => {
     dispatch(fetchUserProfile());
@@ -879,13 +887,23 @@ const Profile = () => {
     }
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!formData.user_name.trim()) {
-      toast.error('Username cannot be empty');
+      setSnackbar({
+        open: true,
+        message: 'Username cannot be empty',
+        severity: 'error'
+      });
       return;
     }
+
+    setIsUploading(true);
 
     const getAuthToken = () => {
       const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
@@ -914,12 +932,21 @@ const Profile = () => {
         }
       );
 
-      toast.success('Profile updated successfully');
+      setSnackbar({
+        open: true,
+        message: 'Profile updated successfully',
+        severity: 'success'
+      });
       setIsDirty(false);
       dispatch(fetchUserProfile()); // Refresh profile data
     } catch (error) {
-      console.error('Profile update error:', error);
-      toast.error(error?.response?.data?.message || 'Failed to update profile');
+      setSnackbar({
+        open: true,
+        message: error?.response?.data?.message || 'Failed to update profile',
+        severity: 'error'
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -929,11 +956,17 @@ const Profile = () => {
         <div className="lg:flex-row flex-col flex w-full lg:items-start items-center lg:justify-evenly">
           <div className="relative mt-4 w-48 h-48 lg:w-60 lg:h-60 lg:top-14">
             <div className="relative w-full h-full rounded-full border border-gray-400">
-              <img
-                src={previewImage || "/default-profile.png"}
-                alt="profile"
-                className="w-full h-full rounded-full object-cover"
-              />
+              {isUploading ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 rounded-full">
+                  <LoadingAnimation size={60} color="#3F4870" />
+                </div>
+              ) : (
+                <img
+                  src={previewImage || "/default-profile.png"}
+                  alt="profile"
+                  className="w-full h-full rounded-full object-cover"
+                />
+              )}
               <label className="absolute bottom-0 right-0 bg-gray-800 rounded-full p-2 cursor-pointer">
                 <input
                   type="file"
@@ -983,6 +1016,20 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      <Snackbar 
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity={snackbar.severity}
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </section>
   );
 };

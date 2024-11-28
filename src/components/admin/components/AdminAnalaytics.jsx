@@ -176,8 +176,8 @@ const AdminAnalytics = () => {
   const getLastTwoValues = (array) => {
     if (!array || array.length < 2) return [0, 0];
     return [
-      array[array.length - 2] || 0, // previous day
-      array[array.length - 1] || 0  // current day
+      array[array.length - 2] || 0, 
+      array[array.length - 1] || 0  
     ];
   };
 
@@ -354,8 +354,8 @@ const AdminAnalytics = () => {
                 onDoubleClick={handleSectionDoubleClick}
               >
                 <StaffMetrics />
-                <section className="bg-white rounded-lg shadow-lg p-4 h-80">
-                  <div className="h-80">
+                <section className="bg-white rounded-lg shadow-lg p-4 h-[40.5vh]">
+                  <div className="h-96">
                     <h3 className="text-lg font-semibold">Check-In Data</h3>
                     <div className="h-64 w-full flex justify-center items-center">
                       <LineChart
@@ -365,7 +365,7 @@ const AdminAnalytics = () => {
                             ? checkinsData.data 
                             : [0], 
                           color: "#3331D1",
-                          curve: "natural",
+                          curve: "linear",
                           area: true,
                         }]}
                       xAxis={[
@@ -421,6 +421,7 @@ const AdminAnalytics = () => {
                           data: dailyRevenues,
                           color: "#0B8FD9",
                           area: true,
+                          curve: "linear",
                         },
                       ]}
                       xAxis={[

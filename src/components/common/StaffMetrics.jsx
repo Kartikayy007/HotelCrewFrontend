@@ -1,73 +1,84 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from 'react-redux';
+import axios from "axios";
 import { LineChart } from "@mui/x-charts/LineChart";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import Skeleton from "@mui/material/Skeleton";
-import { selectAllTasks, selectTasksLoading } from "../../redux/slices/TaskSlice";
-import { selectStaffPerDepartment, fetchStaffData } from "../../redux/slices/StaffSlice";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 
 function StaffMetrics() {
-  const dispatch = useDispatch();
-  const tasks = useSelector(selectAllTasks);
-  const staffPerDepartment = useSelector(selectStaffPerDepartment);
-  const loading = useSelector(selectTasksLoading);
-  
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [performanceRange, setPerformanceRange] = useState([0, currentHour || 1]);
   const [timeData, setTimeData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [viewType, setViewType] = useState('daily');
+  const [weeklyData, setWeeklyData] = useState(null);
+  const [dailyPerformance, setDailyPerformance] = useState(0);
 
-  useEffect(() => {
-    dispatch(fetchStaffData());
-  }, [dispatch]);
 
-  useEffect(() => {
-    if (tasks.length && staffPerDepartment) {
-      calculatePerformanceData();
+  const getAuthHeaders = () => {
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const getTodayData = (weeklyStats) => {
+    const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    return weeklyStats.find(stat => stat.date === today) || { performance_percentage: 0 };
+  };
+
+  const fetchWeeklyData = async () => {
+    try {
+      const response = await axios.get('https://hotelcrew-1.onrender.com/api/statics/performance/hotel/week/', {
+        headers: getAuthHeaders(),
+      });
+      setWeeklyData(response.data);
+      
+      // Get today's performance using helper function
+      const todayData = getTodayData(response.data.weekly_stats);
+      setDailyPerformance(todayData.performance_percentage);
+      calculateDailyData(todayData.performance_percentage);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [tasks, staffPerDepartment, currentHour]);
+  };
 
-  const calculatePerformanceData = () => {
+  useEffect(() => {
+    fetchWeeklyData();
+    const interval = setInterval(() => {
+      fetchWeeklyData();
+    }, 3600000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const calculateDailyData = (currentPerformance) => {
     const performanceData = [];
-    const totalAvailableStaff = Object.values(staffPerDepartment).reduce(
-      (sum, count) => sum + count,
-      0
-    );
+    let lastPerformance = 0;
 
     for (let i = 0; i <= currentHour; i++) {
-      const workedAndCompletedStaff = tasks.filter(
-        task => task.status === 'completed' || task.status === 'in-progress'
-      ).length;
-
-      const performanceRate = Math.min(
-        (workedAndCompletedStaff / totalAvailableStaff) * 100,
-        100
-      );
-
+      const hourlyRate = i === currentHour ? 
+        currentPerformance - lastPerformance : 
+        (currentPerformance / currentHour);
+        
       performanceData.push({
         hour: `${i}:00`,
-        performance: performanceRate,
+        performance: hourlyRate,
       });
+      
+      lastPerformance += hourlyRate;
     }
 
     setTimeData(performanceData);
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newHour = new Date().getHours();
-      if (newHour !== currentHour) {
-        setCurrentHour(newHour);
-        setPerformanceRange([0, newHour || 1]);
-      }
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [currentHour]);
-
   const generateMarks = () => {
     const marks = [];
-    const maxHour = currentHour || 1;
+    const maxHour = viewType === 'daily' ? (currentHour || 1) : 6;
     marks.push({ value: 0, label: "0h" });
     if (maxHour >= 6) marks.push({ value: 6, label: "6h" });
     if (maxHour >= 12) marks.push({ value: 12, label: "12h" });
@@ -80,68 +91,60 @@ function StaffMetrics() {
   };
 
   const getFilteredData = (range) => {
+    if (viewType === 'weekly' && weeklyData) {
+      return weeklyData.weekly_stats;
+    }
     return timeData.slice(range[0], range[1] + 1);
   };
 
+  const handleViewTypeChange = (event) => {
+    setViewType(event.target.value);
+    if (event.target.value === 'daily') {
+      setPerformanceRange([0, currentHour || 1]);
+    } else {
+      setPerformanceRange([0, 6]); // For weekly view
+    }
+  };
+
   const performanceData = {
-    xAxis: [
-      {
-        id: "time",
-        data: getFilteredData(performanceRange).map((d) => d.hour),
-        scaleType: "band",
-      },
-    ],
-    series: [
-      {
-        data: getFilteredData(performanceRange).map((d) => d.performance),
-        curve: "linear",
-        color: "#2A2AA9",
-      },
-    ],
+    xAxis: [{
+      id: "time",
+      data: viewType === 'weekly' ? 
+        getFilteredData().map(d => new Date(d.date).toLocaleDateString()) :
+        getFilteredData(performanceRange).map(d => d.hour),
+      scaleType: "band",
+    }],
+    series: [{
+      data: viewType === 'weekly' ? 
+        getFilteredData().map(d => d.performance_percentage) :
+        getFilteredData(performanceRange).map(d => d.performance),
+      curve: "linear",
+      color: "#2A2AA9",
+    }],
   };
 
-  const handlePerformanceRangeChange = (event, newValue) => {
-    setPerformanceRange(newValue);
-  };
-
-  const StatsDisplay = () => {
-    const totalAvailableStaff = Object.values(staffPerDepartment).reduce(
-      (sum, count) => sum + count,
-      0
-    );
-    const workedAndCompletedStaff = tasks.filter(
-      task => task.status === 'completed' || task.status === 'in-progress'
-    ).length;
-    const currentPerformance = timeData.length > 0 ? 
-      timeData[timeData.length - 1].performance.toFixed(1) : '0';
-
-    return (
-      <div className="grid gap-4 md:grid-cols-3 ">
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-gray-600">Total Available Staff</p>
-          <p className="text-2xl font-bold">{totalAvailableStaff}</p>
-        </div>
-        
-        <div className="p-4 bg-green-50 rounded-lg">
-          <p className="text-sm text-gray-600">Worked & Completed</p>
-          <p className="text-2xl font-bold">{workedAndCompletedStaff}</p>
-        </div>
-        
-        <div className="p-4 bg-purple-50 rounded-lg">
-          <p className="text-sm text-gray-600">Current Performance Rate</p>
-          <p className="text-2xl font-bold">{currentPerformance}%</p>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="bg-white rounded-xl shadow-lg flex-1 w-full p-4">
-      <h2 className="text-lg sm:text-xl font-semibold mb-4">
-        Staff Metrics (Hours {performanceRange[0]} - {performanceRange[1]})
-      </h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg sm:text-xl font-semibold">
+          Staff Metrics ({viewType === 'daily' ? 
+            `Hours ${performanceRange[0]} - ${performanceRange[1]}` : 
+            'Weekly View'})
+        </h2>
+        <FormControl sx={{ minWidth: 120 }}>
+          <InputLabel>View</InputLabel>
+          <Select
+            value={viewType}
+            onChange={handleViewTypeChange}
+            label="View"
+          >
+            <MenuItem value="daily">Daily</MenuItem>
+            <MenuItem value="weekly">Weekly</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
 
-      <StatsDisplay />
       
       <Box sx={{ width: "100%", mb: 4, mt: 5 }}>
         {loading ? (
@@ -154,25 +157,42 @@ function StaffMetrics() {
           />
         ) : (
           <LineChart
-            xAxis={performanceData.xAxis}
-            series={performanceData.series}
-            height={250}
-            margin={{ top: 5, right: 20, bottom: 30, left: 40 }}
-          />
+  xAxis={performanceData.xAxis}
+  series={[{
+    data: viewType === 'weekly' ? 
+      getFilteredData().map(d => d.performance_percentage) :
+      getFilteredData(performanceRange).map(d => d.performance),
+    curve: "linear",
+    color: "#4C51BF",
+    area: true
+  }]}
+  height={300}
+  margin={{ top: 5, right: 20, bottom: 30, left: 40 }}
+  sx={{
+    ".MuiLineElement-root": {
+      strokeWidth: 2,
+    },
+    ".MuiAreaElement-root": {
+      fillOpacity: 0.1,
+    },
+  }}
+/>
         )}
       </Box>
 
-      <Box sx={{ width: "100%", px: 2 }}>
-        <Slider
-          value={performanceRange}
-          onChange={handlePerformanceRangeChange}
-          valueLabelDisplay="auto"
-          step={1}
-          marks={generateMarks()}
-          min={0}
-          max={currentHour || 1}
-        />
-      </Box>
+      {viewType === 'daily' && (
+        <Box sx={{ width: "100%", px: 2 }}>
+          <Slider
+            value={performanceRange}
+            onChange={(event, newValue) => setPerformanceRange(newValue)}
+            valueLabelDisplay="auto"
+            step={1}
+            marks={generateMarks()}
+            min={0}
+            max={currentHour || 1}
+          />
+        </Box>
+      )}
     </div>
   );
 }
