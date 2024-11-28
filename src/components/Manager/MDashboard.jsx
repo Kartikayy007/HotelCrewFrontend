@@ -1171,7 +1171,7 @@ const MDashboard = () => {
               </div>
               <div className="border rounded p-4">
                 <h3 className="font-medium">Approved Leaves</h3>
-                <p className="text-2xl font-bold mt-2">{leaveCount}</p>
+                {/* <p className="text-2xl font-bold mt-2">{leaveCount}</p> */}
               </div>
             </div>
           </div>

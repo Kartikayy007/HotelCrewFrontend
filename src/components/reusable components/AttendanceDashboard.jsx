@@ -312,13 +312,13 @@ const AttendanceDashboard = () => {
 
             </select>
           </div> */}
-          <div className=" flex mb-2 pl-7 pb-2 gap-4 rounded-3xl pr-9 overflow-x-auto">
+          <div className=" flex mb-2 pl-7 pb-2 gap-4 rounded-3xl pr-9 overflow-x-auto scrollbar-hidden">
             {/* "All" Button */}
 
             <button
               key="all"
               onClick={() => toggleDepartmentSelection('All')}
-              className={`px-4 py-1 xl:w-[150px] rounded-3xl font-semibold  border-none ${selectedDepartments.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
+              className={`px-4 py-1 xl:w-[100px] rounded-3xl font-semibold  border-none ${selectedDepartments.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
                 }`}
             >
               All

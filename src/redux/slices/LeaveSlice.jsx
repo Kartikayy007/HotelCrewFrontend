@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_BASE_URL = "http://13.200.191.108:8000/api/attendance"; // Replace with your actual API base URL
+const API_BASE_URL = "https://hotelcrew-1.onrender.com/api/attendance"; // Replace with your actual API base URL
 
 const getAuthHeaders = () => {
-    const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MTg3MDQ2LCJpYXQiOjE3MzI1OTUwNDYsImp0aSI6Ijc1Y2Q2MzZkYTk5MTQ5ZWFiMjA2ZjBlNjZhODMwZTY2IiwidXNlcl9pZCI6MTA5fQ.xIQKLkKU6TMTbqBlw8f4GGxhpWJt6U9FA7RVfMPGSwQ';
+    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1Mzg1OTIyLCJpYXQiOjE3MzI3OTM5MjIsImp0aSI6ImZmZWU4NzMwNTk3MzRhMGI5OWFkYWNkMTI0Y2E1MWYxIiwidXNlcl9pZCI6MTcxfQ.svLwErjg3XfYrhOF_2sfUpzOXuixu56N6R08SJ5XErE';
 
 
     if (!token) {

@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'http://13.200.191.108:8000/api/hoteldetails/room-stats/'; // Replace with your actual API endpoint
+const API_URL = 'https://hotelcrew-1.onrender.com/api/hoteldetails/room-stats/'; // Replace with your actual API endpoint
 
 const getAuthHeaders = () => {
-  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MTg3MDQ2LCJpYXQiOjE3MzI1OTUwNDYsImp0aSI6Ijc1Y2Q2MzZkYTk5MTQ5ZWFiMjA2ZjBlNjZhODMwZTY2IiwidXNlcl9pZCI6MTA5fQ.xIQKLkKU6TMTbqBlw8f4GGxhpWJt6U9FA7RVfMPGSwQ';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MzgwMTYxLCJpYXQiOjE3MzI3ODgxNjEsImp0aSI6IjIzZmI3NjhlY2Y3MjQ4NzM4YjQ2NzMzZDBhY2M2YWFkIiwidXNlcl9pZCI6MTc4fQ.9HKA5XN7DddiStgpO318XkVbkatf_45g9-YlLpeWVbE';
 
 
   if (!token) {

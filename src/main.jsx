@@ -13,8 +13,8 @@ createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       {/* <App /> */}
       {/* <MSideBar /> */}
-      {/* <MainLayout /> */}
-      <SLayout />
+      <MainLayout />
+      {/* <SLayout /> */}
     </ Provider>
   </StrictMode>,
 )
