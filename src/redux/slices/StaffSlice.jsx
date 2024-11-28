@@ -168,10 +168,11 @@ export const selectDepartments = (state) => {
       label: dept.charAt(0).toUpperCase() + dept.slice(1),
       value: dept
     }));
+    console.log('Departments:', departments);
   return departments;
 };
 
-// In StaffSlice.jsx, add this selector:
+
 export const selectTotalStaff = (state) => {
   const staffPerDept = state.staff.staffPerDepartment;
   if (!staffPerDept || typeof staffPerDept !== 'object') {

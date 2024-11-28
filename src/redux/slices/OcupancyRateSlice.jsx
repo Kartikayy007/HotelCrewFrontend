@@ -1,5 +1,3 @@
-// src/redux/slices/OccupancyRateSlice.js
-
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -78,7 +76,6 @@ const occupancySlice = createSlice({
   }
 });
 
-// Selectors with error handling
 export const selectOccupiedRooms = (state) => state.occupancy?.occupiedRooms ?? 0;
 export const selectAvailableRooms = (state) => state.occupancy?.availableRooms ?? 0;
 export const selectOccupancyLoading = (state) => state.occupancy?.loading ?? false;

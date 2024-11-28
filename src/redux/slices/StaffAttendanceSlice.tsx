@@ -1,4 +1,3 @@
-// src/redux/slices/StaffAttendanceSlice.tsx
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -72,7 +71,6 @@ const staffAttendanceSlice = createSlice({
   }
 });
 
-// Selectors
 export const selectStaffAttendance = (state: { staffAttendance: StaffAttendanceState }) => state.staffAttendance.data;
 export const selectStaffAttendanceLoading = (state: { staffAttendance: StaffAttendanceState }) => state.staffAttendance.loading;
 export const selectStaffAttendanceError = (state: { staffAttendance: StaffAttendanceState }) => state.staffAttendance.error;

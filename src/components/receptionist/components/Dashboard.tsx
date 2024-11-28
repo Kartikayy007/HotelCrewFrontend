@@ -141,16 +141,16 @@ const Dashboard = () => {
         <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Recent Customers</h2>
           <div className="overflow-x-auto">
-            <div className="max-h-80 overflow-y-auto ">
+            <div className="max-h-96 overflow-y-auto ">
               <table className="w-full">
                 <thead className="bg-[#252941] text-white sticky top-0 z-10">
                   <tr>
-                    <th className="p-3 text-left rounded-tl-lg">PROFILE</th>
-                    <th className="p-3 text-left">Check-in</th>
-                    <th className="p-3 text-left">Check-out</th>
-                    <th className="p-3 text-left">Duration</th>
-                    <th className="p-3 text-left">Room</th>
-                    <th className="p-3 text-left rounded-tr-lg">Status</th>
+                    <th className="p-3 text-center rounded-tl-lg">PROFILE</th>
+                    <th className="p-3 text-center">Check-in</th>
+                    <th className="p-3 text-center">Check-out</th>
+                    <th className="p-3 text-center">Duration</th>
+                    <th className="p-3 text-center">Room</th>
+                    <th className="p-3 text-center rounded-tr-lg">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -158,15 +158,21 @@ const Dashboard = () => {
                     <TableSkeleton />
                   ) : allCustomers.length > 0 ? (
                     getRecentCustomers().map((customer, index) => (
-                      <tr key={index} className="border-b hover:bg-gray-50">
-                        <td className="p-3">{customer.profile}</td>
-                        <td className="p-3">{customer.checkIn}</td>
-                        <td className="p-3">{customer.checkOut}</td>
-                        <td className="p-3">{customer.duration}</td>
-                        <td className="p-3">{customer.room}</td>
-                        <td className="p-3">
-                          <span className={`px-2 py-1 rounded ${customer.status === 'VIP' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'
-                            }`}>
+                      <tr 
+                        key={index} 
+                        className="even:bg-[#F1F6FC] odd:bg-[#DEE8FF] hover:bg-gray-50 border-b"
+                      >
+                        <td className="p-3 text-center">{customer.profile}</td>
+                        <td className="p-3 text-center">{customer.checkIn}</td>
+                        <td className="p-3 text-center">{customer.checkOut}</td>
+                        <td className="p-3 text-center">{customer.duration}</td>
+                        <td className="p-3 text-center">{customer.room}</td>
+                        <td className="p-3 text-center">
+                          <span className={`px-2 py-1 rounded-full ${
+                            customer.status === 'VIP' 
+                              ? 'bg-yellow-100 text-yellow-800' 
+                              : 'bg-blue-100 text-blue-800'
+                          }`}>
                             {customer.status}
                           </span>
                         </td>

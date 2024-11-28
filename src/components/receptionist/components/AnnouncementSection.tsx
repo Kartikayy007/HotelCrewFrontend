@@ -50,7 +50,7 @@ const AnnouncementSection: React.FC = () => {
 
   return (
     <div className="bg-white h-96 rounded-lg shadow-lg flex flex-col">
-    <div className="sticky top-0 z-20 bg-white/95    ">
+    <div className="sticky top-0 z-20 bg-white rounded-lg ">
       <h2 className="text-xl font-semibold p-4">
         Announcement Channel
       </h2>
