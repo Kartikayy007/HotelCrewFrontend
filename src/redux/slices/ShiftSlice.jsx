@@ -2,12 +2,12 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 // URL for fetching and updating shifts
-const FETCH_SHIFTS_URL = 'http://13.200.191.108:8000/api/edit/schedule_list/';
-const UPDATE_SHIFT_URL = 'http://13.200.191.108:8000/api/edit/schedule_change'; // Assuming this is the update shift API
+const FETCH_SHIFTS_URL = 'https://hotelcrew-1.onrender.com/api/edit/schedule_list/';
+const UPDATE_SHIFT_URL = 'https://hotelcrew-1.onrender.com/edit/schedule_change'; // Assuming this is the update shift API
 
 // Utility to get auth headers
 const getAuthHeaders = () => {
-  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MTg3MDQ2LCJpYXQiOjE3MzI1OTUwNDYsImp0aSI6Ijc1Y2Q2MzZkYTk5MTQ5ZWFiMjA2ZjBlNjZhODMwZTY2IiwidXNlcl9pZCI6MTA5fQ.xIQKLkKU6TMTbqBlw8f4GGxhpWJt6U9FA7RVfMPGSwQ'
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
 
 
   if (!token) {

@@ -355,7 +355,7 @@ const AttendanceDashboard = () => {
                     <th className="px-4 py-2 text-le3t">Email</th>
                     <th className="px-4 py-2 text-left">Department</th>
                     <th className="px-4 py-2 text-center">Attendance</th>
-                    <th className="px-4 py-2 flex mb-1  items-center justify-center">
+                    {/* <th className="px-4 py-2 flex mb-1  items-center justify-center">
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DemoContainer components={['DatePicker']}>
                           <DatePicker
@@ -390,15 +390,15 @@ const AttendanceDashboard = () => {
                               },
 
                             }}
-                          />
-                        </DemoContainer>
-                      </LocalizationProvider>
+                          /> */}
+                        {/* </DemoContainer> */}
+                      {/* </LocalizationProvider> */}
                       {/* <input type="date"
           className='bg-[#E6EEF9] '
           placeholder='Date'
           /> */}
 
-                    </th>
+                    {/* </th> */}
                     {/* <th className="px-4 py-2 text-center">Date</th> */}
                   </tr>
                 </thead>
@@ -425,7 +425,7 @@ const AttendanceDashboard = () => {
                           {member.current_attendance}
                         </button>
                       </td>
-                      <td className="px-4 py-2"></td>
+                      {/* <td className="px-4 py-2"></td> */}
                     </tr>
                   ))}
                 </tbody>
