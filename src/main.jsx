@@ -13,8 +13,8 @@ createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       {/* <App /> */}
       {/* <MainLayout /> */}
-      <Admin />   
-      {/* <Reception /> */}
+      {/* <Admin />    */}
+      <Reception />
     </Provider>
   </StrictMode>,
 )

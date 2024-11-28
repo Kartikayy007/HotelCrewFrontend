@@ -9,7 +9,7 @@ const getAuthToken = () => {
   }
   return token;
 };
-
+ 
 export const fetchTodayRevenue = createAsyncThunk(
   'hotelCheckin/fetchTodayRevenue',
   async (_, { rejectWithValue }) => {

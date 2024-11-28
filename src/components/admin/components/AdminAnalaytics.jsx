@@ -293,7 +293,21 @@ const AdminAnalytics = () => {
                           },
                         ]}
                         borderRadius={5}
-                        xAxis={[{data: weeklyStats.dates, scaleType: "band"}]}
+                        xAxis={[{
+                          data: weeklyStats.dates,
+                          scaleType: "band",
+                          tickLabelStyle: {
+                            angle: 0,
+                            textAnchor: "middle",
+                            fontSize: 12
+                          }
+                        }]}
+                        margin={{ top: 40, right: 20, bottom: 30, left: 40 }}
+                        sx={{
+                          "& .MuiChartsAxis-bottom .MuiChartsAxis-tickLabel": {
+                            transform: "translateY(5px)"
+                          }
+                        }}
                       />
                     )}
                   </Box>

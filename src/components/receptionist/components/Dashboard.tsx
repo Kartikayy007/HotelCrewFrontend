@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectCheckIns, fetchCheckIns } from '../../../redux/slices/CheckInSlice';
-import { PieChart, Pie, Cell } from 'recharts';
-import { Dialog, DialogContent, DialogActions, Button } from '@mui/material';
-import NewCustomerForm from './NewCustomerForm'; 
-import { 
-  selectAllTasks, 
-  fetchTasks, 
-  selectTasksByStatus 
+import { selectCheckIns, fetchCheckIns, selectCheckInsLoading } from '../../../redux/slices/CheckInSlice';
+import { Dialog, DialogContent, DialogActions, Button, Skeleton } from '@mui/material';
+import NewCustomerForm from './NewCustomerForm';
+import {
+  selectAllTasks,
+  fetchTasks,
+  selectTasksByStatus,
+  selectTaskMetrics
 } from '../../../redux/slices/TaskSlice';
+import AnnouncementSection from './AnnouncementSection';
+import { selectCustomers, fetchCustomers } from '../../../redux/slices/CustomerSlice';
+import { PieChart } from '@mui/x-charts';
+import { 
+  selectStaffAttendance, 
+  fetchStaffAttendance 
+} from '../../../redux/slices/StaffAttendanceSlice';
 
 interface RoomSelection {
   type: string;
@@ -16,60 +23,54 @@ interface RoomSelection {
 }
 
 const Dashboard = () => {
-  // Dummy check-in data
-  const checkIns = [
-    {
-      name: "John Doe",
-      check_in_time: "2024-03-20T10:00:00",
-      check_out_time: "2024-03-22T12:00:00",
-      room_number: "101",
-      status: "VIP"
-    },
-    {
-      name: "Jane Smith",
-      check_in_time: "2024-03-19T14:00:00",
-      check_out_time: "2024-03-21T11:00:00",
-      room_number: "102",
-      status: "REGULAR"
+  const dispatch = useDispatch();
+  const checkInsFromRedux = useSelector(selectCheckIns);
+  const allCustomers = useSelector(selectCustomers);
+  const isLoading = useSelector(selectCheckInsLoading);
+  const taskMetrics = useSelector(selectTaskMetrics);
+  const attendanceData = useSelector(selectStaffAttendance);
+
+  useEffect(() => {
+    dispatch(fetchCheckIns());
+    dispatch(fetchCustomers());
+    dispatch(fetchTasks());
+    dispatch(fetchStaffAttendance());
+  }, [dispatch]);
+
+  // Refresh customers when new check-in occurs
+  useEffect(() => {
+    if (checkInsFromRedux?.length > 0) {
+      dispatch(fetchCustomers());
     }
-  ];
+  }, [checkInsFromRedux, dispatch]);
 
-  // Dummy task data
-  const allTasks = [
-    { id: 1, status: 'completed' },
-    { id: 2, status: 'pending' },
-    { id: 3, status: 'in_progress' },
-    { id: 4, status: 'completed' }
-  ];
+  // Get recent 20 customers sorted by check-in time
+  const getRecentCustomers = () => {
+    return [...allCustomers]
+      .sort((a, b) => new Date(b.check_in_time) - new Date(a.check_in_time))
+      .slice(0, 20)
+      .map(customer => ({
+        profile: customer.name,
+        checkIn: new Date(customer.check_in_time).toLocaleDateString(),
+        checkOut: new Date(customer.check_out_time).toLocaleDateString(),
+        duration: Math.ceil(
+          (new Date(customer.check_out_time) - new Date(customer.check_in_time)) /
+          (1000 * 60 * 60 * 24)
+        ),
+        room: customer.room_no.toString(),
+        status: customer.status
+      }));
+  };
 
-  const completedTasks = allTasks.filter(task => task.status === 'completed');
-  const pendingTasks = allTasks.filter(task => task.status === 'pending');
-  const inProgressTasks = allTasks.filter(task => task.status === 'in_progress');
-
-  const recentCustomers = checkIns
-    .sort((a, b) => new Date(b.check_in_time).getTime() - new Date(a.check_in_time).getTime())
-    .slice(0, 50)
-    .map(checkIn => ({
-      profile: checkIn.name,
-      checkIn: new Date(checkIn.check_in_time).toLocaleDateString(),
-      checkOut: checkIn.check_out_time ? new Date(checkIn.check_out_time).toLocaleDateString() : '-----',
-      duration: checkIn.check_out_time ? 
-        Math.ceil((new Date(checkIn.check_out_time) - new Date(checkIn.check_in_time)) / (1000 * 60 * 60 * 24)) : 
-        '-----',
-      room: checkIn.room_number || '---',
-      status: checkIn.status
-    }));
-
-  // Calculate task statistics
   const calculateTaskStats = () => {
-    const total = allTasks.length;
+    const total = taskMetrics.total;
     if (total === 0) return [
       { name: 'Completed', value: 0 },
       { name: 'Remaining', value: 0 }
     ];
 
-    const completed = completedTasks.length;
-    const remaining = total - completed;
+    const completed = taskMetrics.completed;
+    const remaining = taskMetrics.pending; // This includes both pending and in_progress
 
     return [
       { name: 'Completed', value: Math.round((completed / total) * 100) },
@@ -79,20 +80,63 @@ const Dashboard = () => {
 
   const taskData = calculateTaskStats();
 
-  const attendanceData = [
-    { name: 'Present', value: 86 },
-    { name: 'Absent', value: 14 }
-  ];
+  const calculateAttendancePercentage = () => {
+    if (!attendanceData) return { present: 0, absent: 0 };
+    
+    const totalDays = attendanceData.total_days_up_to_today;
+    const daysPresent = attendanceData.days_present;
+    const leaves = attendanceData.leaves;
+    
+    const presentPercentage = Math.round((daysPresent / totalDays) * 100);
+    const absentPercentage = Math.round(((totalDays - daysPresent) / totalDays) * 100);
+    
+    return { present: presentPercentage, absent: absentPercentage };
+  };
+
+  const attendance = calculateAttendancePercentage();
 
   const COLORS = {
     task: ['#252941', '#E6EEF9'],
     attendance: ['#4338CA', '#E6EEF9']
   };
 
+  const TableSkeleton = () => (
+    <>
+      {[1, 2, 3, 4, 5].map((item) => (
+        <tr key={item} className="border-b">
+          <td className="p-3"><Skeleton variant="text" width={100} /></td>
+          <td className="p-3"><Skeleton variant="text" width={80} /></td>
+          <td className="p-3"><Skeleton variant="text" width={80} /></td>
+          <td className="p-3"><Skeleton variant="text" width={60} /></td>
+          <td className="p-3"><Skeleton variant="text" width={40} /></td>
+          <td className="p-3"><Skeleton variant="rectangular" width={60} height={24} /></td>
+        </tr>
+      ))}
+    </>
+  );
+
+  const EmptyState = () => (
+    <tr>
+      <td colSpan={6} className="text-center p-8">
+        <div className="flex flex-col items-center justify-center text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+          </svg>
+          <p className="text-lg font-medium">No Customers Yet</p>
+          <p className="text-sm">New customers will appear here when they check in</p>
+        </div>
+      </td>
+    </tr>
+  );
+
+  const refreshCustomers = () => {
+    dispatch(fetchCustomers());
+  };
+
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
       <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">Dashboard</h1>
-      
+
       <div className="grid  grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Recent Customers</h2>
@@ -110,84 +154,116 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentCustomers.map((customer, index) => (
-                    <tr key={index} className="border-b hover:bg-gray-50">
-                      <td className="p-3">{customer.profile}</td>
-                      <td className="p-3">{customer.checkIn}</td>
-                      <td className="p-3">{customer.checkOut}</td>
-                      <td className="p-3">{customer.duration}</td>
-                      <td className="p-3">{customer.room}</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-1 rounded ${
-                          customer.status === 'VIP' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'
-                        }`}>
-                          {customer.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {isLoading ? (
+                    <TableSkeleton />
+                  ) : allCustomers.length > 0 ? (
+                    getRecentCustomers().map((customer, index) => (
+                      <tr key={index} className="border-b hover:bg-gray-50">
+                        <td className="p-3">{customer.profile}</td>
+                        <td className="p-3">{customer.checkIn}</td>
+                        <td className="p-3">{customer.checkOut}</td>
+                        <td className="p-3">{customer.duration}</td>
+                        <td className="p-3">{customer.room}</td>
+                        <td className="p-3">
+                          <span className={`px-2 py-1 rounded ${customer.status === 'VIP' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'
+                            }`}>
+                            {customer.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <EmptyState />
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <NewCustomerForm />
+        <NewCustomerForm onCheckInSuccess={refreshCustomers} />
 
         <div className="bg-white rounded-lg p-6 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Task Progress</h2>
-          <div className="flex justify-center">
-            <PieChart width={200} height={200}>
-              <Pie
-                data={taskData}
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={0}
-                dataKey="value"
-              >
-                {taskData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS.task[index]} />
-                ))}
-              </Pie>
-            </PieChart>
-          </div>
-          <div className="mt-4 text-center">
-            <p>On-going tasks: {inProgressTasks.length}</p>
-            <p>Completed tasks: {completedTasks.length}</p>
+          <div className="flex justify-center items-center mt-20">
+            <div className="relative w-48">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-2xl -mt-8 font-bold">
+                  {Math.round((taskMetrics.completed / (taskMetrics.total || 1)) * 100)}%
+                </span>
+              </div>
+              <PieChart
+                series={[
+                  {
+                    data: [
+                      { id: 0, value: taskMetrics.completed, color: '#34D399' },
+                      { id: 1, value: taskMetrics.pending, color: '#60A5FA' }
+                    ],
+                    highlightScope: { faded: 'global', highlighted: 'item' },
+                    innerRadius: 40,
+                    outerRadius: 70,
+                    paddingAngle: 2,
+                    cornerRadius: 4,
+                  },
+                ]}
+                width={280}
+                height={192}
+                margin={{ bottom: 40 }}
+              />
+            </div>
+            <div className="flex flex-col -mt-16 justify-center">
+              <div>
+                <h3 className="text-xl">Pending Tasks</h3>
+                <p className="text-3xl font-bold text-[#60A5FA]">{taskMetrics.pending}</p>
+              </div>
+              <div>
+                <h3 className="text-xl">Completed Tasks</h3>
+                <p className="text-3xl font-bold text-[#34D399]">{taskMetrics.completed}</p>
+              </div>
+            </div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg p-6 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Attendance</h2>
-          <div className="flex justify-center">
-            <PieChart width={200} height={200}>
-              <Pie
-                data={attendanceData}
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={0}
-                dataKey="value"
-              >
-                {attendanceData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS.attendance[index]} />
-                ))}
-              </Pie>
-            </PieChart>
-          </div>
-          <div className="mt-4 text-center">
-            <p>Attendance: 120/300</p>
+          <div className="flex justify-center items-center mt-20">
+            <div className="relative w-48">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-2xl -mt-8 font-bold">{attendance.present}%</span>
+              </div>
+              <PieChart
+                series={[
+                  {
+                    data: [
+                      { id: 0, value: attendance.present, color: '#4338CA' },
+                      { id: 1, value: attendance.absent, color: '#E6EEF9' }
+                    ],
+                    highlightScope: { faded: 'global', highlighted: 'item' },
+                    innerRadius: 40,
+                    outerRadius: 70,
+                    paddingAngle: 2,
+                    cornerRadius: 4,
+                  },
+                ]}
+                width={280}
+                height={192}
+                margin={{ bottom: 40 }}
+              />
+            </div>
+            <div className="flex flex-col -mt-16 justify-center">
+              <div className="text-center">
+                <h3 className="text-xl">Present</h3>
+                <p className="text-3xl font-bold text-[#4338CA]">{attendance.present}%</p>
+              </div>
+              <div className="text-center">
+                <h3 className="text-xl">Absent</h3>
+                <p className="text-3xl font-bold text-[#E6EEF9]">{attendance.absent}%</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-6 shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">Announcement Channel</h2>
-          <div className="p-4 bg-gray-50 rounded">
-            <h3 className="font-medium">Important Announcement from Admin to All Staff</h3>
-            <p className="mt-2">We would like to inform you about some key updates and important happening at the XYZ Hotel.</p>
-            <p>The first important change is the......</p>
-            <p className="mt-4 text-sm text-gray-500">15 November 2024 03:13 PM</p>
-          </div>
-        </div>
+        <AnnouncementSection />
       </div>
     </section>
   );

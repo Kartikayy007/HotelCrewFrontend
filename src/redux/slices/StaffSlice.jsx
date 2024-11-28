@@ -26,7 +26,7 @@ export const fetchStaffData = createAsyncThunk(
         }
       };
       const response = await axios.get(API_URL, config);
-      console.log('Fetched staff data:', response.data);
+      console.log('Fetched staff data:', response);
       return response.data;
     } catch (error) {
       console.error('Failed to fetch staff data:');

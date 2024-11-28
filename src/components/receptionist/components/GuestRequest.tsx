@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch } from '../../../redux/store';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { Dialog, Snackbar, Alert, AlertColor } from '@mui/material';
 import { PieChart } from '@mui/x-charts/PieChart';
-import { createTask, selectTasksLoading } from '../../../redux/slices/TaskSlice';
+import { createTask, selectTasksLoading,selectTasksError, selectTaskMetrics, fetchTasks } from '../../../redux/slices/TaskSlice';
 import TaskAssignment from './TaskAssignment';
 
 interface SnackbarState {
@@ -21,11 +22,13 @@ const departments = [
 ];
 
 const GuestRequest: React.FC = () => {
-  const dispatch = useDispatch();
-  const Taskloading = useSelector(selectTasksLoading);
+  const dispatch = useDispatch<AppDispatch>();
+  const taskMetrics = useSelector(selectTaskMetrics);
 
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
+  const Taskloading = useSelector(selectTasksLoading);
+  const error = useSelector(selectTasksError);
   const [selectedPriority, setSelectedPriority] = useState('');
   const [selected, setSelected] = useState({ label: "Department", value: "" });
 
@@ -37,27 +40,34 @@ const GuestRequest: React.FC = () => {
     severity: 'success'
   });
 
-  const taskStats = {
-    ongoing: 8,
-    completed: 12,
-    total: 20
-  };
-
-  const completionPercentage = 60;
+  useEffect(() => {
+    dispatch(fetchTasks());
+  }, [dispatch]);
 
   const handleSelect = (dept: { label: string, value: string }) => {
     setSelected(dept);
     setIsDropdownOpen(false);
   };
 
-  const handleAssign = async (e: React.FormEvent) => {
+  const [deadline, setDeadline] = useState("");
+  const [selectedHour, setSelectedHour] = useState("09");
+  const [selectedMinute, setSelectedMinute] = useState("00");
+
+  const hours = Array.from({length: 24}, (_, i) =>
+    i.toString().padStart(2, "0")
+  );
+  const minutes = Array.from({length: 60}, (_, i) =>
+    i.toString().padStart(2, "0")
+  );
+
+  const handleAssign = async (e) => {
     e.preventDefault();
 
     if (!taskTitle.trim()) {
       setSnackbar({
         open: true,
         message: "Please enter a task title",
-        severity: "error"
+        severity: "error",
       });
       return;
     }
@@ -66,7 +76,7 @@ const GuestRequest: React.FC = () => {
       setSnackbar({
         open: true,
         message: "Please enter a task description",
-        severity: "error"
+        severity: "error",
       });
       return;
     }
@@ -75,45 +85,54 @@ const GuestRequest: React.FC = () => {
       setSnackbar({
         open: true,
         message: "Please select a department",
-        severity: "error"
+        severity: "error",
       });
       return;
     }
 
     try {
-      // await dispatch(createTask({
-      //   title: taskTitle.trim(),
-      //   description: taskDescription.trim(),
-      //   department: selected.value,
-      //   priority: selectedPriority,
-      // })).unwrap();
+      const today = new Date();
+      today.setHours(parseInt(selectedHour, 10));
+      today.setMinutes(parseInt(selectedMinute, 10));
+      today.setSeconds(0);
 
-      setTaskTitle('');
-      setTaskDescription('');
-      setSelected({ label: "Select Department", value: "" });
-      setSelectedPriority('');
+      const formattedDeadline = today.toISOString();
+      await dispatch(
+        createTask({
+          title: taskTitle.trim(),
+          description: taskDescription.trim(),
+          department: selected.value,
+          deadline: formattedDeadline,
+        })
+      ).unwrap();
+
+      dispatch(fetchTasks());
+
+      setTaskTitle("");
+      setTaskDescription("");
+      setSelected({value: "", label: "Department"}); 
+      setSelectedHour("09");
+      setSelectedMinute("00");
 
       setSnackbar({
         open: true,
         message: "Task assigned successfully",
-        severity: "success"
+        severity: "success",
       });
-
-    } catch (error) {
+    } catch (err) {
       setSnackbar({
         open: true,
-        message: "Failed to assign task",
-        severity: "error"
+        message: err.message || "Failed to assign task",
+        severity: "error",
       });
-    } finally {
-      setPriorityDropdownOpen(false);
-      setIsDropdownOpen(false);
     }
   };
 
   const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
+    setSnackbar({...snackbar, open: false});
   };
+
+  const taskPercentage = Math.round((taskMetrics.completed / (taskMetrics.total || 1)) * 100);
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
@@ -127,8 +146,11 @@ const GuestRequest: React.FC = () => {
 
         <div className='flex xl:flex-col lg:flex-row flex-col gap-4 xl:w-2/6 h-full xl:mr-12 xl:p-0 p-6 '>
 
-          <form onSubmit={handleAssign} className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg w-full ">
-            <div className="flex justify-between items-center mb-2">
+        <form
+            onSubmit={handleAssign}
+            className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg lg:flex-1"
+          >
+            <div className="flex justify-between items-center mb-2 ">
               <h2 className="text-lg sm:text-xl font-semibold">Assign Task</h2>
             </div>
 
@@ -139,59 +161,28 @@ const GuestRequest: React.FC = () => {
               onChange={(e) => setTaskTitle(e.target.value)}
               className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
             />
-
             <div className="flex justify-between gap-4">
-              {/* Priority Dropdown */}
-              <div className="relative w-full">
-                <button
-                  type="button"
-                  onClick={() => setPriorityDropdownOpen(!isPriorityDropdownOpen)}
-                  className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${selectedPriority ? "text-black" : "text-gray-400"
-                    } focus:outline-none flex justify-between items-center`}
-                >
-                  {selectedPriority || "Select Priority"}
-                  {isPriorityDropdownOpen ? <FaChevronUp className="text-gray-600" /> : <FaChevronDown className="text-gray-600" />}
-                </button>
-
-                {isPriorityDropdownOpen && (
-                  <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                    {["High", "Medium", "Low"].map((priority) => (
-                      <button
-                        key={priority}
-                        type="button"
-                        onClick={() => {
-                          setSelectedPriority(priority);
-                          setPriorityDropdownOpen(false);
-                        }}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                      >
-                        <span className={`inline-block w-2 h-2 rounded-full mr-2 ${priority === "High" ? "bg-red-500" :
-                          priority === "Medium" ? "bg-yellow-500" : "bg-green-500"
-                          }`}></span>
-                        {priority}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Department Dropdown */}
               <div className="relative w-full">
                 <button
                   type="button"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${selected.value ? "text-black" : "text-gray-400"
-                    } focus:outline-none flex justify-between items-center`}
+                  className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                    selected.value ? "text-black" : "text-gray-400"
+                  } focus:outline-none flex justify-between items-center`}
                 >
                   {selected.label}
-                  {isDropdownOpen ? <FaChevronUp className="text-gray-600" /> : <FaChevronDown className="text-gray-600" />}
+                  {isDropdownOpen ? (
+                    <FaChevronUp className="text-gray-600" />
+                  ) : (
+                    <FaChevronDown className="text-gray-600" />
+                  )}
                 </button>
 
                 {isDropdownOpen && (
                   <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                    {departments.map((dept, index) => (
+                    {departments.map((dept) => (
                       <button
-                        key={index}
+                        key={dept.value}
                         type="button"
                         onClick={() => handleSelect(dept)}
                         className="w-full text-left px-4 py-2 hover:bg-gray-100"
@@ -203,41 +194,70 @@ const GuestRequest: React.FC = () => {
                 )}
               </div>
             </div>
-
+            <div className="relative w-full mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Task Time
+              </label>
+              <div className="flex space-x-2">
+                <select
+                  value={selectedHour}
+                  onChange={(e) => setSelectedHour(e.target.value)}
+                  className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                >
+                  {hours.map((hour) => (
+                    <option key={hour} value={hour}>
+                      {hour}:00
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={selectedMinute}
+                  onChange={(e) => setSelectedMinute(e.target.value)}
+                  className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                >
+                  {minutes.map((minute) => (
+                    <option key={minute} value={minute}>
+                      {minute}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <textarea
               value={taskDescription}
               onChange={(e) => setTaskDescription(e.target.value)}
               placeholder="Task Description"
               maxLength={350}
-              className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 h-44 resize-none focus:border-gray-300 focus:outline-none"
+              className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
             />
-
             <div className="flex justify-end">
               <button
                 type="submit"
                 disabled={Taskloading}
-                className="h-9 w-full bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50"
+                className="h-9 w-full bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50 shadow-xl flex items-center justify-center"
               >
-                {Taskloading ? "Assigning..." : "Assign"}
+                {Taskloading ? (
+                  <LoadingAnimation size={24} color="#FFFFFF" />
+                ) : (
+                  "Assign"
+                )}
               </button>
             </div>
           </form>
 
-          <div className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg w-full ">
-            <h2 className="text-lg sm:text-xl font-semibold">
-              Task Progress
-            </h2>
-            <div className="flex justify-center items-center gap-12">
+          <div className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg w-full">
+            <h2 className="text-lg sm:text-xl font-semibold">Task Progress</h2>
+            <div className="flex justify-center items-center">
               <div className="relative w-48">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl -mt-8 font-bold">{completionPercentage}%</span>
+                  <span className="text-2xl -mt-8 font-bold">{taskPercentage}%</span>
                 </div>
                 <PieChart
                   series={[
                     {
                       data: [
-                        { id: 0, value: taskStats.ongoing, color: '#60A5FA' },
-                        { id: 1, value: taskStats.completed, color: '#34D399' }
+                        { id: 0, value: taskMetrics.completed, color: '#34D399' },
+                        { id: 1, value: taskMetrics.pending, color: '#60A5FA' }
                       ],
                       highlightScope: { faded: 'global', highlighted: 'item' },
                       innerRadius: 40,
@@ -251,14 +271,14 @@ const GuestRequest: React.FC = () => {
                   margin={{ bottom: 40 }}
                 />
               </div>
-              <div className="flex flex-col -mt-16">
+              <div className="flex flex-col -mt-16 justify-center">
                 <div>
-                  <h3 className="text-xl">On Going Tasks</h3>
-                  <p className="text-3xl font-bold text-[#60A5FA]">{taskStats.ongoing}</p>
+                  <h3 className="text-xl">Pending Tasks</h3>
+                  <p className="text-3xl font-bold text-[#60A5FA]">{taskMetrics.pending}</p>
                 </div>
                 <div>
                   <h3 className="text-xl">Completed Tasks</h3>
-                  <p className="text-3xl font-bold text-[#34D399]">{taskStats.completed}</p>
+                  <p className="text-3xl font-bold text-[#34D399]">{taskMetrics.completed}</p>
                 </div>
               </div>
             </div>

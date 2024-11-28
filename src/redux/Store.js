@@ -17,6 +17,7 @@ import hotelDetailsReducer from './slices/HotelDetailsSlice'
 import checkInReducer from './slices/CheckInSlice'
 import occupancyReducer from './slices/OcupancyRateSlice';
 import userProfileReducer from './slices/userProfileSlice'
+import staffAttendanceReducer from './slices/StaffAttendanceSlice';
 
 const store = configureStore({
   reducer: {
@@ -37,6 +38,7 @@ const store = configureStore({
     hotelDetails: hotelDetailsReducer,
     checkIns: checkInReducer,
     occupancy: occupancyReducer,
+    staffAttendance: staffAttendanceReducer,
     userProfile: userProfileReducer,
   },
 })

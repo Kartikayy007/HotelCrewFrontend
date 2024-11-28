@@ -31,7 +31,6 @@ export const fetchTasks = createAsyncThunk(
         }
       );
       console.log('Fetched tasks:', response.data.tasks);
-      // Extract tasks array from response
       return {
         tasks: Array.isArray(response.data.tasks) ? response.data.tasks : [],
         metrics: {
@@ -112,7 +111,6 @@ export const taskSlice = createSlice({
   }
 });
 
-// Updated selectors with type checking
 export const selectAllTasks = (state) => {
   return Array.isArray(state?.tasks?.tasks) ? state.tasks.tasks : [];
 };
