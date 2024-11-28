@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Skeleton } from '@mui/material'
+import { Skeleton, Snackbar, Alert } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux';
+import InfoIcon from "@mui/icons-material/Info";
 import { getStaffProfile,updateStaffProfile, selectStaffProfile, selectStaffProfileLoading, selectStaffProfileError,selectStaffProfileSuccessMessage } from '../../../redux/slices/StaffProfileSlice';
 import { Pencil } from 'lucide-react';
 
@@ -13,7 +14,37 @@ const SProfile = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState(profile?.user_name || '');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error'); 
+  useEffect(() => {
+    if (error) {
+      if (!navigator.onLine) {
+        setSnackbarMessage('No internet connection. Please check your network.');
+      } else if (error?.status === 429) {
+        setSnackbarMessage('Too many requests. Please try again later.');
+      } else {
+        setSnackbarMessage(error.message || 'An unexpected error occurred.');
+      }
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  }, [error]);
 
+
+
+  // Handle successful updates
+  useEffect(() => {
+    if (updatemsg) {
+      setSnackbarMessage(updatemsg);
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    }
+  }, [updatemsg]);
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
   // const data = {
   //   // user_name: username,
   //   user_profile: image, // Assuming the user is uploading an image or providing a URL
@@ -155,6 +186,34 @@ const SProfile = () => {
 
         </div>
       )};
+       {/* <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={5000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      > */}
+       <Snackbar
+  open={snackbarOpen}
+  autoHideDuration={4000}
+  onClose={handleSnackbarClose}
+  // onClose={() => setSnackbar({ ...snackbar, open: false })} // Close Snackbar
+  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+  ContentProps={{
+    style: {
+      backgroundColor: snackbarSeverity === "success" ? "green" : "red",
+    },
+  }}
+  message={
+    <span style={{ display: "flex", alignItems: "center" }}>
+      <InfoIcon style={{ marginRight: 8 }} />
+      {snackbarMessage}
+    </span>
+  }
+>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </section>
   );
 };

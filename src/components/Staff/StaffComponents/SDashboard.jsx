@@ -1,7 +1,7 @@
-import { useState, useEffect, React } from 'react'
+import { useState, useEffect, React,useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
-import { Card, CardContent, Typography, Paper, Container, Box, Skeleton, Slider } from '@mui/material';
+import { Card, CardContent, Typography, Paper, Container, Box, Skeleton,Snackbar,Alert ,Slider } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { getStaffLeaveHistory } from '../../../redux/slices/StaffLeaveSlice';
 import { getAttendanceStats,selectAttendanceStats,selectStatsLoading,selectStatsError } from '../../../redux/slices/StaffAttendanceSlice';
@@ -13,7 +13,9 @@ const SDashboard = () => {
   const announcements = useSelector(selectAllAnnouncements);
   const AnnLoading = useSelector(selectAnnouncementsLoading);
   const AnnError = useSelector(selectAnnouncementsError);
-  
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error'); 
   const today = new Date();
   const [loading, setLoading] = useState(true);
   const {
@@ -33,7 +35,38 @@ const SDashboard = () => {
   const statsLoading = useSelector(selectStatsLoading);
   const statsError = useSelector(selectStatsError);
 
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
+  const isOffline = useRef(false);
+  // useEffect(() => {
+  
+  // //   if (navigator.onLine==='false') {
+  // //     setSnackbarMessage('No internet connection. Please check your network.');
+  // //    setSnackbarSeverity('error');
+  // //   setSnackbarOpen(true);
+  // //      // Mark as offline
+  // //     return;
+  // //   }
+  // // else{
+    
+  
+  //   if (((AnnError || statsError))?.status === 429) {
+  //     setSnackbarMessage('Too many requests. Please try again later.');
+  //   }  if (AnnError) {
+  //     setSnackbarMessage(AnnError.message || 'Announcements failed to load.');
+  //   }  if (statsError ) {
+  //     setSnackbarMessage(statsError.message || 'Attendance Statistics failed to load.');
+  //   }
+  //   // else {
+  //   //   setSnackbarMessage('An unexpected error occurred.');
+  //   // }
+  
+  //   setSnackbarSeverity('error');
+  //   setSnackbarOpen(true);
+  // // }
+  // }, [AnnError, statsError]);
 
   useEffect(() => {
     // Function to fetch announcements
@@ -455,7 +488,7 @@ const SDashboard = () => {
               </div>
             ) : announcements.length === 0 ? (
               <>
-              <h2 className="text-lg sm:text-xl font-semibold text-left mt-3 mb-4">Announcements (0)</h2>
+              <h2 className="text-lg sm:text-xl font-semibold text-left mt-3 mb-4">Announcements {announcements.count}</h2>
               <div className="text-center mt-10 text-gray-500">
                 <p>No announcements available.</p>
               </div>
@@ -502,6 +535,28 @@ const SDashboard = () => {
           </div>
         </div>
       </div>
+      <Snackbar
+  open={snackbarOpen}
+  autoHideDuration={4000}
+  onClose={handleSnackbarClose}
+  // onClose={() => setSnackbar({ ...snackbar, open: false })} // Close Snackbar
+  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+  ContentProps={{
+    style: {
+      backgroundColor: snackbarSeverity === "success" ? "green" : "red",
+    },
+  }}
+  message={
+    <span style={{ display: "flex", alignItems: "center" }}>
+      {/* <InfoIcon style={{ marginRight: 8 }} /> */}
+      {snackbarMessage}
+    </span>
+  }
+>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+        </Snackbar>
     </section>
   )
 }

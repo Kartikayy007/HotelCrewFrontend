@@ -77,6 +77,31 @@ const SSchedule = () => {
       [name]: value,
     }));
   };
+  useEffect(() => {
+    if (applyLeaveError) {
+      if (!navigator.onLine) {
+        setSnackbar({
+          open: true,
+          message: "No internet connection. Please check your network.",
+          severity: "error"
+        });
+      }  if (error?.status === 429) {
+        setSnackbar({
+          open: true,
+          message: "Too Many Requests. Please try again later.",
+          severity: "error"
+        });
+      }
+      // } else {
+      //   setSnackbar({
+      //     open: true,
+      //     message: "From Date is required.",
+      //     severity: "error"
+      //   });
+      // }
+      dispatch(resetApplyLeaveError());
+    }
+    }, [applyLeaveError])
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -317,7 +342,7 @@ const SSchedule = () => {
               </div>
             ) : (
               <div className='text-lg text-[#47518C] font-semibold mb-2'>
-                <p className='capitalize'>{profile?.shift||""} Shift</p>
+                <p className='capitalize'>{profile?.shift||"Invalid"} Shift</p>
                 <p className=''>Time: {shiftTime(profile?.shift||'shifts[0]')}</p>
               </div>
             )}
@@ -613,8 +638,10 @@ const SSchedule = () => {
       {snackbar.message}
     </span>
   }
-/>
-    
+><Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+    </Snackbar>
         </div>
       </div>
     </section>

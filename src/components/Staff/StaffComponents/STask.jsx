@@ -1,6 +1,6 @@
 import { useState, useEffect, React } from 'react'
 import { FaClock, FaCheckCircle } from 'react-icons/fa';
-import { Snackbar, Skeleton } from "@mui/material";
+import { Snackbar, Skeleton,Alert } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
 import { selectStaffTasks, selectStaffTaskCount, selectStaffTaskLoading, selectStaffTaskError, fetchStaffTasks } from '../../../redux/slices/StaffTaskSlice';
 const STask = () => {
@@ -10,10 +10,23 @@ const STask = () => {
   const taskloading = useSelector(selectStaffTaskLoading);
   const taskerror = useSelector(selectStaffTaskError);
   const [loading, setLoading] = useState(true);
-
+  // const [snackbarOpen, setSnackbarOpen] = useState(false);
+  // const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error'); 
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
   // useEffect(() => {
   //   dispatch(getTasks()); // Correctly dispatch the action
   // }, [dispatch]);
+  useEffect(()=>{
+    if(taskerror){
+      setSnackbarMessage(taskerror.messege ||"An error occured");
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
+  },[taskerror])
 
   useEffect(() => {
     dispatch(fetchStaffTasks()); // Fetch tasks immediately
@@ -62,6 +75,8 @@ const STask = () => {
     if (selectedTask) {
       setSnackbarMessage("A task is alerady selected to be updated");
       setSnackbarOpen(true);
+      setSnackbarSeverity('success');
+
       return;
     }
 
@@ -340,7 +355,7 @@ const STask = () => {
 
         </div>
       </div>
-      <Snackbar
+      {/* <Snackbar
         open={snackbarOpen}
         onClose={() => setSnackbarOpen(false)}
         message={<span style={{ color: 'black', fontSize: '16px' }}>{snackbarMessage}</span>}
@@ -361,8 +376,30 @@ const STask = () => {
             padding: '12px', // Add some padding
             boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // Optional: subtle shadow
           },
-        }}
-      />
+        }} */}
+      {/* /> */}
+      <Snackbar
+  open={snackbarOpen}
+  autoHideDuration={4000}
+  onClose={handleSnackbarClose}
+  // onClose={() => setSnackbar({ ...snackbar, open: false })} // Close Snackbar
+  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+  ContentProps={{
+    style: {
+      backgroundColor: snackbarSeverity === "success" ? "green" : "red",
+    },
+  }}
+  message={
+    <span style={{ display: "flex", alignItems: "center" }}>
+      {/* <InfoIcon style={{ marginRight: 8 }} />/ */}
+      {snackbarMessage}
+    </span>
+  }
+>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </section>
 
   )
