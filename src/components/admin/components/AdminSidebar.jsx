@@ -18,12 +18,44 @@ import AdminAnalaytics from './AdminAnalaytics';
 import AdminLeaveManagment from './AdminLeaveManagment';
 import AdminSettings from './AdminSettings';
 import AdminScheduleStatus from './AdminScheduleStatus';
-import { selectUserProfile, fetchUserProfile } from '../../../redux/slices/userProfileSlice';
+import { selectUserProfile, selectUserProfileLoading, fetchUserProfile } from '../../../redux/slices/userProfileSlice';
+
+const ProfileSkeleton = () => (
+  <div className="flex flex-col items-center py-8 space-y-4">
+    <div className="w-24 h-24 rounded-full bg-gray-700/50 animate-pulse" />
+    <div className="h-6 w-32 bg-gray-700/50 rounded animate-pulse" />
+  </div>
+);
+
+const ProfilePreviewModal = ({ imageUrl, isOpen, onClose }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      onClick={onClose}
+    >
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" />
+      <div 
+        className="relative z-50 max-w-3xl w-full animate-fade-in"
+        onClick={e => e.stopPropagation()}
+      >
+        <img
+          src={imageUrl || "/default-profile.png"}
+          alt="Profile Preview"
+          className="w-full h-auto rounded-lg"
+        />
+      </div>
+    </div>
+  );
+};
 
 const AdminSidebar = ({ onMenuItemClick }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const dispatch = useDispatch();
   const userProfile = useSelector(selectUserProfile);
+  const isLoading = useSelector(selectUserProfileLoading);
 
   useEffect(() => {
     dispatch(fetchUserProfile());
@@ -70,16 +102,25 @@ const AdminSidebar = ({ onMenuItemClick }) => {
           ${isOpen ? 'translate-x-0' : '-translate-x-full 2xl:translate-x-0'}
         `} 
       >
-        <div className="flex flex-col items-center py-8 space-y-4">
-          <div className="w-24 h-24 rounded-full overflow-hidden">
-            <img
-              src={userProfile?.user_profile || "/default-profile.png"}
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
+        {isLoading ? (
+          <ProfileSkeleton />
+        ) : (
+          <div className="flex flex-col items-center py-8 space-y-4">
+            <div 
+              className="w-24 h-24 rounded-full overflow-hidden bg-gray-700  hover:opacity-90 transition-opacity"
+              onClick={() => setIsPreviewOpen(true)}
+            >
+              <img
+                src={userProfile?.user_profile || "/default-profile.png"}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <h2 className="text-xl font-semibold">
+              {userProfile?.user_name || 'User'}
+            </h2>
           </div>
-          <h2 className="text-xl font-semibold">{userProfile?.user_name || 'User'}</h2>
-        </div>
+        )}
 
         <ul className="flex-1 space-y-4 px-6 py-4">
           {menuItems.map((item, index) => (
@@ -95,6 +136,11 @@ const AdminSidebar = ({ onMenuItemClick }) => {
           ))}
         </ul>
       </nav>
+      <ProfilePreviewModal 
+        imageUrl={userProfile?.user_profile}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+      />
     </>
   );
 };

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const BASE_URL = 'https://hotelcrew-1.onrender.com/api/taskassignment/announcements/day/  ';
+const BASE_URL = 'https://hotelcrew-1.onrender.com/api/taskassignment/announcements/day/';
 
 const getAuthToken = () => {
   const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
@@ -71,10 +71,14 @@ export const fetchAnnouncements = createAsyncThunk(
 );
 
 export const deleteAnnouncement = createAsyncThunk(
-  'announcements/delete',
-  async (id, { rejectWithValue }) => {
+  'announcements/deleteAnnouncement',
+  async (announcementId, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
+      
+      // Trim any whitespace and ensure proper URL formatting
+      const cleanId = announcementId.toString().trim();
+      
       const config = {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -82,21 +86,17 @@ export const deleteAnnouncement = createAsyncThunk(
         }
       };
 
-      const URL = `${BASE_URL}${id}/`;
-
-       ('Deleting announcement with ID:', id);
-      const response = await axios.delete(URL, config);
-
-      if (response.status === 204) {
-        return id; 
-      }
-
-      throw new Error('Unexpected response status: ' + response.status);
+      const response = await axios.delete(
+        `https://hotelcrew-1.onrender.com/api/taskassignment/announcements/${cleanId}/`,
+        config
+      );
+      
+      return response.data;
     } catch (error) {
-      console.error('Delete API error:', error);
+      console.error('Delete announcement error:', error.response?.data || error);
       return rejectWithValue(
-        error.response?.data?.message || 
-        error.message || 
+        error.response?.data?.detail || 
+        error.response?.data?.message ||
         'Failed to delete announcement'
       );
     }
@@ -127,7 +127,7 @@ const announcementSlice = createSlice({
       })
       .addCase(createAnnouncement.fulfilled, (state, action) => {
         state.loading = false;
-        state.announcements.push(action.payload);
+        state.announcements = [action.payload, ...state.announcements];
       })
       .addCase(createAnnouncement.rejected, (state, action) => {
         state.loading = false;
@@ -141,7 +141,7 @@ const announcementSlice = createSlice({
       .addCase(fetchAnnouncements.fulfilled, (state, action) => {
         state.loading = false;
         if (action.payload.results) {
-          state.announcements = [...state.announcements, ...action.payload.results];
+          state.announcements = action.payload.results;
         }
       })
       .addCase(fetchAnnouncements.rejected, (state, action) => {
@@ -155,8 +155,9 @@ const announcementSlice = createSlice({
       })
       .addCase(deleteAnnouncement.fulfilled, (state, action) => {
         state.loading = false;
+        // Remove deleted announcement from state
         state.announcements = state.announcements.filter(
-          announcement => announcement.id !== action.payload
+          announcement => announcement.id.toString() !== action.meta.arg.toString()
         );
       })
       .addCase(deleteAnnouncement.rejected, (state, action) => {

@@ -9,7 +9,7 @@ const getAuthToken = () => {
 }
 
 export const fetchUserProfile = createAsyncThunk(
-  'userProfile/fetchUserProfile',
+  'userProfile/fetchUserProfile', 
   async (_, { rejectWithValue }) => {
     try {
       const token = getAuthToken();

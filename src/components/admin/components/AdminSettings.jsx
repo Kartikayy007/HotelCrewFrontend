@@ -19,12 +19,52 @@ import { toast } from 'react-toastify';
 import axios from "axios";
 import { Snackbar, Alert } from '@mui/material';
 import LoadingAnimation from '../../common/LoadingAnimation';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 
 const BasicInfo = () => {
   const dispatch = useDispatch();
   const hotelDetails = useSelector(selectHotelDetails);
   const updateLoading = useSelector(selectHotelUpdateLoading);
   const updateError = useSelector(selectHotelUpdateError);
+
+  const useConfirmationDialog = (onConfirm) => {
+  const [open, setOpen] = useState(false);
+  
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const handleConfirm = () => {
+    handleClose();
+    onConfirm();
+  };
+
+  const ConfirmationDialog = () => (
+    <Dialog open={open} onClose={handleClose}>
+      <DialogTitle>Confirm Changes</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Are you sure you want to save these changes?
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <button 
+          className="px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100"
+          onClick={handleClose}
+        >
+          Cancel
+        </button>
+        <button 
+          className="px-4 py-2 bg-[#424C6B] text-white rounded-lg hover:bg-[#374160]"
+          onClick={handleConfirm}
+        >
+          Confirm
+        </button>
+      </DialogActions>
+    </Dialog>
+  );
+
+  return [handleOpen, ConfirmationDialog];
+};
+  
   
   const [formData, setFormData] = useState({
     hotel_name: '',

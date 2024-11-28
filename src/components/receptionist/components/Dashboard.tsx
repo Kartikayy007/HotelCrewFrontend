@@ -203,7 +203,7 @@ const Dashboard = () => {
                   {
                     data: [
                       { id: 0, value: taskMetrics.completed, color: '#34D399' },
-                      { id: 1, value: taskMetrics.pending, color: '#60A5FA' }
+                      { id: 1, value: taskMetrics.pending, color: '#facc15' }
                     ],
                     highlightScope: { faded: 'global', highlighted: 'item' },
                     innerRadius: 40,
@@ -220,7 +220,7 @@ const Dashboard = () => {
             <div className="flex flex-col -mt-16 justify-center">
               <div>
                 <h3 className="text-xl">Pending Tasks</h3>
-                <p className="text-3xl font-bold text-[#60A5FA]">{taskMetrics.pending}</p>
+                <p className="text-3xl font-bold text-blue-600">{taskMetrics.pending}</p>
               </div>
               <div>
                 <h3 className="text-xl">Completed Tasks</h3>
@@ -241,8 +241,8 @@ const Dashboard = () => {
                 series={[
                   {
                     data: [
-                      { id: 0, value: attendance.present, color: '#4338CA' },
-                      { id: 1, value: attendance.absent, color: '#E6EEF9' }
+                      { id: 0, value: attendance.present, color: '#E6EEF9' },
+                      { id: 1, value: attendance.absent, color: '#252941' }
                     ],
                     highlightScope: { faded: 'global', highlighted: 'item' },
                     innerRadius: 40,
@@ -263,7 +263,7 @@ const Dashboard = () => {
               </div>
               <div className="text-center">
                 <h3 className="text-xl">Absent</h3>
-                <p className="text-3xl font-bold text-[#E6EEF9]">{attendance.absent}%</p>
+                <p className="text-3xl font-bold text-[#252941]">{attendance.absent}%</p>
               </div>
             </div>
           </div>

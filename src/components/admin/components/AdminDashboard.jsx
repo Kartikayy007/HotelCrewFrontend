@@ -278,13 +278,13 @@ const generateTimeData = () => {
       id: 0,
       value: attendanceStats.total_present,
       label: "Present",
-      color: "#252941",
+      color: "#8094D4",
     },
     {
       id: 1,
       value: attendanceStats.total_crew - attendanceStats.total_present,
       label: "Absent",
-      color: "#8094D4",
+      color: " #252941",
     },
   ];
 
@@ -1057,7 +1057,7 @@ const generateTimeData = () => {
             </div>
             <div className="relative w-full mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Task Time
+                Deadline
               </label>
               <div className="flex space-x-2">
                 <select

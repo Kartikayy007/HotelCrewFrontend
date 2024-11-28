@@ -259,7 +259,7 @@ const GuestRequest: React.FC = () => {
                       {
                         data: [
                           { id: 0, value: taskMetrics.completed, color: '#34D399' },
-                          { id: 1, value: taskMetrics.pending, color: '#60A5FA' }
+                          { id: 1, value: taskMetrics.pending, color: '#facc15' }
                         ],
                         highlightScope: { faded: 'global', highlighted: 'item' },
                         innerRadius: 40,
