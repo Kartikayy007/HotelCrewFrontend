@@ -118,6 +118,10 @@ const announcementSlice = createSlice({
       state.previousPage = action.payload.previous;
       state.totalCount = action.payload.count;
     },
+    appendAnnouncements: (state, action) => {
+      // Append new announcements to the existing array
+      state.announcements = [...state.announcements, ...action.payload];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -140,7 +144,11 @@ const announcementSlice = createSlice({
       })
       .addCase(fetchAnnouncements.fulfilled, (state, action) => {
         state.loading = false;
-        state.announcements = action.payload.results;
+        // state.announcements = action.payload.results;
+       
+        state.announcements = [...state.announcements, ...action.payload.results];
+        
+        // Update pagination info
         state.nextPage = action.payload.next;
         state.previousPage = action.payload.previous;
         state.totalCount = action.payload.count;
@@ -167,7 +175,7 @@ const announcementSlice = createSlice({
   }
 });
 
-export const { clearError, setCurrentAnnouncement, setPagination  } = announcementSlice.actions;
+export const { clearError, setCurrentAnnouncement, setPagination,appendAnnouncements  } = announcementSlice.actions;
 
 export const selectAllAnnouncements = state => state.announcements.announcements;
 export const selectAnnouncementsLoading = state => state.announcements.loading;

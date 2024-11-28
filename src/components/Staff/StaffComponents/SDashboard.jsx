@@ -3,12 +3,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card, CardContent, Typography, Paper, Container, Box, Skeleton,Snackbar,Alert ,Slider } from '@mui/material';
 import { LineChart } from '@mui/x-charts/LineChart';
-import { getStaffLeaveHistory } from '../../../redux/slices/StaffLeaveSlice';
+import { getStaffLeaveHistory,selectLeaveHistory,selectFetchHistoryError,selectFetchHistoryLoading } from '../../../redux/slices/StaffLeaveSlice';
 import { getAttendanceStats,selectAttendanceStats,selectStatsLoading,selectStatsError } from '../../../redux/slices/StaffAttendanceSlice';
-import { fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsError, selectAnnouncementsLoading } from '../../../redux/slices/AnnouncementSlice';
+import { fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsError, selectAnnouncementsLoading,selectPagination,appendAnnouncements,setPagination } from '../../../redux/slices/AnnouncementSlice';
+import { selectDailyStats,selectLoading,selectError,fetchStaffPerformance,selectStaffPerformance } from '../../../redux/slices/StaffPerformanceSlice';
+
+
+
 const SDashboard = () => {
   const dispatch = useDispatch();
-
+  const performance = useSelector(selectDailyStats);
+  const performanceloading = useSelector(selectLoading);
+  const performanceError = useSelector(selectError);
   // Select announcements, loading, and error states from the store
   const announcements = useSelector(selectAllAnnouncements);
   const AnnLoading = useSelector(selectAnnouncementsLoading);
@@ -18,18 +24,20 @@ const SDashboard = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('error'); 
   const today = new Date();
   const [loading, setLoading] = useState(true);
-  const {
-    fetchHistoryLoading,
-    fetchHistoryError,
-    leaveHistory,
-  } = useSelector((state) => state.leave);
+  // const {
+  //   fetchHistoryLoading,
+  //   fetchHistoryError,
+  //   leaveHistory,
+  // } = useSelector((state) => state.leave);
   // const {
   //   attendanceStats,
   //   statsLoading,
   //   statsError
   // } = useSelector((state) => state.attendance)
   // const leaveStatus = useSelector((state) => state.leave.leaveStatus);
-
+const leaveHistory=useSelector(selectLeaveHistory);
+const fetchHistoryError=useSelector(selectFetchHistoryError);
+const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
   // Fetch leave history on initial mount
   const attendanceStats = useSelector(selectAttendanceStats);
   const statsLoading = useSelector(selectStatsLoading);
@@ -39,7 +47,7 @@ const SDashboard = () => {
     setSnackbarOpen(false);
   };
 
-  const isOffline = useRef(false);
+  // const isOffline = useRef(false);
   // useEffect(() => {
   
   // //   if (navigator.onLine==='false') {
@@ -71,7 +79,8 @@ const SDashboard = () => {
   useEffect(() => {
     // Function to fetch announcements
     const fetchData = () => {
-      // dispatch(fetchAnnouncements());
+      dispatch(fetchAnnouncements());
+      dispatch(fetchStaffPerformance());
       dispatch(getStaffLeaveHistory());
       dispatch(getAttendanceStats());
     };
@@ -163,7 +172,7 @@ const SDashboard = () => {
   //     urgency: "normal",
   //   }
   // ];
-
+  const [page, setPage] = useState(1);
   const [nextUrl, setNextUrl] = useState('https://hotelcrew-1.onrender.com/api/taskassignment/announcements/?page=1'); // Initial URL (page 1)
   const [previousUrl, setPreviousUrl] = useState(null); // URL for previous page
   const [reachedEnd, setReachedEnd] = useState(false); // Flag to check if we have reached the end
@@ -182,8 +191,16 @@ const SDashboard = () => {
             if (!response.payload.next) {
               setReachedEnd(true); // Mark that the end is reached
             }
+             dispatch(appendAnnouncements(results));
+
+          // Update the pagination state
+          dispatch(setPagination({ next, previous, count }));
+        
           }
         });
+        // dispatch(appendAnnouncements(response.payload.announcements));
+        // dispatch(setNextUrl(response.payload.next)); // Update next URL
+        // dispatch(setPreviousUrl(response.payload.previous));
     }
   };
 
@@ -193,6 +210,7 @@ const SDashboard = () => {
     // If user scrolls to the bottom, load more announcements
     if (scrollHeight === scrollTop + clientHeight && !reachedEnd) {
       loadMoreAnnouncements(nextUrl);
+      setPage(2);
     }
 
     // If user scrolls to the top, load previous announcements
@@ -201,20 +219,6 @@ const SDashboard = () => {
     }
   };
 
-  // useEffect(() => {
-  //   // Fetch initial set of announcements
-  //   loadMoreAnnouncements(nextUrl);
-  // }, []);
-
-  const demoTasks = [
-    { day: 0, tasksCompleted: 4, averageDuration: 29 },  // Sunday
-    { day: 1, tasksCompleted: 10, averageDuration: 60 },  // Monday
-    { day: 2, tasksCompleted: 12, averageDuration: 41 },  // Tuesday
-    { day: 3, tasksCompleted: 5, averageDuration: 83 },  // Wednesday
-    { day: 4, tasksCompleted: 12, averageDuration: 124 },  // Thursday
-    { day: 5, tasksCompleted: 7, averageDuration: 88 }, // Friday
-    { day: 6, tasksCompleted: 8, averageDuration: 51 }, // Saturday
-  ];
 
   // const demoLeave = [
   //   {
@@ -248,7 +252,7 @@ const SDashboard = () => {
   // ]
 
 
-  const averageDurations = demoTasks.map(task => task.averageDuration);
+  // const averageDurations = demoTasks.map(task => task.averageDuration);
 
   // const totalDays = 300;
   // const presentDays = 280;
@@ -306,14 +310,19 @@ const SDashboard = () => {
 
   const getUrgencyClass = (urgency) => {
     switch (urgency) {
-      case "urgent":
+      case "Urgent":
         return "text-red-500 uppercase font-semibold";
-      case "normal":
+      case "Normal":
         return "hidden";
 
     }
   };
 
+  const dates = performance.map(stat => new Date(stat.date));
+  const performanceValues = performance.map(stat => stat.performance_percentage);
+  console.log('Performance Data:', performance);
+  console.log('Dates:', dates);
+  console.log('Performance Percentages:', performanceValues);
 
   return (
     <section className=" h-screen py-2 mx-4 px-0 font-Montserrat ">
@@ -325,37 +334,48 @@ const SDashboard = () => {
 
           <div className="bg-white w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
             <h2 className="text-lg sm:text-xl font-semibold text-left">Your Performance</h2>
-            {loading ? (
+            {performanceloading ? (
               <div className='ml-4 mb-2'>
                 <Skeleton variant="rectangular"
                   width="95%"
-                  height={320}
+                  height={380}
                   {...skeletonProps}
                 />
               </div>
             ) : (
 
-              <LineChart
-                xAxis={demoTasks.day}
-                series={[{
-                  data: averageDurations,
-                  showMark: false
-                }]}
-                margin={{ top: 20, right: 20, bottom: 30, left: 40 }}
-                sx={{
-                  ".MuiLineElement-root": {
-                    strokeWidth: 2,
-                    stroke: '#4b59aa'
-                  },
-                  ".MuiHighlightElement-root": {
-                    fill: "#4b59aa", // Set the color of the circle (e.g., red)
-                    stroke: "#4b59aa", // Optional: set the border color if needed
-                  },
-
-                }}
-                // width={500}
-                height={340}
-              />
+              // <Card>
+      // <CardContent>
+       
+        <div style={{ width: '100%', height: 410 }}>
+          <LineChart
+            xAxis={[{
+              data: dates,
+              scaleType: 'time',
+              tickLabelStyle: {
+                angle: 45,
+                textAnchor: 'start',
+                fontSize: 12
+              }
+            }]}
+            yAxis={[{
+              min: 0,
+              max: 100,
+              label: 'Performance (%)'
+            }]}
+            series={[
+              {
+                data: performanceValues,
+                label: 'Performance',
+                color: '#2196f3'
+              }
+            ]}
+            height={400}
+            margin={{ top: 20, right: 30, bottom: 60, left: 60 }}
+          />
+        </div>
+      // </CardContent>
+    // </Card>
             )}
           </div>
           <div className="flex lg:flex-row flex-col gap-4">
@@ -366,7 +386,7 @@ const SDashboard = () => {
                   <Skeleton
                     variant="rectangular"
                     width="95%"
-                    height="220px"
+                    height="280px"
                     {...skeletonProps}
                   />
                 </div>
@@ -439,7 +459,7 @@ const SDashboard = () => {
                   <Skeleton
                     variant="rectangular"
                     width="95%"
-                    height="220px"
+                    height="300px"
                     {...skeletonProps}
                   />
                 </div>
@@ -474,10 +494,10 @@ const SDashboard = () => {
             </div>
           </div>
         </div>
-        <div className="space-y-5 h-[725px]  ">
+        <div className="space-y-5 h-[790px]  ">
           <div className='bg-white    w-full mb-4 h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow'>
             
-            {AnnLoading ? (
+            {AnnLoading && page === 1? (
               <div className='ml-4 mb-2'>
                 <Skeleton
                   variant="rectangular"
@@ -496,7 +516,7 @@ const SDashboard = () => {
               ) : (
                 <>
                 <h2 className="text-lg sm:text-xl font-semibold text-left mt-3 mb-4">Announcements {announcements.count}</h2>
-              <div onScroll={handleScroll} className='h-[90%] my-4 overflow-y-auto flex flex-col scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent'>
+              <div onScroll={handleScroll} className='h-[90%] my-4 overflow-y-auto flex flex-col scrollbar scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent transition-opacity duration-300 '>
                 {announcements.map((announcement) => {
                   // Format the created_at date
                   const createdDate = new Date(announcement.created_at);

@@ -34,7 +34,7 @@ const SSchedule = () => {
   const [fileName, setFileName] = useState("");
   const [loading, setLoading] = useState(true);
 
-
+ 
   const appliedLeave = useSelector((state) => state.leave.leaveStatus);
   const applyLeaveError = useSelector((state) => state.leave.applyLeaveError);
   const leaveLoading = useSelector((state) => state.leave.applyLeaveLoading);

@@ -108,6 +108,12 @@ const leaveSlice = createSlice({
       });
   },
 });
+export const selectLeaveHistory = (state) => state.leavestaff.leaveHistory;
+export const selectLeaveStatus = (state) => state.leavestaff.leaveStatus;
+export const selectApplyLeaveError = (state) => state.leavestaff.applyLeaveError;
+export const selectApplyLeaveLoading = (state) => state.leavestaff.applyLeaveLoading;
+export const selectFetchHistoryError = (state) => state.leavestaff.fetchHistoryError;
+export const selectFetchHistoryLoading = (state) => state.leavestaff.fetchHistoryLoading;
 
 export const { resetApplyLeaveError, resetLeaveStatus } = leaveSlice.actions;
 export default leaveSlice.reducer;

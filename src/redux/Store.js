@@ -10,7 +10,7 @@ import announcementReducer from './slices/AnnouncementSlice.jsx'
 import staffleaveReducer from './slices/StaffLeaveSlice.jsx'
 import attendanceReducer from './slices/StaffAttendanceSlice.jsx'
 import staffProfileReducer from './slices/StaffProfileSlice.jsx'
-
+import performanceReducer from './slices/StaffPerformanceSlice.jsx';
 import shiftReducer from './slices/ShiftSlice.jsx'
 import leaveReducer from './slices/LeaveSlice.jsx'
 import guestReducer from './slices/GuestSlice.jsx';
@@ -32,6 +32,7 @@ export const store = configureStore({
     shifts: shiftReducer,
     leave: leaveReducer,
     guest: guestReducer,
+    performance:performanceReducer,
   },
 })
 
