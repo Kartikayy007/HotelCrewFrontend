@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {
   LayoutDashboard,
   Database,
@@ -10,21 +10,23 @@ import {
   ClipboardCheck,
   Calendar
 } from 'lucide-react';
+import { useSelector,useDispatch } from 'react-redux';
 import SDashboard from './SDashboard';
 import STask from './STask';
 import SProfile from './SProfile';
 import SSchedule from './SSchedule';
+import { getStaffProfile, selectStaffProfile, selectStaffProfileLoading, selectStaffProfileError, } from '../../../redux/slices/StaffProfileSlice';
 
 const SSidebar = ({ onMenuItemClick }) => {
+  const dispatch=useDispatch();
   const [isOpen, setIsOpen] = useState(false);
-  const [image, setImage] = useState('/profile.png');
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        const imageUrl = URL.createObjectURL(file);
-        setImage(imageUrl);
-    }
-}
+  const profile = useSelector(selectStaffProfile);
+  const loading = useSelector(selectStaffProfileLoading);
+  const error = useSelector(selectStaffProfileError);
+  // const [image, setImage] = useState('/profile.png');
+  useEffect(() => {
+    dispatch(getStaffProfile());
+  }, [dispatch]);
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', component: 'SDashboard' },
     { icon: <LineChart size={20} />, label: 'Task', component: 'STask' },
@@ -67,20 +69,14 @@ const SSidebar = ({ onMenuItemClick }) => {
         <div className="flex flex-col items-center py-8 space-y-4">
                     <div className="w-24 h-24 rounded-full overflow-hidden cursor-pointer">
                         <img
-                            src={image}
+                            src={profile?.user_profile||'User Profile'}
                             alt="profile"
                             className="w-full h-full object-cover"
-                            onClick={() => document.getElementById("imageUpload").click()}
+                          
                         />
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            style={{ display: 'none' }}
-                            id="imageUpload"
-                        />
+                        
                     </div>
-          <h2 className="text-xl font-semibold">Username</h2>
+          <h2 className="text-xl font-semibold">{profile?.user_name||'username'}</h2>
         </div>
 
         <ul className="flex-1 space-y-4 px-6 py-4">

@@ -15,10 +15,13 @@ import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from "dayjs";
-
+import { getStaffProfile, selectStaffProfile, selectStaffProfileLoading, selectStaffProfileError, } from '../../../redux/slices/StaffProfileSlice';
 
 const SSchedule = () => {
   const dispatch = useDispatch();
+  const profile = useSelector(selectStaffProfile);
+  const profileLoading = useSelector(selectStaffProfileLoading);
+  const profileError = useSelector(selectStaffProfileError);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [isStartDropdownOpen, setIsStartDropdownOpen] = useState(false);
@@ -270,11 +273,11 @@ const SSchedule = () => {
   };
   const shifts = ["morning", "day", "night"];
   const shiftTime = (shift) => {
-    if (shift === "morning") {
+    if (shift === "Morning") {
       return "05:00 AM to 01:00 PM";
-    } else if (shift === "day") {
+    } else if (shift === "Evening") {
       return "01:00 PM to 09:00 PM";
-    } else if (shift === "night") {
+    } else if (shift === "Night") {
       return "09:00 PM to 05:00 AM";
     } else {
       return "Invalid shift"; // Handle invalid inputs
@@ -313,9 +316,9 @@ const SSchedule = () => {
                 />
               </div>
             ) : (
-              <div className='text-md text-[#47518C] font-semibold mb-2'>
-                <p className='capitalize'>{shifts[0]}</p>
-                <p className=''>Time: {shiftTime(shifts[0])}</p>
+              <div className='text-lg text-[#47518C] font-semibold mb-2'>
+                <p className='capitalize'>{profile?.shift||""} Shift</p>
+                <p className=''>Time: {shiftTime(profile?.shift||'shifts[0]')}</p>
               </div>
             )}
           </div>

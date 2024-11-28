@@ -44,6 +44,39 @@ export const getStaffProfile = createAsyncThunk(
   }
 );
 
+export const updateStaffProfile = createAsyncThunk(
+  'staffProfile/updateStaffProfile', // Slice name
+  async (updatedDetails, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken(); // Retrieve auth token
+      const response = await axios.put(
+        'https://hotelcrew-1.onrender.com/api/edit/user_profile/', // API endpoint for updating staff profile
+        updatedDetails, // The updated user details
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Attach token in headers
+          },
+        }
+      );
+      console.log('Profile Updated:', response.data); // For debugging, log the response
+      return response.data.user; // Return updated user details
+    } catch (error) {
+      if (error.response) {
+        // The request was made, but the server responded with an error
+        console.error('Server error:', error.response.data);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error('Network error:', error.message);
+      } else {
+        // Something else went wrong
+        console.error('Error:', error.message);
+      }
+      return rejectWithValue(error.response?.data || 'Failed to update staff profile');
+    }
+  }
+);
+
+
 // Slice to manage the staff profile state
 const staffProfileSlice = createSlice({
   name: 'staffProfile', // Updated slice name to staffProfile
@@ -66,7 +99,22 @@ const staffProfileSlice = createSlice({
       .addCase(getStaffProfile.rejected, (state, action) => {
         state.loading = false; // Set loading to false when request fails
         state.error = action.payload; // Store error message in state
+      })
+
+      .addCase(updateStaffProfile.pending, (state) => {
+        state.loading = true; // Set loading to true while updating data
+        state.error = null;
+      })
+      .addCase(updateStaffProfile.fulfilled, (state, action) => {
+        state.loading = false; // Set loading to false once the data is updated
+        state.profile = action.payload; // Update the profile with new data
+        state.successMessage = 'Profile updated successfully.'; // Store success message
+      })
+      .addCase(updateStaffProfile.rejected, (state, action) => {
+        state.loading = false; // Set loading to false when request fails
+        state.error = action.payload; // Store error message in state
       });
+
   },
 });
 
@@ -74,6 +122,8 @@ const staffProfileSlice = createSlice({
 export const selectStaffProfile = (state) => state.staffProfile.profile;
 export const selectStaffProfileLoading = (state) => state.staffProfile.loading;
 export const selectStaffProfileError = (state) => state.staffProfile.error;
+export const selectStaffProfileSuccessMessage = (state) => state.staffProfile.successMessage;
+
 
 export default staffProfileSlice.reducer;
 
