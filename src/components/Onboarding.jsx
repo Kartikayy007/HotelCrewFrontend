@@ -441,7 +441,8 @@ const Onboarding = () => {
                     src="/iPhone 15 Pro - Black Titanium - Portrait.svg "
                     alt="iPhone mockup"
                     className="w-56 md:w-64 lg:w-auto h-auto"
-                  />
+                  >
+                  </img>
                 </div>
               </div>
             </div>

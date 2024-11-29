@@ -92,17 +92,28 @@ const validatePassword = useCallback((password) => {
       if (loginUser.fulfilled.match(result)) {
         localStorage.setItem(
           "loginAttempts",
-          JSON.stringify({count: 0, timestamp: now})
+          JSON.stringify({count: 0, timestamp: Date.now()})
         );
-        setEmail("");
-        setPassword("");
-        setErrorMsg("");
-        navigate("/dashboard");
-      } else {
-        loginAttempts.count += 1;
-        loginAttempts.timestamp = now;
-        localStorage.setItem("loginAttempts", JSON.stringify(loginAttempts));
+        
+        // Get user role and navigate accordingly
+        const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user'));
+        const roleRoutes = {
+          'Admin': '/admin/dashboard',
+          'Manager': '/manager/dashboard',
+          'Reception': '/reception/dashboard',
+          'Staff': '/staff/dashboard'
+        };
 
+        const redirectPath = roleRoutes[user.role];
+        if (redirectPath) {
+          setEmail("");
+          setPassword("");
+          setErrorMsg("");
+          navigate(redirectPath);
+        } else {
+          throw new Error("Invalid role");
+        }
+      } else {
         throw new Error("Invalid credentials");
       }
     } catch (error) {

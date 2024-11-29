@@ -8,6 +8,10 @@ import {
 } from '../../../redux/slices/AnnouncementSlice';
 import { Dialog, DialogContent, DialogTitle, Skeleton } from '@mui/material';
 import LoadingAnimation from '../../common/LoadingAnimation';
+import { onMessage } from 'firebase/messaging';
+import { messaging } from '../../../firebase-config';
+import { registerDeviceToken } from '../../../services/notificationService';
+import { toast } from 'react-toastify';
 
 interface Announcement {
   id: number;
@@ -26,6 +30,7 @@ const AnnouncementSection: React.FC = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const observer = useRef<IntersectionObserver | null>(null);
   const lastAnnouncementRef = useCallback((node: HTMLDivElement | null) => {
     if (loading) return;
@@ -43,6 +48,67 @@ const AnnouncementSection: React.FC = () => {
   useEffect(() => {
     dispatch(fetchAnnouncements(`?page=${page}`));
   }, [dispatch, page]);
+
+  // useEffect(() => {
+  //   const initNotifications = async () => {
+  //     try {
+  //       // Check current permission
+  //       const currentPermission = Notification.permission;
+  //       setNotificationPermission(currentPermission);
+
+  //       if (currentPermission === 'denied') {
+  //         toast.warning('Please enable notifications in your browser settings', {
+  //           position: "top-right",
+  //           autoClose: false,
+  //         });
+  //         return;
+  //       }
+
+  //       if (currentPermission === 'default') {
+  //         // Show explanation before requesting
+  //         toast.info('We need your permission to send notifications', {
+  //           position: "top-right",
+  //           autoClose: 5000,
+  //         });
+  //       }
+
+  //       // Register device
+  //       await registerDeviceToken();
+        
+  //       toast.success('Notifications enabled successfully!', {
+  //         position: "top-right",
+  //         autoClose: 3000,
+  //       });
+
+  //       return onMessage(messaging, (payload) => {
+  //         console.log('Received message:', payload);
+  //         toast.info(payload.notification?.body, {
+  //           title: payload.notification?.title,
+  //           position: "top-right",
+  //           autoClose: 5000
+  //         });
+  //       });
+  //     } catch (error) {
+  //       console.error('Error initializing notifications:', error);
+  //       if (error.message.includes('permission denied')) {
+  //         toast.error('Please allow notifications to receive updates', {
+  //           position: "top-right",
+  //           autoClose: false,
+  //         });
+  //       } else {
+  //         toast.error('Failed to initialize notifications', {
+  //           position: "top-right",
+  //           autoClose: 5000,
+  //         });
+  //       }
+  //     }
+  //   };
+
+  //   const unsubscribe = initNotifications();
+  //   return () => {
+  //     unsubscribe?.();
+  //   };
+  // }, []);
 
   const handleAnnouncementClick = (announcement: Announcement) => {
     setSelectedAnnouncement(announcement);

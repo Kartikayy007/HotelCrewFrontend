@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import AdminSidebar from './components/AdminSidebar';
 import { setActiveComponent } from '../../redux/slices/AdminSlice';
@@ -11,11 +11,20 @@ const Admin = () => {
     dispatch(setActiveComponent(component));
   };
 
+  useEffect(() => {
+    const multiStepCompleted = localStorage.getItem('multiStepCompleted');
+    if (multiStepCompleted === 'false') {
+      import('../common/IncompleteRegisteration').then(module => {
+        dispatch(setActiveComponent(module.default));
+      });
+    }
+  }, [dispatch]);
+
   return (
     <div className="flex h-screen">
       <AdminSidebar onMenuItemClick={handleMenuItemClick} />
       <div className="flex-1">
-        {React.createElement(activeComponent)}
+        {activeComponent && React.createElement(activeComponent)}
       </div>
     </div>
   );

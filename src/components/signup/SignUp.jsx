@@ -146,6 +146,7 @@ const SignUp = () => {
       if (verifyOtp.fulfilled.match(result)) {
          ("OTP verified");
         localStorage.setItem("otpVerified", "true");
+        localStorage.setItem('multiStepCompleted', 'false');
         navigate("/signup/hoteldetails");
       } else {
         setOtpResentMessage("");

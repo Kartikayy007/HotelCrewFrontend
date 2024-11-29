@@ -3,12 +3,14 @@ import doc from '/documentupload.svg';
 import lineIcon from '/Line.svg';
 import docupload from '/docupload.svg';
 import exampleSheet from '/example.pdf';
+import LoadingAnimation from '../common/LoadingAnimation'; // Add this import
 
 function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const fileInputRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (initialData?.staff_excel_sheet) {
@@ -100,14 +102,16 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
     }
   };
 
-  const handleSubmitClick = (e) => {
+  const handleSubmitClick = async (e) => {
     e.preventDefault();
     if (files.length === 0) {
       setErrorMessage('Please upload a staff Excel sheet');
       return;
     }
+    setIsLoading(true);
     updateFormData({ staff_excel_sheet: files[0] });
-    onSubmit();
+    await onSubmit();
+    setIsLoading(false);
   };
 
   const triggerFileInput = () => {
@@ -116,8 +120,8 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-0 lg:ml-[5.1rem] m-auto p-0 lg:p-0 lg:gap-52">
-        <div className="flex lg:hidden font-medium gap-3 mb-4 fixed lg:top-9 top-1">
+      <div className="flex flex-col xl:flex-row justify-center items-center gap-0 lg:ml-[5.1rem] m-auto p-0 lg:p-0 lg:gap-52">
+        <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-1">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -130,7 +134,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
           ))}
         </div>
 
-        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mt-8">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mt-8">
           <img
             src={doc}
             alt="Hotel Icon"
@@ -165,7 +169,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
           />
 
           <div 
-            className={`w-[330px] lg:w-[623px] h-[227px] lg:h-[192px] border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer
+            className={`w-[330px] lg:w-[623px] h-[227px] xl:h-[192px] border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer
               ${dragActive ? 'border-[#5663AC] bg-[#F8F9FF]' : 'border-[#BDBDBD] bg-[#EFEFEF]'}
               ${errorMessage ? 'border-[#99182C]' : ''}`}
             onDragEnter={handleDrag}
@@ -228,15 +232,20 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
               </button>
               <button 
                 onClick={handleSubmitClick}
-                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white lg:fixed lg:left-[41.2vw]"
+                disabled={isLoading}
+                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white lg:fixed lg:left-[41.2vw] flex items-center justify-center"
               >
-                Submit ➔
+                {isLoading ? (
+                  <LoadingAnimation size={24} color="#FFFFFF" />
+                ) : (
+                  'Submit ➔'
+                )}
               </button>
             </div>
           </div> 
         </form>
 
-        <div className="hidden lg:block lg:w-[512px] font-medium fixed top-0 right-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+        <div className="hidden xl:block lg:w-[512px] font-medium fixed top-0 right-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
           <div className="flex gap-5 text-[32px]">
             {[1, 2, 3, 4, 5, 6].map((num) => (
               <div

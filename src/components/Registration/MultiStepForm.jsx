@@ -7,6 +7,7 @@ import Property from './Property';
 import OperationalInfo from './OperationalInfo';
 import UploadDoc from './UploadDoc';
 import { useNavigate } from 'react-router-dom';
+import { Snackbar, Alert } from '@mui/material';
 
 const MultiStepForm = () => {
   const userEmail = localStorage.getItem('id');
@@ -34,6 +35,12 @@ const MultiStepForm = () => {
     department_names: [],
     staff_excel_sheet: null,
     room_types: []
+  });
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
   });
 
   useEffect(() => {
@@ -105,7 +112,11 @@ const MultiStepForm = () => {
     };
   
     return transformedData;
-  };``
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   const handleSubmit = async () => {
     try {
@@ -146,24 +157,39 @@ const MultiStepForm = () => {
         }
       );
 
-      if (response.status === 201) {
-         ('Form submitted successfully:', response.data);
-        // localStorage.setItem('registrationComplete', 'true');
-        localStorage.setItem('multiStepCompleted', 'true');
-        alert('Hotel registered successfully!');
-        navigate('/login');
+      if (response.ok) {
+        setSnackbar({
+          open: true,
+          message: 'Hotel registered successfully!',
+          severity: 'success'
+        });
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       }
     } catch (error) {
       console.error('Error submitting form:', error);
       console.error('Error response:', error.response?.data);
       if(error.status === 400) {
-        alert("EXCEL sheet already exists");
+        setSnackbar({
+          open: true,
+          message: 'EXCEL sheet already exists',
+          severity: 'error'
+        });
       }
       else if(error.status === 500) {
-        alert("Check your internet connection and try again");
+        setSnackbar({
+          open: true,
+          message: 'Check your internet connection and try again',
+          severity: 'error'
+        });
       }
       else {
-        alert("Hotel registration failed, please try again");
+        setSnackbar({
+          open: true,
+          message: 'Hotel registration failed, please try again',
+          severity: 'error'
+        });
       }
     }
   };
@@ -289,6 +315,20 @@ const MultiStepForm = () => {
   return (
     <div className="min-h-screen bg-white">
       {renderStep()}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={6000} 
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity={snackbar.severity}
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
