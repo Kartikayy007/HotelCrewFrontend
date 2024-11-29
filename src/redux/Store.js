@@ -6,7 +6,7 @@ import { receptionReducer } from './slices/ReceptionSlice'
 import ManagerReducer from './slices/ManagerSlice.jsx'
 import StaffReducer from './slices/StaffSlice.jsx'
 import AdminAttendanceSlice from './slices/AdminAttendanceSlice'
-import taskReducer from './slices/TaskSlice'
+import TaskReducer from './slices/TaskSlice'
 import taskReducer from './slices/StaffTaskSlice.jsx'
 import announcementReducer from './slices/AnnouncementSlice.jsx'
 import staffleaveReducer from './slices/StaffLeaveSlice.jsx'
@@ -14,7 +14,6 @@ import attendanceReducer from './slices/StaffAttendanceSlice.jsx'
 import staffProfileReducer from './slices/StaffProfileSlice.jsx'
 import performanceReducer from './slices/StaffPerformanceSlice.jsx';
 import shiftReducer from './slices/ShiftSlice.jsx'
-import leaveReducer from './slices/LeaveSlice.jsx'
 import guestReducer from './slices/GuestSlice.jsx';
 
 
@@ -29,10 +28,13 @@ import checkInReducer from './slices/CheckInSlice'
 import occupancyReducer from './slices/OcupancyRateSlice';
 import userProfileReducer from './slices/userProfileSlice'
 import staffAttendanceReducer from './slices/StaffAttendanceSlice';
-import checkoutReducer from './slices/checkoutSlice'
+import checkoutReducer from './slices/checkoutSlice';
+import adminstaffReducer from './slices/AdminStaffSlice.jsx';
+import staffannouncementReducer from './slices/StaffAnnouncememt.jsx';
 
 const store = configureStore({
   reducer: {
+
     user: UserReducer,
     otp: OtpReducer,
     admin: adminReducer,
@@ -40,7 +42,7 @@ const store = configureStore({
     staff: StaffReducer,
     attendance: attendanceReducer,
     staffAttendance: attendanceReducer,
-    tasks: taskReducer,
+    tasks: TaskReducer,
     stafftasks:taskReducer,
     announcements: announcementReducer,
     leavestaff: staffleaveReducer,
@@ -64,8 +66,10 @@ const store = configureStore({
     occupancy: occupancyReducer,
     staffAttendance: staffAttendanceReducer,
     userProfile: userProfileReducer,
-    checkout: checkoutReducer
+    checkout: checkoutReducer,
+    adminstaff:adminstaffReducer,
+    staffannouncement:staffannouncementReducer
   },
 })
 
-export default store
+export default store;

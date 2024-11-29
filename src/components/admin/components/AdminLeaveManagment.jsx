@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Calendar, Check, X, Clock } from 'lucide-react';
-import { fetchLeaveRequests, updateLeaveStatus } from '../../../redux/slices/leaveSlice';
+import { fetchLeaveRequests, selectLeaveError, selectLeaveRequests, selectUpdateStatus, updateLeaveStatus } from '../../../redux/slices/leaveSlice';
 import {
   Alert,
   Box,
@@ -89,9 +89,12 @@ const LeaveRequestSkeleton = ({ isMobile }) => {
 
 const AdminLeaveManagement = () => {
   const dispatch = useDispatch();
-  const leaveRequests = useSelector((state) => state.leave.requests);
-  const status = useSelector((state) => state.leave.status);
-  const error = useSelector((state) => state.leave.error);
+  // const leaveRequests = useSelector((state) => state.leave.requests);
+  // const status = useSelector((state) => state.leave.status);
+  // const error = useSelector((state) => state.leave.error);
+  const leaveRequests = useSelector(selectLeaveRequests);
+  const status=useSelector(selectUpdateStatus);
+  const error=useSelector(selectLeaveError);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));

@@ -10,12 +10,12 @@ import {
   selectTaskMetrics
 } from '../../../redux/slices/TaskSlice';
 import AnnouncementSection from './AnnouncementSection';
-import { selectCustomers, fetchCustomers } from '../../../redux/slices/CustomerSlice';
+import { selectCustomers, fetchCustomers } from '../../../redux/slices/customerSlice';
 import { PieChart } from '@mui/x-charts';
 import { 
   selectStaffAttendance, 
   fetchStaffAttendance 
-} from '../../../redux/slices/StaffAttendanceSlice';
+} from '../../../redux/slices/StaffAttendanceSlice.tsx';
 
 interface RoomSelection {
   type: string;

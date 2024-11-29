@@ -37,7 +37,7 @@ import {
   selectStaffPerDepartment,
   selectStaffLoading,
   selectDepartments,
-} from "../../../redux/slices/StaffSlice";
+} from "../../../redux/slices/AdminStaffSlice";
 import StaffMetrics from "../../common/StaffMetrics";
 import LoadingAnimation from "../../common/LoadingAnimation";
 import {fetchTasks} from "../../../redux/slices/TaskSlice";

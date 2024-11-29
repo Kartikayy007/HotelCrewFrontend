@@ -7,18 +7,44 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import { FaStar } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { BsThreeDots } from "react-icons/bs";
-import { fetchAttendanceStats } from '../../redux/slices/AttendanceSlice';
+import {
+  fetchStaffData,
+  selectStaffPerDepartment,
+  selectStaffLoading,
+  selectDepartments,
+} from "../../redux/slices/AdminStaffSlice";
+import { fetchAttendanceStats, selectError, selectStats,selectLoading } from '../../redux/slices/AttendanceSlice';
 import { Dialog, TextField, Button, Snackbar, Alert, IconButton } from "@mui/material";
 import { CreateAnnouncementBox } from "../common/CreateAnnouncementBox";
 import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError, deleteAnnouncement } from '../../redux/slices/AnnouncementSlice';
-import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
+// import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";
 import { fetchGuestData,selectCheckins,selectCheckouts,selectDates,selectGuestError,selectGuestLoading } from '../../redux/slices/GuestSlice';
 import { Skeleton } from "@mui/material";
 import Box from "@mui/material/Box";
 import MTaskAssignment from "./MTaskAssignment";
+import LoadingAnimation from "../common/LoadingAnimation";
 import { fetchLeaveRequests,fetchLeaveCount ,selectLeaveCount,selectLeaveError,selectLeaveLoading,selectLeaveRequests,selectUpdateStatus} from "../../redux/slices/LeaveSlice";
- 
+import {
+  selectLatestRevenue,
+  fetchRevenueStats,
+  selectRoomStats,
+} from "../../redux/slices/revenueSlice";
+import {
+  fetchRoomStats,
+  selectOccupiedRooms,
+  selectAvailableRooms,
+} from "../../redux/slices/OcupancyRateSlice";
+import {
+  createTask,
+  selectTasksLoading,
+  selectTasksError,
+  selectAllTasks,
+  fetchTasks,
+} from "../../redux/slices/TaskSlice";
+import {MoreVertical} from "lucide-react";
+import {AllAnnouncementsDialog} from "../common/AllAnnouncementsDialog";
+
 const MDashboard = () => {
   const dispatch = useDispatch();
   // const [loading,setloading]=useState(false);
@@ -90,17 +116,148 @@ const MDashboard = () => {
     ],
   });
 
-  useEffect(() => {
-    dispatch(fetchGuestData());
-  }, [dispatch]);
+  const latestRevenue = useSelector(selectLatestRevenue);
+  const revenueLoading = useSelector((state) => state.revenue.loading);
+  // const departments = useSelector(selectDepartments);
+  const availableRooms = useSelector(selectAvailableRooms);
+  const occupiedRooms = useSelector(selectOccupiedRooms);
 
   useEffect(() => {
-    // Ensure dates, checkins, and checkouts are arrays (default to empty arrays)
+    dispatch(fetchRevenueStats());
+
+    const interval = setInterval(() => {
+      dispatch(fetchRevenueStats());
+    }, 3600000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
+
+  useEffect(() => {
+    dispatch(fetchGuestData());
+    dispatch(fetchRoomStats());
+    dispatch(fetchRevenueStats());
+    dispatch(fetchStaffData());
+    dispatch(fetchTasks());
+    const interval = setInterval(() => {
+      dispatch(fetchRoomStats());
+    }, 30 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
+  const [cumulativeRevenue, setCumulativeRevenue] = useState(0);
+
+  const STORAGE_KEY = 'hourlyRevenueData';
+  const HOURS_IN_DAY = 24;
+  
+  const [hourlyRevenues, setHourlyRevenues] = useState(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const initial = new Array(HOURS_IN_DAY).fill(0);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    const currentHour = new Date().getHours();
+    if (latestRevenue) {
+      initial[currentHour] = parseFloat(latestRevenue) - cumulativeRevenue;
+    }
+    return initial;
+  });
+  
+  useEffect(() => {
+    if (latestRevenue) {
+      const currentHour = new Date().getHours();
+      setHourlyRevenues(prev => {
+        const updated = [...prev];
+        updated[currentHour] = parseFloat(latestRevenue) - cumulativeRevenue;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        return updated;
+      });
+    }
+  }, []);
+  
+  useEffect(() => {
+    const midnightClear = setInterval(() => {
+      const now = new Date();
+      if (now.getHours() === 0 && now.getMinutes() === 0) {
+        localStorage.removeItem(STORAGE_KEY);
+        setHourlyRevenues(new Array(HOURS_IN_DAY).fill(0));
+        setCumulativeRevenue(0);
+      }
+    }, 60000);
+  
+    const revenueUpdate = setInterval(() => {
+      const newHour = new Date().getHours();
+      
+      if (newHour !== currentHour) {
+        if (latestRevenue) {
+          const newRevenue = parseFloat(latestRevenue);
+          setHourlyRevenues((prev) => {
+            const updated = [...prev];
+            updated[currentHour] = newRevenue - cumulativeRevenue;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+            return updated;
+          });
+          setCumulativeRevenue(newRevenue);
+        }
+        
+        setCurrentHour(newHour);
+        setPerformanceRange([0, newHour || 1]);
+        setRevenueRange([0, newHour || 1]);
+        dispatch(fetchRevenueStats());
+        setTimeData(generateTimeData());
+      }
+    }, 60000);
+  
+    setTimeData(generateTimeData());
+    setLoading(false);
+  
+    return () => {
+      clearInterval(revenueUpdate);
+      clearInterval(midnightClear);
+    };
+  }, [currentHour, latestRevenue, cumulativeRevenue]);
+  
+  const generateTimeData = () => {
+    const timeData = [];
+    for (let i = 0; i <= currentHour; i++) {
+      timeData.push({
+        hour: `${i}:00`,
+        revenue: hourlyRevenues[i],
+        cumulative: i === 0 ? hourlyRevenues[0] : 
+          timeData[i-1].cumulative + hourlyRevenues[i]
+      });
+    }
+    return timeData;
+  };
+
+
+  const getFilteredRevenueData = () => {
+    return timeData.slice(revenueRange[0], revenueRange[1] + 1);
+  };
+
+  const occupancyData = [
+    {
+      id: 0,
+      value: occupiedRooms,
+      label: "Occupied",
+      color: "#252941",
+    },
+    {
+      id: 1,
+      value: availableRooms,
+      label: "Vacant",
+      color: "#8094D4",
+    },
+  ];
+
+
+  useEffect(() => {
     if (Array.isArray(dates) && dates.length > 0) {
       setInOutData({
         xAxis: [
           {
-            data: dates, // Use actual dates here
+            data: dates,
             scaleType: 'band',
             categoryGapRatio: 0.5,
           },
@@ -167,7 +324,7 @@ const MDashboard = () => {
     // Set up interval to fetch every 4 minutes (240,000 ms)
     const intervalId = setInterval(fetchData, 240000);
 
-    // Clear the interval on component unmount
+  
     return () => clearInterval(intervalId);
   }, [dispatch]);
 
@@ -177,14 +334,6 @@ const MDashboard = () => {
       animationDuration: "0.8s",
     },
   };
-
-  // const togglePriority = () => {
-  //   setIsPriority((prev) => !prev);
-  //   setTaskData((prevData) => ({
-  //     ...prevData,
-  //     priority: !prevData.priority,
-  //   }));
-  // };
 
 
   const departments = [
@@ -198,27 +347,14 @@ const MDashboard = () => {
 
   const [selected, setSelected] = useState({ label: 'Department', value: '' });
 
-  const { stats, error } = useSelector((state) => state.attendance);
-  // useEffect(() => {
-  //   dispatch(fetchAttendanceStats());
-
-  //   const interval = setInterval(() => {
-  //     dispatch(fetchAttendanceStats());
-  //   }, 300000);
-
-  //   return () => clearInterval(interval);
-  // }, [dispatch]);
-
-  const occupancyData = [
-    { id: 0, value: 60, label: "Occupied", color: "#252941" },
-    { id: 1, value: 30, label: "Vacant", color: "#8094D4" },
-    { id: 2, value: 10, label: "Maintainence", color: "#6B46C1" },
-  ];
-
-  const staffStatus = [
-    { id: 0, value: 45, label: "Busy", color: "#252941" },
-    { id: 1, value: 35, label: "Vacant", color: "#8094D4" },
-  ];
+  // const {  error } = useSelector((state) => state.attendance);
+ const stats=useSelector(selectStats);
+const statError=useSelector(selectError);
+const statLoading=useSelector(selectLoading);
+  // const staffStatus = [
+  //   { id: 0, value: 45, label: "Busy", color: "#252941" },
+  //   { id: 1, value: 35, label: "Vacant", color: "#8094D4" },
+  // ];
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [showTaskAssignment, setShowTaskAssignment] = useState(false);
@@ -234,50 +370,45 @@ const MDashboard = () => {
   const staffAttendanceData = [
     {
       id: 0,
-      value: stats.totalPresent || 0,
+      value: stats.total_present,
       label: 'Present',
       color: '#252941',
     },
     {
       id: 1,
-      value: stats.totalCrew - stats.totalPresent || 0,
+      value: stats.total_crew - stats.total_present,
       label: 'Absent',
       color: '#8094D4',
     },
   ];
 
 
-  // const sampleInOutData = {
-  //   xAxis: [
-  //     {
-  //       data: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-  //       scaleType: "band",
-  //       categoryGapRatio: 0.5,
-  //     },
-  //   ],
-  //   series: [
-  //     {
-  //       id: "checkin",
-  //       type: "bar",
-  //       data: [40, 92, 85, 60, 58, 60, 90],
-  //       color: "#8094D4",
-  //       label: "Check-in",
+  const tasks = useSelector(selectAllTasks);
+  const staffPerDepartment = useSelector(selectStaffPerDepartment);
 
-  //     },
-  //     {
-  //       id: "checkout",
-  //       type: "bar",
-  //       data: [70, 40, 49, 25, 89, 50, 70],
-  //       color: "#2A2AA9",
-  //       label: "Check-out",
+  "Staff per department:", staffPerDepartment;
+  "All tasks:", tasks;
 
-  //     },
-  //   ],
-  // };
-  // const [inOutData, setInOutData] = useState(sampleInOutData);
+  const totalStaff = Object.values(staffPerDepartment).reduce(
+    (sum, count) => sum + count,
+    0
+  );
+  "Total staff count:", totalStaff;
 
-  // const [sliderValue, setSliderValue] = useState([0, 6]);
+  const inProgressCount = Array.isArray(tasks)
+    ? tasks.filter((task) => task.status.toLowerCase() === "in_progress").length
+    : 0;
+  const pendingCount = Array.isArray(tasks)
+    ? tasks.filter((task) => task.status.toLowerCase() === "pending").length
+    : 0;
+  const busyStaffCount = inProgressCount + pendingCount;
+  const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
 
+
+  const staffStatus = [
+    {id: 0, value: busyStaffCount, label: "Busy", color: "#252941"},
+    {id: 1, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
+  ];
 
 
   const rotateWeeklyData = (data, todayIndex) => {
@@ -306,68 +437,11 @@ const MDashboard = () => {
   };
 
 
-  // useEffect(() => {
-  //   const currentDayIndex = getCurrentDayIndex();
-  //   const rotatedData = rotateWeeklyData(sampleInOutData, currentDayIndex);
-  //   setInOutData(rotatedData);
-
-
-  //   setSliderValue([0, 6]);
-  // }, []);
-
-
-
-
-  // const handleSliderChange = (e, newValue) => {
-  //   setSliderValue(newValue); // Dynamically update slider range
-  // };
-  // const filteredData = {
-  //   xAxis: [inOutData.xAxis[0].data.slice(sliderValue[0], sliderValue[1] + 1)],
-  //   series: inOutData.series.map((s) => ({
-  //     ...s,
-  //     data: s.data.slice(sliderValue[0], sliderValue[1] + 1),
-  //   })),
-  // };
-
-
-
   const getFilteredData = (range) => {
     return timeData.slice(range[0], range[1] + 1);
   };
-  const revenueData = {
-    xAxis: [
-      {
-        id: "hours",
-        data: getFilteredData(revenueRange).map((d) => d.hour),
-        scaleType: "band",
-      },
-    ],
-    series: [
-      {
-        data: getFilteredData(revenueRange).map((d) => d.revenue),
-        curve: "linear",
-        color: "#6B46C1",
-        highlightScope: {
-          highlighted: "none",
-          faded: "global",
-        },
-      },
-    ],
-  };
-  const handleRevenueRangeChange = (event, newValue) => {
-    setRevenueRange(newValue);
-  };
-  const generateTimeData = (hour) => {
-    const performanceData = [];
-    for (let i = 0; i <= hour; i++) {
-      performanceData.push({
-        hour: `${i}:00`,
-        performance: Math.floor(Math.random() * (95 - 85 + 1)) + 85,
-        revenue: Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000,
-      });
-    }
-    return performanceData;
-  };
+ 
+
 
   const generateMarks = () => {
     const marks = [];
@@ -687,9 +761,9 @@ const MDashboard = () => {
                         <div className="flex items-center justify-center h-[180px] text-gray-500">
                           No Data Available
                         </div> */}
-                      {loading ? (
+                      {statLoading ? (
                         <p>Loading...</p>
-                      ) : error ? (
+                      ) : statError ? (
                         <p className="text-red-500 text-center">No Data Available</p>
                       ) : (
                         <PieChart
@@ -724,7 +798,7 @@ const MDashboard = () => {
           <h2 className="text-lg sm:text-xl font-semibold">Guest Flow Overview</h2>
             <Box sx={{ width: "100%" }}>
               {/* Bar Chart with Weekly Data */}
-              {loading ? (
+              {guestloading ? (
                 <Skeleton
                   variant="rectangular"
                   width="100%"
@@ -790,11 +864,15 @@ const MDashboard = () => {
 
           </div>
           <div className="bg-white rounded-xl shadow-lg min-h-[384px] w-full p-4">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+            <h2 className="text-lg sm:text-xl font-semibold ">
               Revenue (Hours {revenueRange[0]} - {revenueRange[1]})
             </h2>
-            <Box sx={{ width: "100%", mb: 4 }}>
-              {loading ? (
+            <div className="text-right pr-3">
+                <p className="text-sm text-gray-500">Today's Total Revenue</p>
+                <p className="text-xl font-bold">₹{latestRevenue || "0.00"}</p>
+              </div>
+            {/* <Box sx={{ width: "100%", mb: 4 }}> */}
+              {revenueLoading ? (
                 <Skeleton
                   variant="rectangular"
                   width="100%"
@@ -802,38 +880,60 @@ const MDashboard = () => {
                   {...skeletonProps}
                 />
               ) : (
+                <>
                 <LineChart
-                  xAxis={revenueData.xAxis}
-                  series={revenueData.series}
-                  height={250}
-                  margin={{ top: 20, right: 20, bottom: 30, left: 40 }}
+                  height={240}
+                  series={[
+                    {
+                      data: getFilteredRevenueData().map(
+                        (data) => data.revenue
+                      ),
+                      color: "#4C51BF",
+                      area: true,
+                      curve: "linear",
+                    },
+                  ]}
+                  xAxis={[
+                    {
+                      data: getFilteredRevenueData().map((data) => data.hour),
+                      scaleType: "band",
+                    },
+                  ]}
                   sx={{
                     ".MuiLineElement-root": {
                       strokeWidth: 2,
                     },
+                    ".MuiAreaElement-root": {
+                      fillOpacity: 0.1,
+                    },
                   }}
                 />
+                <div className="mt-2 px-4">
+                  <Slider
+                    value={revenueRange}
+                    onChange={(_, newValue) => setRevenueRange(newValue)}
+                    valueLabelDisplay="auto"
+                    min={0}
+                    max={currentHour}
+                    marks={[
+                      {value: 0, label: "00:00"},
+                      {value: currentHour, label: `${currentHour}:00`},
+                    ]}
+                    sx={{
+                      color: "#4C51BF",
+                      "& .MuiSlider-thumb": {
+                        backgroundColor: "#4C51BF",
+                      },
+                      "& .MuiSlider-track": {
+                        backgroundColor: "#4C51BF",
+                      },
+                    }}
+                  />
+                </div>
+              </>
               )}
-            </Box>
-            <Box sx={{ width: "100%", px: 2 }}>
-              <Slider
-                value={revenueRange}
-                onChange={handleRevenueRangeChange}
-                valueLabelDisplay="auto"
-                step={1}
-                marks={marks}
-                min={0}
-                max={currentHour || 1}
-                sx={{
-                  bottom: 20,
-                  height: 3,
-                  "& .MuiSlider-thumb": {
-                    height: 12,
-                    width: 12,
-                  },
-                }}
-              />
-            </Box>
+            {/* </Box> */}
+           
           </div>
         </div>
         {/* Second Column */}

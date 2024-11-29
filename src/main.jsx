@@ -13,8 +13,9 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
       {/* <App /> */}
-      {/* <MainLayout /> */}
-      <Admin />   
+      <MainLayout />
+      {/* <SLayout /> */}
+      {/* <Admin />    */}
       {/* <Reception /> */}
     </Provider>
   </StrictMode>,

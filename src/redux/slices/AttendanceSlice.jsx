@@ -19,7 +19,7 @@ const getAuthHeaders = () => {
   if (!token) {
     throw new Error("Authentication token not found");
   }
-8
+
   return {
     Authorization: `Bearer ${token}`, // Return the headers with the token
   };
@@ -144,5 +144,11 @@ const attendanceSlice = createSlice({
   });
 },
 });
+
+export const selectStaff = (state) => state.attendance.staff;
+export const selectStats = (state) => state.attendance.stats;
+export const selectAttendanceCheck = (state) => state.attendance.attendanceCheck;
+export const selectLoading = (state) => state.attendance.loading;
+export const selectError = (state) => state.attendance.error;
 
 export default attendanceSlice.reducer;
