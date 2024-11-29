@@ -4,7 +4,8 @@ import axios from 'axios';
 const BASE_URL = 'https://hotelcrew-1.onrender.com/api/taskassignment/announcements/day/';
 
 const getAuthToken = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
+  // const token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1MjM5LCJpYXQiOjE3MzI2MTMyMzksImp0aSI6ImUwMzMyNjRkYjk0OTQ5YzI5YjNhM2EzNjgxZGZhNDUzIiwidXNlcl9pZCI6MTIwfQ.ITV01RFPWCfFAVu6YJWZqjRCExMYpMw8DKf3xAvzL0w';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MzgwMTYxLCJpYXQiOjE3MzI3ODgxNjEsImp0aSI6IjIzZmI3NjhlY2Y3MjQ4NzM4YjQ2NzMzZDBhY2M2YWFkIiwidXNlcl9pZCI6MTc4fQ.9HKA5XN7DddiStgpO318XkVbkatf_45g9-YlLpeWVbE';
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -109,7 +110,10 @@ const announcementSlice = createSlice({
     announcements: [],
     loading: false,
     error: null,
-    currentAnnouncement: null
+    currentAnnouncement: null,
+    nextPage: null,
+    previousPage: null,
+    totalCount: 0,
   },
   reducers: {
     clearError: (state) => {
@@ -117,7 +121,16 @@ const announcementSlice = createSlice({
     },
     setCurrentAnnouncement: (state, action) => {
       state.currentAnnouncement = action.payload;
-    }
+    },
+    setPagination: (state, action) => {
+      state.nextPage = action.payload.next;
+      state.previousPage = action.payload.previous;
+      state.totalCount = action.payload.count;
+    },
+    appendAnnouncements: (state, action) => {
+      // Append new announcements to the existing array
+      state.announcements = [...state.announcements, ...action.payload];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -167,11 +180,16 @@ const announcementSlice = createSlice({
   }
 });
 
-export const { clearError, setCurrentAnnouncement } = announcementSlice.actions;
+export const { clearError, setCurrentAnnouncement, setPagination,appendAnnouncements  } = announcementSlice.actions;
 
 export const selectAllAnnouncements = state => state.announcements.announcements;
 export const selectAnnouncementsLoading = state => state.announcements.loading;
 export const selectAnnouncementsError = state => state.announcements.error;
 export const selectCurrentAnnouncement = state => state.announcements.currentAnnouncement;
+export const selectPagination = (state) => ({
+  nextPage: state.announcements.nextPage,
+  previousPage: state.announcements.previousPage,
+  totalCount: state.announcements.totalCount,
+});
 
 export default announcementSlice.reducer;

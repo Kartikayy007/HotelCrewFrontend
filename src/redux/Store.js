@@ -4,9 +4,20 @@ import OtpReducer from './slices/OtpSlice'
 import { adminReducer } from './slices/AdminSlice'
 import { receptionReducer } from './slices/ReceptionSlice'
 import ManagerReducer from './slices/ManagerSlice.jsx'
+import StaffReducer from './slices/StaffSlice.jsx'
 import AdminAttendanceSlice from './slices/AdminAttendanceSlice'
 import taskReducer from './slices/TaskSlice'
-import announcementReducer from './slices/AnnouncementSlice'
+import taskReducer from './slices/StaffTaskSlice.jsx'
+import announcementReducer from './slices/AnnouncementSlice.jsx'
+import staffleaveReducer from './slices/StaffLeaveSlice.jsx'
+import attendanceReducer from './slices/StaffAttendanceSlice.jsx'
+import staffProfileReducer from './slices/StaffProfileSlice.jsx'
+import performanceReducer from './slices/StaffPerformanceSlice.jsx';
+import shiftReducer from './slices/ShiftSlice.jsx'
+import leaveReducer from './slices/LeaveSlice.jsx'
+import guestReducer from './slices/GuestSlice.jsx';
+
+
 import staffReducer from "./slices/StaffSlice"
 import hotelCheckInReducer from './slices/hotelCheckInSlice'
 import revenueReducer from './slices/revenueSlice' 
@@ -26,6 +37,18 @@ const store = configureStore({
     otp: OtpReducer,
     admin: adminReducer,
     manager: ManagerReducer,
+    staff: StaffReducer,
+    attendance: AttendanceReducer,
+    staffAttendance: attendanceReducer,
+    tasks: TaskReducer,
+    stafftasks:taskReducer,
+    announcements: announcementReducer,
+    leavestaff: staffleaveReducer,
+    staffProfile: staffProfileReducer,
+    shifts: shiftReducer,
+    leave: leaveReducer,
+    guest: guestReducer,
+    performance:performanceReducer,
     reception: receptionReducer,
     attendance: AdminAttendanceSlice,
     tasks: taskReducer,

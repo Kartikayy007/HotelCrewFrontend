@@ -13,7 +13,7 @@ export const CreateAnnouncementBox = ({ onClose, onSubmit, departments }) => {
   const [announcement, setAnnouncement] = useState({
     title: '',
     department: 'all', 
-    urgency: 'normal',
+    urgency: 'Normal',
     description: ''
   });
 
@@ -89,7 +89,7 @@ export const CreateAnnouncementBox = ({ onClose, onSubmit, departments }) => {
             }}
             displayEmpty
           >
-            <MenuItem value="all">All Departments</MenuItem>
+            <MenuItem value="All">All Departments</MenuItem>
             {departments.map((dept) => (
               <MenuItem key={dept.value} value={dept.value}>
                 {dept.label}
@@ -111,7 +111,7 @@ export const CreateAnnouncementBox = ({ onClose, onSubmit, departments }) => {
               urgency: e.target.value
             })}
           >
-            <MenuItem value="normal">
+            <MenuItem value="Normal">
               <span className="flex items-center">
                 <span className="h-2 w-2 rounded-full bg-blue-500 mr-2" />
                 Normal
