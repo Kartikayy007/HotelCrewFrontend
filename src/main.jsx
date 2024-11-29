@@ -7,6 +7,7 @@ import App from './App.jsx'
 import Admin from './components/admin/Admin.jsx'
 import MainLayout from './components/Manager/MainLayout.jsx'
 import Reception from './components/receptionist/Reception.tsx'
+import SLayout from './components/Staff/SLayout.jsx'
 // import IncompleteRegisteration from './components/common/IncompleteRegisteration.jsx'
 // import { RevealBento } from './components/common/IncompleteRegisteration.jsx'
 

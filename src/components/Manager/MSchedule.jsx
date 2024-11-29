@@ -1,36 +1,73 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Search, Move } from "lucide-react";
 import { Snackbar, Alert } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchShifts, updateShift } from '../../redux/slices/ShiftSlice';
+
 
 function MSchedule() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchShifts());
+    
+    const interval = setInterval(() => {
+      dispatch(fetchShifts());
+    }, 300000); // 5 minutes
+    
+    return () => clearInterval(interval);
+  }, [dispatch]);
+  
+  
+  const { loading, error, updateLoading, updateError, updatedShift } = useSelector((state) => state.shifts?.scheduleList || {});
+  const scheduleList = useSelector((state) => state.shifts.scheduleList);
+
+  console.log("xnfcnfn" ,scheduleList)
+  // const { scheduleList=[], loading, error } = useSelector((state) => state.shifts);
+  // const scheduleList = useSelector(state => state.shifts.scheduleList);
+  // console.log(scheduleList);
+
+  // useEffect(() => {
+  //   console.log("Dispatching Shifts...")
+  //   dispatch(fetchShifts());
+  // }, [dispatch]);
+
+  if (loading) return <div>Loading shifts...</div>;
+  if (error) return <div>Error: {error}</div>;
+if(!scheduleList) return <div>no data in scgedulelist</div>;
+//   if (!scheduleList || !Array.isArray(scheduleList) || scheduleList.length === 0) {
+//   return <div>No data in schedule list</div>;
+// }
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedShift, setSelectedShift] = useState("All Shifts");
   const [isShiftChangeMode, setIsShiftChangeMode] = useState(false);
-  const [staffData, setStaffData] = useState([
-    {name: "Ben Smith", department: "Kitchen", shift: "Day Shift"},
-  {name: "Sarah Johnson", department: "Housekeeping", shift: "Evening Shift"},
-  {name: "Mike Chen", department: "Kitchen", shift: "Night Shift"},
-  {name: "Maria Garcia", department: "Reception", shift: "Day Shift"},
-  {name: "Alex Wong", department: "Security", shift: "Evening Shift"},
-  {name: "Lisa Parker", department: "Housekeeping", shift: "Day Shift"},
-  {name: "James Wilson", department: "Reception", shift: "Night Shift"},
-  {name: "Thomas Anderson", department: "Maintenance", shift: "Day Shift"},
-  {name: "Nina Patel", department: "F&B", shift: "Evening Shift"},
-  {name: "Carlos Rodriguez", department: "Front Office", shift: "Night Shift"},
-  {name: "Sophie Zhang", department: "Kitchen", shift: "Day Shift"},
-  {name: "Omar Hassan", department: "Security", shift: "Evening Shift"},
-  {name: "Emily Brown", department: "Housekeeping", shift: "Night Shift"},
-  {name: "Daniel Lee", department: "Maintenance", shift: "Day Shift"},
-  {name: "Isabella Silva", department: "F&B", shift: "Evening Shift"},
-  {name: "Ryan Murphy", department: "Front Office", shift: "Night Shift"},
-  {name: "Aisha Khan", department: "Kitchen", shift: "Day Shift"},
-  {name: "Marcus Thompson", department: "Security", shift: "Evening Shift"},
-  {name: "Julia Kim", department: "Housekeeping", shift: "Night Shift"},
-  {name: "Mohammed Al-Said", department: "Maintenance", shift: "Day Shift"},
-  {name: "Lucy Chen", department: "F&B", shift: "Evening Shift"},
-  {name: "Samuel Jackson", department: "Front Office", shift: "Night Shift"}
-]);
+  // const [staffData, setStaffData] = useState(scheduleList);
+
+//   const [staffData, setStaffData] = useState([
+//     {name: "Ben Smith", department: "Kitchen", shift: "Day Shift"},
+//   {name: "Sarah Johnson", department: "Housekeeping", shift: "Evening Shift"},
+//   {name: "Mike Chen", department: "Kitchen", shift: "Night Shift"},
+//   {name: "Maria Garcia", department: "Reception", shift: "Day Shift"},
+//   {name: "Alex Wong", department: "Security", shift: "Evening Shift"},
+//   {name: "Lisa Parker", department: "Housekeeping", shift: "Day Shift"},
+//   {name: "James Wilson", department: "Reception", shift: "Night Shift"},
+//   {name: "Thomas Anderson", department: "Maintenance", shift: "Day Shift"},
+//   {name: "Nina Patel", department: "F&B", shift: "Evening Shift"},
+//   {name: "Carlos Rodriguez", department: "Front Office", shift: "Night Shift"},
+//   {name: "Sophie Zhang", department: "Kitchen", shift: "Day Shift"},
+//   {name: "Omar Hassan", department: "Security", shift: "Evening Shift"},
+//   {name: "Emily Brown", department: "Housekeeping", shift: "Night Shift"},
+//   {name: "Daniel Lee", department: "Maintenance", shift: "Day Shift"},
+//   {name: "Isabella Silva", department: "F&B", shift: "Evening Shift"},
+//   {name: "Ryan Murphy", department: "Front Office", shift: "Night Shift"},
+//   {name: "Aisha Khan", department: "Kitchen", shift: "Day Shift"},
+//   {name: "Marcus Thompson", department: "Security", shift: "Evening Shift"},
+//   {name: "Julia Kim", department: "Housekeeping", shift: "Night Shift"},
+//   {name: "Mohammed Al-Said", department: "Maintenance", shift: "Day Shift"},
+//   {name: "Lucy Chen", department: "F&B", shift: "Evening Shift"},
+//   {name: "Samuel Jackson", department: "Front Office", shift: "Night Shift"}
+// ]);
   
   const [draggedStaff, setDraggedStaff] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -47,23 +84,74 @@ function MSchedule() {
     e.preventDefault(); 
   };
   
+  
+  // const handleDrop = (e, newShift) => {
+  //   e.preventDefault();
+  
+  //   if (draggedStaff && isShiftChangeMode) {
+  //     setTargetShift(newShift);
+  
+      
+  //     if (!draggedStaff || !Array.isArray(scheduleList)) {
+  //       console.error("Invalid data: draggedStaff or scheduleList is undefined");
+  //       return;
+  //     }
+      
+  //     dispatch(updateShift({ userId: draggedStaff.id, shift: newShift }));
+  
+  //     // Optionally show a success snackbar
+  //     setSnackbarOpen(true);
+  //     const updatedFilteredStaff = scheduleList.map(staff => 
+  //       staff.id === draggedStaff.id ? { ...staff, shift: newShift } : staff
+  //     );
+  
+  //     // Update shift state based on the new filtered list
+  //     setDayShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "morning"));
+  //     setEveningShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "evening"));
+  //     setNightShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "night"));
+  
+  //     console.log("dragged: ",draggedStaff)
+      
+  //     setDraggedStaff(null);
+  //   }
+  // };
   const handleDrop = (e, newShift) => {
     e.preventDefault();
+  
     if (draggedStaff && isShiftChangeMode) {
       setTargetShift(newShift);
-      
-      const updatedStaffData = staffData.map(staff => 
-        staff.name === draggedStaff.name 
-          ? { ...staff, shift: newShift }
-          : staff
+      const updatedFilteredStaff = scheduleList.map(staff =>
+        staff.id === draggedStaff.id ? { ...staff, shift: newShift } : staff
       );
+  
+      setFilteredStaff(updatedFilteredStaff);
+      setDayShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "morning"));
+      setEveningShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "evening"));
+      setNightShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "night"));
+  
+  
+      dispatch(updateShift({ userId: draggedStaff.id, shift: newShift }))
+        .then(() => {
+          // Fetch the updated schedule list after backend update
+          dispatch(fetchShifts());
+        })
+        .catch((error) => {
+          console.error("Failed to update shift:", error);
+          // Revert the optimistic update if the backend call fails
+        setFilteredStaff(scheduleList);
+        setDayShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === "morning"));
+        setEveningShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === "evening"));
+        setNightShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === "night"));
       
-      setStaffData(updatedStaffData);
+        });
+  
       setDraggedStaff(null);
-      setSnackbarOpen(true); 
+      setSnackbarOpen(true);
     }
   };
-
+  
+  
+ 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
     setTargetShift(null); 
@@ -72,38 +160,72 @@ function MSchedule() {
   const toggleShiftChangeMode = () => {
     setIsShiftChangeMode(!isShiftChangeMode);
   };
+  console.log("activeFilter:", activeFilter);
+  console.log("searchTerm:", searchTerm);
+  console.log("selectedShift:", selectedShift);
+  const [filteredStaff, setFilteredStaff] = useState([]);
+const [dayShiftStaff, setDayShiftStaff] = useState([]);
+const [eveningShiftStaff, setEveningShiftStaff] = useState([]);
+const [nightShiftStaff, setNightShiftStaff] = useState([]);
+console.log("M",dayShiftStaff);
+console.log("E",eveningShiftStaff);
+console.log("N",nightShiftStaff);
+  
+useEffect(() => {
+  if (Array.isArray(scheduleList)) {
+    const updatedFilteredStaff = scheduleList.filter((staff) => {
+      // Case-insensitive matching for department
+      const departmentMatch =
+        activeFilter === "All" || 
+        staff.department?.toLowerCase() === activeFilter.toLowerCase();
 
-  const filteredStaff = staffData.filter((staff) => {
-    const departmentMatch =
-      activeFilter === "All" ||
-      staff.department.toLowerCase() === activeFilter.toLowerCase();
+      // Case-insensitive matching for search term
+      const searchMatch = staff.user_name
+        ? staff.user_name.toLowerCase().includes(searchTerm.toLowerCase())
+        : false;
 
-    const searchMatch = staff.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+      // Case-insensitive matching for shift
+      const shiftMatch =
+        selectedShift === "All Shifts" || 
+        staff.shift?.toLowerCase() === selectedShift.toLowerCase();
 
-    const shiftMatch =
-      selectedShift === "All Shifts" || staff.shift === selectedShift;
+      return departmentMatch && searchMatch && shiftMatch;
+    });
 
-    return departmentMatch && searchMatch && shiftMatch;
-  });
+    setFilteredStaff(updatedFilteredStaff);
 
-  const dayShiftStaff = filteredStaff.filter(
-    (staff) => staff.shift === "Day Shift"
-  );
-  const eveningShiftStaff = filteredStaff.filter(
-    (staff) => staff.shift === "Evening Shift"
-  );
-  const nightShiftStaff = filteredStaff.filter(
-    (staff) => staff.shift === "Night Shift"
-  );
+    // Update shift-specific lists
+    setDayShiftStaff(
+      updatedFilteredStaff.filter((staff) => staff.shift?.toLowerCase() === "morning")
+    );
+    setEveningShiftStaff(
+      updatedFilteredStaff.filter((staff) => staff.shift?.toLowerCase() === "evening")
+    );
+    setNightShiftStaff(
+      updatedFilteredStaff.filter((staff) => staff.shift?.toLowerCase() === "night")
+    );
+  }
+}, [scheduleList, activeFilter, searchTerm, selectedShift]);
+const [selectedDepartments, setSelectedDepartments] = useState(['All']);
+useEffect(() => {
+  if (scheduleList && scheduleList.length > 0) {
+    // Extract unique departments, ignoring case
+    const uniqueDepartments = [
+      ...new Set(scheduleList.map((item) => item.department.toLowerCase()))
+    ];
 
+    setDepartment(uniqueDepartments);
+    if (selectedDepartments.length === 0) {
+      setSelectedDepartments(["All"]); // Select 'All' by default
+    }
+  }
+}, [scheduleList]);
 
   const ShiftSection = ({ title, staff, shiftType }) => (
     <div className="h-auto sm:h-80">
       <div className="px-2 xs:px-4 sm:px-8">
         <div 
-          className={`bg-white ${shiftType !== "Day Shift" ? "mt-6 sm:mt-11" : ""}`}
+          className={`bg-white ${shiftType !== "morning" ? "mt-6 sm:mt-11" : ""}`}
           onDragOver={handleDragOver}
           onDrop={(e) => handleDrop(e, shiftType)}
         >
@@ -120,9 +242,10 @@ function MSchedule() {
           </div>
           <div className="h-[180px] xs:h-[200px] sm:h-[280px] overflow-y-auto">
             <div className="flex flex-wrap gap-2 xs:gap-3 sm:gap-4 pt-2">
-              {staff.map((staff, index) => (
+              {staff.map((staff) => (
                 <div
-                  key={`${shiftType}-${index}`}
+                  // key={`${shift}-${index}`}
+                  key={staff.id}
                   draggable={isShiftChangeMode}
                   onDragStart={(e) => handleDragStart(e, staff)}
                   className={`rounded-3xl text-sm xs:text-base sm:text-xl 
@@ -132,7 +255,7 @@ function MSchedule() {
                     bg-[#E6EEF9] min-w-[100px] xs:min-w-[120px] sm:min-w-32 
                     text-center p-1.5 xs:p-2 sm:p-3`}
                 >
-                  <p>{staff.name}</p>
+                  <p>{staff.user_name}</p>
                   <p className="text-xs text-gray-500">{staff.department}</p>
                 </div>
               ))}
@@ -142,7 +265,7 @@ function MSchedule() {
       </div>
     </div>
   );
-
+  const [department, setDepartment] = useState([]);
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-auto scrollbar-thin p-1 xs:p-2 sm:p-4">
       <h1 className="text-[#252941] text-3xl my-4 pl-12 font-semibold">
@@ -169,19 +292,21 @@ function MSchedule() {
 
             <div className="flex flex-col lg:justify-between lg:flex-row px-2 xs:px-4 sm:px-6 space-y-2 xs:space-y-4 lg:space-y-0">
               <div className="flex gap-2 xs:gap-3 sm:gap-5 text-black font-medium w-full lg:w-2/3 overflow-x-auto scrollbar-none scrollbar-thumb-[#E6EEF9] scrollbar-track-transparent pb-2">
-                {[
-                  "All",
-                  "Kitchen",
-                  "Housekeeping",
-                  "Reception",
-                  "Security",
-                ].map((department) => (
+              <button
+              key="all"
+              onClick={() => setActiveFilter("All")}
+              className={`px-4 py-1 w-auto rounded-3xl font-semibold  border-none ${activeFilter.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
+                }`}
+            >
+              All
+            </button>
+                {department.map((department) => (
                   <button
                     key={department}
                     onClick={() => setActiveFilter(department)}
                     className={`p-1.5 xs:p-2 sm:p-2
                       min-w-30 text-[14px] xs:text-lg sm:text-sm md:text-base lg:text-lg 
-                      rounded-3xl 
+                      rounded-3xl capitalize
                       whitespace-nowrap 
                       transition-colors 
                       ${
@@ -210,9 +335,9 @@ function MSchedule() {
             </div>
           </div>
 
-          <ShiftSection title="Day Shift" staff={dayShiftStaff} shiftType="Day Shift" />
-          <ShiftSection title="Evening Shift" staff={eveningShiftStaff} shiftType="Evening Shift" />
-          <ShiftSection title="Night Shift" staff={nightShiftStaff} shiftType="Night Shift" />
+          <ShiftSection title="Morning Shift" staff={dayShiftStaff} shiftType="morning" />
+          <ShiftSection title="Evening Shift" staff={eveningShiftStaff} shiftType="evening" />
+          <ShiftSection title="Night Shift" staff={nightShiftStaff} shiftType="night" />
         </div>
       </div>
 

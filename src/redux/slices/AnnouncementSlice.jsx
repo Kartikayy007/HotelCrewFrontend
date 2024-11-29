@@ -110,7 +110,10 @@ const announcementSlice = createSlice({
     announcements: [],
     loading: false,
     error: null,
-    currentAnnouncement: null
+    currentAnnouncement: null,
+    nextPage: null,
+    previousPage: null,
+    totalCount: 0,
   },
   reducers: {
     clearError: (state) => {
@@ -118,7 +121,16 @@ const announcementSlice = createSlice({
     },
     setCurrentAnnouncement: (state, action) => {
       state.currentAnnouncement = action.payload;
-    }
+    },
+    setPagination: (state, action) => {
+      state.nextPage = action.payload.next;
+      state.previousPage = action.payload.previous;
+      state.totalCount = action.payload.count;
+    },
+    appendAnnouncements: (state, action) => {
+      // Append new announcements to the existing array
+      state.announcements = [...state.announcements, ...action.payload];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -168,11 +180,16 @@ const announcementSlice = createSlice({
   }
 });
 
-export const { clearError, setCurrentAnnouncement } = announcementSlice.actions;
+export const { clearError, setCurrentAnnouncement, setPagination,appendAnnouncements  } = announcementSlice.actions;
 
 export const selectAllAnnouncements = state => state.announcements.announcements;
 export const selectAnnouncementsLoading = state => state.announcements.loading;
 export const selectAnnouncementsError = state => state.announcements.error;
 export const selectCurrentAnnouncement = state => state.announcements.currentAnnouncement;
+export const selectPagination = (state) => ({
+  nextPage: state.announcements.nextPage,
+  previousPage: state.announcements.previousPage,
+  totalCount: state.announcements.totalCount,
+});
 
 export default announcementSlice.reducer;

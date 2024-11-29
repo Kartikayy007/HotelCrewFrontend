@@ -121,8 +121,10 @@ const initialState = {
 };
 
 const staffSlice = createSlice({
-  name: "staff",
-  initialState,
+  name: 'manager',
+  initialState: {
+    currentComponent: 'SDashboard', 
+  },
   reducers: {
     clearStaffCache: (state) => {
       localStorage.removeItem(CACHE_KEY);

@@ -4,7 +4,7 @@ import MDashboard from '../../components/Manager/MDashboard';
 const managerSlice = createSlice({
   name: 'manager',
   initialState: {
-    currentComponent: 'MDashboard', 
+    currentComponent: MDashboard, 
   },
   reducers: {
     setCurrentComponent: (state, action) => {
