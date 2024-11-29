@@ -4,7 +4,7 @@ import axios from "axios";
 const API_BASE_URL = "https://hotelcrew-1.onrender.com/api/attendance"; // Replace with your actual API base URL
 
 const getAuthHeaders = () => {
-    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1Mzg1OTIyLCJpYXQiOjE3MzI3OTM5MjIsImp0aSI6ImZmZWU4NzMwNTk3MzRhMGI5OWFkYWNkMTI0Y2E1MWYxIiwidXNlcl9pZCI6MTcxfQ.svLwErjg3XfYrhOF_2sfUpzOXuixu56N6R08SJ5XErE';
+    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NDU5MzUwLCJpYXQiOjE3MzI4NjczNTAsImp0aSI6ImYyZWIyMWIzZGVlZjQ0MWQ5YThlNzY2OWFmMWIxNGQ1IiwidXNlcl9pZCI6MTg1fQ.YkgvzmHmNKwR3bvQ9KiZvc1lZd_xf0ZgKmLg1KujQ4Y'
 
 
     if (!token) {
@@ -22,7 +22,7 @@ export const fetchLeaveRequests = createAsyncThunk(
   "leave/fetchLeaveRequests",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/leave_list/`, {
+      const response = await axios.get(`https://hotelcrew-1.onrender.com/api/attendance/leave_list/`, {
         headers: getAuthHeaders(), // Correctly invoke the function and pass as headers
       });
       console.log(response.data.data)
@@ -42,6 +42,7 @@ export const fetchLeaveCount = createAsyncThunk(
         params: { date },
         headers: getAuthHeaders(),
       });
+      console.log("leave",response.data.data)
       return response.data.data; // Assuming "data" contains the leave count
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching leave count");
@@ -111,8 +112,8 @@ const leaveSlice = createSlice({
         })
         .addCase(fetchLeaveCount.fulfilled, (state, action) => {
           state.leaveLoading = false;
-          console.log(action.payload);
-          state.leaveCount = action.payload;
+          console.log("P",action.payload.leave_count);
+          state.leaveCount = action.payload.leave_count;
         })
         .addCase(fetchLeaveCount.rejected, (state, action) => {
           state.leaveLoading = false;
@@ -138,6 +139,11 @@ const leaveSlice = createSlice({
   });
   
   // Actions
+  export const selectLeaveRequests = (state) => state.leave.leaveRequests; // List of all leave requests
+export const selectLeaveCount = (state) => state.leave.leaveCount; // Leave count for a specific date
+export const selectLeaveLoading = (state) => state.leave.leaveLoading; // Loading state
+export const selectLeaveError = (state) => state.leave.leaveError; // Error state
+export const selectUpdateStatus = (state) => state.leave.updateStatus; // Status
   export const { clearUpdateStatus, clearError } = leaveSlice.actions;
   
   // Reducer

@@ -208,28 +208,29 @@ const SProfile = () => {
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       > */}
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={4000}
-                onClose={handleSnackbarClose}
-                // onClose={() => setSnackbar({ ...snackbar, open: false })} // Close Snackbar
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-                ContentProps={{
-                    style: {
-                        backgroundColor: snackbarSeverity === "success" ? "green" : "red",
-                    },
-                }}
-                message={
-                    <span style={{ display: "flex", alignItems: "center" }}>
-                        <InfoIcon style={{ marginRight: 8 }} />
-                        {snackbarMessage}
-                    </span>
-                }
-            >
-                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity="success"
+          variant="filled"
+          sx={{ 
+            width: '100%',
+            '& .MuiAlert-filledSuccess': {
+              backgroundColor: '#4CAF50'
+            }
+          }}
+        >
+          {/* {draggedStaff && targetShift ? 
+            `Shift updated successfully` : 
+            'Shift updated successfully'
+          } */}
+        </Alert>
+      </Snackbar>
         </section>
     );
 };

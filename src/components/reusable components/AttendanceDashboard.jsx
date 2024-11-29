@@ -8,6 +8,10 @@ import {
   updateLeaveStatus,
   clearUpdateStatus,
   clearError,
+  selectLeaveRequests,
+  selectLeaveLoading,
+  selectLeaveError,
+  selectUpdateStatus,
 } from "../../redux/slices/LeaveSlice";
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -33,7 +37,12 @@ const AttendanceDashboard = () => {
   // const [filteredStaffList, setFilteredStaffList] = useState([]);
   const dispatch = useDispatch();
   const [selectedDepartments, setSelectedDepartments] = useState(['All']);
-  const { leaveRequests,leaveLoading, leaveError, updateStatus } = useSelector((state) => state.leave);
+  // const { leaveRequests,leaveLoading, leaveError, updateStatus } = useSelector((state) => state.leave);
+  const leaveRequests=useSelector(selectLeaveRequests);
+  const leaveLoading=useSelector(selectLeaveLoading);
+  const leaveError=useSelector(selectLeaveError);
+  const updateStatus=useSelector(selectUpdateStatus);
+  
   // const leaveRequests = useSelector((state) => state.leave.leaveRequests || []);
 
   // const [leaveRequests, setLeaveRequests] = useState([
@@ -51,6 +60,7 @@ const AttendanceDashboard = () => {
     message: "",
     severity: "success",
   });
+  const [selectedShift, setSelectedShift] = useState('All');
   const
     handleOpenModal = (staff) => {
       setSelectedStaff(staff);
@@ -106,16 +116,29 @@ const AttendanceDashboard = () => {
   }, [dispatch]);
 
 
+  // useEffect(() => {
+  //   if (staff && staff.length > 0) {
+  //     // Extract unique departments
+  //     const uniqueDepartments = [
+  //       ...new Set(staff.map((item) => item.department))
+  //     ];
+  //     setDepartment(uniqueDepartments);
+  //     setSelectedDepartments(["All"]); // Select 'All' by default
+  //   }
+  // }, [staff])
   useEffect(() => {
     if (staff && staff.length > 0) {
-      // Extract unique departments
+      // Extract unique departments, ignoring case
       const uniqueDepartments = [
-        ...new Set(staff.map((item) => item.department))
+        ...new Set(staff.map((item) => item.department.toLowerCase()))
       ];
+  
       setDepartment(uniqueDepartments);
-      setSelectedDepartments(["All"]); // Select 'All' by default
+      if (selectedDepartments.length === 0) {
+        setSelectedDepartments(["All"]); // Select 'All' by default
+      }
     }
-  }, [staff])
+  }, [staff]);
 
   const handleToggleAttendance = (id) => {
     dispatch(updateAttendance(id));
@@ -237,11 +260,24 @@ const AttendanceDashboard = () => {
     }));
   };
 
-  const
-    filteredStaff = selectedDepartments.includes("All")
-      ? staff
-      : staff.filter((member) => selectedDepartments.includes(member.department));
-
+  // const filteredStaff = staff.filter((member) => {
+  //   const departmentMatch = selectedDepartments.includes('All') || selectedDepartments.includes(member.department);
+  //   const shiftMatch = selectedShift === 'All' || member.shift === selectedShift;
+  //   return departmentMatch && shiftMatch;
+  // });
+  const filteredStaff = staff.filter((member) => {
+    const normalizedDepartments = selectedDepartments.map((dept) => dept.toLowerCase());
+    const departmentMatch =
+      normalizedDepartments.includes('all') || 
+      normalizedDepartments.includes(member.department.toLowerCase());
+  
+    const shiftMatch =
+      selectedShift.toLowerCase() === 'all' || 
+      member.shift.toLowerCase() === selectedShift.toLowerCase();
+  
+    return departmentMatch && shiftMatch;
+  });
+  
   // const filteredStaff = selectedDepartments.includes("All")
   //   ? dataToUse
   //   : dataToUse.filter((member) => selectedDepartments.includes(member.department));
@@ -277,7 +313,7 @@ const AttendanceDashboard = () => {
       {/* <div> */}
       <div className='flex justify-center mb-1 mt-6 pb-5 px-3'>
         {/* <div className="bg-white w-full h-[392px] pb-7  py-2  rounded-lg shadow"> */}
-        <div className={`bg-white w-full rounded-xl shadow ${isTableExpanded ? "h-screen" : "h-[370px]"}`}>
+        <div className={`bg-white w-full rounded-xl shadow ${isTableExpanded ? "h-screen" : "h-[450px]"}`}>
           <div className="flex justify-between items-center p-4">
             <h2 className="text-[#252941] text-lg pl-3 mt-2 md:mt-4 mb-0 font-semibold">Select Department:</h2>
             {/* Expand/Collapse Icons */}
@@ -318,7 +354,7 @@ const AttendanceDashboard = () => {
             <button
               key="all"
               onClick={() => toggleDepartmentSelection('All')}
-              className={`px-4 py-1 xl:w-[100px] rounded-3xl font-semibold  border-none ${selectedDepartments.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
+              className={`px-4 py-1 w-auto rounded-3xl font-semibold  border-none ${selectedDepartments.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
                 }`}
             >
               All
@@ -329,7 +365,7 @@ const AttendanceDashboard = () => {
               <button
                 key={dept}
                 onClick={() => toggleDepartmentSelection(dept)}
-                className={`px-4 py-1xl: w-[150px]  rounded-3xl border-none font-semibold ${selectedDepartments.includes(dept)
+                className={`px-4 py-1xl: w-auto capitalize rounded-3xl border-none font-semibold ${selectedDepartments.includes(dept)
                   ? "bg-[#6675C5] text-white"
                   : "bg-[#E6EEF9] text-[#252941] "
                   }`}
@@ -338,6 +374,23 @@ const AttendanceDashboard = () => {
               </button>
             ))}
           </div>
+          <h2 className="text-[#252941] text-lg pl-3 mt-2  mb-2 font-semibold ml-5">Select Shift:</h2>
+          <div className="flex mb-2 pl-7 pb-2 gap-4 rounded-3xl pr-9 overflow-x-auto scrollbar-hidden">
+    {/* Shift Buttons */}
+    {['All', 'Morning', 'Evening', 'Night'].map((shift) => (
+      <button
+        key={shift}
+        onClick={() => setSelectedShift(shift)}
+        className={`px-4 py-1 w-auto rounded-3xl border-none font-semibold ${
+          selectedShift === shift 
+            ? 'bg-[#6675C5] text-white' 
+            : 'bg-[#E6EEF9] text-[#252941]'
+        }`}
+      >
+        {shift}
+      </button>
+    ))}
+  </div>
           <div
             className={` ${isTableExpanded ? "max-h-[calc(100%-200px)]" : "max-h-[200px]"
               } md:ml-2 ml-4 mr-5 overflow-y-auto rounded-xl scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-200`}
@@ -352,54 +405,10 @@ const AttendanceDashboard = () => {
                 <thead>
                   <tr className="bg-[#3F4870] text-[#E6EEF9] rounded-xl">
                     <th className="px-4 py-2 text-left">Name</th>
-                    <th className="px-4 py-2 text-le3t">Email</th>
+                    <th className="px-4 py-2 text-left">Email</th>
                     <th className="px-4 py-2 text-left">Department</th>
                     <th className="px-4 py-2 text-center">Attendance</th>
-                    {/* <th className="px-4 py-2 flex mb-1  items-center justify-center">
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DemoContainer components={['DatePicker']}>
-                          <DatePicker
-                            className='w-[50px] '
-                            placeholder="Date"
-                            sx={{
-
-                              height: "28px", // Minimize padding
-                              fontSize: "12px", // Smaller font size
-                              borderRadius: "3px", // Adjust border radius
-                              borderColor: "transparent",
-                              backgroundColor: "#E6EEF9",
-
-
-                              "& .MuiInputBase-root": {
-
-                                fontSize: "16px",
-                                fontFamily: "Montserrat"
-                              },
-
-                              "& .MuiSvgIcon-root": {
-                                fontSize: "19px",
-                              },
-                              "& .MuiIconButton-root": {
-                                paddingTop: "4px",
-                                paddingBottom: "10px",
-                              },
-                              "& .MuiInputBase-input": {
-                                paddingTop: '4px',
-                                paddingBottom: '4px',
-
-                              },
-
-                            }}
-                          /> */}
-                        {/* </DemoContainer> */}
-                      {/* </LocalizationProvider> */}
-                      {/* <input type="date"
-          className='bg-[#E6EEF9] '
-          placeholder='Date'
-          /> */}
-
-                    {/* </th> */}
-                    {/* <th className="px-4 py-2 text-center">Date</th> */}
+                    
                   </tr>
                 </thead>
 

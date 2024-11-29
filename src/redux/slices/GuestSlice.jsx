@@ -4,7 +4,7 @@ import axios from 'axios';
 const API_URL = 'https://hotelcrew-1.onrender.com/api/hoteldetails/room-stats/'; // Replace with your actual API endpoint
 
 const getAuthHeaders = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MzgwMTYxLCJpYXQiOjE3MzI3ODgxNjEsImp0aSI6IjIzZmI3NjhlY2Y3MjQ4NzM4YjQ2NzMzZDBhY2M2YWFkIiwidXNlcl9pZCI6MTc4fQ.9HKA5XN7DddiStgpO318XkVbkatf_45g9-YlLpeWVbE';
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NDU5MzUwLCJpYXQiOjE3MzI4NjczNTAsImp0aSI6ImYyZWIyMWIzZGVlZjQ0MWQ5YThlNzY2OWFmMWIxNGQ1IiwidXNlcl9pZCI6MTg1fQ.YkgvzmHmNKwR3bvQ9KiZvc1lZd_xf0ZgKmLg1KujQ4Y';
 
 
   if (!token) {
@@ -62,5 +62,11 @@ const guestSlice = createSlice({
       });
   },
 });
+
+export const selectDates = (state) => state.guest.dates;
+export const selectCheckins = (state) => state.guest.checkins;
+export const selectCheckouts = (state) => state.guest.checkouts;
+export const selectGuestLoading = (state) => state.guest.guestloading;
+export const selectGuestError = (state) => state.guest.guesterror;
 
 export default guestSlice.reducer;

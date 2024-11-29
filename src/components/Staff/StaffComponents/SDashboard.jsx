@@ -317,11 +317,14 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
 
     }
   };
-
+  const formattedDates = performance.map(stat => {
+    const date = new Date(stat.date);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); // Example: "Nov 26"
+  });
   const dates = performance.map(stat => new Date(stat.date));
   const performanceValues = performance.map(stat => stat.performance_percentage);
   console.log('Performance Data:', performance);
-  console.log('Dates:', dates);
+  console.log('Dates:', formattedDates);
   console.log('Performance Percentages:', performanceValues);
 
   return (
@@ -356,7 +359,14 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
                 angle: 45,
                 textAnchor: 'start',
                 fontSize: 12
-              }
+              },
+              // tickFormatter: (value) => {
+              //   const date = new Date(value);
+              //   return date.toLocaleDateString('en-US', { 
+              //     month: 'short', 
+              //     day: 'numeric'
+              //   });
+              // }
             }]}
             yAxis={[{
               min: 0,
@@ -367,11 +377,18 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
               {
                 data: performanceValues,
                 label: 'Performance',
-                color: '#2196f3'
+                color: '#2196f3',
+                showInLegend: false
+                
               }
             ]}
             height={400}
-            margin={{ top: 20, right: 30, bottom: 60, left: 60 }}
+            margin={{ top: 20, right: 30, bottom: 80, left: 60 }}
+            slotProps={{
+              legend: {
+                hidden: true
+              }}
+            }
           />
         </div>
       // </CardContent>
@@ -420,7 +437,7 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
                               <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
                           </Pie>
-                          <Tooltip />
+                          <Tooltip className="z-20 relative."/>
                         </PieChart>
                       </ResponsiveContainer>
 
@@ -433,7 +450,7 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
                           // Ensure it's on top of the Pie chart
                         }}
                       >
-                        <h2 className="text-[28px] mt-0  font-semibold">
+                        <h2 className="text-[20px] mt-0 z-10  font-semibold">
                           {`${presentPercentage}%`}
                         </h2>
 
@@ -459,7 +476,7 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
                   <Skeleton
                     variant="rectangular"
                     width="95%"
-                    height="300px"
+                    height="280px"
                     {...skeletonProps}
                   />
                 </div>
@@ -556,27 +573,26 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
         </div>
       </div>
       <Snackbar
-  open={snackbarOpen}
-  autoHideDuration={4000}
-  onClose={handleSnackbarClose}
-  // onClose={() => setSnackbar({ ...snackbar, open: false })} // Close Snackbar
-  anchorOrigin={{ vertical: "top", horizontal: "center" }}
-  ContentProps={{
-    style: {
-      backgroundColor: snackbarSeverity === "success" ? "green" : "red",
-    },
-  }}
-  message={
-    <span style={{ display: "flex", alignItems: "center" }}>
-      {/* <InfoIcon style={{ marginRight: 8 }} /> */}
-      {snackbarMessage}
-    </span>
-  }
->
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity="success"
+          variant="filled"
+          sx={{ 
+            width: '100%',
+            '& .MuiAlert-filledSuccess': {
+              backgroundColor: '#4CAF50'
+            }
+          }}
+        >
           {snackbarMessage}
         </Alert>
-        </Snackbar>
+      </Snackbar>
+      
     </section>
   )
 }

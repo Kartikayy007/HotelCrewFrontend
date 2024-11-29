@@ -172,32 +172,54 @@ console.log("E",eveningShiftStaff);
 console.log("N",nightShiftStaff);
   
 useEffect(() => {
-  // Only update shifts from scheduleList if not in drag-and-drop mode
-  if (!isShiftChangeMode) {
-    if (Array.isArray(scheduleList)) {
-      const updatedFilteredStaff = scheduleList.filter((staff) => {
-        const departmentMatch =
-          activeFilter === "All" || staff.department.toLowerCase() === activeFilter.toLowerCase();
+  if (Array.isArray(scheduleList)) {
+    const updatedFilteredStaff = scheduleList.filter((staff) => {
+      // Case-insensitive matching for department
+      const departmentMatch =
+        activeFilter === "All" || 
+        staff.department?.toLowerCase() === activeFilter.toLowerCase();
 
-        const searchMatch = staff.user_name
-          ? staff.user_name.toLowerCase().includes(searchTerm.toLowerCase())
-          : false;
+      // Case-insensitive matching for search term
+      const searchMatch = staff.user_name
+        ? staff.user_name.toLowerCase().includes(searchTerm.toLowerCase())
+        : false;
 
-        const shiftMatch =
-          selectedShift === "All Shifts" || staff.shift?.toLowerCase() === selectedShift.toLowerCase();
+      // Case-insensitive matching for shift
+      const shiftMatch =
+        selectedShift === "All Shifts" || 
+        staff.shift?.toLowerCase() === selectedShift.toLowerCase();
 
-        return departmentMatch && searchMatch && shiftMatch;
-      });
+      return departmentMatch && searchMatch && shiftMatch;
+    });
 
-      setFilteredStaff(updatedFilteredStaff);
-      setDayShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "morning"));
-      setEveningShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "evening"));
-      setNightShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "night"));
+    setFilteredStaff(updatedFilteredStaff);
+
+    // Update shift-specific lists
+    setDayShiftStaff(
+      updatedFilteredStaff.filter((staff) => staff.shift?.toLowerCase() === "morning")
+    );
+    setEveningShiftStaff(
+      updatedFilteredStaff.filter((staff) => staff.shift?.toLowerCase() === "evening")
+    );
+    setNightShiftStaff(
+      updatedFilteredStaff.filter((staff) => staff.shift?.toLowerCase() === "night")
+    );
+  }
+}, [scheduleList, activeFilter, searchTerm, selectedShift]);
+const [selectedDepartments, setSelectedDepartments] = useState(['All']);
+useEffect(() => {
+  if (scheduleList && scheduleList.length > 0) {
+    // Extract unique departments, ignoring case
+    const uniqueDepartments = [
+      ...new Set(scheduleList.map((item) => item.department.toLowerCase()))
+    ];
+
+    setDepartment(uniqueDepartments);
+    if (selectedDepartments.length === 0) {
+      setSelectedDepartments(["All"]); // Select 'All' by default
     }
   }
-}, [scheduleList, activeFilter, searchTerm, selectedShift, isShiftChangeMode]);
-
-
+}, [scheduleList]);
 
   const ShiftSection = ({ title, staff, shiftType }) => (
     <div className="h-auto sm:h-80">
@@ -243,7 +265,7 @@ useEffect(() => {
       </div>
     </div>
   );
-
+  const [department, setDepartment] = useState([]);
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-auto scrollbar-thin p-1 xs:p-2 sm:p-4">
       <h1 className="text-[#252941] text-3xl my-4 pl-12 font-semibold">
@@ -270,20 +292,21 @@ useEffect(() => {
 
             <div className="flex flex-col lg:justify-between lg:flex-row px-2 xs:px-4 sm:px-6 space-y-2 xs:space-y-4 lg:space-y-0">
               <div className="flex gap-2 xs:gap-3 sm:gap-5 text-black font-medium w-full lg:w-2/3 overflow-x-auto scrollbar-none scrollbar-thumb-[#E6EEF9] scrollbar-track-transparent pb-2">
-                {[
-                  "All",
-                  // "Kitchen",
-                  "Manager",
-                  "Housekeeping",
-                  "Maintenance",
-                  // "Security",
-                ].map((department) => (
+              <button
+              key="all"
+              onClick={() => setActiveFilter("All")}
+              className={`px-4 py-1 w-auto rounded-3xl font-semibold  border-none ${activeFilter.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
+                }`}
+            >
+              All
+            </button>
+                {department.map((department) => (
                   <button
                     key={department}
                     onClick={() => setActiveFilter(department)}
                     className={`p-1.5 xs:p-2 sm:p-2
                       min-w-30 text-[14px] xs:text-lg sm:text-sm md:text-base lg:text-lg 
-                      rounded-3xl 
+                      rounded-3xl capitalize
                       whitespace-nowrap 
                       transition-colors 
                       ${

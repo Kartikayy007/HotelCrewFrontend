@@ -298,11 +298,11 @@ const SSchedule = () => {
   };
   const shifts = ["morning", "day", "night"];
   const shiftTime = (shift) => {
-    if (shift === "Morning") {
+    if (shift === "Morning"|| shift==="morning") {
       return "05:00 AM to 01:00 PM";
-    } else if (shift === "Evening") {
+    } else if (shift === "Evening"|| shift==="evening") {
       return "01:00 PM to 09:00 PM";
-    } else if (shift === "Night") {
+    } else if (shift === "Night" || shift==="night") {
       return "09:00 PM to 05:00 AM";
     } else {
       return "Invalid shift"; // Handle invalid inputs
@@ -326,9 +326,9 @@ const SSchedule = () => {
   // ]
   return (
     <section className=" h-screen  font-Montserrat  overflow-y-auto ">
-      <h2 className="text-[#252941] text-3xl mt-5  my-3 pl-11 ml-5 font-semibold">Schedule Status</h2>
+      <h2 className="text-[#252941] text-3xl mt-5 lg:text-center  my-3 pl-11 ml-5 font-semibold">Schedule Status</h2>
       {/* <div className="grid grid-cols-1  xl:grid-cols-[40%,35%,25%] gap-5 p-3 "> */}
-      <div className="flex flex-col  xl:flex-row xl:gap-5 gap-14 p-3 h-[92%]">
+      <div className="flex flex-col justify-center xl:flex-row xl:gap-5 gap-14 p-3 ">
         <div className="space-y-5 xl:w-[40%] ">
           <div className="bg-white w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 text-left">Shift Schedule</h2>
@@ -348,7 +348,7 @@ const SSchedule = () => {
             )}
           </div>
 
-          <div className="bg-white w-full h-[80%] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
+          <div className="bg-white w-full h-[550px] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-3 text-left">Attendance</h2>
             <div className='h-[90%] mb-4 overflow-y-auto rounded-lg'>
               {loading ? (
@@ -407,8 +407,8 @@ const SSchedule = () => {
             </div>
           </div>
         </div>
-        <div className='space-y-5 xl:w-[35%] gap-5 sm:mt-0 mt-11'>
-          <div className="bg-white w-full xl:h-[99%] max-h[693px] pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
+        <div className='space-y-5 xl:w-[35%] gap-5 '>
+          <div className="bg-white w-full h-[700px]  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-2 text-left">Leave Request</h2>
             {loading ? (
               <div className='ml-4 mb-2'>
@@ -621,27 +621,31 @@ const SSchedule = () => {
           <button onClick={handleCloseSnackbar} className="absolute top-1 right-2 text-xl">×</button>
         </div>
       )} */}
-         <Snackbar
-  open={snackbar.open}
-  autoHideDuration={4000}
-  onClose={handleCloseSnackbar}
-  // onClose={() => setSnackbar({ ...snackbar, open: false })} // Close Snackbar
-  anchorOrigin={{ vertical: "top", horizontal: "center" }}
-  ContentProps={{
-    style: {
-      backgroundColor: snackbar.severity === "success" ? "green" : "red",
-    },
-  }}
-  message={
-    <span style={{ display: "flex", alignItems: "center" }}>
-      <InfoIcon style={{ marginRight: 8 }} />
-      {snackbar.message}
-    </span>
-  }
-><Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity="success"
+          variant="filled"
+          sx={{ 
+            width: '100%',
+            '& .MuiAlert-filledSuccess': {
+              backgroundColor: '#4CAF50'
+            }
+          }}
+        >{snackbar.message}
+          {/* {draggedStaff && targetShift ? 
+            `Shift updated successfully` : 
+            'Shift updated successfully'
+          } */}
         </Alert>
-    </Snackbar>
+      </Snackbar>
+       
+
         </div>
       </div>
     </section>

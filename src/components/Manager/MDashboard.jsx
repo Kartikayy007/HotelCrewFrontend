@@ -13,11 +13,11 @@ import { CreateAnnouncementBox } from "../reusable components/CreateAnnouncement
 import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError, deleteAnnouncement } from '../../redux/slices/AnnouncementSlice';
 import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";
-import { fetchGuestData } from '../../redux/slices/GuestSlice';
+import { fetchGuestData,selectCheckins,selectCheckouts,selectDates,selectGuestError,selectGuestLoading } from '../../redux/slices/GuestSlice';
 import { Skeleton } from "@mui/material";
 import Box from "@mui/material/Box";
 import MTaskAssignment from "./MTaskAssignment";
-import { fetchLeaveRequests,fetchLeaveCount } from "../../redux/slices/LeaveSlice";
+import { fetchLeaveRequests,fetchLeaveCount ,selectLeaveCount,selectLeaveError,selectLeaveLoading,selectLeaveRequests,selectUpdateStatus} from "../../redux/slices/LeaveSlice";
  
 const MDashboard = () => {
   const dispatch = useDispatch();
@@ -45,14 +45,24 @@ const MDashboard = () => {
     message: "",
     severity: "success",
   });
-  const { leaveRequests,leaveLoading, leaveError,leaveCount} = useSelector((state) => state.leave);
+  const leaveRequests = useSelector(selectLeaveRequests);
+  const leaveLoading = useSelector(selectLeaveLoading);
+  const leaveError = useSelector(selectLeaveError);
+  const leaveCount=useSelector(selectLeaveCount);
+  const updateLeaveStatus=useSelector(selectUpdateStatus);
+  // const { leaveRequests,leaveLoading, leaveError,leaveCount} = useSelector((state) => state.leave);
   // const [taskData, setTaskData] = useState({
   //   title: '',
   //   description: '',
   //   department: '',
   //   // priority: false, // For priority status
   // });
-  const { dates, checkins, checkouts, guestloading, guesterror } = useSelector((state) => state.attendance);
+  // const { dates, checkins, checkouts, guestloading, guesterror } = useSelector((state) => state.attendance);
+  const dates=useSelector(selectDates);
+  const checkins=useSelector(selectCheckins);
+  const checkouts=useSelector(selectCheckouts);
+  const guestloading=useSelector(selectGuestLoading);
+  const guesterror=useSelector(selectGuestError);
   const [sliderValue, setSliderValue] = useState([0, 6]);
   const [inOutData, setInOutData] = useState({
     xAxis: [
@@ -964,26 +974,6 @@ const MDashboard = () => {
           </Dialog>
           <div className="bg-white rounded-lg flex flex-col shadow xl:min-h-[515px] w-full p-4">
           <h2 className="text-lg font-semibold">Announcements</h2>
-            {/* <div className="space-y-4">
-              <div className="border-b pb-2">
-                <h3 className="font-medium">Monthly Staff Meeting</h3>
-                <p className="text-sm text-gray-600">
-                  Schedule changed to 3 PM
-                </p>
-              </div>
-              <div className="border-b pb-2">
-                <h3 className="font-medium">New Safety Guidelines</h3>
-                <p className="text-sm text-gray-600">
-                  Updated protocols available
-                </p>
-              </div>
-              <div className="border-b pb-2">
-                <h3 className="font-medium">System Maintenance</h3>
-                <p className="text-sm text-gray-600">
-                  Scheduled for next weekend
-                </p>
-              </div>
-            </div> */}
             <div className="flex-1 overflow-y-auto mb-4">
               {announcementsLoading ? (
                 <div className="space-y-4">
@@ -1171,7 +1161,7 @@ const MDashboard = () => {
               </div>
               <div className="border rounded p-4">
                 <h3 className="font-medium">Approved Leaves</h3>
-                {/* <p className="text-2xl font-bold mt-2">{leaveCount}</p> */}
+                <p className="text-2xl font-bold mt-2">{leaveCount}</p>
               </div>
             </div>
           </div>
