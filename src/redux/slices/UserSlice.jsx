@@ -23,7 +23,7 @@ export const loginUser = createAsyncThunk(
         ...response.user_data
       };
 
-      storageMethod.setItem('accessToken', response.access_token);
+      storageMethod.setItem('token', response.access_token);
       storageMethod.setItem('refreshToken', response.refresh_token);
       storageMethod.setItem('user', JSON.stringify(userData)); 
       

@@ -4,6 +4,7 @@ import { Clock, Check, X } from 'lucide-react';
 import { 
   fetchTasks, 
   selectAllTasks, 
+  deleteTask,
   selectTasksLoading, 
   selectTasksError,
   selectTasksByStatus,
@@ -60,6 +61,26 @@ const TaskColumn = ({ title, status, tasks }) => (
 );
 
 const TaskDetailDialog = ({ task, open, onClose }) => {
+  const dispatch = useDispatch();
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const handleDelete = async () => {
+    try {
+      if (!task?.id) {
+        throw new Error('No task ID available');
+      }
+      
+      setIsDeleting(true);
+      await dispatch(deleteTask(task.id)).unwrap();
+      await dispatch(fetchTasks()); // Refetch tasks after deletion
+      setIsDeleting(false);
+      onClose();
+    } catch (err) {
+      setIsDeleting(false);
+      console.error('Failed to delete task:', err);
+    }
+  };
+
   const formattedDate = (dateString) => {
     if (!dateString) return '';
     return new Date(dateString).toLocaleString('en-US', {
@@ -140,6 +161,25 @@ const TaskDetailDialog = ({ task, open, onClose }) => {
             </div>
           </div>
         </DialogContent>
+        <div className="mt-4 flex justify-end space-x-2">
+          <Button
+            onClick={handleDelete}
+            variant="outlined"
+            color="error"
+            disabled={isDeleting}
+            className="text-red-600 border-red-600 hover:bg-red-50"
+          >
+            {isDeleting ? 'Deleting...' : 'Delete Task'}
+          </Button>
+          <Button
+            onClick={onClose}
+            variant="contained"
+            disabled={isDeleting}
+            className="bg-gray-500 hover:bg-gray-600"
+          >
+            Close
+          </Button>
+        </div>
       </div>
     </Dialog>
   );

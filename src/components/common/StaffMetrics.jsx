@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { LineChart } from "@mui/x-charts/LineChart";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
@@ -9,18 +9,17 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 
-function StaffMetrics() {
+const StaffMetrics = () => {
+  const [weeklyData, setWeeklyData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [performanceRange, setPerformanceRange] = useState([0, currentHour || 1]);
   const [timeData, setTimeData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [viewType, setViewType] = useState('daily');
-  const [weeklyData, setWeeklyData] = useState(null);
   const [dailyPerformance, setDailyPerformance] = useState(0);
 
-
   const getAuthHeaders = () => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
+    const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
@@ -34,10 +33,18 @@ function StaffMetrics() {
       const response = await axios.get('https://hotelcrew-1.onrender.com/api/statics/performance/hotel/week/', {
         headers: getAuthHeaders(),
       });
-      setWeeklyData(response.data);
       
-      // Get today's performance using helper function
+      // Format data for graph
+      const formattedData = response.data.weekly_stats.map(stat => ({
+        date: new Date(stat.date).toLocaleDateString('en-US', { weekday: 'short' }),
+        performance: stat.performance_percentage
+      }));
+      
+      setWeeklyData(formattedData);
+
       const todayData = getTodayData(response.data.weekly_stats);
+      console.log('Today data:', todayData);
+      console.log('Current hour:', response.data);
       setDailyPerformance(todayData.performance_percentage);
       calculateDailyData(todayData.performance_percentage);
     } catch (error) {
@@ -49,10 +56,8 @@ function StaffMetrics() {
 
   useEffect(() => {
     fetchWeeklyData();
-    const interval = setInterval(() => {
-      fetchWeeklyData();
-    }, 3600000);
-
+    // Refresh data every hour
+    const interval = setInterval(fetchWeeklyData, 3600000);
     return () => clearInterval(interval);
   }, []);
 
@@ -92,7 +97,7 @@ function StaffMetrics() {
 
   const getFilteredData = (range) => {
     if (viewType === 'weekly' && weeklyData) {
-      return weeklyData.weekly_stats;
+      return weeklyData;
     }
     return timeData.slice(range[0], range[1] + 1);
   };
@@ -110,19 +115,18 @@ function StaffMetrics() {
     xAxis: [{
       id: "time",
       data: viewType === 'weekly' ? 
-        getFilteredData().map(d => new Date(d.date).toLocaleDateString()) :
+        getFilteredData().map(d => d.date) :
         getFilteredData(performanceRange).map(d => d.hour),
       scaleType: "band",
     }],
     series: [{
       data: viewType === 'weekly' ? 
-        getFilteredData().map(d => d.performance_percentage) :
+        getFilteredData().map(d => d.performance) :
         getFilteredData(performanceRange).map(d => d.performance),
       curve: "linear",
       color: "#2A2AA9",
     }],
   };
-
 
   return (
     <div className="bg-white rounded-xl shadow-lg flex-1 w-full p-4">
@@ -160,7 +164,7 @@ function StaffMetrics() {
   xAxis={performanceData.xAxis}
   series={[{
     data: viewType === 'weekly' ? 
-      getFilteredData().map(d => d.performance_percentage) :
+      getFilteredData().map(d => d.performance) :
       getFilteredData(performanceRange).map(d => d.performance),
     curve: "linear",
     color: "#4C51BF",
@@ -195,6 +199,6 @@ function StaffMetrics() {
       )}
     </div>
   );
-}
+};
 
 export default StaffMetrics;

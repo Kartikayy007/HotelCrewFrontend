@@ -4,11 +4,12 @@ import { updateAvailableRooms } from './HotelDetailsSlice';
 
 
 const getAuthToken = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs'
-
-  if (!token) throw new Error('Authentication token not found');
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('Authentication token not found');
+  }
   return token;
-}
+};
 
 // Async thunk to fetch check-ins
 export const fetchCheckIns = createAsyncThunk(
@@ -23,7 +24,7 @@ export const fetchCheckIns = createAsyncThunk(
           'Authorization': `Bearer ${token}`
         }
       });
-      console.log('Fetched check-ins:', response.data);
+      // console.log('Fetched check-ins:', response.data);
       const occupiedRooms = response.data.length;
       dispatch(updateAvailableRooms(occupiedRooms));
       

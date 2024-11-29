@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
 import {useDispatch, useSelector} from "react-redux";
-import {fetchAttendanceStats} from "../../../redux/slices/AdminAttendanceSlice";
+import {fetchAttendanceStats, selectWeeklyStats} from "../../../redux/slices/AdminAttendanceSlice";
 import {FaChevronUp, FaChevronDown} from "react-icons/fa";
 import {
   createTask,
@@ -271,20 +271,39 @@ const generateTimeData = () => {
     {id: 2, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
   ];
 
- 
+  const weeklyStats = useSelector(selectWeeklyStats);
 
+  const getTodayStats = () => {
+    if (!weeklyStats.dates || !weeklyStats.total_crew_present || !weeklyStats.total_staff_absent) {
+      return { present: 0, absent: 0 };
+    }
+  
+    const today = new Date().toISOString().split('T')[0];
+    const todayIndex = weeklyStats.dates.findIndex(date => date === today);
+  
+    if (todayIndex === -1) {
+      return { present: 0, absent: 0 };
+    }
+  
+    return {
+      present: weeklyStats.total_crew_present[todayIndex] || 0,
+      absent: weeklyStats.total_staff_absent[todayIndex] || 0
+    };
+  };
+
+  const todayStats = getTodayStats();
   const staffAttendance = [
     {
       id: 0,
-      value: attendanceStats.total_present,
+      value: todayStats.present,
       label: "Present",
       color: "#8094D4",
     },
     {
       id: 1,
-      value: attendanceStats.total_crew - attendanceStats.total_present,
-      label: "Absent",
-      color: " #252941",
+      value: todayStats.absent,
+      label: "Absent", 
+      color: "#252941",
     },
   ];
 
@@ -849,35 +868,41 @@ const generateTimeData = () => {
                 </div>
               ) : (
                 <div className="overflow-scroll">
-                  {sortedAnnouncements.map((announcement) => (
-                    <div
-                      key={announcement._id}
-                      className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
-                      onClick={() => handleViewAnnouncement(announcement)}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-lg">
-                          {announcement.title}
-                        </h3>
-                        <span className="text-sm text-gray-500">
-                          {announcement.created_at &&
-                          !isNaN(new Date(announcement.created_at))
-                            ? new Date(
-                                announcement.created_at
-                              ).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })
-                            : "Date not available"}
-                        </span>
-                      </div>
-                      <p className="text-gray-600">{announcement.content}</p>
-                    </div>
-                  ))}
-                </div>
+  {sortedAnnouncements.length === 0 ? (
+    <div className="text-center py-8 text-gray-500">
+      No announcements available
+    </div>
+  ) : (
+    sortedAnnouncements.map((announcement) => (
+      <div
+        key={announcement._id}
+        className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
+        onClick={() => handleViewAnnouncement(announcement)}
+      >
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="font-semibold text-lg">
+            {announcement.title}
+          </h3>
+          <span className="text-sm text-gray-500">
+            {announcement.created_at &&
+            !isNaN(new Date(announcement.created_at))
+              ? new Date(
+                  announcement.created_at
+                ).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "Date not available"}
+          </span>
+        </div>
+        <p className="text-gray-600">{announcement.content}</p>
+      </div>
+    ))
+  )}
+</div>
               )}
             </div>
             <div className="mt-auto">

@@ -2,27 +2,32 @@ import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAeNBaiZMi00tOI4fKLNZw5EOeW2ONtrEg",
-    authDomain: "hotelcrewfrontend.firebaseapp.com",
-    projectId: "hotelcrewfrontend",
-    storageBucket: "hotelcrewfrontend.firebasestorage.app",
-    messagingSenderId: "97278318826",
-    appId: "1:97278318826:web:a03063b15ae03e1c345f93",
-    measurementId: "G-FVBMZQ5MH0"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const messaging = getMessaging(app);
 
-// Request notification permission and get FCM token
 export const requestPermissionAndGetToken = async () => {
     try {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
-            return await getToken(messaging, {
-                vapidKey: "BPLfqgHCgUX_ArfuCUFfAb3qzMf2zSOxGofeULnG6KUi-MH5QCFLjKz4qHj5ttJLAdXC-qg0bUyliE5qYQjSdas"
+            const token = await getToken(messaging, {
+                vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+                serviceWorkerRegistration: await navigator.serviceWorker.ready
             });
+            
+            if (!token) {
+                throw new Error('No registration token available');
+            }
+            
+            return token;
         }
         throw new Error('Notification permission denied');
     } catch (error) {
@@ -31,11 +36,10 @@ export const requestPermissionAndGetToken = async () => {
     }
 };
 
-// Handle foreground messages
 export const onMessageListener = () =>
     new Promise((resolve) => {
         onMessage(messaging, (payload) => {
-            console.log('Received foreground message:', payload);
+            // console.log('Received foreground message:', payload);
             resolve(payload);
         });
     });

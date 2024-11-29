@@ -16,7 +16,6 @@ interface SidebarProps {
   onMenuItemClick: (component: React.ComponentType) => void;
 }
 
-// Add Skeleton Loading Component
 const SkeletonLoader = () => (
   <div className="flex flex-col items-center py-8 space-y-4 ">
     <div className="w-24 h-24 rounded-full bg-gray-600/50" />
@@ -24,7 +23,6 @@ const SkeletonLoader = () => (
   </div>
 );
 
-// Add this component at the top of Sidebar.tsx
 const ProfilePreviewModal = ({ imageUrl, isOpen, onClose }) => {
   if (!isOpen) return null;
   

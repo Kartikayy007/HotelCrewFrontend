@@ -7,14 +7,16 @@ import App from './App.jsx'
 import Admin from './components/admin/Admin.jsx'
 import MainLayout from './components/Manager/MainLayout.jsx'
 import Reception from './components/receptionist/Reception.tsx'
-import IncompleteRegisteration from './components/common/IncompleteRegisteration.jsx'
+// import IncompleteRegisteration from './components/common/IncompleteRegisteration.jsx'
+// import { RevealBento } from './components/common/IncompleteRegisteration.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
-      {/* <App /> */}
+      <App />
+      {/* <RevealBento /> */}
       {/* <MainLayout /> */}
-      <Admin />   
+      {/* <Admin />    */}
       {/* <Reception /> */}
       {/* <IncompleteRegisteration /> */}
     </Provider>

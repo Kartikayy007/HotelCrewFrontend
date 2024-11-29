@@ -13,7 +13,7 @@ const initialState = {
 };
 
 const getAuthToken = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
+  const token = localStorage.getItem('token');
   return token;
 };
 
@@ -67,6 +67,37 @@ export const createTask = createAsyncThunk(
   }
 );
 
+export const deleteTask = createAsyncThunk(
+  'tasks/deleteTask',
+  async (taskId, { rejectWithValue }) => {
+    try {
+      if (!taskId) {
+        throw new Error('Task ID is required');
+      }
+
+      console.log('Deleting task with ID:', taskId); // Debug log
+      
+      const token = getAuthToken();
+      await axios.delete(
+        `https://hotelcrew-1.onrender.com/api/taskassignment/tasks/delete/${taskId}/`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      return taskId;
+
+    } catch (error) {
+      console.error('Delete task error:', error); // Debug log
+      if (!taskId) {
+        return rejectWithValue('Invalid task ID');
+      }
+      return rejectWithValue(error.response?.data || 'Failed to delete task');
+    }
+  }
+);
+
 export const taskSlice = createSlice({
   name: 'tasks',
   initialState,
@@ -105,6 +136,19 @@ export const taskSlice = createSlice({
           : [action.payload];
       })
       .addCase(createTask.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteTask.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tasks = state.tasks.filter(task => task._id !== action.payload);
+        state.metrics.total = Math.max(0, state.metrics.total - 1);
+      })
+      .addCase(deleteTask.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

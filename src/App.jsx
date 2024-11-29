@@ -15,7 +15,7 @@ import Page404 from './components/common/Page404';
 
 const RoleBasedRoute = ({ children, allowedRoles }) => {
   const location = useLocation();
-  const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  const accessToken = localStorage.getItem('token') || sessionStorage.getItem('token');
   let user = null;
 
   try {
