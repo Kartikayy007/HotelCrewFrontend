@@ -39,7 +39,6 @@ export const requestPermissionAndGetToken = async () => {
 export const onMessageListener = () =>
     new Promise((resolve) => {
         onMessage(messaging, (payload) => {
-            // console.log('Received foreground message:', payload);
             resolve(payload);
         });
     });

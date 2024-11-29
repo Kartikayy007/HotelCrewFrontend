@@ -86,7 +86,7 @@ const AdminAnalytics = () => {
   const todaysCheckIns = roomStats?.daily_checkins[roomStats.daily_checkins.length - 1] || 0;
   const todaysCheckOuts = roomStats?.daily_checkouts[roomStats.daily_checkouts.length - 1] || 0;
 
-  // console.log("todays revenue:", todaysRevenue);
+  console.log("todays revenue:", todaysRevenue);
 
   const animatedRevenue = useCountAnimation(loading ? 0 : todaysRevenue);
   const animatedCheckIns = useCountAnimation(loading ? 0 : todaysCheckIns);

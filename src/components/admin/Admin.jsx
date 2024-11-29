@@ -31,6 +31,7 @@ const Admin = () => {
           },
         }
       );
+      console.log(fcmToken)
       console.log('Device token registered:', response.data);
       return response.data;
     } catch (error) {

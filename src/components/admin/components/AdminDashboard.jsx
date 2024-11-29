@@ -37,6 +37,8 @@ import {
   selectStaffPerDepartment,
   selectStaffLoading,
   selectDepartments,
+  fetchStaffStatus,
+  selectStaffStatus,
 } from "../../../redux/slices/StaffSlice";
 import StaffMetrics from "../../common/StaffMetrics";
 import LoadingAnimation from "../../common/LoadingAnimation";
@@ -102,6 +104,7 @@ function AdminDashboard() {
     dispatch(fetchHotelDetails());
     dispatch(fetchRevenueStats());
     dispatch(fetchRoomStats());
+    dispatch(fetchStaffStatus());
 
     const interval = setInterval(() => {
       dispatch(fetchRoomStats());
@@ -259,10 +262,21 @@ const generateTimeData = () => {
   const busyStaffCount = inProgressCount + pendingCount;
   const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
 
+  const staffStatus = useSelector(selectStaffStatus);
 
-  const staffStatus = [
-    {id: 0, value: busyStaffCount, label: "Busy", color: "#252941"},
-    {id: 1, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
+  const staffStatusData = [
+    {
+      id: 0, 
+      value: staffStatus.busy,
+      label: "Busy",
+      color: "#252941"
+    },
+    {
+      id: 1,
+      value: staffStatus.available,
+      label: "Available",
+      color: "#8094D4"
+    }
   ];
 
   const detailedStaffStatus = [
@@ -599,35 +613,41 @@ const generateTimeData = () => {
                       <h3 className="font-medium mb-2 text-center">
                         Occupancy Rate
                       </h3>
-                      <PieChart
-                        series={[
-                          {
-                            data: occupancyData,
-                            highlightScope: {fade: "global", highlight: "item"},
-                            innerRadius: 45,
-                            paddingAngle: 1,
-                            cornerRadius: 1,
-                          },
-                        ]}
-                        height={220}
-                        margin={{top: 0, bottom: 40, left: 0, right: 0}}
-                        slotProps={{
-                          legend: {
-                            direction: "row",
-                            position: {
-                              vertical: "bottom",
-                              horizontal: "center",
+                      {(occupiedRooms === 0 && availableRooms === 0) ? (
+                        <div className="flex items-center justify-center h-[180px] text-gray-500">
+                          No Occupancy Data Available
+                        </div>
+                      ) : (
+                        <PieChart
+                          series={[
+                            {
+                              data: occupancyData,
+                              highlightScope: {fade: "global", highlight: "item"},
+                              innerRadius: 45,
+                              paddingAngle: 1,
+                              cornerRadius: 1,
                             },
-                            padding: 0,
-                            markSize: 10,
-                            itemGap: 15,
-                            labelStyle: {
-                              fontSize: 12,
-                              fontWeight: 500,
+                          ]}
+                          height={220}
+                          margin={{top: 0, bottom: 40, left: 0, right: 0}}
+                          slotProps={{
+                            legend: {
+                              direction: "row",
+                              position: {
+                                vertical: "bottom",
+                                horizontal: "center",
+                              },
+                              padding: 0,
+                              markSize: 10,
+                              itemGap: 15,
+                              labelStyle: {
+                                fontSize: 12,
+                                fontWeight: 500,
+                              },
                             },
-                          },
-                        }}
-                      />
+                          }}
+                        />
+                      )}
                     </div>
 
                     <div className="flex-1 min-w-[250px]">
@@ -642,7 +662,7 @@ const generateTimeData = () => {
                         <PieChart
                           series={[
                             {
-                              data: staffStatus,
+                              data: staffStatusData,
                               highlightScope: {
                                 fade: "global",
                                 highlight: "item",

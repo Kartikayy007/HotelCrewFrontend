@@ -5,6 +5,7 @@ const API_URL = "https://hotelcrew-1.onrender.com/api/edit/list/";
 const EDIT_STAFF_URL = "https://hotelcrew-1.onrender.com/api/edit/update/";
 const CACHE_KEY = 'staffData';
 const DELETE_STAFF_URL = "https://hotelcrew-1.onrender.com/api/edit/delete/";
+const STAFF_STATUS_URL = "https://hotelcrew-1.onrender.com/api/taskassignment/staff/available/";
 
 const getAuthToken = () => {
   const token = localStorage.getItem('token');
@@ -26,7 +27,7 @@ export const fetchStaffData = createAsyncThunk(
         }
       };
       const response = await axios.get(API_URL, config);
-      // console.log('Fetched staff data:', response);
+      console.log('Fetched staff data:', response);
       return response.data;
     } catch (error) {
       console.error('Failed to fetch staff data:');
@@ -83,6 +84,27 @@ export const deleteStaff = createAsyncThunk(
   }
 );
 
+export const fetchStaffStatus = createAsyncThunk(
+  "staff/fetchStaffStatus",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+      const response = await axios.get(STAFF_STATUS_URL, config);
+      console.log('Fetched staff status:', response);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch staff status:', error);
+      return rejectWithValue(error.response?.data || "Failed to fetch staff status");
+    }
+  }
+);
+
 const initialState = {
   staffPerDepartment: {},
   totalDepartments: 0,
@@ -91,6 +113,11 @@ const initialState = {
   error: null,
   editLoading: false,
   editError: null,
+  availableStaff: 0,
+  staffBusy: 0,
+  totalStaff: 0,
+  staffStatusLoading: false,
+  staffStatusError: null,
 };
 
 const staffSlice = createSlice({
@@ -146,6 +173,20 @@ const staffSlice = createSlice({
       .addCase(deleteStaff.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchStaffStatus.pending, (state) => {
+        state.staffStatusLoading = true;
+        state.staffStatusError = null;
+      })
+      .addCase(fetchStaffStatus.fulfilled, (state, action) => {
+        state.staffStatusLoading = false;
+        state.availableStaff = action.payload.availablestaff;
+        state.staffBusy = action.payload.staffbusy;
+        state.totalStaff = action.payload.totalstaff;
+      })
+      .addCase(fetchStaffStatus.rejected, (state, action) => {
+        state.staffStatusLoading = false;
+        state.staffStatusError = action.payload;
       });
   },
 });
@@ -168,17 +209,30 @@ export const selectDepartments = (state) => {
       label: dept.charAt(0).toUpperCase() + dept.slice(1),
       value: dept
     }));
-    // console.log('Departments:', departments);
+    console.log('Departments:', departments);
   return departments;
 };
 
 
 export const selectTotalStaff = (state) => {
-  const staffPerDept = state.staff.staffPerDepartment;
-  if (!staffPerDept || typeof staffPerDept !== 'object') {
-    return 0;
+  // Get staff list from state
+  const staffList = state.staff.staffList;
+  
+  // Return the length of staff list if it exists and is an array
+  if (Array.isArray(staffList)) {
+    return staffList.length;
   }
-  return Object.values(staffPerDept).reduce((sum, count) => sum + (Number(count) || 0), 0);
+  
+  // Return 0 if staff list is invalid
+  return 0;
 };
+
+export const selectStaffStatus = (state) => ({
+  available: state.staff.availableStaff,
+  busy: state.staff.staffBusy,
+  total: state.staff.totalStaff,
+  loading: state.staff.staffStatusLoading,
+  error: state.staff.staffStatusError
+});
 
 export default staffSlice.reducer;
