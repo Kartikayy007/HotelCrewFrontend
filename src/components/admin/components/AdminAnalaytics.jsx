@@ -1,24 +1,36 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Skeleton,
   Dialog,
   DialogContent,
 } from "@mui/material";
-import {LineChart} from "@mui/x-charts";
-import {BarChart} from "@mui/x-charts/BarChart";
-import {TrendingUp, TrendingDown, Menu, X} from "lucide-react";
+import { LineChart } from "@mui/x-charts";
+import { BarChart } from "@mui/x-charts/BarChart";
+import { TrendingUp, TrendingDown, Menu, X } from "lucide-react";
 import AdminAttendanceList from "./analysis/AdminAttendanceList";
-import {useSelector, useDispatch} from "react-redux";
-import {selectStaffList, selectTotalStaff} from "../../../redux/slices/StaffSlice";
-import {fetchWeeklyAttendance} from "../../../redux/slices/AdminAttendanceSlice";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  selectStaffList,
+  selectTotalStaff,
+  fetchStaffData,
+  fetchStaffStatus
+} from '../../../redux/slices/StaffSlice';
+import {
+  fetchWeeklyAttendance,
+  fetchAttendanceStats
+} from '../../../redux/slices/AdminAttendanceSlice';
+import {
+  fetchRevenueStats,
+  selectRoomStats
+} from '../../../redux/slices/revenueSlice';
+import { fetchRoomStats } from '../../../redux/slices/OcupancyRateSlice';
 import StaffMetrics from "../../common/StaffMetrics";
-import {fetchRevenueStats, selectRoomStats} from "../../../redux/slices/revenueSlice";
 import DepartmentPerformance from "./analysis/DepartmentPerformance";
 
 const useCountAnimation = (end, duration = 500) => {
   const [count, setCount] = useState(0);
-  
+
   useEffect(() => {
     if (end === 0) {
       setCount(0);
@@ -27,11 +39,11 @@ const useCountAnimation = (end, duration = 500) => {
 
     let startTime;
     let animationFrame;
-    
+
     const animate = (currentTime) => {
       if (!startTime) startTime = currentTime;
       const progress = (currentTime - startTime) / duration;
-      
+
       if (progress < 1) {
         setCount(Math.floor(end * progress));
         animationFrame = requestAnimationFrame(animate);
@@ -39,15 +51,16 @@ const useCountAnimation = (end, duration = 500) => {
         setCount(end);
       }
     };
-    
+
     animationFrame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationFrame);
   }, [end, duration]);
-  
+
   return count;
 };
 
 const AdminAnalytics = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [performanceRange, setPerformanceRange] = useState([
     0,
@@ -65,9 +78,9 @@ const AdminAnalytics = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [localLoading, setLocalLoading] = useState(true);
-  
+
   const dispatch = useDispatch();
-  
+
   // Selectors
   const staffList = useSelector(selectStaffList);
   const weeklyStats = useSelector((state) => state.attendance.weeklyStats);
@@ -93,27 +106,37 @@ const AdminAnalytics = () => {
   const animatedCheckOuts = useCountAnimation(loading ? 0 : todaysCheckOuts);
   const animatedStaff = useCountAnimation(loading ? 0 : totalStaff);
 
-
   // Check-ins Data
   const checkinsData = {
-    data: roomStats?.daily_checkins || [], 
+    data: roomStats?.daily_checkins || [],
     labels: roomStats?.dates || []
   };
 
-   ('Check-ins data:', checkinsData);
-   ('Revenue data:', dailyRevenues);
+  ('Check-ins data:', checkinsData);
+  ('Revenue data:', dailyRevenues);
 
   useEffect(() => {
-    dispatch(fetchWeeklyAttendance());
-    dispatch(fetchRevenueStats());
+    const loadAnalyticsData = async () => {
+      try {
+        setIsLoading(true);
 
+        await Promise.all([
+          dispatch(fetchStaffData()),
+          dispatch(fetchStaffStatus()),
+          dispatch(fetchWeeklyAttendance()),
+          dispatch(fetchAttendanceStats()),
+          dispatch(fetchRevenueStats()),
+          dispatch(fetchRoomStats())
+        ]);
 
-    const intervalId = setInterval(() => {
-      dispatch(fetchWeeklyAttendance());
-      dispatch(fetchRevenueStats());
-    }, 60 * 60 * 1000);
+      } catch (error) {
+        console.error('Error loading analytics data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearInterval(intervalId);
+    loadAnalyticsData();
   }, [dispatch]);
 
   useEffect(() => {
@@ -131,7 +154,7 @@ const AdminAnalytics = () => {
 
     // Set initial time data
     setTimeData(generateTimeData(currentHour));
-    
+
     const interval = setInterval(() => {
       const newHour = new Date().getHours();
       if (newHour !== currentHour) {
@@ -147,7 +170,7 @@ const AdminAnalytics = () => {
   // Utility functions
   const formatDates = (dateString) => {
     const date = new Date(dateString);
-    const day = date.toLocaleDateString("en-US", {weekday: "short"});
+    const day = date.toLocaleDateString("en-US", { weekday: "short" });
     const monthDay = date.toLocaleDateString("en-US", {
       month: "numeric",
       day: "numeric",
@@ -175,8 +198,8 @@ const AdminAnalytics = () => {
   const getLastTwoValues = (array) => {
     if (!array || array.length < 2) return [0, 0];
     return [
-      array[array.length - 2] || 0, 
-      array[array.length - 1] || 0  
+      array[array.length - 2] || 0,
+      array[array.length - 1] || 0
     ];
   };
 
@@ -263,7 +286,7 @@ const AdminAnalytics = () => {
                       ⋯
                     </button>
                   </div>
-                  <Box sx={{width: "100%", height: "90%", mt: -4}}>
+                  <Box sx={{ width: "100%", height: "90%", mt: -4 }}>
                     {loading || !hasAttendanceData ? (
                       <div className="space-y-4 pt-8">
                         <Skeleton
@@ -360,34 +383,34 @@ const AdminAnalytics = () => {
                       <LineChart
                         height={220}
                         series={[{
-                          data: checkinsData.data.length > 0 
-                            ? checkinsData.data 
-                            : [0], 
+                          data: checkinsData.data.length > 0
+                            ? checkinsData.data
+                            : [0],
                           color: "#3331D1",
                           curve: "linear",
                           area: true,
                         }]}
-                      xAxis={[
-                        {
-                          data: dates.map(formatDates),
-                          scaleType: "band",
-                          tickLabelStyle: {
-                            angle: 0, 
-                            textAnchor: "start",
-                            fontSize: 12,
+                        xAxis={[
+                          {
+                            data: dates.map(formatDates),
+                            scaleType: "band",
+                            tickLabelStyle: {
+                              angle: 0,
+                              textAnchor: "start",
+                              fontSize: 12,
+                            },
                           },
-                        },
-                      ]}
-                      sx={{
-                        ".MuiLineElement-root": {
-                          strokeWidth: 2,
-                        },
-                        ".MuiAreaElement-root": {
-                          fillOpacity: 0.1,
-                        },
-                      }}
-                      margin={{ top: 15, right: 20, bottom: 40, left: 40 }}
-                    />
+                        ]}
+                        sx={{
+                          ".MuiLineElement-root": {
+                            strokeWidth: 2,
+                          },
+                          ".MuiAreaElement-root": {
+                            fillOpacity: 0.1,
+                          },
+                        }}
+                        margin={{ top: 15, right: 20, bottom: 40, left: 40 }}
+                      />
                     </div>
                   </div>
                 </section>
@@ -428,7 +451,7 @@ const AdminAnalytics = () => {
                           data: dates.map(formatDates),
                           scaleType: "band",
                           tickLabelStyle: {
-                            angle: 0, 
+                            angle: 0,
                             textAnchor: "start",
                             fontSize: 12,
                           },
@@ -443,14 +466,14 @@ const AdminAnalytics = () => {
                         },
                       }}
                       height={300}
-                      margin={{top: 20, right: 40, bottom: 20, left: 60}}
+                      margin={{ top: 20, right: 40, bottom: 20, left: 60 }}
                     />
                   )}
                 </div>
               </section>
 
               <section className="bg-white min-h-[54.5rem] rounded-lg shadow-lg p-4">
-              <h3 className="text-lg font-semibold">
+                <h3 className="text-lg font-semibold">
                   Department Performance
                 </h3>
                 <DepartmentPerformance />
