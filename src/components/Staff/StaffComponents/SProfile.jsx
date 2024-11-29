@@ -1,5 +1,5 @@
 import React from 'react'
-import ProfileStaff from '../../reusable components/ProfileStaff'
+import ProfileStaff from '../../common/ProfileStaff'
 const SProfile = () => {
   return (
     <div><ProfileStaff /></div>

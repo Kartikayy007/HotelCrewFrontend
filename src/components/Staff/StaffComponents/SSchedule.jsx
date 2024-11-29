@@ -7,7 +7,7 @@ import { Snackbar, Skeleton, Alert } from "@mui/material";
 import { staffLeaveApply,resetLeaveStatus, resetApplyLeaveError } from '../../../redux/slices/StaffLeaveSlice'
 import { getMonthlyAttendance } from '../../../redux/slices/StaffAttendanceSlice';
 import MuiAlert from "@mui/material/Alert";
-import InfoIcon from "@mui/icons-material/Info";
+// import InfoIcon from "@mui/icons-material/Info";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { Dialog, Box } from "@mui/material";

@@ -118,7 +118,7 @@ function AdminDashboard() {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
-    severity: "success",
+    severity: "success", 
   });
 
   const departments = useSelector(selectDepartments);

@@ -10,7 +10,7 @@ import {BarChart} from "@mui/x-charts/BarChart";
 import {TrendingUp, TrendingDown, Menu, X} from "lucide-react";
 import AdminAttendanceList from "./analysis/AdminAttendanceList";
 import {useSelector, useDispatch} from "react-redux";
-import {selectStaffList, selectTotalStaff} from "../../../redux/slices/StaffSlice";
+import {selectStaffList, selectTotalStaff} from "../../../redux/slices/AdminStaffSlice";
 import {fetchWeeklyAttendance} from "../../../redux/slices/AdminAttendanceSlice";
 import StaffMetrics from "../../common/StaffMetrics";
 import {fetchRevenueStats, selectRoomStats} from "../../../redux/slices/revenueSlice";

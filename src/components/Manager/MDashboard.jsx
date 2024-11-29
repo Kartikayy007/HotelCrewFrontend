@@ -1,24 +1,66 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useMemo } from "react";
 import * as React from 'react';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { LineChart } from "@mui/x-charts/LineChart";
 import { BarChart } from '@mui/x-charts/BarChart';
-import { FaStar } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { BsThreeDots } from "react-icons/bs";
-import { fetchAttendanceStats } from '../../redux/slices/AttendanceSlice';
+import {
+  fetchStaffData,
+  selectStaffPerDepartment,
+  selectStaffLoading,
+  selectDepartments,
+} from "../../redux/slices/AdminStaffSlice";
+import { fetchAttendanceStats, selectError, selectStats, selectLoading } from '../../redux/slices/AttendanceSlice';
 import { Dialog, TextField, Button, Snackbar, Alert, IconButton } from "@mui/material";
 import { CreateAnnouncementBox } from "../common/CreateAnnouncementBox";
-import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError, deleteAnnouncement } from '../../redux/slices/AnnouncementSlice';
-import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
+import {
+  createAnnouncement,
+  fetchAnnouncements,
+  selectAllAnnouncements,
+  selectAnnouncementsLoading,
+  selectAnnouncementsError,
+  deleteAnnouncement
+} from '../../redux/slices/AnnouncementSlice';
+import { AllAnnouncementsDialog } from "../common/AllAnnouncementsDialog";
+// import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";
-import { fetchGuestData,selectCheckins,selectCheckouts,selectDates,selectGuestError,selectGuestLoading } from '../../redux/slices/GuestSlice';
+import { fetchGuestData, selectCheckins, selectCheckouts, selectDates, selectGuestError, selectGuestLoading } from '../../redux/slices/GuestSlice';
 import { Skeleton } from "@mui/material";
 import Box from "@mui/material/Box";
 import MTaskAssignment from "./MTaskAssignment";
-import { fetchLeaveRequests,fetchLeaveCount ,selectLeaveCount,selectLeaveError,selectLeaveLoading,selectLeaveRequests,selectUpdateStatus} from "../../redux/slices/LeaveSlice";
- 
+import AdminTaskAssignment from "../admin/components/AdminTaskAssignment";
+import LoadingAnimation from "../common/LoadingAnimation";
+import {
+  fetchLeaveRequests,
+  fetchLeaveCount,
+  selectLeaveCount,
+  selectLeaveError,
+  selectLeaveLoading,
+  selectLeaveRequests,
+  selectUpdateStatus
+}
+  from "../../redux/slices/LeaveSlice";
+import {
+  selectLatestRevenue,
+  fetchRevenueStats,
+  selectRoomStats,
+} from "../../redux/slices/revenueSlice";
+import {
+  fetchRoomStats,
+  selectOccupiedRooms,
+  selectAvailableRooms,
+} from "../../redux/slices/OcupancyRateSlice";
+import {
+  createTask,
+  selectTasksLoading,
+  selectTasksError,
+  selectAllTasks,
+  fetchTasks,
+} from "../../redux/slices/TaskSlice";
+import { MoreVertical } from "lucide-react";
+
+
 const MDashboard = () => {
   const dispatch = useDispatch();
   // const [loading,setloading]=useState(false);
@@ -27,8 +69,8 @@ const MDashboard = () => {
   const [selectedPriority, setSelectedPriority] = useState("");
   const [timeData, setTimeData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [taskTitle, setTaskTitle] = useState("");
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const Taskloading = useSelector(selectTasksLoading);
   const Taskerror = useSelector(selectTasksError);
@@ -48,8 +90,8 @@ const MDashboard = () => {
   const leaveRequests = useSelector(selectLeaveRequests);
   const leaveLoading = useSelector(selectLeaveLoading);
   const leaveError = useSelector(selectLeaveError);
-  const leaveCount=useSelector(selectLeaveCount);
-  const updateLeaveStatus=useSelector(selectUpdateStatus);
+  const leaveCount = useSelector(selectLeaveCount);
+  const updateLeaveStatus = useSelector(selectUpdateStatus);
   // const { leaveRequests,leaveLoading, leaveError,leaveCount} = useSelector((state) => state.leave);
   // const [taskData, setTaskData] = useState({
   //   title: '',
@@ -58,11 +100,11 @@ const MDashboard = () => {
   //   // priority: false, // For priority status
   // });
   // const { dates, checkins, checkouts, guestloading, guesterror } = useSelector((state) => state.attendance);
-  const dates=useSelector(selectDates);
-  const checkins=useSelector(selectCheckins);
-  const checkouts=useSelector(selectCheckouts);
-  const guestloading=useSelector(selectGuestLoading);
-  const guesterror=useSelector(selectGuestError);
+  const dates = useSelector(selectDates);
+  const checkins = useSelector(selectCheckins);
+  const checkouts = useSelector(selectCheckouts);
+  const guestloading = useSelector(selectGuestLoading);
+  const guesterror = useSelector(selectGuestError);
   const [sliderValue, setSliderValue] = useState([0, 6]);
   const [inOutData, setInOutData] = useState({
     xAxis: [
@@ -90,17 +132,148 @@ const MDashboard = () => {
     ],
   });
 
-  useEffect(() => {
-    dispatch(fetchGuestData());
-  }, [dispatch]);
+  const latestRevenue = useSelector(selectLatestRevenue);
+  const revenueLoading = useSelector((state) => state.revenue.loading);
+  // const departments = useSelector(selectDepartments);
+  const availableRooms = useSelector(selectAvailableRooms);
+  const occupiedRooms = useSelector(selectOccupiedRooms);
 
   useEffect(() => {
-    // Ensure dates, checkins, and checkouts are arrays (default to empty arrays)
+    dispatch(fetchRevenueStats());
+
+    const interval = setInterval(() => {
+      dispatch(fetchRevenueStats());
+    }, 3600000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
+
+  useEffect(() => {
+    dispatch(fetchGuestData());
+    dispatch(fetchRoomStats());
+    dispatch(fetchRevenueStats());
+    dispatch(fetchStaffData());
+    // dispatch(fetchTasks());
+    const interval = setInterval(() => {
+      dispatch(fetchRoomStats());
+    }, 30 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
+  const [cumulativeRevenue, setCumulativeRevenue] = useState(0);
+
+  const STORAGE_KEY = 'hourlyRevenueData';
+  const HOURS_IN_DAY = 24;
+
+  const [hourlyRevenues, setHourlyRevenues] = useState(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const initial = new Array(HOURS_IN_DAY).fill(0);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    const currentHour = new Date().getHours();
+    if (latestRevenue) {
+      initial[currentHour] = parseFloat(latestRevenue) - cumulativeRevenue;
+    }
+    return initial;
+  });
+
+  useEffect(() => {
+    if (latestRevenue) {
+      const currentHour = new Date().getHours();
+      setHourlyRevenues(prev => {
+        const updated = [...prev];
+        updated[currentHour] = parseFloat(latestRevenue) - cumulativeRevenue;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        return updated;
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const midnightClear = setInterval(() => {
+      const now = new Date();
+      if (now.getHours() === 0 && now.getMinutes() === 0) {
+        localStorage.removeItem(STORAGE_KEY);
+        setHourlyRevenues(new Array(HOURS_IN_DAY).fill(0));
+        setCumulativeRevenue(0);
+      }
+    }, 60000);
+
+    const revenueUpdate = setInterval(() => {
+      const newHour = new Date().getHours();
+
+      if (newHour !== currentHour) {
+        if (latestRevenue) {
+          const newRevenue = parseFloat(latestRevenue);
+          setHourlyRevenues((prev) => {
+            const updated = [...prev];
+            updated[currentHour] = newRevenue - cumulativeRevenue;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+            return updated;
+          });
+          setCumulativeRevenue(newRevenue);
+        }
+
+        setCurrentHour(newHour);
+        setPerformanceRange([0, newHour || 1]);
+        setRevenueRange([0, newHour || 1]);
+        dispatch(fetchRevenueStats());
+        setTimeData(generateTimeData());
+      }
+    }, 60000);
+
+    setTimeData(generateTimeData());
+    setLoading(false);
+
+    return () => {
+      clearInterval(revenueUpdate);
+      clearInterval(midnightClear);
+    };
+  }, [currentHour, latestRevenue, cumulativeRevenue]);
+
+  const generateTimeData = () => {
+    const timeData = [];
+    for (let i = 0; i <= currentHour; i++) {
+      timeData.push({
+        hour: `${i}:00`,
+        revenue: hourlyRevenues[i],
+        cumulative: i === 0 ? hourlyRevenues[0] :
+          timeData[i - 1].cumulative + hourlyRevenues[i]
+      });
+    }
+    return timeData;
+  };
+
+
+  const getFilteredRevenueData = () => {
+    return timeData.slice(revenueRange[0], revenueRange[1] + 1);
+  };
+
+  const occupancyData = [
+    {
+      id: 0,
+      value: occupiedRooms,
+      label: "Occupied",
+      color: "#252941",
+    },
+    {
+      id: 1,
+      value: availableRooms,
+      label: "Vacant",
+      color: "#8094D4",
+    },
+  ];
+
+
+  useEffect(() => {
     if (Array.isArray(dates) && dates.length > 0) {
       setInOutData({
         xAxis: [
           {
-            data: dates, // Use actual dates here
+            data: dates,
             scaleType: 'band',
             categoryGapRatio: 0.5,
           },
@@ -156,9 +329,9 @@ const MDashboard = () => {
 
     // Function to fetch data
     const fetchData = () => {
+      dispatch(fetchAttendanceStats());
       dispatch(fetchLeaveRequests());
       dispatch(fetchLeaveCount(currentDate));
-      dispatch(fetchAttendanceStats());
     };
 
     // Fetch immediately on mount
@@ -167,7 +340,7 @@ const MDashboard = () => {
     // Set up interval to fetch every 4 minutes (240,000 ms)
     const intervalId = setInterval(fetchData, 240000);
 
-    // Clear the interval on component unmount
+
     return () => clearInterval(intervalId);
   }, [dispatch]);
 
@@ -177,14 +350,6 @@ const MDashboard = () => {
       animationDuration: "0.8s",
     },
   };
-
-  // const togglePriority = () => {
-  //   setIsPriority((prev) => !prev);
-  //   setTaskData((prevData) => ({
-  //     ...prevData,
-  //     priority: !prevData.priority,
-  //   }));
-  // };
 
 
   const departments = [
@@ -198,86 +363,57 @@ const MDashboard = () => {
 
   const [selected, setSelected] = useState({ label: 'Department', value: '' });
 
-  const { stats, error } = useSelector((state) => state.attendance);
-  // useEffect(() => {
-  //   dispatch(fetchAttendanceStats());
-
-  //   const interval = setInterval(() => {
-  //     dispatch(fetchAttendanceStats());
-  //   }, 300000);
-
-  //   return () => clearInterval(interval);
-  // }, [dispatch]);
-
-  const occupancyData = [
-    { id: 0, value: 60, label: "Occupied", color: "#252941" },
-    { id: 1, value: 30, label: "Vacant", color: "#8094D4" },
-    { id: 2, value: 10, label: "Maintainence", color: "#6B46C1" },
-  ];
-
-  const staffStatus = [
-    { id: 0, value: 45, label: "Busy", color: "#252941" },
-    { id: 1, value: 35, label: "Vacant", color: "#8094D4" },
-  ];
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [showTaskAssignment, setShowTaskAssignment] = useState(false);
-
-  const handleDotsClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleShowTaskAssignment = () => {
-    setShowTaskAssignment(true);
-    handleDotsClose();
-  };
+  // const {  error } = useSelector((state) => state.attendance);
+  const stats = useSelector(selectStats);
+  const statError = useSelector(selectError);
+  const statLoading = useSelector(selectLoading);
+  // const staffStatus = [
+  //   { id: 0, value: 45, label: "Busy", color: "#252941" },
+  //   { id: 1, value: 35, label: "Vacant", color: "#8094D4" },
+  // ];
+  // const { totalCrew, totalPresent } = useSelector(selectStats);
   const staffAttendanceData = [
     {
       id: 0,
-      value: stats.totalPresent || 0,
+      value: stats.totalPresent,
       label: 'Present',
       color: '#252941',
     },
     {
       id: 1,
-      value: stats.totalCrew - stats.totalPresent || 0,
+      value: stats.totalCrew- stats.totalPresent,
       label: 'Absent',
       color: '#8094D4',
     },
   ];
 
 
-  // const sampleInOutData = {
-  //   xAxis: [
-  //     {
-  //       data: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-  //       scaleType: "band",
-  //       categoryGapRatio: 0.5,
-  //     },
-  //   ],
-  //   series: [
-  //     {
-  //       id: "checkin",
-  //       type: "bar",
-  //       data: [40, 92, 85, 60, 58, 60, 90],
-  //       color: "#8094D4",
-  //       label: "Check-in",
+  const tasks = useSelector(selectAllTasks);
+  const staffPerDepartment = useSelector(selectStaffPerDepartment);
 
-  //     },
-  //     {
-  //       id: "checkout",
-  //       type: "bar",
-  //       data: [70, 40, 49, 25, 89, 50, 70],
-  //       color: "#2A2AA9",
-  //       label: "Check-out",
+  "Staff per department:", staffPerDepartment;
+  "All tasks:", tasks;
 
-  //     },
-  //   ],
-  // };
-  // const [inOutData, setInOutData] = useState(sampleInOutData);
+  const totalStaff = Object.values(staffPerDepartment).reduce(
+    (sum, count) => sum + count,
+    0
+  );
+  "Total staff count:", totalStaff;
 
-  // const [sliderValue, setSliderValue] = useState([0, 6]);
+  const inProgressCount = Array.isArray(tasks)
+    ? tasks.filter((task) => task.status.toLowerCase() === "in_progress").length
+    : 0;
+  const pendingCount = Array.isArray(tasks)
+    ? tasks.filter((task) => task.status.toLowerCase() === "pending").length
+    : 0;
+  const busyStaffCount = inProgressCount + pendingCount;
+  const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
 
+
+  const staffStatus = [
+    { id: 0, value: busyStaffCount, label: "Busy", color: "#252941" },
+    { id: 1, value: vacantStaffCount, label: "Vacant", color: "#8094D4" },
+  ];
 
 
   const rotateWeeklyData = (data, todayIndex) => {
@@ -306,68 +442,11 @@ const MDashboard = () => {
   };
 
 
-  // useEffect(() => {
-  //   const currentDayIndex = getCurrentDayIndex();
-  //   const rotatedData = rotateWeeklyData(sampleInOutData, currentDayIndex);
-  //   setInOutData(rotatedData);
-
-
-  //   setSliderValue([0, 6]);
-  // }, []);
-
-
-
-
-  // const handleSliderChange = (e, newValue) => {
-  //   setSliderValue(newValue); // Dynamically update slider range
-  // };
-  // const filteredData = {
-  //   xAxis: [inOutData.xAxis[0].data.slice(sliderValue[0], sliderValue[1] + 1)],
-  //   series: inOutData.series.map((s) => ({
-  //     ...s,
-  //     data: s.data.slice(sliderValue[0], sliderValue[1] + 1),
-  //   })),
-  // };
-
-
-
   const getFilteredData = (range) => {
     return timeData.slice(range[0], range[1] + 1);
   };
-  const revenueData = {
-    xAxis: [
-      {
-        id: "hours",
-        data: getFilteredData(revenueRange).map((d) => d.hour),
-        scaleType: "band",
-      },
-    ],
-    series: [
-      {
-        data: getFilteredData(revenueRange).map((d) => d.revenue),
-        curve: "linear",
-        color: "#6B46C1",
-        highlightScope: {
-          highlighted: "none",
-          faded: "global",
-        },
-      },
-    ],
-  };
-  const handleRevenueRangeChange = (event, newValue) => {
-    setRevenueRange(newValue);
-  };
-  const generateTimeData = (hour) => {
-    const performanceData = [];
-    for (let i = 0; i <= hour; i++) {
-      performanceData.push({
-        hour: `${i}:00`,
-        performance: Math.floor(Math.random() * (95 - 85 + 1)) + 85,
-        revenue: Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000,
-      });
-    }
-    return performanceData;
-  };
+
+
 
   const generateMarks = () => {
     const marks = [];
@@ -407,43 +486,134 @@ const MDashboard = () => {
     return () => clearInterval(interval);
   }, [currentHour]);
 
-  
+
 
 
   const handleSelect = (dept) => {
-    //  (taskData);
     setSelected(dept);
-    setTaskData((prevData) => ({
-      ...prevData,
-      department: dept.value,
-    }));
     setIsDropdownOpen(false);
   };
-  // useEffect(() => {
-  //    ("Updated taskData:", taskData);
-  // }, [taskData]);
 
-  // localStorage.setItem('accessToken',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9. tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY")
+  const announcements = useSelector(selectAllAnnouncements);
+  const announcementsLoading = useSelector(selectAnnouncementsLoading);
+  const announcementsError = useSelector(selectAnnouncementsError);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newAnnouncement, setNewAnnouncement] = useState({
+    title: "",
+    description: "",
+  });
 
-  // const dataToSend = {
-  //   title,
-  //   description,
-  //   department,
-  //   // priority,
-  // };
+  const handleModalOpen = () => setIsModalOpen(true);
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setNewAnnouncement({ title: "", description: "" });
+  };
 
-  //   try {
-  //     const response = await dispatch(createTask(taskData));
-  //     //  (response.data);
-  //     if (response.data.status === 'success') {
-  //       alert('Task created successfully');
-  //     } else {
-  //       alert('Failed to create task: ' + response.data.message);
-  //     }
-  //   } catch (error) {
-  //     alert('An error occurred: ' + error.message);
-  //   }
-  // };
+  useEffect(() => {
+    dispatch(fetchAnnouncements());
+  }, [dispatch]);
+
+  const handleCreateAnnouncement = async (announcementData) => {
+    try {
+      setLoading(true);
+      const enrichedData = {
+        ...announcementData,
+        created_at: new Date().toISOString(),
+      };
+
+      await dispatch(createAnnouncement(enrichedData)).unwrap();
+      setShowAnnouncementBox(false);
+
+      await dispatch(fetchAnnouncements());
+
+      setSnackbar({
+        open: true,
+        message: "Announcement created successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error("Create announcement error:", error);
+      setSnackbar({
+        open: true,
+        message: error || "Failed to create announcement",
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewAnnouncement = (announcement) => {
+    setSelectedAnnouncement(announcement);
+  };
+
+  const handleViewClose = () => {
+    setSelectedAnnouncement(null);
+  };
+
+
+
+  const handleDelete = async () => {
+    if (!selectedAnnouncement?.id) {
+      setSnackbar({
+        open: true,
+        message: "Invalid announcement ID",
+        severity: "error"
+      });
+      return;
+    }
+
+    try {
+      await dispatch(deleteAnnouncement(selectedAnnouncement.id)).unwrap();
+      handleViewClose();
+      setSnackbar({
+        open: true,
+        message: "Announcement deleted successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error('Delete error:', error);
+      setSnackbar({
+        open: true,
+        message: error?.message || "Failed to delete announcement",
+        severity: "error"
+      });
+    }
+  };
+
+  const pendingLeavesCount = leaveRequests.filter(
+    (leave) => leave.status === "Pending"
+  ).length;
+
+
+  const [deadline, setDeadline] = useState("");
+  const [selectedHour, setSelectedHour] = useState("09");
+  const [selectedMinute, setSelectedMinute] = useState("00");
+
+  const hours = Array.from({ length: 24 }, (_, i) =>
+    i.toString().padStart(2, "0")
+  );
+  const minutes = Array.from({ length: 60 }, (_, i) =>
+    i.toString().padStart(2, "0")
+  );
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [showTaskAssignment, setShowTaskAssignment] = useState(false);
+
+  const handleDotsClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleShowTaskAssignment = () => {
+    setShowTaskAssignment(true);
+    handleDotsClose();
+  };
+
+
   const handleAssign = async (e) => {
     e.preventDefault();
 
@@ -475,18 +645,28 @@ const MDashboard = () => {
     }
 
     try {
+      const today = new Date();
+      today.setHours(parseInt(selectedHour, 10));
+      today.setMinutes(parseInt(selectedMinute, 10));
+      today.setSeconds(0);
+
+      const formattedDeadline = today.toISOString();
       await dispatch(
         createTask({
           title: taskTitle.trim(),
           description: taskDescription.trim(),
           department: selected.value,
-          priority: selectedPriority
+          deadline: formattedDeadline,
         })
       ).unwrap();
 
+      dispatch(fetchTasks());
+
       setTaskTitle("");
       setTaskDescription("");
-      setSelected({ label: "Select Department", value: "" });
+      setSelected({ value: "", label: "Department" });
+      setSelectedHour("09");
+      setSelectedMinute("00");
 
       setSnackbar({
         open: true,
@@ -501,88 +681,24 @@ const MDashboard = () => {
       });
     }
   };
-  const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
 
-  const announcements = useSelector(selectAllAnnouncements);
-  const announcementsLoading = useSelector(selectAnnouncementsLoading);
-  const announcementsError = useSelector(selectAnnouncementsError);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newAnnouncement, setNewAnnouncement] = useState({
-    title: "",
-    description: "",
-  });
+  // const [showAnnouncementBox, setShowAnnouncementBox] = useState(false);
+  const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
 
-  const handleModalOpen = () => setIsModalOpen(true);
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setNewAnnouncement({ title: "", description: "" });
-  };
+  const sortedAnnouncements = useMemo(() => {
+    if (!announcements?.length) return [];
 
-  useEffect(() => {
-    dispatch(fetchAnnouncements());
-  }, [dispatch]);
+    return [...announcements].sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at) : null;
+      const dateB = b.created_at ? new Date(a.created_at) : null;
 
-  const handleCreateAnnouncement = async (announcementData) => {
-    try {
-      await dispatch(createAnnouncement(announcementData)).unwrap();
-      setShowAnnouncementBox(false);
-      setSnackbar({
-        open: true,
-        message: "Announcement created successfully",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: error || "Failed to create announcement",
-        severity: "error",
-      });
-    }
-  };
+      if (!dateA || isNaN(dateA.getTime())) return 1;
+      if (!dateB || isNaN(dateB.getTime())) return -1;
 
-  const handleViewAnnouncement = (announcement) => {
-    setSelectedAnnouncement(announcement);
-  };
+      return dateB - dateA;
+    });
+  }, [announcements]);
 
-  const handleViewClose = () => {
-    setSelectedAnnouncement(null);
-  };
-
-
-
-  const handleDelete = async () => {
-    if (!selectedAnnouncement?.id) {
-      setSnackbar({
-        open: true,
-        message: "Invalid announcement ID",
-        severity: "error"
-      });
-      return;
-    }
-
-    try {
-      await dispatch(deleteAnnouncement(selectedAnnouncement.id)).unwrap();
-      handleViewClose();
-      setSnackbar({
-        open: true,
-        message: "Announcement deleted successfully",
-        severity: "success"
-      });
-    } catch (error) {
-      console.error('Delete error:', error);
-      setSnackbar({
-        open: true,
-        message: error?.message || "Failed to delete announcement",
-        severity: "error"
-      });
-    }
-  };
-
-  const pendingLeavesCount = leaveRequests.filter(
-    (leave) => leave.status === "Pending"
-  ).length;
 
 
 
@@ -657,6 +773,11 @@ const MDashboard = () => {
                       <h3 className="font-medium mb-2 text-center">
                         Staff Status
                       </h3>
+                      {totalStaff === 0 ? (
+                        <div className="flex items-center justify-center h-[180px] text-gray-500">
+                          No Staff Data Available
+                        </div>
+                      ) : (
                       <PieChart
                         series={[
                           {
@@ -676,6 +797,7 @@ const MDashboard = () => {
                           }
                         }}
                       />
+                      )}
                     </div>
 
                     <div className="flex-1 min-w-[250px]">
@@ -687,11 +809,14 @@ const MDashboard = () => {
                         <div className="flex items-center justify-center h-[180px] text-gray-500">
                           No Data Available
                         </div> */}
-                      {loading ? (
+                        
+                      {statLoading ? (
                         <p>Loading...</p>
-                      ) : error ? (
+                      ) : statError ? (
                         <p className="text-red-500 text-center">No Data Available</p>
                       ) : (
+                        <>
+                        {console.log('Staff Attendance Data:', staffAttendanceData)}
                         <PieChart
                           series={[
                             {
@@ -708,9 +833,10 @@ const MDashboard = () => {
                             legend: {
                               hidden: true,
 
-                            }
-                          }}
+                            },
+                          }}//line-837
                         />
+                        </>
                       )}
                     </div>
                   </div>
@@ -721,10 +847,10 @@ const MDashboard = () => {
 
           </div>
           <div className="bg-white rounded-lg shadow  w-full p-4">
-          <h2 className="text-lg sm:text-xl font-semibold">Guest Flow Overview</h2>
+            <h2 className="text-lg sm:text-xl font-semibold">Guest Flow Overview</h2>
             <Box sx={{ width: "100%" }}>
               {/* Bar Chart with Weekly Data */}
-              {loading ? (
+              {guestloading ? (
                 <Skeleton
                   variant="rectangular"
                   width="100%"
@@ -789,51 +915,77 @@ const MDashboard = () => {
             </Box>
 
           </div>
-          <div className="bg-white rounded-xl shadow-lg min-h-[384px] w-full p-4">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+          <div className="bg-white rounded-xl shadow-lg min-h-[384px] w-full p-4 pb-0">
+            <h2 className="text-lg sm:text-xl font-semibold ">
               Revenue (Hours {revenueRange[0]} - {revenueRange[1]})
             </h2>
-            <Box sx={{ width: "100%", mb: 4 }}>
-              {loading ? (
-                <Skeleton
-                  variant="rectangular"
-                  width="100%"
-                  height={250}
-                  {...skeletonProps}
-                />
-              ) : (
+            <div className="text-right pr-3">
+              <p className="text-sm text-gray-500">Today's Total Revenue</p>
+              <p className="text-xl font-bold">₹{latestRevenue || "0.00"}</p>
+            </div>
+            {/* <Box sx={{ width: "100%", mb: 4 }}> */}
+            {revenueLoading ? (
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height={250}
+                {...skeletonProps}
+              />
+            ) : (
+              <>
                 <LineChart
-                  xAxis={revenueData.xAxis}
-                  series={revenueData.series}
-                  height={250}
-                  margin={{ top: 20, right: 20, bottom: 30, left: 40 }}
+                  height={373}
+                  series={[
+                    {
+                      data: getFilteredRevenueData().map(
+                        (data) => data.revenue
+                      ),
+                      color: "#4C51BF",
+                      area: true,
+                      curve: "linear",
+                    },
+                  ]}
+                  xAxis={[
+                    {
+                      data: getFilteredRevenueData().map((data) => data.hour),
+                      scaleType: "band",
+                    },
+                  ]}
                   sx={{
                     ".MuiLineElement-root": {
                       strokeWidth: 2,
                     },
+                    ".MuiAreaElement-root": {
+                      fillOpacity: 0.1,
+                    },
                   }}
                 />
-              )}
-            </Box>
-            <Box sx={{ width: "100%", px: 2 }}>
-              <Slider
-                value={revenueRange}
-                onChange={handleRevenueRangeChange}
-                valueLabelDisplay="auto"
-                step={1}
-                marks={marks}
-                min={0}
-                max={currentHour || 1}
-                sx={{
-                  bottom: 20,
-                  height: 3,
-                  "& .MuiSlider-thumb": {
-                    height: 12,
-                    width: 12,
-                  },
-                }}
-              />
-            </Box>
+                <div className="mt-0 px-4">
+                  <Slider
+                    value={revenueRange}
+                    onChange={(_, newValue) => setRevenueRange(newValue)}
+                    valueLabelDisplay="auto"
+                    min={0}
+                    max={currentHour}
+                    marks={[
+                      { value: 0, label: "00:00" },
+                      { value: currentHour, label: `${currentHour}:00` },
+                    ]}
+                    sx={{
+                      color: "#4C51BF",
+                      "& .MuiSlider-thumb": {
+                        backgroundColor: "#4C51BF",
+                      },
+                      "& .MuiSlider-track": {
+                        backgroundColor: "#4C51BF",
+                      },
+                    }}
+                  />
+                </div>
+              </>
+            )}
+            {/* </Box> */}
+
           </div>
         </div>
         {/* Second Column */}
@@ -843,25 +995,14 @@ const MDashboard = () => {
             <div className="bg-white  h-[50%] p-4 pr-6 pl-6 shadow rounded-lg">
               <form className="flex flex-col gap-4" onSubmit={handleAssign}>
                 <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Task Assignment</h2>
-                  {/* <div
-                  className={`cursor-pointer ${isPriority ? 'text-gold' : 'text-gray-200'}`}
-                  onClick={togglePriority}
-                >
-                  {isPriority ? (
-                    <FaStar size={25} color="gold" />
-                  ) : (
-                    // <FaRegStar size={25} color="gray" />
-                    <p className="text-gray-400">Mark Priority</p>
-                  )}
+                  <h2 className="text-lg font-semibold">Assign Task</h2>
 
-                </div> */}
                   <IconButton
                     onClick={handleShowTaskAssignment}
                     size="small"
                     className="text-gray-600"
                   >
-                    <BsThreeDots />
+                    <MoreVertical />
                   </IconButton>
                 </div>
 
@@ -873,13 +1014,13 @@ const MDashboard = () => {
                   className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
                 />
                 <div className="flex lg:justify-between gap-2">
-                  <div className="relative lg:w-48 w-full">
+                  <div className="relative  w-full">
                     <button
                       type="button"
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                       className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${selected.value ? "text-black" : "text-gray-400"
-                        } focus:outline-none flex justify-between items-center`}
-                    >
+                        } focus:outline-none flex justify-between items-center`}>
+
                       {selected.label}
                       {isDropdownOpen ? (
                         <FaChevronUp className="text-gray-600" />
@@ -890,16 +1031,12 @@ const MDashboard = () => {
 
                     {isDropdownOpen && (
                       <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                        {departments.map((dept, index) => (
+                        {departments.map((dept) => (
                           <button
-                            key={index}
+                            key={dept.value}
                             type="button"
                             onClick={() => handleSelect(dept)}
-                            disabled={dept.disabled}
-                            className={`w-full text-left px-4 py-2 ${dept.disabled
-                              ? "text-gray-400 cursor-default"
-                              : "text-black hover:bg-gray-100"
-                              }`}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100"
                           >
                             {dept.label}
                           </button>
@@ -907,42 +1044,34 @@ const MDashboard = () => {
                       </div>
                     )}
                   </div>
-                  <div className="relative w-full lg:w-40">
-                    <button
-                      type="button"
-                      onClick={() => setPriorityDropdownOpen(!isPriorityDropdownOpen)}
-                      className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${selectedPriority ? "text-black" : "text-gray-400"
-                        } focus:outline-none flex justify-between items-center`}
+                </div>
+                <div className="relative w-full mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Deadline
+                  </label>
+                  <div className="flex space-x-2">
+                    <select
+                      value={selectedHour}
+                      onChange={(e) => setSelectedHour(e.target.value)}
+                      className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
                     >
-                      {selectedPriority || " Priority"}
-                      {isPriorityDropdownOpen ? (
-                        <FaChevronUp className="text-gray-600" />
-                      ) : (
-                        <FaChevronDown className="text-gray-600" />
-                      )}
-                    </button>
-
-                    {isPriorityDropdownOpen && (
-                      <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                        {["High", "Medium", "Low"].map((priority) => (
-                          <button
-                            key={priority}
-                            type="button"
-                            onClick={() => {
-                              setSelectedPriority(priority);
-                              setPriorityDropdownOpen(false);
-                            }}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                          >
-                            <span className={`inline-block w-2 h-2 rounded-full mr-2 ${priority === "High" ? "bg-red-500" :
-                              priority === "Medium" ? "bg-yellow-500" :
-                                "bg-green-500"
-                              }`}></span>
-                            {priority}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                      {hours.map((hour) => (
+                        <option key={hour} value={hour}>
+                          {hour}:00
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={selectedMinute}
+                      onChange={(e) => setSelectedMinute(e.target.value)}
+                      className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                    >
+                      {minutes.map((minute) => (
+                        <option key={minute} value={minute}>
+                          {minute}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 <textarea
@@ -956,9 +1085,13 @@ const MDashboard = () => {
                   <button
                     type="submit"
                     disabled={Taskloading}
-                    className="h-9  w-full  bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white  shadow-xl"
+                    className="h-9  w-full  bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50 shadow-xl flex items-center justify-center"
                   >
-                    {Taskloading ? "Assigning..." : "Assign"}
+                    {Taskloading ? (
+                      <LoadingAnimation size={24} color="#FFFFFF" />
+                    ) : (
+                      "Assign"
+                    )}
                   </button>
                 </div>
               </form>
@@ -969,11 +1102,17 @@ const MDashboard = () => {
             onClose={() => setShowTaskAssignment(false)}
             maxWidth="lg"
             fullWidth
+            BackdropProps={{
+              sx: {
+                backgroundColor: "rgba(0, 0, 0, 0.4)",
+                backdropFilter: "blur(5px)",
+              },
+            }}
           >
-            <MTaskAssignment onClose={() => setShowTaskAssignment(false)} />
+            <AdminTaskAssignment onClose={() => setShowTaskAssignment(false)} />
           </Dialog>
           <div className="bg-white rounded-lg flex flex-col shadow xl:min-h-[515px] w-full p-4">
-          <h2 className="text-lg font-semibold">Announcements</h2>
+            <h2 className="text-lg font-semibold">Announcements</h2>
             <div className="flex-1 overflow-y-auto mb-4">
               {announcementsLoading ? (
                 <div className="space-y-4">
@@ -1153,7 +1292,7 @@ const MDashboard = () => {
           </div>
           <div className="bg-white rounded-lg shadow h-auto w-full p-4">
             <h2 className="text-lg  font-semibold mb-1">Leave Management</h2>
-            
+
             <div className="grid grid-cols-2 gap-3">
               <div className="border rounded p-4">
                 <h3 className="font-medium">Pending Requests</h3>
@@ -1168,6 +1307,25 @@ const MDashboard = () => {
         </div>
 
       </div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+      <AllAnnouncementsDialog
+        open={showAllAnnouncements}
+        onClose={() => setShowAllAnnouncements(false)}
+      />
     </section>
   )
 }

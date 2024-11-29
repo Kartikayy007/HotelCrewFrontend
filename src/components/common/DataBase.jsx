@@ -1,6 +1,6 @@
 import React, {useState, useRef, useEffect} from "react";
 import { useSelector } from 'react-redux';
-import { selectStaffPerDepartment } from '../../redux/slices/StaffSlice';
+import { selectStaffPerDepartment } from '../../redux/slices/AdminStaffSlice';
 import { selectCustomers } from '../../redux/slices/customerSlice'; // Adjust path as needed
 import StaffDB from "./DB/StaffDB";
 import CustomerDB from "./DB/CustomerDB";

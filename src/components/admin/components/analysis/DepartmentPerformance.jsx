@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllTasks, fetchTasks } from '../../../../redux/slices/TaskSlice';
-import { fetchStaffData, selectStaffPerDepartment } from '../../../../redux/slices/StaffSlice';
+import { fetchStaffData, selectStaffPerDepartment } from '../../../../redux/slices/AdminStaffSlice';
 
 const DepartmentSkeleton = () => {
   return (
