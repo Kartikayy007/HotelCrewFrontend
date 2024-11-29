@@ -22,8 +22,8 @@ import { selectUserProfile, selectUserProfileLoading, fetchUserProfile } from '.
 
 const ProfileSkeleton = () => (
   <div className="flex flex-col items-center py-8 space-y-4">
-    <div className="w-24 h-24 rounded-full bg-gray-700/50 animate-pulse" />
-    <div className="h-6 w-32 bg-gray-700/50 rounded animate-pulse" />
+    <div className="w-24 h-24 rounded-full bg-gray-700/50 " />
+    <div className="h-6 w-32 bg-gray-700/50 rounded " />
   </div>
 );
 

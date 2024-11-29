@@ -772,7 +772,7 @@ const StaffData = () => {
     const selectedFile = e.target.files[0];
     if (selectedFile && validateFile(selectedFile)) {
       setFile(selectedFile);
-      console.log('File selected:', selectedFile); // Debug log
+      // console.log('File selected:', selectedFile); // Debug log
     }
   };
 
@@ -787,7 +787,7 @@ const StaffData = () => {
       const formData = new FormData();
       formData.append('staff_excel_sheet', file); // Updated field name
       
-      console.log('Uploading file:', file.name);
+      // console.log('Uploading file:', file.name);
       const result = await dispatch(massCreateStaff(formData)).unwrap();
       
       toast.success('Staff data uploaded successfully');
@@ -946,7 +946,7 @@ const Profile = () => {
     setIsUploading(true);
 
     const getAuthToken = () => {
-      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
+      const token = localStorage.getItem('token');
       if (!token) throw new Error('Authentication token not found');
       return token;
     }

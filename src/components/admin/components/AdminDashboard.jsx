@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
 import {useDispatch, useSelector} from "react-redux";
-import {fetchAttendanceStats} from "../../../redux/slices/AdminAttendanceSlice";
+import {fetchAttendanceStats, selectWeeklyStats} from "../../../redux/slices/AdminAttendanceSlice";
 import {FaChevronUp, FaChevronDown} from "react-icons/fa";
 import {
   createTask,
@@ -37,6 +37,8 @@ import {
   selectStaffPerDepartment,
   selectStaffLoading,
   selectDepartments,
+  fetchStaffStatus,
+  selectStaffStatus,
 } from "../../../redux/slices/StaffSlice";
 import StaffMetrics from "../../common/StaffMetrics";
 import LoadingAnimation from "../../common/LoadingAnimation";
@@ -102,6 +104,7 @@ function AdminDashboard() {
     dispatch(fetchHotelDetails());
     dispatch(fetchRevenueStats());
     dispatch(fetchRoomStats());
+    dispatch(fetchStaffStatus());
 
     const interval = setInterval(() => {
       dispatch(fetchRoomStats());
@@ -259,10 +262,21 @@ const generateTimeData = () => {
   const busyStaffCount = inProgressCount + pendingCount;
   const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
 
+  const staffStatus = useSelector(selectStaffStatus);
 
-  const staffStatus = [
-    {id: 0, value: busyStaffCount, label: "Busy", color: "#252941"},
-    {id: 1, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
+  const staffStatusData = [
+    {
+      id: 0, 
+      value: staffStatus.busy,
+      label: "Busy",
+      color: "#252941"
+    },
+    {
+      id: 1,
+      value: staffStatus.available,
+      label: "Available",
+      color: "#8094D4"
+    }
   ];
 
   const detailedStaffStatus = [
@@ -271,20 +285,39 @@ const generateTimeData = () => {
     {id: 2, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
   ];
 
- 
+  const weeklyStats = useSelector(selectWeeklyStats);
 
+  const getTodayStats = () => {
+    if (!weeklyStats.dates || !weeklyStats.total_crew_present || !weeklyStats.total_staff_absent) {
+      return { present: 0, absent: 0 };
+    }
+  
+    const today = new Date().toISOString().split('T')[0];
+    const todayIndex = weeklyStats.dates.findIndex(date => date === today);
+  
+    if (todayIndex === -1) {
+      return { present: 0, absent: 0 };
+    }
+  
+    return {
+      present: weeklyStats.total_crew_present[todayIndex] || 0,
+      absent: weeklyStats.total_staff_absent[todayIndex] || 0
+    };
+  };
+
+  const todayStats = getTodayStats();
   const staffAttendance = [
     {
       id: 0,
-      value: attendanceStats.total_present,
+      value: todayStats.present,
       label: "Present",
       color: "#8094D4",
     },
     {
       id: 1,
-      value: attendanceStats.total_crew - attendanceStats.total_present,
-      label: "Absent",
-      color: " #252941",
+      value: todayStats.absent,
+      label: "Absent", 
+      color: "#252941",
     },
   ];
 
@@ -580,35 +613,41 @@ const generateTimeData = () => {
                       <h3 className="font-medium mb-2 text-center">
                         Occupancy Rate
                       </h3>
-                      <PieChart
-                        series={[
-                          {
-                            data: occupancyData,
-                            highlightScope: {fade: "global", highlight: "item"},
-                            innerRadius: 45,
-                            paddingAngle: 1,
-                            cornerRadius: 1,
-                          },
-                        ]}
-                        height={220}
-                        margin={{top: 0, bottom: 40, left: 0, right: 0}}
-                        slotProps={{
-                          legend: {
-                            direction: "row",
-                            position: {
-                              vertical: "bottom",
-                              horizontal: "center",
+                      {(occupiedRooms === 0 && availableRooms === 0) ? (
+                        <div className="flex items-center justify-center h-[180px] text-gray-500">
+                          No Occupancy Data Available
+                        </div>
+                      ) : (
+                        <PieChart
+                          series={[
+                            {
+                              data: occupancyData,
+                              highlightScope: {fade: "global", highlight: "item"},
+                              innerRadius: 45,
+                              paddingAngle: 1,
+                              cornerRadius: 1,
                             },
-                            padding: 0,
-                            markSize: 10,
-                            itemGap: 15,
-                            labelStyle: {
-                              fontSize: 12,
-                              fontWeight: 500,
+                          ]}
+                          height={220}
+                          margin={{top: 0, bottom: 40, left: 0, right: 0}}
+                          slotProps={{
+                            legend: {
+                              direction: "row",
+                              position: {
+                                vertical: "bottom",
+                                horizontal: "center",
+                              },
+                              padding: 0,
+                              markSize: 10,
+                              itemGap: 15,
+                              labelStyle: {
+                                fontSize: 12,
+                                fontWeight: 500,
+                              },
                             },
-                          },
-                        }}
-                      />
+                          }}
+                        />
+                      )}
                     </div>
 
                     <div className="flex-1 min-w-[250px]">
@@ -623,7 +662,7 @@ const generateTimeData = () => {
                         <PieChart
                           series={[
                             {
-                              data: staffStatus,
+                              data: staffStatusData,
                               highlightScope: {
                                 fade: "global",
                                 highlight: "item",
@@ -849,35 +888,41 @@ const generateTimeData = () => {
                 </div>
               ) : (
                 <div className="overflow-scroll">
-                  {sortedAnnouncements.map((announcement) => (
-                    <div
-                      key={announcement._id}
-                      className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
-                      onClick={() => handleViewAnnouncement(announcement)}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-lg">
-                          {announcement.title}
-                        </h3>
-                        <span className="text-sm text-gray-500">
-                          {announcement.created_at &&
-                          !isNaN(new Date(announcement.created_at))
-                            ? new Date(
-                                announcement.created_at
-                              ).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })
-                            : "Date not available"}
-                        </span>
-                      </div>
-                      <p className="text-gray-600">{announcement.content}</p>
-                    </div>
-                  ))}
-                </div>
+  {sortedAnnouncements.length === 0 ? (
+    <div className="text-center py-8 text-gray-500">
+      No announcements available
+    </div>
+  ) : (
+    sortedAnnouncements.map((announcement) => (
+      <div
+        key={announcement._id}
+        className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
+        onClick={() => handleViewAnnouncement(announcement)}
+      >
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="font-semibold text-lg">
+            {announcement.title}
+          </h3>
+          <span className="text-sm text-gray-500">
+            {announcement.created_at &&
+            !isNaN(new Date(announcement.created_at))
+              ? new Date(
+                  announcement.created_at
+                ).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "Date not available"}
+          </span>
+        </div>
+        <p className="text-gray-600">{announcement.content}</p>
+      </div>
+    ))
+  )}
+</div>
               )}
             </div>
             <div className="mt-auto">

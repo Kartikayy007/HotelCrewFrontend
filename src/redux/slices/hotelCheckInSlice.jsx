@@ -3,7 +3,7 @@ import axios from 'axios';
 
 
 const getAuthToken = () => {
-  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MTg0NjkyLCJpYXQiOjE3MzI1OTI2OTIsImp0aSI6IjNlNmY5MWJkMDc4NzRlOTQ5NjJlM2VhYmNjY2QwMGM2IiwidXNlcl9pZCI6OTB9.RPTv22z2mUg1uRrNrxUUSvv2RzCwGajbwPPONZkEE_Q';
+  const token = localStorage.getItem('token');
   if (!token) {
     throw new Error('Authentication token not found');
   }

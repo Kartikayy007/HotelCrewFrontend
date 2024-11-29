@@ -5,7 +5,7 @@ import { fetchStaffData, selectStaffPerDepartment } from '../../../../redux/slic
 
 const DepartmentSkeleton = () => {
   return (
-    <div className="bg-white rounded-lg p-2 shadow-sm border border-gray-100 animate-pulse">
+    <div className="bg-white rounded-lg p-2 shadow-sm border border-gray-100 ">
       <div className="flex justify-between items-center mb-1">
         <div className="h-4 w-24 bg-gray-200 rounded"></div>
         <div className="h-4 w-12 bg-gray-200 rounded"></div>

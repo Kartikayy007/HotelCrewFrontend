@@ -13,16 +13,12 @@ const CHECK_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/ch
 // localStorage.setItem('accessToken','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY4MTQ3LCJpYXQiOjE3MzE2NzYxNDcsImp0aSI6IjUyZTJkNDc4NTYxYzRhMmM4ZGIxNDRmMjVkZWYxMjJmIiwidXNlcl9pZCI6NDV9.p4LuZecKhv6K5dVs-9f1lNFxprEdi-_j7wcoR4Zbscs')
 
 
-const getAuthHeaders = () => {
-  const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NDU5MzUwLCJpYXQiOjE3MzI4NjczNTAsImp0aSI6ImYyZWIyMWIzZGVlZjQ0MWQ5YThlNzY2OWFmMWIxNGQ1IiwidXNlcl9pZCI6MTg1fQ.YkgvzmHmNKwR3bvQ9KiZvc1lZd_xf0ZgKmLg1KujQ4Y';
-
+const getAuthToken = () => {
+  const token = localStorage.getItem('token');
   if (!token) {
-    throw new Error("Authentication token not found");
+    throw new Error('Authentication token not found');
   }
-8
-  return {
-    Authorization: `Bearer ${token}`, // Return the headers with the token
-  };
+  return token;
 };
 
 

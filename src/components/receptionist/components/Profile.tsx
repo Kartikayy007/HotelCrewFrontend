@@ -80,7 +80,7 @@ function Profile() {
         formData.append('user_profile', selectedFile);
       }
 
-      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs'; 
+      const token = localStorage.getItem('token'); 
       const response = await axios.put(
         'https://hotelcrew-1.onrender.com/api/edit/user_profile/',
         formData,

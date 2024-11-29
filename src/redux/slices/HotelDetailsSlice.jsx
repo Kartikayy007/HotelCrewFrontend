@@ -2,10 +2,12 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const getAuthToken = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
-  if (!token) throw new Error('Authentication token not found');
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('Authentication token not found');
+  }
   return token;
-}
+};
 
 export const fetchHotelDetails = createAsyncThunk(
   'hotelDetails/fetchHotelDetails',
@@ -41,7 +43,6 @@ export const updateHotelDetails = createAsyncThunk(
         }
       );
       
-      // Dispatch fetchHotelDetails to refresh the details after update
       dispatch(fetchHotelDetails());
       
       return response.data.hotel;
@@ -52,7 +53,6 @@ export const updateHotelDetails = createAsyncThunk(
   }
 );
 
-// New async thunk for mass creating staff
 export const massCreateStaff = createAsyncThunk(
   'hotelDetails/massCreateStaff',
   async (formData, { rejectWithValue }) => {
