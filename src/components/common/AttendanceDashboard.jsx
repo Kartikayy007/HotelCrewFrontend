@@ -86,6 +86,7 @@ const AttendanceDashboard = () => {
   const [rejectedLeaves, setRejectedLeaves] = useState([]);
   // const { staff, loading, error } = useSelector((state) => state.attendance);
 const staff=useSelector(selectStaff);
+// const staff = useSelector((state) => state.attendance.staff || []);
 const loading=useSelector(selectLoading);
 const error=useSelector(selectError);
   const demoStaff = [
@@ -94,6 +95,10 @@ const error=useSelector(selectError);
     { id: 3, user_name: "Alice Johnson", email: "alice.j@example.com", department: "Finance", current_attendance: "Present" },
   ];
 
+
+  useEffect(() => {
+    console.log('Staff:', staff); // Debug the staff data
+  }, [staff]);
 
   const [demoMode, setDemoMode] = useState(false);
 
@@ -277,20 +282,10 @@ const error=useSelector(selectError);
   
     return departmentMatch && shiftMatch;
   });
-  
-  // const filteredStaff = selectedDepartments.includes("All")
-  //   ? dataToUse
-  //   : dataToUse.filter((member) => selectedDepartments.includes(member.department));
-  // Handle department selection
+
   const toggleDepartmentSelection = (department) => {
     setSelectedDepartments([department]);
-    // setSelectedDepartments((prev) => {
-    //   if (prev.includes(department)) {
-    //     return prev.filter((dep) => dep !== department);
-    //   } else {
-    //     return department === "All" ? ["All"] : prev.filter((dep) => dep !== "All").concat(department);
-    //   }
-    // });
+
 
   };
   const calculateDuration = (fromDate, toDate) => {
