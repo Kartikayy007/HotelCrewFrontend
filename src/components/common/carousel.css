@@ -1,0 +1,68 @@
+/* carousel.css */
+.custom-dots {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  gap: 15px;
+}
+
+.custom-dots li {
+  width: 12px;
+  height: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.custom-dots li button {
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 0;
+  font-size: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.custom-dots li button:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #CBD5E0;
+  transition: all 0.3s ease;
+}
+
+.custom-dots li.slick-active {
+  transform: scale(1.2);
+}
+
+.custom-dots li.slick-active button:before {
+  background: #3B82F6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.timeline {
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #3B82F6;
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0;
+}
+
+.custom-dots li.slick-active .timeline {
+  animation: timelineFill 2s linear;
+  opacity: 1;
+}
+
+
+.custom-dots li.slick-active button:before {
+  animation: pulse 2s infinite;
+}

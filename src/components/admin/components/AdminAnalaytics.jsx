@@ -160,7 +160,6 @@ const AdminAnalytics = () => {
     weeklyStats.total_crew_present.length > 0 &&
     weeklyStats.total_staff_absent.length > 0;
 
-  // Handlers
   const handlePerformanceRangeChange = (event, newValue) => {
     setPerformanceRange(newValue);
   };

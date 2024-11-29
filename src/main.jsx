@@ -7,6 +7,7 @@ import App from './App.jsx'
 import Admin from './components/admin/Admin.jsx'
 import MainLayout from './components/Manager/MainLayout.jsx'
 import Reception from './components/receptionist/Reception.tsx'
+import IncompleteRegisteration from './components/common/IncompleteRegisteration.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -15,6 +16,7 @@ createRoot(document.getElementById('root')).render(
       {/* <MainLayout /> */}
       <Admin />   
       {/* <Reception /> */}
+      {/* <IncompleteRegisteration /> */}
     </Provider>
   </StrictMode>,
 )

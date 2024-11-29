@@ -39,7 +39,7 @@ const LeaveRequestSkeleton = ({ isMobile }) => {
         {[1, 2, 3].map((item) => (
           <div
             key={item}
-            className="bg-white rounded-lg shadow-md p-4 animate-pulse"
+            className="bg-white rounded-lg shadow-md p-4 "
           >
             <div className="flex justify-between items-center mb-2">
               <Skeleton variant="text" width="60%" height={24} />
@@ -61,7 +61,7 @@ const LeaveRequestSkeleton = ({ isMobile }) => {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm text-left animate-pulse">
+      <table className="w-full text-sm text-left">
         <thead className="bg-[#F1F6FC] text-black">
           <tr>
             {['Employee Name', 'Leave Type', 'Start Date', 'End Date', 'Status', 'Actions'].map((header) => (

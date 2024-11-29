@@ -40,7 +40,7 @@ const getStatusIcon = (status: string): JSX.Element | null => {
 };
 
 const TaskCardSkeleton = () => (
-  <div className="bg-white rounded-lg shadow p-4 border border-gray-200 animate-pulse">
+  <div className="bg-white rounded-lg shadow p-4 border border-gray-200 ">
     <div className="flex items-start space-x-4">
       <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
       <div className="flex-1 space-y-3">
