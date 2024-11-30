@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -13,6 +12,11 @@ export default defineConfig({
     }
   },
   build: {
+    target: 'esnext',
+    outDir: 'dist',
+    assetsDir: 'assets',
+    minify: 'terser',
+    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -21,7 +25,15 @@ export default defineConfig({
           ui: ['@mui/material', '@emotion/react', '@emotion/styled']
         }
       }
-    },
-    chunkSizeWarningLimit: 1000
+    }
+  },
+  server: {
+    port: 5173,
+    strictPort: true,
+    host: true,
+    cors: true
+  },
+  preview: {
+    port: 4173
   }
 });
