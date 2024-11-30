@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const Onboarding = () => {
   const [rangeValue, setRangeValue] = useState(50);
-  const [visibleProfiles, setVisibleProfiles] = useState(2);
+  const [visibleProfiles, setVisibleProfiles] = useState(2);  
 
   useEffect(() => {
     if (rangeValue <= 50) {
@@ -124,14 +124,22 @@ const Onboarding = () => {
                     Home
                   </Link>
                   <Link
-                    to="/#services"
+                    to="/#features"
                     className="cursor-pointer hover:text-[#5663AC] transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
                   >
                     Features
                   </Link>
                   <Link
-                    to="/#about"
+                    to="/#contact"
                     className="cursor-pointer hover:text-[#5663AC] transition-colors"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
                   >
                     Contact
                   </Link>
