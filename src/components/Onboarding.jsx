@@ -413,6 +413,18 @@ const Onboarding = () => {
               </div>
             </div>
           </div>
+          <div className="bg-[#252941] mx-4 md:mx-12 lg:m-24 rounded-2xl min-h-[450px] lg:h-[650px] animate-on-scroll1">
+  <iframe
+    width="100%"
+    height="100%"
+    src="https://www.youtube.com/embed/ldk7CG7oMRU"
+    title="YouTube video player"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+    className="rounded-2xl"
+  ></iframe>
+</div>
 
           <div className="p-1">
             <div className="bg-[#E2E3FF] mx-4 md:mx-12 lg:m-24 rounded-2xl min-h-[300px] lg:h-[403px] mt-8 lg:mt-32">
