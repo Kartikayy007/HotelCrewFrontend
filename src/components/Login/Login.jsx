@@ -117,25 +117,25 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      if (error.response?.status === "ERR_INTERNET_DISCONNECTED") {
-        setErrorMsg("No internet connection. Please try again later");
-      }
-      if (error.message === "Network Error") {
-        setErrorMsg(
-          "Network error. Please check your connection and try again."
-        );
-      }
-      if (error.name === "Error" && error.message === "Invalid credentials") {
+
+      if (error.response) {
+        switch (error.response.status) {
+          case 401:
+            setErrorMsg("Invalid email or password");
+            break;
+          case 429:
+            setErrorMsg("Too many login attempts. Please try again later");
+            break;
+          case 404:
+            setErrorMsg("Account not found. Please check your email");
+            break;
+          default:
+            setErrorMsg("An error occurred during login. Please try again");
+        }
+      } else if (error.message === "Network Error") {
+        setErrorMsg("Network error. Please check your connection and try again.");
+      } else if (error.message === "Invalid credentials") {
         setErrorMsg("Invalid email or password");
-      }
-      if (error.response?.status === 401) {
-        setErrorMsg("Invalid email or password");
-      }
-      if (error.response?.status === 429) {
-        setErrorMsg("Too many login attempts. Please try again later");
-      }
-      if (error.response?.status === 404) {
-        setErrorMsg("Account not found. Please check your email");
       } else {
         setErrorMsg("An error occurred during login. Please try again");
       }
@@ -296,7 +296,7 @@ const Login = () => {
           </div>
         </div>
       ) : (
-        <div className="w-full lg:w-1/2 flex justify-center items-center p-8">
+        <div className="w-full lg:w-1/2 flex justify-center items-center p-2">
           <div className="space-y-9">
             <form
               className="w-full lg:w-96 lg:space-y-7 space-y-4"
