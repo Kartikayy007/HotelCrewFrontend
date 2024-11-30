@@ -6,6 +6,7 @@ import {Menu, X} from "lucide-react";
 import Preloading from "./common/Preloading";
 import {gsap} from "gsap";
 import {ScrollTrigger} from "gsap/ScrollTrigger";
+import FloatingPhone from "./common/FloatingPhone";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -248,11 +249,11 @@ const Onboarding = () => {
               </div>
             </div>
 
-            <div className="relative left-9 parallax">
+            <div className="relative parallax">
               <img
                 src="/Mask group.svg"
                 alt="Hotel Staff Illustration"
-                class="w-full md:w-4/5 lg:w-[90%] mt-5"
+                class="w-full md:w-4/5 lg:w-[90%] mt-10"
               />
             </div>
           </div>
@@ -435,15 +436,9 @@ const Onboarding = () => {
                     </div>
                   </div>
                 </div>
-
-                <div className="w-full lg:w-1/2 flex justify-center lg:justify-end lg:mr-40 animation3">
-                  <img
-                    src="/iPhone 15 Pro - Black Titanium - Portrait.svg "
-                    alt="iPhone mockup"
-                    className="w-56 md:w-64 lg:w-auto h-auto"
-                  >
-                  </img>
-                </div>
+                <div className="w-full lg:w-96 flex justify-center lg:justify-end lg:mr-40 animation3">
+        <FloatingPhone />
+      </div>
               </div>
             </div>
           </div>
@@ -457,7 +452,7 @@ const Onboarding = () => {
                   className="w-40 mx-auto"
                 />
                 <RevealLinks />
-                <p className="mt-4">© 2024 HotelCrew. All rights reserved.</p>
+                <p className="mt-4">©️ 2024 HotelCrew. All rights reserved.</p>
               </div>
             </div>
           </footer>

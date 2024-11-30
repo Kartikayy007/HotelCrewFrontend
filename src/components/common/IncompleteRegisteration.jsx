@@ -158,27 +158,35 @@ const EmailListBlock = () => {
   };
 
   return (
-    <Block className=" col-span-full bg-white shadow-lg ">
-      <p className="mb-3 text-lg">Have any query?</p>
-      <form
-        onSubmit={handleSubmit}
-        className="flex items-center gap-2"
-      >
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
-          className="w-full rounded border border-zinc-700 bg-white px-3 py-1.5 transition-colors focus:border-red-300 focus:outline-0"
-          required
-        />
-        <button
-          type="submit"
-          className="flex items-center gap-2 whitespace-nowrap rounded bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-300"
+    <>
+      <Block className=" col-span-full bg-white shadow-lg ">
+        <p className="mb-3 text-lg">Have any query?</p>
+        <form
+          onSubmit={handleSubmit}
+          className="flex items-center gap-2"
         >
-          <FiMail /> contact us
-        </button>
-      </form>
-    </Block>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            className="w-full rounded border border-zinc-700 bg-white px-3 py-1.5 transition-colors focus:border-red-300 focus:outline-0"
+            required
+          />
+          <button
+            type="submit"
+            className="flex items-center gap-2 whitespace-nowrap rounded bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-300"
+          >
+            <FiMail /> contact us
+          </button>
+        </form>
+      </Block>
+      <a
+        href="mailto:hotelcrew.noreply@gmail.com"
+        className="mt-2 flex items-center gap-2 whitespace-nowrap rounded bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-300"
+      >
+        <FiMail /> Send email directly
+      </a>
+    </>
   );
 };
