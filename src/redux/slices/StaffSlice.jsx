@@ -105,6 +105,28 @@ export const fetchStaffStatus = createAsyncThunk(
   }
 );
 
+export const createStaff = createAsyncThunk(
+  'staff/createStaff',
+  async (staffData, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        'https://hotelcrew-1.onrender.com/api/edit/create/',
+        staffData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to create staff');
+    }
+  }
+);
+
 const initialState = {
   staffPerDepartment: {},
   totalDepartments: 0,
@@ -234,5 +256,17 @@ export const selectStaffStatus = (state) => ({
   loading: state.staff.staffStatusLoading,
   error: state.staff.staffStatusError
 });
+
+export const selectShifts = (state) => {
+  const shifts = state.staff.staffList
+    .map(staff => staff.shift)
+    .filter(Boolean)
+    .filter((shift, index, self) => self.indexOf(shift) === index)
+    .map(shift => ({
+      label: shift.charAt(0).toUpperCase() + shift.slice(1),
+      value: shift
+    }));
+  return shifts;
+};
 
 export default staffSlice.reducer;

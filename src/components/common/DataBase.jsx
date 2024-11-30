@@ -1,10 +1,16 @@
 import React, {useState, useRef, useEffect} from "react";
-import { useSelector } from 'react-redux';
-import { selectStaffPerDepartment } from '../../redux/slices/StaffSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { 
+  selectStaffPerDepartment, 
+  createStaff,
+  fetchStaffData  // Add this import
+} from '../../redux/slices/StaffSlice';
 import { selectCustomers } from '../../redux/slices/customerSlice'; // Adjust path as needed
 import StaffDB from "./DB/StaffDB";
 import CustomerDB from "./DB/CustomerDB";
 import {Search, ChevronLeft, ChevronRight} from "lucide-react";
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select, MenuItem } from '@mui/material';
+import LoadingAnimation from './LoadingAnimation'; // Adjust path as needed
 
 function DataBase() {
   const [activeComponent, setActiveComponent] = React.useState("StaffDB");
@@ -20,7 +26,50 @@ function DataBase() {
     // Customer filters
     customerType: "All",
     roomType: "All"  // Replace bookingStatus with roomType
+  }); 
+
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [newStaffData, setNewStaffData] = useState({
+    email: '',
+    user_name: '',
+    role: 'staff',
+    salary: '',
+    upi_id: '',
+    shift: 'morning',
+    department: 'housekeeping'
   });
+  const [isCreating, setIsCreating] = useState(false);
+  const [isDepartmentsLoading, setIsDepartmentsLoading] = useState(true);
+  const dispatch = useDispatch();
+
+  const handleCreateStaff = async () => {
+    try {
+      setIsCreating(true);
+      await dispatch(createStaff(newStaffData)).unwrap();
+      await dispatch(fetchStaffData());
+      setCreateDialogOpen(false);
+      setNewStaffData({
+        email: '',
+        user_name: '',
+        role: 'staff',
+        salary: '',
+        upi_id: '',
+        shift: 'morning',
+        department: 'housekeeping'
+      });
+    } catch (error) {
+      console.error('Failed to create staff:', error);
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setNewStaffData({
+      ...newStaffData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const checkScroll = () => {
     if (scrollContainerRef.current) {
@@ -38,6 +87,12 @@ function DataBase() {
       return () => scrollContainer.removeEventListener("scroll", checkScroll);
     }
   }, []);
+
+  useEffect(() => {
+    setIsDepartmentsLoading(true);
+    dispatch(fetchStaffData())
+      .finally(() => setIsDepartmentsLoading(false));
+  }, [dispatch]);
 
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
@@ -210,6 +265,158 @@ function DataBase() {
           </div>
         </div>
       </div>
+      {activeComponent === "StaffDB" && (
+        <Button
+          variant="contained"
+          onClick={() => setCreateDialogOpen(true)}
+          sx={{
+            position: 'fixed',
+            bottom: 32,
+            right: 32,
+            bgcolor: '#252941',
+            '&:hover': { bgcolor: '#1a1f36' },
+            borderRadius: '50px',
+            padding: '12px 24px',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+            zIndex: 1000,
+            textTransform: 'none',
+            fontSize: '1rem'
+          }}
+        >
+          Add Staff <span className="ml-2">+</span>
+        </Button>
+      )}
+      <Dialog 
+        open={createDialogOpen} 
+        onClose={() => setCreateDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+          }
+        }}
+      >
+        <DialogTitle sx={{ bgcolor: '#252941', color: 'white' }}>
+          Create New Staff
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2, minHeight: '400px' }}>
+          {isCreating ? (
+            <div className="flex flex-col items-center justify-center h-full">
+              <LoadingAnimation size={60} />
+              <p className="mt-4 text-gray-600">Creating staff member...</p>
+            </div>
+          ) : (
+            <>
+              <TextField
+                autoFocus
+                margin="dense"
+                name="user_name"
+                label="Name"
+                fullWidth
+                value={newStaffData.user_name}
+                onChange={handleInputChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                margin="dense"
+                name="email"
+                label="Email"
+                type="email"
+                fullWidth
+                value={newStaffData.email}
+                onChange={handleInputChange}
+                sx={{ mb: 2 }}
+              />
+              <Select
+                fullWidth
+                name="department"
+                value={newStaffData.department}
+                onChange={handleInputChange}
+                sx={{ mb: 2 }}
+                disabled={isDepartmentsLoading}
+              >
+                {isDepartmentsLoading ? (
+                  <MenuItem value="" disabled>
+                    <div className="flex items-center">
+                      <LoadingAnimation size={20} />
+                      <span className="ml-2">Loading departments...</span>
+                    </div>
+                  </MenuItem>
+                ) : (
+                  departments.map(dept => (
+                    <MenuItem key={dept.value} value={dept.value}>
+                      {dept.label}
+                    </MenuItem>
+                  ))
+                )}
+              </Select>
+              <Select
+                fullWidth
+                name="role"
+                value={newStaffData.role}
+                onChange={handleInputChange}
+                sx={{ mb: 2 }}
+              >
+                <MenuItem value="staff">Staff</MenuItem>
+                <MenuItem value="manager">Manager</MenuItem>
+                <MenuItem value="receptionist">Receptionist</MenuItem>
+              </Select>
+              <Select
+                fullWidth
+                name="shift"
+                value={newStaffData.shift}
+                onChange={handleInputChange}
+                sx={{ mb: 2 }}
+              >
+                <MenuItem value="morning">Morning</MenuItem>
+                <MenuItem value="evening">Evening</MenuItem>
+                <MenuItem value="night">Night</MenuItem>
+              </Select>
+              <TextField
+                margin="dense"
+                name="salary"
+                label="Salary"
+                type="number"
+                fullWidth
+                value={newStaffData.salary}
+                onChange={handleInputChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                margin="dense"
+                name="upi_id"
+                label="UPI ID"
+                fullWidth
+                value={newStaffData.upi_id}
+                onChange={handleInputChange}
+              />
+            </>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button 
+            onClick={() => setCreateDialogOpen(false)} 
+            color="inherit"
+            disabled={isCreating}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleCreateStaff}
+            variant="contained"
+            disabled={isCreating}
+            sx={{ 
+              bgcolor: '#252941',
+              '&:hover': { bgcolor: '#1a1f36' }
+            }}
+          >
+            {isCreating ? 'Creating...' : 'Create'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </section>
   );
 }

@@ -19,6 +19,7 @@ import occupancyReducer from './slices/OcupancyRateSlice';
 import userProfileReducer from './slices/userProfileSlice'
 import staffAttendanceReducer from './slices/StaffAttendanceSlice';
 import checkoutReducer from './slices/checkoutSlice'
+import payrollReducer from './slices/PayrollSlice';
 
 const store = configureStore({
   reducer: {
@@ -41,7 +42,8 @@ const store = configureStore({
     occupancy: occupancyReducer,
     staffAttendance: staffAttendanceReducer,
     userProfile: userProfileReducer,
-    checkout: checkoutReducer
+    checkout: checkoutReducer,
+    payroll: payrollReducer
   },
 })
 

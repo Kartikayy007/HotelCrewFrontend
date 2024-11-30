@@ -376,7 +376,7 @@ const PropertyDetails = () => {
   };
 
   const addRoomType = () => {
-    const updatedRoomTypes = [...formData.room_types, { room_type: '', count: 0, price: '' }];
+    const updatedRoomTypes = [...formData.room_types, { room_type: '', count: 0, price: 0 }];
     handleRoomTypes(updatedRoomTypes);
   };
 
@@ -430,40 +430,52 @@ const PropertyDetails = () => {
             </button>
           </div>
           
-          {formData.room_types.map((room, index) => (
-            <div key={index} className="grid grid-cols-12 gap-2 mb-4 items-end">
-              <div className="col-span-6">
-                <label className="block text-xs mb-2">Room Type</label>
-                <input
-                  type="text"
-                  value={room.room_type}
-                  onChange={(e) => updateRoomType(index, 'room_type', e.target.value)}
-                  placeholder="e.g. Single, Double"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              
-              <div className="col-span-4">
-                <label className="block text-xs mb-2">Count</label>
-                <input
-                  type="number"
-                  value={room.count}
-                  onChange={(e) => updateRoomType(index, 'count', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              
-              <div className="col-span-1">
-                <button
-                  type="button"
-                  onClick={() => removeRoomType(index)}
-                  className="px-2 py-2 text-gray-400 hover:text-gray-600"
-                >
-                  <Trash2 size={20} />
-                </button>
-              </div>
-            </div>
-          ))}
+{formData.room_types.map((room, index) => (
+  <div key={index} className="grid grid-cols-12 gap-2 mb-4 items-end">
+    <div className="col-span-4">
+      <label className="block text-xs mb-2">Room Type</label>
+      <input
+        type="text"
+        value={room.room_type}
+        onChange={(e) => updateRoomType(index, 'room_type', e.target.value)}
+        placeholder="e.g. Single, Double"
+        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      />
+    </div>
+    
+    <div className="col-span-3">
+      <label className="block text-xs mb-2">Count</label>
+      <input
+        type="number"
+        value={room.count}
+        onChange={(e) => updateRoomType(index, 'count', parseInt(e.target.value) || 0)}
+        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      />
+    </div>
+
+    <div className="col-span-4">
+      <label className="block text-xs mb-2">Price</label>
+      <input
+        type="number"
+        value={room.price}
+        onChange={(e) => updateRoomType(index, 'price', parseFloat(e.target.value) || 0)}
+        placeholder="0.00"
+        step="0.01"
+        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      />
+    </div>
+    
+    <div className="col-span-1">
+      <button
+        type="button"
+        onClick={() => removeRoomType(index)}
+        className="px-2 py-2 text-gray-400 hover:text-gray-600"
+      >
+        <Trash2 size={20} />
+      </button>
+    </div>
+  </div>
+))}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -516,118 +528,118 @@ const PropertyDetails = () => {
   );
 };
 
-// const StaffManagement = () => {
-//   const dispatch = useDispatch();
-//   const hotelDetails = useSelector(selectHotelDetails);
-//   const updateLoading = useSelector(selectHotelUpdateLoading);
-//   const updateError = useSelector(selectHotelUpdateError);
+const StaffManagement = () => {
+  const dispatch = useDispatch();
+  const hotelDetails = useSelector(selectHotelDetails);
+  const updateLoading = useSelector(selectHotelUpdateLoading);
+  const updateError = useSelector(selectHotelUpdateError);
 
-//   const [formData, setFormData] = useState({
-//     department_names: ''
-//   });
-//   const [departments, setDepartments] = useState([]);
-//   const [isDirty, setIsDirty] = useState(false);
-//   const [lastChangedField, setLastChangedField] = useState(null);
+  const [formData, setFormData] = useState({
+    department_names: ''
+  });
+  const [departments, setDepartments] = useState([]);
+  const [isDirty, setIsDirty] = useState(false);
+  const [lastChangedField, setLastChangedField] = useState(null);
 
-//   useEffect(() => {
-//     if (hotelDetails?.department_names) {
-//       setDepartments(hotelDetails.department_names.split(', '));
-//       setFormData({
-//         department_names: hotelDetails.department_names
-//       });
-//     }
-//   }, [hotelDetails]);
+  useEffect(() => {
+    if (hotelDetails?.department_names) {
+      setDepartments(hotelDetails.department_names.split(', '));
+      setFormData({
+        department_names: hotelDetails.department_names
+      });
+    }
+  }, [hotelDetails]);
 
-//   const updateDepartments = (newDepartments) => {
-//     setDepartments(newDepartments);
-//     const departmentString = newDepartments.filter(d => d).join(', ');
-//     setFormData(prev => ({
-//       ...prev,
-//       department_names: departmentString
-//     }));
-//     setIsDirty(true);
-//     setLastChangedField('department_names');
-//   };
+  const updateDepartments = (newDepartments) => {
+    setDepartments(newDepartments);
+    const departmentString = newDepartments.filter(d => d).join(', ');
+    setFormData(prev => ({
+      ...prev,
+      department_names: departmentString
+    }));
+    setIsDirty(true);
+    setLastChangedField('department_names');
+  };
 
-//   const addDepartment = () => {
-//     updateDepartments([...departments, ""]);
-//   };
+  const addDepartment = () => {
+    updateDepartments([...departments, ""]);
+  };
 
-//   const removeDepartment = (index) => {
-//     updateDepartments(departments.filter((_, i) => i !== index));
-//   };
+  const removeDepartment = (index) => {
+    updateDepartments(departments.filter((_, i) => i !== index));
+  };
 
-//   const handleDepartmentChange = (index, value) => {
-//     const newDepartments = [...departments];
-//     newDepartments[index] = value;
-//     updateDepartments(newDepartments);
-//   };
+  const handleDepartmentChange = (index, value) => {
+    const newDepartments = [...departments];
+    newDepartments[index] = value;
+    updateDepartments(newDepartments);
+  };
 
-//   const handleSubmit = async () => {
-//     try {
-//       await dispatch(updateHotelDetails({
-//         ...formData,
-//         lastChangedField
-//       })).unwrap();
-//       setIsDirty(false);
-//       setLastChangedField(null);
-//     } catch (err) {
-//       console.error('Failed to update:', err);
-//     }
-//   };
+  const handleSubmit = async () => {
+    try {
+      await dispatch(updateHotelDetails({
+        ...formData,
+        lastChangedField
+      })).unwrap();
+      setIsDirty(false);
+      setLastChangedField(null);
+    } catch (err) {
+      console.error('Failed to update:', err);
+    }
+  };
 
-//   return (
-//     <section className="bg-white mx-4 lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm lg:w-2/3">
-//       <h2 className="text-xl font-bold mb-8">Staff Management</h2>
-//       {updateError && (
-//         <div className="text-red-500 mb-4">
-//           Error updating departments: {updateError.message}
-//         </div>
-//       )}
-//       <div className="space-y-6">
-//         <div>
-//           <div className="flex justify-between items-center mb-2">
-//             <label className="block text-sm font-medium">Departments</label>
-//             <button
-//               onClick={addDepartment}
-//               className="text-gray-600 hover:text-gray-800"
-//             >
-//               <Plus size={24} />
-//             </button>
-//           </div>
-//           {departments.map((department, index) => (
-//             <div key={index} className="flex gap-4 mb-4 items-center">
-//               <input
-//                 type="text"
-//                 value={department}
-//                 onChange={(e) => handleDepartmentChange(index, e.target.value)}
-//                 placeholder="Department name"
-//                 className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-//               />
-//               <button
-//                 onClick={() => removeDepartment(index)}
-//                 className="text-gray-400 hover:text-gray-600"
-//               >
-//                 <Trash2 size={20} />
-//               </button>
-//             </div>
-//           ))}
-//         </div>
-//         <div className="flex justify-end mt-8">
-//           <button
-//             onClick={handleSubmit}
-//             disabled={!isDirty || updateLoading}
-//             className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] transition-colors ${
-//               (!isDirty || updateLoading) ? 'opacity-50 cursor-not-allowed' : ''
-//             }`}
-//           >
-//             {updateLoading ? 'Saving...' : 'Save Changes'}
-//           </button>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
+  return (
+    <section className="bg-white mx-4 lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm lg:w-2/3">
+      <h2 className="text-xl font-bold mb-8">Staff Management</h2>
+      {updateError && (
+        <div className="text-red-500 mb-4">
+          Error updating departments: {updateError.message}
+        </div>
+      )}
+      <div className="space-y-6">
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium">Departments</label>
+            <button
+              onClick={addDepartment}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              <Plus size={24} />
+            </button>
+          </div>
+          {departments.map((department, index) => (
+            <div key={index} className="flex gap-4 mb-4 items-center">
+              <input
+                type="text"
+                value={department}
+                onChange={(e) => handleDepartmentChange(index, e.target.value)}
+                placeholder="Department name"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button
+                onClick={() => removeDepartment(index)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-end mt-8">
+          <button
+            onClick={handleSubmit}
+            disabled={!isDirty || updateLoading}
+            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] transition-colors ${
+              (!isDirty || updateLoading) ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            {updateLoading ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const OperationalInfo = () => {
   const hotelDetails = useSelector(selectHotelDetails);
@@ -1083,7 +1095,7 @@ const AdminSettings = () => {
     {id: "basicInfo", label: "Basic Info"},
     {id: "contactInfo", label: "Contact Info"},
     {id: "propertyDetails", label: "Property Details"},
-    // {id: "staffManagement", label: "Staff Management"},
+    {id: "staffManagement", label: "Staff Management"},
     {id: "operationalInfo", label: "Operational Info"},
     {id: "staffData", label: "Staff Data"},
   ];
@@ -1098,8 +1110,8 @@ const AdminSettings = () => {
         return <ContactInfo />;
       case "propertyDetails":
         return <PropertyDetails />;
-      // case "staffManagement":
-      //   return <StaffManagement />;
+      case "staffManagement":
+        return <StaffManagement />;
       case "operationalInfo":
         return <OperationalInfo />;
       case "staffData":
