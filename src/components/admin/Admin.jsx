@@ -94,7 +94,7 @@ const Admin = () => {
   useEffect(() => {
     initializeNotifications();
     const multiStepCompleted = localStorage.getItem('multiStepCompleted');
-    if (multiStepCompleted === 'true') {
+    if (multiStepCompleted === 'false') {
       setShowOverlay(true);
     }
   }, []);

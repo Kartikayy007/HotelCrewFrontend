@@ -88,7 +88,7 @@ const SocialsBlock = () => (
       className="col-span-6 bg-red-500 md:col-span-3 shadow-lg"
     >
       <a
-        href="#"
+        href="https://youtube.com/@kartikay7289?si=gD2GbzjnYR36hqXx"
         className="grid h-full place-content-center text-3xl text-white"
       >
         <SiYoutube />
@@ -102,7 +102,7 @@ const SocialsBlock = () => (
       className="col-span-6 bg-purple-500 md:col-span-3 shadow-lg"
     >
       <a
-        href="#"
+        href="https://www.instagram.com/hotel.crew?igsh=bms4Ym5ybnBkZGN0"
         className="grid h-full place-content-center text-3xl text-white"
       >
         <SiInstagram />
@@ -116,7 +116,7 @@ const SocialsBlock = () => (
       className="col-span-6 bg-[#FBBC04] md:col-span-3 shadow-lg"
     >
       <a
-        href="#"
+        href="mailto:hotelcrew.noreply@gmail.com"
         className="grid h-full place-content-center text-3xl text-white"
       >
         <SiGmail />
