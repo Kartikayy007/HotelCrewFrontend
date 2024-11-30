@@ -5,9 +5,10 @@ const API_URL = "https://hotelcrew-1.onrender.com/api/edit/list/";
 const EDIT_STAFF_URL = "https://hotelcrew-1.onrender.com/api/edit/update/";
 const CACHE_KEY = 'staffData';
 const DELETE_STAFF_URL = "https://hotelcrew-1.onrender.com/api/edit/delete/";
+const STAFF_STATUS_URL = "https://hotelcrew-1.onrender.com/api/taskassignment/staff/available/";
 
 const getAuthToken = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
+  const token = localStorage.getItem('token');
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -15,7 +16,7 @@ const getAuthToken = () => {
 };
 
 export const fetchStaffData = createAsyncThunk(
-  "adminstaff/fetchStaffData",
+  "staff/fetchStaffData",
   async (_, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
@@ -36,7 +37,7 @@ export const fetchStaffData = createAsyncThunk(
 );
 
 export const editStaff = createAsyncThunk(
-  "adminstaff/editStaff",
+  "staff/editStaff",
   async ({ employeeId, updatedData }, { rejectWithValue, dispatch, getState }) => {
     const previousState = getState().staff.staffList;
     
@@ -64,7 +65,7 @@ export const editStaff = createAsyncThunk(
 );
 
 export const deleteStaff = createAsyncThunk(
-  "adminstaff/deleteStaff",
+  "staff/deleteStaff",
   async (employeeId, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
@@ -83,6 +84,49 @@ export const deleteStaff = createAsyncThunk(
   }
 );
 
+export const fetchStaffStatus = createAsyncThunk(
+  "staff/fetchStaffStatus",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+      const response = await axios.get(STAFF_STATUS_URL, config);
+      console.log('Fetched staff status:', response);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch staff status:', error);
+      return rejectWithValue(error.response?.data || "Failed to fetch staff status");
+    }
+  }
+);
+
+export const createStaff = createAsyncThunk(
+  'staff/createStaff',
+  async (staffData, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        'https://hotelcrew-1.onrender.com/api/edit/create/',
+        staffData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to create staff');
+    }
+  }
+);
+
 const initialState = {
   staffPerDepartment: {},
   totalDepartments: 0,
@@ -91,10 +135,15 @@ const initialState = {
   error: null,
   editLoading: false,
   editError: null,
+  availableStaff: 0,
+  staffBusy: 0,
+  totalStaff: 0,
+  staffStatusLoading: false,
+  staffStatusError: null,
 };
 
-const staffSlice = createSlice({
-  name: "adminstaff",
+const AdminStaffSlice = createSlice({
+  name: "staff",
   initialState,
   reducers: {
     clearStaffCache: (state) => {
@@ -146,21 +195,35 @@ const staffSlice = createSlice({
       .addCase(deleteStaff.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchStaffStatus.pending, (state) => {
+        state.staffStatusLoading = true;
+        state.staffStatusError = null;
+      })
+      .addCase(fetchStaffStatus.fulfilled, (state, action) => {
+        state.staffStatusLoading = false;
+        state.availableStaff = action.payload.availablestaff;
+        state.staffBusy = action.payload.staffbusy;
+        state.totalStaff = action.payload.totalstaff;
+      })
+      .addCase(fetchStaffStatus.rejected, (state, action) => {
+        state.staffStatusLoading = false;
+        state.staffStatusError = action.payload;
       });
   },
 });
 
-export const { clearStaffCache, resetEditState } = staffSlice.actions;
+export const { clearStaffCache, resetEditState } = AdminStaffSlice.actions;
 
-export const selectStaffPerDepartment = (state) => state.adminstaff.staffPerDepartment;
-export const selectStaffList = (state) => state.adminstaff.staffList;
-export const selectStaffLoading = (state) => state.adminstaff.loading;
-export const selectStaffError = (state) => state.adminstaff.error;
-export const selectEditLoading = (state) => state.adminstaff.editLoading;
-export const selectEditError = (state) => state.adminstaff.editError;
+export const selectStaffPerDepartment = (state) => state.staff.staffPerDepartment;
+export const selectStaffList = (state) => state.staff.staffList;
+export const selectStaffLoading = (state) => state.staff.loading;
+export const selectStaffError = (state) => state.staff.error;
+export const selectEditLoading = (state) => state.staff.editLoading;
+export const selectEditError = (state) => state.staff.editError;
 
 export const selectDepartments = (state) => {
-  const departments = state.adminstaff.staffList
+  const departments = state.staff.staffList
     .map(staff => staff.department)
     .filter(Boolean)
     .filter((dept, index, self) => self.indexOf(dept) === index)
@@ -174,11 +237,36 @@ export const selectDepartments = (state) => {
 
 
 export const selectTotalStaff = (state) => {
-  const staffPerDept = state.adminstaff.staffPerDepartment;
-  if (!staffPerDept || typeof staffPerDept !== 'object') {
-    return 0;
+  // Get staff list from state
+  const staffList = state.staff.staffList;
+  
+  // Return the length of staff list if it exists and is an array
+  if (Array.isArray(staffList)) {
+    return staffList.length;
   }
-  return Object.values(staffPerDept).reduce((sum, count) => sum + (Number(count) || 0), 0);
+  
+  // Return 0 if staff list is invalid
+  return 0;
 };
 
-export default staffSlice.reducer;
+export const selectStaffStatus = (state) => ({
+  available: state.staff.availableStaff,
+  busy: state.staff.staffBusy,
+  total: state.staff.totalStaff,
+  loading: state.staff.staffStatusLoading,
+  error: state.staff.staffStatusError
+});
+
+export const selectShifts = (state) => {
+  const shifts = state.staff.staffList
+    .map(staff => staff.shift)
+    .filter(Boolean)
+    .filter((shift, index, self) => self.indexOf(shift) === index)
+    .map(shift => ({
+      label: shift.charAt(0).toUpperCase() + shift.slice(1),
+      value: shift
+    }));
+  return shifts;
+};
+
+export default AdminStaffSlice.reducer;

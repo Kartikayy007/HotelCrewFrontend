@@ -41,6 +41,26 @@ const getStatusIcon = (status) => {
   }
 };
 
+// Add EmptyState component
+const EmptyTaskState = ({ status }) => (
+  <div className="flex flex-col items-center justify-center h-48 text-gray-500">
+    <svg 
+      className="w-12 h-12 mb-3 text-gray-300"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+      />
+    </svg>
+    <p className="text-sm font-medium">No {status} tasks</p>
+  </div>
+);
+
 // Update the TaskColumn component's div className
 const TaskColumn = ({ title, status, tasks }) => (
   <div className="bg-gray-50 rounded-lg p-4 h-[65vh] overflow-scroll">
@@ -53,9 +73,13 @@ const TaskColumn = ({ title, status, tasks }) => (
       {title}
     </h2>
     <div className="space-y-4">
-      {tasks.map((task, index) => (
-        <TaskCard key={`${status}-${index}`} task={task} />
-      ))}
+      {tasks.length === 0 ? (
+        <EmptyTaskState status={status} />
+      ) : (
+        tasks.map((task, index) => (
+          <TaskCard key={`${status}-${index}`} task={task} />
+        ))
+      )}
     </div>
   </div>
 );
@@ -171,14 +195,7 @@ const TaskDetailDialog = ({ task, open, onClose }) => {
           >
             {isDeleting ? 'Deleting...' : 'Delete Task'}
           </Button>
-          <Button
-            onClick={onClose}
-            variant="contained"
-            disabled={isDeleting}
-            className="bg-gray-500 hover:bg-gray-600"
-          >
-            Close
-          </Button>
+          
         </div>
       </div>
     </Dialog>
@@ -293,6 +310,30 @@ const AdminTaskAssignment = ({ onClose }) => {
           <p className="font-medium">Error loading tasks</p>
           <p className="text-sm mt-1">{error}</p>
         </div>
+      </div>
+    );
+  }
+
+  if (!loading && metrics.total === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[80vh]">
+        <svg 
+          className="w-16 h-16 text-gray-300 mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.5}
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+          />
+        </svg>
+        <h3 className="text-xl font-medium text-gray-900 mb-2">No Tasks Found</h3>
+        <p className="text-gray-500 text-center max-w-sm">
+          There are no tasks available at the moment. Create a new task to get started.
+        </p>
       </div>
     );
   }

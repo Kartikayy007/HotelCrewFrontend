@@ -7,15 +7,13 @@ const UPDATE_SHIFT_URL = 'https://hotelcrew-1.onrender.com/api/edit/schedule_cha
 
 // Utility to get auth headers
 const getAuthHeaders = () => {
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
-
+  const token = localStorage.getItem('token');
 
   if (!token) {
     throw new Error('Authentication token not found');
   }
   return {
     Authorization: `Bearer ${token}`,
-    
   };
 };
 
@@ -40,58 +38,51 @@ export const fetchShifts = createAsyncThunk(
 
 // Async thunk to update a shift
 export const updateShift = createAsyncThunk(
-    'shifts/updateShift',
-    async ({ userId, shift }, { rejectWithValue }) => {
-      try {
-        const response = await axios.put(
-          `${UPDATE_SHIFT_URL}/${userId}/`,  // Assuming userId is part of the URL or request body
-          { shift },
-          {
-            headers: {
-              ...getAuthHeaders(),
-              'Content-Type': 'application/json'  // Add Content-Type header here
-            }
-          }
-        );
-        return response.data; // Return response data which contains message, user_id, and new_shift
-      } catch (error) {
-        return rejectWithValue(
-          error.response?.data?.detail || 'Failed to update shift.'
-        );
-      }
+  'shifts/updateShift',
+  async ({ userId, shift }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `${UPDATE_SHIFT_URL}/${userId}/`, // Assuming userId is part of the URL or request body
+        { shift },
+        {
+          headers: {
+            ...getAuthHeaders(),
+            'Content-Type': 'application/json', // Add Content-Type header here
+          },
+        }
+      );
+      return response.data; // Return response data which contains message, user_id, and new_shift
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.detail || 'Failed to update shift.'
+      );
     }
-  );
-  
+  }
+);
 
-const shiftSlice = createSlice({
+const initialState = {
+  scheduleList: [],
+  loading: false,
+  error: null,
+};
+
+const shiftsSlice = createSlice({
   name: 'shifts',
-  initialState: {
-    scheduleList: [], // Stores the list of shifts
-    loading: false,   // Loading state for fetch operation
-    error: null,      // Error state
-    updateLoading: false,  // Loading state for update operation
-    updateError: null,     // Error state for update operation
-    updatedShift: null,    // Stores the updated shift information
-  },
+  initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch shifts actions
       .addCase(fetchShifts.pending, (state) => {
         state.loading = true;
-        state.error = null; // Clear any previous errors
       })
       .addCase(fetchShifts.fulfilled, (state, action) => {
-        console.log("Fetched Data:", action.payload);
+        state.scheduleList = action.payload;
         state.loading = false;
-        state.scheduleList = action.payload; // Update the state with fetched data
       })
       .addCase(fetchShifts.rejected, (state, action) => {
+        state.error = action.error.message;
         state.loading = false;
-        state.error = action.payload; // Capture the error message
       })
-
-      // Update shift actions
       .addCase(updateShift.pending, (state) => {
         state.updateLoading = true;
         state.updateError = null; // Clear any previous errors
@@ -112,4 +103,8 @@ const shiftSlice = createSlice({
   },
 });
 
-export default shiftSlice.reducer;
+export const selectScheduleList = (state) => state.shifts.scheduleList;
+export const selectShiftsLoading = (state) => state.shifts.loading;
+export const selectShiftsError = (state) => state.shifts.error;
+
+export default shiftsSlice.reducer;

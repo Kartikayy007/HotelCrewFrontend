@@ -105,7 +105,30 @@ export const fetchStaffStatus = createAsyncThunk(
   }
 );
 
+export const createStaff = createAsyncThunk(
+  'staff/createStaff',
+  async (staffData, { rejectWithValue }) => {
+    try {
+      const token = getAuthToken();
+      const response = await axios.post(
+        'https://hotelcrew-1.onrender.com/api/edit/create/',
+        staffData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to create staff');
+    }
+  }
+);
+
 const initialState = {
+  currentComponent: 'SDashboard', // Add this to track current component
   staffPerDepartment: {},
   totalDepartments: 0,
   staffList: [],
@@ -121,10 +144,8 @@ const initialState = {
 };
 
 const staffSlice = createSlice({
-  name: 'manager',
-  initialState: {
-    currentComponent: 'SDashboard', 
-  },
+  name: 'staff', // Change name to 'staff' to match state structure
+  initialState,
   reducers: {
     clearStaffCache: (state) => {
       localStorage.removeItem(CACHE_KEY);
@@ -135,6 +156,10 @@ const staffSlice = createSlice({
     resetEditState: (state) => {
       state.editLoading = false;
       state.editError = null;
+    },
+    // Add setCurrentComponent reducer
+    setCurrentComponent: (state, action) => {
+      state.currentComponent = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -193,7 +218,11 @@ const staffSlice = createSlice({
   },
 });
 
-export const { clearStaffCache, resetEditState } = staffSlice.actions;
+export const { 
+  clearStaffCache, 
+  resetEditState,
+  setCurrentComponent 
+} = staffSlice.actions;
 
 export const selectStaffPerDepartment = (state) => state.staff.staffPerDepartment;
 export const selectStaffList = (state) => state.staff.staffList;
@@ -236,5 +265,17 @@ export const selectStaffStatus = (state) => ({
   loading: state.staff.staffStatusLoading,
   error: state.staff.staffStatusError
 });
+
+export const selectShifts = (state) => {
+  const shifts = state.staff.staffList
+    .map(staff => staff.shift)
+    .filter(Boolean)
+    .filter((shift, index, self) => self.indexOf(shift) === index)
+    .map(shift => ({
+      label: shift.charAt(0).toUpperCase() + shift.slice(1),
+      value: shift
+    }));
+  return shifts;
+};
 
 export default staffSlice.reducer;

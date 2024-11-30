@@ -1,7 +1,10 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllTasks, fetchTasks } from '../../../../redux/slices/TaskSlice';
 import { fetchStaffData, selectStaffPerDepartment } from '../../../../redux/slices/AdminStaffSlice';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { BarChart } from '@mui/x-charts/BarChart';
+import { PieChart } from '@mui/x-charts/PieChart';
 
 const DepartmentSkeleton = () => {
   return (
@@ -29,6 +32,9 @@ const DepartmentPerformance = () => {
   const staffPerDepartment = useSelector(selectStaffPerDepartment);
   const loading = useSelector(state => state.tasks.loading || state.staff.loading);
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+
   useEffect(() => {
     dispatch(fetchTasks());
     dispatch(fetchStaffData());
@@ -37,7 +43,6 @@ const DepartmentPerformance = () => {
   const departmentMetrics = useMemo(() => {
     if (!tasks?.length) return [];
 
-    // Create metrics for each department
     const metrics = Object.keys(staffPerDepartment).map(dept => {
       const deptTasks = tasks.filter(task => 
         task?.department?.toLowerCase() === dept.toLowerCase()
@@ -74,6 +79,115 @@ const DepartmentPerformance = () => {
     return metrics.sort((a, b) => parseFloat(b.performance) - parseFloat(a.performance));
   }, [tasks, staffPerDepartment]);
 
+  const DepartmentDetailsDialog = ({ open, onClose, department, metrics }) => {
+    if (!department) return null;
+
+    const taskData = [
+      {
+        value: metrics.completed,
+        label: 'Completed',
+        color: '#22C55E'
+      },
+      {
+        value: metrics.inProgress,
+        label: 'In Progress', 
+        color: '#EAB308'
+      },
+      {
+        value: metrics.pending,
+        label: 'Pending',
+        color: '#EF4444'
+      }
+    ];
+
+    const barChartData = {
+      data: [
+        { category: 'Tasks', completed: metrics.completed, inProgress: metrics.inProgress, pending: metrics.pending }
+      ],
+      colors: ['#22C55E', '#EAB308', '#EF4444']
+    };
+
+    return (
+      <Dialog 
+        open={open} 
+        onClose={onClose}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+          }
+        }}
+        BackdropProps={
+          { sx: { backdropFilter: 'blur(5px)' } }
+        }
+      >
+        <DialogTitle>
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-semibold">{department} Performance</h2>
+              <p className="text-sm text-gray-500">
+                {metrics.staffCount} staff members • {metrics.performance}% efficiency
+              </p>
+            </div>
+          </div>
+        </DialogTitle>
+        <DialogContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="text-sm font-medium mb-4">Task Distribution</h3>
+              <PieChart
+                series={[{
+                  data: taskData,
+                  highlightScope: { faded: 'global', highlighted: 'item' },
+                  innerRadius: 30,
+                  paddingAngle: 2,
+                  cornerRadius: 4,
+                }]}
+                height={200}
+                margin={{ top: 10, bottom: 10 }}
+              />
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="text-sm font-medium mb-4">Task Status Overview</h3>
+              <BarChart
+                dataset={barChartData.data}
+                series={[
+                  { dataKey: 'completed' },
+                  { dataKey: 'inProgress' },
+                  { dataKey: 'pending'}
+                ]}
+                height={200}
+                colors={barChartData.colors}
+                xAxis={[{ scaleType: 'band', dataKey: 'category' }]}
+              />
+            </div>
+
+            <div className="col-span-1 md:col-span-2 bg-gray-50 rounded-lg p-4">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-semibold text-green-600">{metrics.completed}</p>
+                  <p className="text-sm text-gray-600">Completed Tasks</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-semibold text-yellow-600">{metrics.inProgress}</p>
+                  <p className="text-sm text-gray-600">Active Tasks</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-semibold text-red-600">{metrics.pending}</p>
+                  <p className="text-sm text-gray-600">Pending Tasks</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
   if (loading) {
     return (
       <div className="w-full overflow-y-auto h-[51rem]">
@@ -96,7 +210,11 @@ const DepartmentPerformance = () => {
         {departmentMetrics.map((dept) => (
           <div 
             key={dept.department} 
-            className="bg-white rounded-lg p-2 shadow-sm border border-gray-100"
+            className="bg-white rounded-lg p-2 shadow-sm border border-gray-100 cursor-pointer transition-all duration-200 hover:shadow-md"
+            onDoubleClick={() => {
+              setSelectedDepartment(dept);
+              setDialogOpen(true);
+            }}
           >
             <div className="flex justify-between items-center mb-1">
               <div>
@@ -136,6 +254,15 @@ const DepartmentPerformance = () => {
           </div>
         ))}
       </div>
+      <DepartmentDetailsDialog
+        open={dialogOpen}
+        onClose={() => {
+          setDialogOpen(false);
+          setSelectedDepartment(null);
+        }}
+        department={selectedDepartment?.department}
+        metrics={selectedDepartment}
+      />
     </div>
   );
 };
