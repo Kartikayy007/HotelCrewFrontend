@@ -7,7 +7,7 @@ import {
   selectShifts,
 } from "../../../redux/slices/AdminStaffSlice";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, CircularProgress } from '@mui/material';
-import { createWallet } from '../../../redux/slices/payrollSlice';
+import { createWallet } from '../../../redux/slices/PayrollSlice';
 
 const MAX_NAME_LENGTH = 20;
 
