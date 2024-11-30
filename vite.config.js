@@ -19,21 +19,14 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          firebase: ['firebase/app', 'firebase/messaging'],
-          ui: ['@mui/material', '@emotion/react', '@emotion/styled']
-        }
+        manualChunks: undefined
+      }
+    },
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
       }
     }
-  },
-  server: {
-    port: 5173,
-    strictPort: true,
-    host: true,
-    cors: true
-  },
-  preview: {
-    port: 4173
   }
 });
