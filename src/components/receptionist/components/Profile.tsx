@@ -6,7 +6,7 @@ import {
   fetchUserProfile,
   updateUserProfile 
 } from '../../../redux/slices/userProfileSlice';
-import LoadingAnimation from '../../common/loadingAnimation';
+import LoadingAnimation from '../../common/LoadingAnimation';
 import { Snackbar, Alert } from '@mui/material';
 import axios from 'axios';
 
