@@ -25,15 +25,15 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
     }
   
     const formData = { check_in_time: checkInTime, check_out_time: checkOutTime, payment_methods: paymentMethods };
-     ('Updating form data with:', formData); 
+    console.log('Updating form data with:', formData); 
     updateFormData(formData, 5); 
     onNext();
   };
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-0 lg:ml-[5.1rem] m-auto p-0 lg:p-0 lg:gap-52">
-        <div className="flex lg:hidden font-medium gap-3 mb-4 fixed lg:top-9 top-1">
+      <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
+        <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-6">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -46,16 +46,16 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
           ))}
         </div>
 
-        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-20">
           <img
             src={HotelIcon}
             alt="Hotel Icon"
-            className="h-[96] mb-4 text-[#5663AC]"
+            className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[28px] text-center font-[500] font-Montserrat ">
+          <h2 className="text-[32px] font-medium font-Montserrat">
             Operational Information
           </h2>
-          <p className="font-sans font-[400] text-center">
+          <p className="font-sans font-normal text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -63,10 +63,11 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
             settings menu.
           </p>
         </div>
-        <form className="space-y-8 lg:w-full ">
-          
-            <h1 className="text-[32px] font-[600] lg:block hidden">Operational Information</h1>
-          
+
+        <form className="space-y-2 xl:w-full max-w-[330px]">
+          <div className="flex justify-between items-center">
+            <h1 className="text-[32px] font-semibold hidden xl:block xl:text-left">Operational Information</h1>
+          </div>
 
           <div>
             <label
@@ -80,7 +81,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-in-time"
               value={checkInTime}
               onChange={(e) => setCheckInTime(e.target.value)}
-              className={`placeholder:text-base h-8 w-[182px] lg:w-[299px] mr-6 py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
+              className={`placeholder:text-base h-8 w-[182px] xl:w-[299px] mr-6 py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
                 !checkInTime && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
@@ -98,7 +99,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-out-time"
               value={checkOutTime}
               onChange={(e) => setCheckOutTime(e.target.value)}
-              className={`h-8 w-[182px] lg:w-[299px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
+              className={`h-8 w-[182px] xl:w-[299px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
                 !checkOutTime && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder='Check-out timings'
@@ -117,7 +118,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="payment-methods"
               value={paymentMethods}
               onChange={(e) => setPaymentMethods(e.target.value)}
-              className={`h-8 w-[330px] lg:w-[623px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
+              className={`h-8 w-[330px] xl:w-[623px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
                 !paymentMethods && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder='Add Methods'
@@ -126,12 +127,12 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               <div className='h-5'>
           {error && <p className="text-[#99182C] fixed">{error}</p>}
           </div>
-          <div className='lg:fixed lg:top-[80vh] mt-auto mb-8'>
-            <div className="flex justify-between gap-4">
+          <div className="px-1 xl:px-0 xl:left-auto xl:right-auto xl:fixed xl:top-[80vh]">
+            <div className="flex justify-between xl:w-[42rem]">
               <button type="button" onClick={onBack} className="h-9 w-[7rem] bg-gray-400 font-Montserrat font-[700] rounded-lg text-white">
                 <span>Back </span>
               </button>
-              <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white lg:fixed lg:left-[41.2vw]">
+              <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white xl:fixed xl:left-[41.2vw]">
                 <span>Next </span>
                 <span>➔</span>
               </button>
@@ -140,7 +141,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
         </form>
 
         <div>
-          <div className="hidden lg:block lg:w-[512px] font-medium fixed top-0 right-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+          <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
             <div className="flex gap-5 text-[32px]">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div

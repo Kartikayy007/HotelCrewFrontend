@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import contactIcon from "/contact.svg";
 import lineIcon from '/Line.svg';
@@ -57,8 +58,8 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-12 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-51">
-      <div className="flex lg:hidden gap-3 mb-4 fixed lg:top-9 top-1">
+      <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
+        <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-6">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -71,7 +72,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
           ))}
         </div>
 
-        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
           <img
             src={contactIcon}
             alt="Contact Icon"
@@ -89,9 +90,9 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
           </p>
         </div>
 
-        <form className="space-y-7 w-full lg:w-40-">
+        <form className="space-y-7 w-full xl:w-40-">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-semibold hidden lg:block lg:text-left">Contact & Location</h1>
+            <h1 className="text-[32px] font-semibold hidden xl:block xl:text-left">Contact & Location</h1>
           </div>
 
           <div>
@@ -106,7 +107,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="complete-address"
               value={completeAddress}
               onChange={(e) => setCompleteAddress(e.target.value)}
-              className={`placeholder:text-base h-8 w-full lg:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
+              className={`h-8 w-full xl:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                 !completeAddress && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder="Enter full address"
@@ -127,7 +128,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
                 id="main-phone"
                 value={mainPhoneNumber}
                 onChange={(e) => handleNumberInput(e, setMainPhoneNumber)}
-                className={`placeholder:text-base h-8 w-full lg:w-[299px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
+                className={`h-8 w-full xl:w-[299px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                   !mainPhoneNumber && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                 } focus:border-purple-500`}
                 placeholder="Main number"
@@ -140,9 +141,9 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="emergency-phone"
               value={emergencyPhoneNumber}
               onChange={(e) => handleNumberInput(e, setEmergencyPhoneNumber)}
-              className={` placeholder:text-base h-8 w-1/2 lg:w-[299px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
+              className={`h-8 w-1/2 xl:w-[299px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                 !emergencyPhoneNumber && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
-              } focus:border-purple-500 lg:ml-4`}
+              } focus:border-purple-500 xl:ml-4`}
               placeholder="Emergency number"
               maxLength={10}
             />
@@ -160,19 +161,19 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="hotel-email"
               value={emailAddress}
               onChange={(e) => setEmailAddress(e.target.value)}
-              className={`placeholder:text-base h-8 w-full lg:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
+              className={`h-8 w-full xl:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                 !emailAddress && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder="hotel@example.com"
             />
           </div>
-              <div className="h-1 lg:h-0">
-              {error && <p className="text-[#99182C] lg:fixed">{error}</p>}
+              <div className="h-1 xl:h-0">
+              {error && <p className="text-[#99182C] xl:fixed">{error}</p>}
               </div>
           
 
-          <div className="lg:fixed lg:top-[80vh] ">
-            <div className="lg:flex lg:justify-between flex justify-between">
+          <div className="xl:fixed xl:top-[80vh] ">
+            <div className="xl:flex xl:justify-between flex justify-between">
               <button
                 type="button"
                 onClick={() => {
@@ -191,7 +192,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               </button>
               <button
                 onClick={handleNextClick}
-                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white lg:fixed lg:left-[41.2vw]"
+                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white xl:fixed xl:left-[41.2vw]"
               >
                 <span>Next </span>
                 <span>➔</span>
@@ -201,15 +202,13 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
         </form>
 
         <div>
-        <div className="hidden lg:block lg:w-[30.476vw] font-medium fixed right-0 top-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
-            <div className="flex lg:gap-5 gap-0 text-[32px]">
+          <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+            <div className="flex gap-5 text-[32px]">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}
-                  className={`top-20 lg:left-20 left-4 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                    num === 2
-                      ? "border-[#5C69F8] text-black"
-                      : "text-black bg-white border-none"
+                  className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
+                    num === 2 ? 'border-[#5C69F8] text-black' : 'text-black bg-white border-none'
                   }`}
                 >
                   {num}
@@ -217,10 +216,10 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               ))}
             </div>
 
-            <img className="relative hidden lg:block top-36 left-[43.7%]" src={lineIcon} alt="" />
-            <img className="relative hidden lg:block top-[80%] left-[43.7%]" src={lineIcon} />
+            <img className="relative top-36 left-[43.7%]" src={lineIcon} alt="" />
+            <img className="relative top-[80%] left-[43.7%]" src={lineIcon} alt="" />
 
-            <div className="flex flex-col items-center justify-center h-full space-y-4">
+            <div className="flex flex-col items-center justify-center h-full space-y4">
               <img 
                 src={contactIcon} 
                 alt="Contact Icon" 

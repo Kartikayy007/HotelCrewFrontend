@@ -1,14 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
-import doc from '/documentupload.svg';
-import lineIcon from '/Line.svg';
-import docupload from '/docupload.svg';
-import exampleSheet from '/example.pdf';
-import LoadingAnimation from '../common/LoadingAnimation'; // Add this import
+import React, {useState, useRef, useEffect} from "react";
+import doc from "/documentupload.svg";
+import lineIcon from "/Line.svg";
+import docupload from "/docupload.svg";
+import exampleSheet from "/example.pdf";
+import LoadingAnimation from "../common/LoadingAnimation";
 
-function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
+function UploadDoc({onSubmit, onBack, updateFormData, initialData}) {
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState([]);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,50 +30,43 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
 
   const validateExcelFile = (file) => {
     const validTypes = [
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ];
-    
-     ('Validating file:', file);
-     ('File type:', file.type);
-     ('File name:', file.name);
-    
-    if (!validTypes.includes(file.type) && 
-        !file.name.endsWith('.xls') && 
-        !file.name.endsWith('.xlsx')) {
-      setErrorMessage('Please upload only Excel files (.xls or .xlsx)');
+
+    if (
+      !validTypes.includes(file.type) &&
+      !file.name.endsWith(".xls") &&
+      !file.name.endsWith(".xlsx")
+    ) {
+      setErrorMessage("Please upload only Excel files (.xls or .xlsx)");
       return false;
     }
 
-    const maxSize = 5 * 1024 * 1024; 
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      setErrorMessage('File size must be less than 5MB');
+      setErrorMessage("File size must be less than 5MB");
       return false;
     }
 
-    setErrorMessage('');
+    setErrorMessage("");
     return true;
   };
 
   const handleFiles = (fileList) => {
-    const excelFiles = Array.from(fileList).filter(file => 
-      file.name.endsWith('.xls') || file.name.endsWith('.xlsx')
+    const excelFiles = Array.from(fileList).filter(
+      (file) => file.name.endsWith(".xls") || file.name.endsWith(".xlsx")
     );
-    
+
     if (excelFiles.length > 0) {
       const selectedFile = excelFiles[0];
-      
-       ('Selected file:', selectedFile);
-       ('File type:', selectedFile.type);
-       ('File size:', selectedFile.size);
-      
+
       if (validateExcelFile(selectedFile)) {
-         ('File validation passed');
         setFiles([selectedFile]);
-        updateFormData({ staff_excel_sheet: selectedFile });
+        updateFormData({staff_excel_sheet: selectedFile});
       }
     } else {
-      setErrorMessage('Please upload only Excel files (.xls or .xlsx)');
+      setErrorMessage("Please upload only Excel files (.xls or .xlsx)");
     }
   };
 
@@ -81,7 +74,7 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       handleFiles(e.dataTransfer.files);
     }
@@ -95,21 +88,21 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
 
   const handleRemoveFile = () => {
     setFiles([]);
-    setErrorMessage('');
-    updateFormData({ staff_excel_sheet: null });
+    setErrorMessage("");
+    updateFormData({staff_excel_sheet: null});
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
   const handleSubmitClick = async (e) => {
     e.preventDefault();
     if (files.length === 0) {
-      setErrorMessage('Please upload a staff Excel sheet');
+      setErrorMessage("Please upload a staff Excel sheet");
       return;
     }
     setIsLoading(true);
-    updateFormData({ staff_excel_sheet: files[0] });
+    updateFormData({staff_excel_sheet: files[0]});
     await onSubmit();
     setIsLoading(false);
   };
@@ -120,13 +113,15 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col xl:flex-row justify-center items-center gap-0 lg:ml-[5.1rem] m-auto p-0 lg:p-0 lg:gap-52">
-        <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-1">
+      <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
+        <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-6">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
               className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                num === 6 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
+                num === 6
+                  ? "border-[#5C69F8] text-black"
+                  : "text-black bg-white border-none"
               }`}
             >
               {num}
@@ -138,40 +133,50 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
           <img
             src={doc}
             alt="Hotel Icon"
-            className="h-[96] mb-4 text-[#5663AC]"
+            className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[24px] font-[500] font-Montserrat">
+          <h2 className="text-[32px] font-medium font-Montserrat">
             Upload Staff Excel Sheet
           </h2>
-          <p className="font-sans font-[400] text-center">
+          <p className="font-sans font-normal text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
             <br />
             settings menu.
           </p>
-          <a href={exampleSheet} download="example.pdf" className="text-blue-500 underline">
+          <a
+            href={exampleSheet}
+            download="example.pdf"
+            className="text-blue-500 underline"
+          >
             Here's an example of an Excel sheet
           </a>
         </div>
 
-        <form className="space-y-7">
+        <form className="space-y-2 xl:w-full max-w-[330px]">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-[600] lg:block hidden">Upload Staff Excel Sheet</h1>
+            <h1 className="text-[32px] font-semibold hidden xl:block xl:text-left">
+              Upload Staff Excel Sheet
+            </h1>
           </div>
 
-          <input 
-            type="file" 
+          <input
+            type="file"
             ref={fileInputRef}
             onChange={handleFileInput}
             accept=".xls,.xlsx"
-            className="hidden" 
+            className="hidden"
           />
 
-          <div 
-            className={`w-[330px] lg:w-[623px] h-[227px] xl:h-[192px] border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer
-              ${dragActive ? 'border-[#5663AC] bg-[#F8F9FF]' : 'border-[#BDBDBD] bg-[#EFEFEF]'}
-              ${errorMessage ? 'border-[#99182C]' : ''}`}
+          <div
+            className={`w-[330px] xl:w-[623px] h-[227px] xl:h-[192px] border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer
+              ${
+                dragActive
+                  ? "border-[#5663AC] bg-[#F8F9FF]"
+                  : "border-[#BDBDBD] bg-[#EFEFEF]"
+              }
+              ${errorMessage ? "border-[#99182C]" : ""}`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
@@ -180,12 +185,16 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
           >
             <div className="text-center">
               <p className="text-gray-600 mb-2">
-                {dragActive 
-                  ? 'Drop your file here' 
-                  : 'Drag Excel file from computer or click to upload'}
+                {dragActive
+                  ? "Drop your file here"
+                  : "Drag Excel file from computer or click to upload"}
               </p>
-              <img className='relative left-[43%] mb-5' src={docupload} alt="Upload Icon"/>
-              <button 
+              <img
+                className="relative left-[43%] mb-5"
+                src={docupload}
+                alt="Upload Icon"
+              />
+              <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -197,12 +206,10 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
               </button>
             </div>
           </div>
-                <div className='h-1 lg:text-left text-center '>
-          {errorMessage && (
-            <div className="text-[#99182C] text-sm ">
-              {errorMessage}
-            </div>
-          )}
+          <div className="h-1 xl:text-left text-center ">
+            {errorMessage && (
+              <div className="text-[#99182C] text-sm ">{errorMessage}</div>
+            )}
           </div>
 
           {files.length > 0 && (
@@ -221,37 +228,39 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
             </div>
           )}
 
-          <div className='lg:fixed lg:top-[80vh] mt-16 mb-8'>   
-            <div className="flex justify-between gap-4">
-              <button 
-                type="button" 
-                onClick={onBack} 
+          <div className="px-1 xl:px-0 xl:left-auto xl:right-auto xl:fixed xl:top-[80vh]">
+            <div className="flex justify-between xl:w-[42rem]">
+              <button
+                type="button"
+                onClick={onBack}
                 className="h-9 w-[7rem] bg-gray-400 hover:bg-gray-500 font-Montserrat font-[700] rounded-lg text-white transition-colors"
               >
                 Back
               </button>
-              <button 
+              <button
                 onClick={handleSubmitClick}
                 disabled={isLoading}
-                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white lg:fixed lg:left-[41.2vw] flex items-center justify-center"
+                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white xl:fixed xl:left-[41.2vw] flex items-center justify-center"
               >
                 {isLoading ? (
                   <LoadingAnimation size={24} color="#FFFFFF" />
                 ) : (
-                  'Submit ➔'
+                  "Submit ➔"
                 )}
               </button>
             </div>
-          </div> 
+          </div>
         </form>
 
-        <div className="hidden xl:block lg:w-[512px] font-medium fixed top-0 right-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+        <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
           <div className="flex gap-5 text-[32px]">
             {[1, 2, 3, 4, 5, 6].map((num) => (
               <div
                 key={num}
                 className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                  num === 6 ? 'border-[#5C69F8] text-black' : 'text-black bg-white border-none'
+                  num === 6
+                    ? "border-[#5C69F8] text-black"
+                    : "text-black bg-white border-none"
                 }`}
               >
                 {num}
@@ -260,7 +269,11 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
           </div>
 
           <img className="relative top-36 left-[43.7%]" src={lineIcon} alt="" />
-          <img className="relative top-[80%] left-[43.7%]" src={lineIcon} alt="" />
+          <img
+            className="relative top-[80%] left-[43.7%]"
+            src={lineIcon}
+            alt=""
+          />
 
           <div className="flex flex-col items-center justify-center h-full space-y-4">
             <img
@@ -268,7 +281,9 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
               className="h-24 mb-4 text-[#5663AC]"
               alt="Document Upload Icon"
             />
-            <h2 className="text-[24px] font-[500] font-Montserrat">Upload Documents</h2>
+            <h2 className="text-[24px] font-[450] font-Montserrat">
+              Upload Documents
+            </h2>
             <p className="font-sans text-[16px] font-[400] text-center">
               Fill out the form on the left.
               <br />
@@ -276,9 +291,25 @@ function UploadDoc({ onSubmit, onBack, updateFormData, initialData }) {
               <br />
               settings menu.
             </p>
-            <a href={exampleSheet} download="example.pdf" className="text-blue-500 underline">
-              Here's an example of an Excel sheet
-            </a>
+            <div>
+              <a
+                href="/Unique_Dummy_Staff_Data.pdf"
+                download="Unique_Dummy_Staff_Data.pdf"
+                className="text-blue-500 underline"
+                onClick={(e) => {
+                  if (
+                    !e.currentTarget.href.includes(
+                      "Unique_Dummy_Staff_Data.pdf"
+                    )
+                  ) {
+                    e.preventDefault();
+                    console.error("PDF file not found");
+                  }
+                }}
+              >
+                Here's an example of an Excel sheet
+              </a>
+            </div>
           </div>
         </div>
       </div>

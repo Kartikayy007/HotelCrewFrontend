@@ -1,9 +1,8 @@
-import {useState, useRef, useEffect} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {verifyOtp, resendOtp} from "../../redux/slices/OtpSlice";
-import {registerUser} from "../../redux/slices/UserSlice";
-import validator from "validator";
-import {useNavigate} from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { verifyOtp, resendOtp } from "../../redux/slices/OtpSlice";
+import { registerUser } from "../../redux/slices/UserSlice";
+import { useNavigate } from "react-router-dom";
 import Lottie from "react-lottie";
 
 const eyeOpenAnimationDataUrl1 = "/eyeOpen.json";
@@ -12,7 +11,7 @@ const eyeOpenAnimationDataUrl2 = "/eyeOpen.json";
 const SignUp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {loading, error} = useSelector((state) => state.user);
+  const { loading, error } = useSelector((state) => state.user);
   const {
     loading: otpLoading,
     error: otpError,
@@ -33,12 +32,12 @@ const SignUp = () => {
   const [isResendDisabled, setIsResendDisabled] = useState(true);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
   const [otpResentMessage, setOtpResentMessage] = useState("");
-  const [hasInteractedAfterResend, setHasInteractedAfterResend] =useState(false);
+  const [hasInteractedAfterResend, setHasInteractedAfterResend] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleInputChange = (set) => (e) => {
-    const sanitizedValue = validator.escape(e.target.value);
-    set(sanitizedValue);
+    const value = e.target.value;
+    set(value);
     setErrorMsg("");
   };
 
@@ -106,10 +105,17 @@ const SignUp = () => {
       return;
     }
 
-    const pwdRegex =
-     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
+    const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
     if (!pwdRegex.test(pwd)) {
-      setErrorMsg("Invalid Password format");
+      if (!/[A-Z]/.test(pwd)) {
+        setErrorMsg("Password must contain at least one capital letter");
+      } else if (!/\d/.test(pwd)) {
+        setErrorMsg("Password must contain at least one number");
+      } else if (!/[a-z]/.test(pwd)) {
+        setErrorMsg("Password must contain at least one small character");
+      } else {
+        setErrorMsg("Password must contain at least one capital letter, one number, and one small character");
+      }
       return;
     }
 
@@ -130,7 +136,6 @@ const SignUp = () => {
 
     dispatch(registerUser({ userCredentials, rememberMe })).then((result) => {
       if (registerUser.fulfilled.match(result)) {
-         ("registered");
         setShowOtpInput(true);
       }
     });
@@ -142,11 +147,10 @@ const SignUp = () => {
       otpSetErrorMsg("Please enter the complete OTP");
       return;
     }
-    dispatch(verifyOtp({email, otp: otp.join("")})).then((result) => {
+    dispatch(verifyOtp({ email, otp: otp.join("") })).then((result) => {
       if (verifyOtp.fulfilled.match(result)) {
-         ("OTP verified");
         localStorage.setItem("otpVerified", "true");
-        localStorage.setItem('multiStepCompleted', 'false');
+        localStorage.setItem("multiStepCompleted", "false");
         navigate("/signup/hoteldetails");
       } else {
         setOtpResentMessage("");
@@ -195,11 +199,9 @@ const SignUp = () => {
 
   const togglePasswordAnimations = () => {
     setShowPwd(!showPwd);
-    // setShowMatchPwd(!showMatchPwd);
     setShowAnimations(!showAnimations);
   };
   const toggleConfirmPasswordAnimations = () => {
-    // setShowPwd(!showPwd);
     setShowMatchPwd(!showMatchPwd);
     setShowAnimations(!showAnimations);
   };
@@ -289,7 +291,7 @@ const SignUp = () => {
           </div>
         </div>
       ) : (
-        <div className="w-full lg:w-1/2 flex justify-center items-center ">
+        <div className="w-full lg:w-1/2 flex justify-center items-center p-8">
           <div className="space-y-9">
             <form
               onSubmit={handleSubmit}
@@ -355,7 +357,9 @@ const SignUp = () => {
                     className={`w-full p-2 pl-4 text-xl placeholder:text-base border-b  
                         focus:outline-none focus:ring-0  pr-4 ${
                           (errorMsg === "Enter all fields" && !pwd) ||
-                          errorMsg === "Invalid Password format"
+                          errorMsg === "Password must contain at least one capital letter" ||
+                          errorMsg === "Password must contain at least one number" ||
+                          errorMsg === "Password must contain at least one small character"
                             ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
                             : "border-gray-500 placeholder-gray-500"
                         }`}
@@ -416,15 +420,15 @@ const SignUp = () => {
                     )}
                   </button>
                 </div>
-                    <div className="h-1">
-                {errorMsg && (
-                  <div
-                    className="text-[#99182C] text-sm text-center lg:text-left lg:top-[55%] top-[72.1%] lg:w-40"
-                    role="alert"
-                  >
-                    {errorMsg}
-                  </div>
-                )}
+                <div className="h-1">
+                  {errorMsg && (
+                    <div
+                      className="text-[#99182C] text-sm text-center lg:text-left lg:top-[55%] top-[72.1%] lg:w-40"
+                      role="alert"
+                    >
+                      {errorMsg}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-end items-center text-base">

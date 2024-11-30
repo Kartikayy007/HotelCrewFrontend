@@ -44,14 +44,14 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
   };
 
   const inputClass = (value) =>
-    `h-8 w-full lg:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
+    `h-8 w-full xl:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
       !value && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
     } focus:border-purple-500`;
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-4 lg:ml-[5.1rem] m-auto p-4 lg:p-0 lg:gap-52 ">
-        <div className="flex lg:hidden gap-3 mb-4 fixed lg:top-9 top-1">
+      <div className="flex flex-col xl:flex-row justify-center items-center gap-4 xl:ml-[5.1rem] m-auto p-4 xl:p-0 xl:gap-52">
+        <div className="flex xl:hidden gap-3 mb-4 fixed xl:top-9 top-6">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -64,7 +64,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           ))}
         </div>
 
-        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
           <img
             src={hotelIcon}
             alt="Hotel Icon"
@@ -82,12 +82,12 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           </p>
         </div>
 
-        <form className="lg:space-y-7 space-y-5 w-[90vw] max-w-lg">
+        <form className="xl:space-y-7 space-y-5 w-[90vw] max-w-lg">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-semibold hidden lg:block lg:text-left">Hotel Information</h1>
+            <h1 className="text-[32px] font-semibold hidden xl:block xl:text-left">Hotel Information</h1>
           </div>
 
-          <div >
+          <div>
             <label
               htmlFor="hotel-name"
               className="block text-sm font-sans font-semibold"
@@ -95,7 +95,6 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               Hotel Name*
             </label>
             <input
-            
               type="text"
               id="hotel-name"
               value={hotelName}
@@ -130,7 +129,6 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
             <input
               type="text"
               id="year-established"
-              // pattern="^(19|20)\d{2}$" 
               value={yearEstablished}
               onChange={handleYearInput}
               placeholder="YYYY"
@@ -155,12 +153,12 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
             />
           </div>
 
-          {error && <p className="text-[#99182C] lg:fixed">{error}</p>}
+          {error && <p className="text-[#99182C] xl:fixed">{error}</p>}
 
-          <div className="lg:fixed lg:top-[80vh] lg:left-[4vw] text-center">
+          <div className="xl:fixed xl:top-[80vh] xl:left-[4vw] text-center">
             <button 
               onClick={handleNextClick} 
-              className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white mx-auto lg:ml-[32rem]"
+              className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white mx-auto xl:ml-[32rem]"
             >
               <span>Next </span>
               <span>➔</span>
@@ -169,15 +167,13 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
         </form>
 
         <div>
-          <div className="hidden lg:block lg:w-[30.476vw] font-medium fixed right-0 top-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
-            <div className="flex lg:gap-5 gap-0 text-[32px]">
+          <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+            <div className="flex gap-5 text-[32px]">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                   key={num}
-                  className={`top-20 lg:left-20 left-4 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-                    num === 1
-                      ? "border-[#5C69F8] text-black"
-                      : "text-black bg-white border-none"
+                  className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
+                    num === 1 ? 'border-[#5C69F8] text-black' : 'text-black bg-white border-none'
                   }`}
                 >
                   {num}
@@ -185,22 +181,26 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               ))}
             </div>
 
-            <img className="relative hidden lg:block top-36 left-[43.7%]" src={lineIcon} alt="" />
-            <img className="relative hidden lg:block top-[80%] left-[43.7%]" src={lineIcon} />
+            <img className="relative top-36 left-[43.7%]" src={lineIcon} alt="" />
+            <img className="relative top-[80%] left-[43.7%]" src={lineIcon} alt="" />
 
             <div className="flex flex-col items-center justify-center h-full space-y-4">
               <img 
-                src={hotelIcon} 
-                alt="Hotel Icon" 
+                src={hotelIcon}
+                alt="Hotel Icon"
                 className="h-[96] mb-4 text-[#5663AC]"
               />
-              <h2 className="text-[24px] font-[500] font-Montserrat">Hotel Information</h2>
-              <p className="font-sans font-[400] text-center">
+              <h2 className="text-[24px] font-[450] font-Montserrat">
+                Hotel Information
+              </h2>
+              <p className="text-gray-600 font-sans font-[300] text-center">
                 Fill out the form on the left.
                 <br />
-                <span className="font-sans font-[300]">You can always edit the data in the </span>
+                <span className="font-sans font-[300]">
+                  You can always edit the data in the
+                </span>
                 <br />
-                <span className="font-sans font-[300]">setting menu.</span>
+                <span>setting menu.</span>
               </p>
             </div>
           </div>

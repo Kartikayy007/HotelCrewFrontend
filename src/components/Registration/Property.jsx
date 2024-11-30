@@ -98,8 +98,8 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
 
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
-      <div className="flex flex-col lg:flex-row justify-center items-center gap-0 lg:ml-[5.1rem] m-auto p-0 lg:p-0 lg:gap-52">
-        <div className="flex lg:hidden gap-3 mb-4 fixed lg:top-9 top-1">
+      <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
+        <div className="flex xl:hidden gap-3 mb-4 fixed xl:top-9 top-6">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -112,7 +112,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
           ))}
         </div>
 
-        <div className="lg:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-20">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-20">
           <img
             src={hotelIcon}
             alt="Hotel Icon"
@@ -130,9 +130,9 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
           </p>
         </div>
 
-        <form className="space-y-2 lg:w-full max-w-[330px]">
+        <form className="space-y-2 xl:w-full max-w-[330px]">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-semibold hidden lg:block lg:text-left">Property Details</h1>
+            <h1 className="text-[32px] font-semibold hidden xl:block xl:text-left">Property Details</h1>
           </div>
 
           <div>
@@ -145,15 +145,16 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
             <input
               type="text"
               id="number-of-rooms"
+              placeholder="Enter Total Number of Rooms"
               value={numberOfRooms}
               onChange={(e) => handleNumberInput(e, setNumberOfRooms)}
-              className={`placeholder:text-base h-8 w-full lg:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
+              className={`placeholder:text-base h-8 w-full xl:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                 !numberOfRooms && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
           </div>
 
-          <div className="h-40 w-96">
+          <div className="h-40 w-full">
             <div className="flex justify-between mb-2">
               <label
                 htmlFor="types-of-rooms"
@@ -163,26 +164,26 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               </label>
               <button
                 type="button"
-                className="lg:relative lg:left-[232px] relative right-12 "
+                className="xl:relative xl:left-[232px] relative right-12 "
                 onClick={handleAddRoomType}
               >
                 <img src={plus} alt="Add room type" />
               </button>
             </div>
 
-            <div className="h-32 lg:w-[630px] w-[320px]  overflow-y-auto overflow-x-hidden pr-3 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100">
-              <div className="space-y-2">
+            <div className="h-32 xl:w-[630px] w-full overflow-y-auto overflow-x-hidden pr-3 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100">
+              <div className="space-y-2 overflow-x-scroll">
                 {roomTypes.map((room, index) => (
                   <div 
                   key={index} 
                   ref={(el) => (roomRefs.current[index] = el)}
-                  className="flex items-center gap-4">
+                  className="flex items-center gap-2 xl:gap-4">
                     <input
                       type="text"
-                      className={`placeholder:text-base h-8 w-[142px] lg:w-[200px] py-2 lg:px-4 px-2 text-xl border rounded-[4px] focus:outline-none ${
+                      className={`placeholder:text-base h-8 w-[100px] xl:w-[200px] py-2 xl:px-4 px-2 text-xl border rounded-[4px] focus:outline-none ${
                         !room.type && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
-                      placeholder="Types of Rooms"
+                      placeholder="Typ of Rooms"
                       value={room.type}
                       onChange={(e) =>
                         handleRoomTypeChange(index, "type", e.target.value)
@@ -190,10 +191,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                     />
                     <input
                       type="text"
-                      className={`placeholder:text-base h-8 w-[120px] lg:w-[180px] py-2 px-2 lg:px-4 text-xl border rounded-[4px] focus:outline-none ${
+                      className={`placeholder:text-base h-8 w-[100px] xl:w-[180px] py-2 px-2 xl:px-4 text-xl border rounded-[4px] focus:outline-none ${
                         !room.count && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
-                      placeholder="Number of Rooms"
+                      placeholder="No. Rooms"
                       value={room.count}
                       onChange={(e) =>
                         handleNumberInput(e, (value) =>
@@ -203,7 +204,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                     />
                     <input
                       type="text"
-                      className={`placeholder:text-base h-8 w-[120px] lg:w-[160px] py-2 px-2 lg:px-4 text-xl border rounded-[4px] focus:outline-none ${
+                      className={`placeholder:text-base h-8 w-[100px] xl:w-[160px] py-2 px-2 xl:px-4 text-xl border rounded-[4px] focus:outline-none ${
                         !room.price && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
                       placeholder="Price of Room"
@@ -238,9 +239,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
             <input
               type="text"
               id="number-of-floors"
+              placeholder="Total Floors "
               value={numberOfFloors}
               onChange={(e) => handleNumberInput(e, setNumberOfFloors)}
-              className={`h-8 w-full lg:w-[623px] py-2 text-xl px-4 border rounded-[4px] focus:outline-none ${
+              className={`h-8 w-full xl:w-[623px] py-2 text-xl px-4 border rounded-[4px] focus:outline-none ${
                 !numberOfFloors && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
@@ -281,7 +283,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                   id="parking-capacity"
                   value={parkingCapacity}
                   onChange={(e) => handleNumberInput(e, setParkingCapacity)}
-                  className={`h-8 w-full lg:w-[623px] py-2 px-4 border rounded-lg focus:outline-none ${
+                  className={`h-8 w-full xl:w-[623px] py-2 px-4 border rounded-lg focus:outline-none ${
                     !parkingCapacity && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                   } focus:border-purple-500`}
                   disabled={!valetParking}
@@ -289,11 +291,11 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               </div>
             )}
           </div>
-            <div className="h-5 lg:h-0">
+            <div className="h-5 xl:h-0">
           {error && <p className="text-[#99182C]">{error}</p>}
           </div>
-          <div className={` px-1 lg:px-0 lg:left-auto lg:right-auto lg:fixed ${valetParking ? 'lg:top-[85vh]' : 'lg:top-[80vh]'}`}>
-            <div className="flex justify-between lg:w-[42rem]">
+          <div className={` px-1 xl:px-0 xl:left-auto xl:right-auto xl:fixed ${valetParking ? 'xl:top-[85vh]' : 'xl:top-[80vh]'}`}>
+            <div className="flex justify-between xl:w-[42rem]">
               <button
                 type="button"
                 onClick={handleBackClick}
@@ -303,7 +305,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               </button>
               <button
                 onClick={handleNextClick}
-                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white lg:fixed lg:left-[41.2vw]"
+                className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white xl:fixed xl:left-[41.2vw]"
               >
                 <span>Next </span>
                 <span>➔</span>
@@ -313,7 +315,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
         </form>
 
         <div>
-          <div className="hidden lg:block lg:w-[512px] font-medium fixed top-0 right-0 lg:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
+          <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
             <div className="flex gap-5 text-[32px]">
               {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
@@ -329,8 +331,8 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               ))}
             </div>
 
-            <img className="relative hidden lg:block top-36 left-[43.7%]" src={line} alt="" />
-            <img className="relative hidden lg:block top-[80%] left-[43.7%]" src={line} alt="" />
+            <img className="relative hidden xl:block top-36 left-[43.7%]" src={line} alt="" />
+            <img className="relative hidden xl:block top-[80%] left-[43.7%]" src={line} alt="" />
             <div className="flex flex-col items-center justify-center h-full space-y-4">
               <img
                 src={hotelIcon}
