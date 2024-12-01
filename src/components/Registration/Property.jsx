@@ -99,7 +99,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
       <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
-        <div className="flex xl:hidden gap-3 mb-4 fixed xl:top-9 top-6">
+        <div className="flex xl:hidden gap-3 mb-4 bg-white fixed font-medium top-6">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -118,7 +118,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
             alt="Hotel Icon"
             className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] font-medium font-Montserrat">
+          <h2 className="text-[32px] text-center font-medium font-Montserrat">
             Property Details
           </h2>
           <p className="font-sans font-normal text-center">
@@ -283,7 +283,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                   id="parking-capacity"
                   value={parkingCapacity}
                   onChange={(e) => handleNumberInput(e, setParkingCapacity)}
-                  className={`h-8 w-full xl:w-[623px] py-2 px-4 border rounded-lg focus:outline-none ${
+                  className={`h-8 w-full xl:w-[623px] py-2 px-4 border rounded-[4px] focus:outline-none ${
                     !parkingCapacity && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                   } focus:border-purple-500`}
                   disabled={!valetParking}

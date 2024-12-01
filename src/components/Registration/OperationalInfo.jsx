@@ -33,7 +33,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
       <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
-        <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-6">
+        <div className="flex xl:hidden font-medium gap-3 mb-4 fixed top-6">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -46,13 +46,13 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
           ))}
         </div>
 
-        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-20">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
           <img
             src={HotelIcon}
             alt="Hotel Icon"
             className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] font-medium font-Montserrat">
+          <h2 className="text-[32px] text-center font-medium font-Montserrat">
             Operational Information
           </h2>
           <p className="font-sans font-normal text-center">

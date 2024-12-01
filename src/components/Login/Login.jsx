@@ -63,10 +63,10 @@ const Login = () => {
         return;
       }
 
-      if (!validatePassword(password)) {
-        setErrorMsg("Invalid Password Format");
-        return;
-      }
+      // if (!validatePassword(password)) {
+      //   setErrorMsg("Invalid Password Format");
+      //   return;
+      // }
 
       const loginAttempts = JSON.parse(
         localStorage.getItem("loginAttempts") || '{"count": 0, "timestamp": 0}'
@@ -224,8 +224,8 @@ const Login = () => {
   };
 
   return (
-    <div className="font-Montserrat lg:min-h-screen lg:w-full lg:flex lg:justify-center ">
-      <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] lg:hidden">
+    <div className="font-Montserrat lg:min-h-screen xl:w-full xl:flex xl:justify-center ">
+      <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] xl:hidden">
         <img
           className="w-full h-full object-fill"
           src="/web2 1.svg"
@@ -233,16 +233,16 @@ const Login = () => {
         />
       </div>
       {showForgotPassword ? (
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-2">
+        <div className="w-full xl:w-1/2 flex items-center justify-center p-2">
           <div className="space-y-9">
             <form
               className="lg:w-96 w-80 lg:space-y-7 space-y-4"
               onSubmit={(e) => e.preventDefault()}
             >
-              <h1 className="text-[45px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
+              <h1 className="text-[40px] font-bold xl:mt-0 mt-5 text-center xl:text-left">
                 Forgot Password
               </h1>
-              <div className="lg:space-y-4 space-y-2">
+              <div className="xl:space-y-4 space-y-2">
                 <input
                   type="email"
                   value={email}
@@ -296,13 +296,13 @@ const Login = () => {
           </div>
         </div>
       ) : (
-        <div className="w-full lg:w-1/2 flex justify-center items-center p-2">
+        <div className="w-full xl:w-1/2 flex justify-center items-center p-2">
           <div className="space-y-9">
             <form
               className="w-full lg:w-96 lg:space-y-7 space-y-4"
               onSubmit={handleSubmit}
             >
-              <h1 className="text-[40px] font-bold mt-5 text-center lg:text-left">
+              <h1 className="text-[40px] font-bold mt-5 text-center xl:text-left">
                 LogIn
               </h1>
               <div className="space-y-4">
@@ -407,7 +407,7 @@ const Login = () => {
           </div>
         </div>
       )}
-      <div className="w-full lg:flex justify-center items-center bg-[#8094D4] hidden ">
+      <div className="w-full xl:flex justify-center items-center bg-[#8094D4] hidden ">
         <img className="w-[90%]" src="/web2 1.svg" alt="Login Hero" />
       </div>
     </div>

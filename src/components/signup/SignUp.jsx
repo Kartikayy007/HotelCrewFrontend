@@ -105,7 +105,7 @@ const SignUp = () => {
       return;
     }
 
-    const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
+    const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,24}$/;
     if (!pwdRegex.test(pwd)) {
       if (!/[A-Z]/.test(pwd)) {
         setErrorMsg("Password must contain at least one capital letter");
@@ -207,8 +207,8 @@ const SignUp = () => {
   };
 
   return (
-    <div className="font-Montserrat lg:min-h-screen lg:w-full lg:flex lg:justify-center">
-      <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] lg:hidden">
+    <div className="font-Montserrat min-h-screen xl:w-full xl:flex xl:justify-center">
+      <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] xl:hidden">
         <img
           src="/Frame2.svg"
           alt="bg"
@@ -216,16 +216,16 @@ const SignUp = () => {
         />
       </div>
       {showOtpInput ? (
-        <div className="w-full lg:w-1/2 flex justify-center items-center">
+        <div className="w-full xl:w-1/2 flex justify-center items-center">
           <div className="space-y-6">
             <form
-              className="w-full lg:space-y-3 space-y-4 "
+              className="w-full :sxlpace-y-3 space-y-4 "
               onSubmit={handleVerifyOtp}
             >
-              <h2 className="text-[40px] font-bold lg:mt-0 mt-5 text-center">
+              <h2 className="text-[40px] font-bold xl:mt-0 mt-5 text-center">
                 Verify E-mail
               </h2>
-              <div className="flex flex-col justify-center items-center gap-4 lg:gap-5">
+              <div className="flex flex-col justify-center items-center gap-4 xl:gap-5">
                 <div className="flex space-x-4">
                   {otp.map((digit, index) => (
                     <input
@@ -291,13 +291,13 @@ const SignUp = () => {
           </div>
         </div>
       ) : (
-        <div className="w-full lg:w-1/2 flex justify-center items-center p-8">
+        <div className="w-full xl:w-1/2 flex justify-center items-center pt-0 md:pt-3 pb-0 sm:pb-4 p-8 xl:p-8">
           <div className="space-y-9">
             <form
               onSubmit={handleSubmit}
               className="w-full lg:w-96  lg:space-y-7 space-y-1"
             >
-              <h2 className="text-[40px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
+              <h2 className="text-[40px] font-bold lg:mt-0 mt-3 text-center xl:text-left">
                 Register
               </h2>
               <div className="lg:space-y-4 space-y-2">
@@ -420,10 +420,10 @@ const SignUp = () => {
                     )}
                   </button>
                 </div>
-                <div className="h-1">
+                <div className="h-2 ">
                   {errorMsg && (
                     <div
-                      className="text-[#99182C] text-sm text-center lg:text-left lg:top-[55%] top-[72.1%] lg:w-40"
+                      className="text-[#99182C] text-sm text-left lg:top-[55%] top-[72.1%] lg:w-40"
                       role="alert"
                     >
                       {errorMsg}
@@ -478,7 +478,7 @@ const SignUp = () => {
           </div>
         </div>
       )}
-      <div className="w-full lg:flex justify-center items-center bg-[#8094D4] hidden">
+      <div className="w-full xl:flex justify-center items-center bg-[#8094D4] hidden">
         <img
           src="/Frame.svg"
           alt="bg"

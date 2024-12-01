@@ -27,8 +27,10 @@ const getAuthToken = () => {
 export const fetchAttendance = createAsyncThunk(
   'attendance/fetchAttendance',
   async () => {
+    const token = getAuthToken();
+    
     const response = await axios.get(FETCH_ATTENDANCE_URL, {
-      headers: getAuthHeaders(),
+      headers: {'Authorization': `Bearer ${token}`},
     });
      (response.data);
     return response.data;
@@ -39,10 +41,11 @@ export const fetchAttendance = createAsyncThunk(
 export const updateAttendance = createAsyncThunk(
   'attendance/updateAttendance',
   async (id) => {
+    const token = getAuthToken();
     const response = await axios.post(
       `${UPDATE_ATTENDANCE_URL}/${id}/`,
       {},
-      { headers: getAuthHeaders() }
+      { headers:{ 'Authorization': `Bearer ${token}`} }
     );
      (response.data);
      ("updated")
@@ -52,8 +55,9 @@ export const updateAttendance = createAsyncThunk(
 export const fetchAttendanceStats = createAsyncThunk(
   'attendance/fetchAttendanceStats',
   async () => {
+    const token = getAuthToken();
     const response = await axios.get(FETCH_ATTENDANCE_STATS_URL, {
-      headers: getAuthHeaders(),
+      headers:{ 'Authorization': `Bearer ${token}`} ,
     });
     console.log("Astats",response.data)
     return response.data;
@@ -62,8 +66,9 @@ export const fetchAttendanceStats = createAsyncThunk(
 export const checkAttendance = createAsyncThunk(
   'attendance/checkAttendance',
   async (date) => {
+    const token = getAuthToken();
     const response = await axios.get(`${CHECK_ATTENDANCE_URL}?date=${date}`, {
-      headers: getAuthHeaders(),
+      headers:{ 'Authorization': `Bearer ${token}`} ,
     });
     return response.data;
   }

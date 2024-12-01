@@ -5,7 +5,8 @@ import axios from 'axios';
 
 const getAuthToken = () => {
     // const token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1MjM5LCJpYXQiOjE3MzI2MTMyMzksImp0aSI6ImUwMzMyNjRkYjk0OTQ5YzI5YjNhM2EzNjgxZGZhNDUzIiwidXNlcl9pZCI6MTIwfQ.ITV01RFPWCfFAVu6YJWZqjRCExMYpMw8DKf3xAvzL0w';
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NDU2OTIxLCJpYXQiOjE3MzI4NjQ5MjEsImp0aSI6ImI4NWVlMzZlMDJhNjQzMDViY2Y0ODA2MTAzNGQzMDc5IiwidXNlcl9pZCI6MTc4fQ.hY-3Fh7NzOBcOwiO0yY1XLBRe-s6CygICH0TLLqBzo8';
+    const token=localStorage.getItem('token');
+    // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NDU2OTIxLCJpYXQiOjE3MzI4NjQ5MjEsImp0aSI6ImI4NWVlMzZlMDJhNjQzMDViY2Y0ODA2MTAzNGQzMDc5IiwidXNlcl9pZCI6MTc4fQ.hY-3Fh7NzOBcOwiO0yY1XLBRe-s6CygICH0TLLqBzo8';
     if (!token) {
       throw new Error('Authentication token not found');
     }

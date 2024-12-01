@@ -2,8 +2,8 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const getAuthHeaders = () => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1Mzc5MDI1LCJpYXQiOjE3MzI3ODcwMjUsImp0aSI6IjYzYmVjY2UxNjAxNzQzY2I5ZjM4Zjc1YTcwMzJkMjdhIiwidXNlcl9pZCI6MTczfQ.U3Qx2NpNSwHMa8vEFtwpaaz8CKLzkAi0pO7YAnlarPc'; // Replace with your token retrieval logic
-  
+    // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1Mzc5MDI1LCJpYXQiOjE3MzI3ODcwMjUsImp0aSI6IjYzYmVjY2UxNjAxNzQzY2I5ZjM4Zjc1YTcwMzJkMjdhIiwidXNlcl9pZCI6MTczfQ.U3Qx2NpNSwHMa8vEFtwpaaz8CKLzkAi0pO7YAnlarPc'; // Replace with your token retrieval logic
+    const token=localStorage.getItem('token');
     if (!token) {
       throw new Error('No authentication token found');
     }
