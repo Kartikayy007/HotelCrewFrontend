@@ -80,7 +80,8 @@ function Profile() {
         formData.append('user_profile', selectedFile);
       }
 
-      const token = localStorage.getItem('token'); 
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+ 
       const response = await axios.put(
         'https://hotelcrew-1.onrender.com/api/edit/user_profile/',
         formData,

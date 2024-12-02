@@ -4,10 +4,19 @@ import { twMerge } from "tailwind-merge";
 import { FiArrowRight, FiMail, FiMapPin } from "react-icons/fi";
 import { Navigate, useNavigate } from "react-router-dom";
 import {  SiGmail, SiInstagram,  SiLinkedin, SiYoutube } from "react-icons/si";
+import { useSelector } from "react-redux";
 
 export const RevealBento = () => {
+  const { registrationStatus } = useSelector(state => state.user);
+  const navigate = useNavigate();
+
+  // Only show overlay if registration is pending
+  if (registrationStatus !== 'pending') {
+    return null;
+  }
+
   return (
-        <div className="min-h-screen w-full  px-12 py-12 text-zinc-50 fixed z-50 backdrop-filter backdrop-blur-md bg-white/5">
+    <div className="min-h-screen w-full px-12 py-12 text-zinc-50 fixed z-50 backdrop-filter backdrop-blur-md bg-white/5">
       <motion.div
         initial="initial"
         animate="animate"
@@ -150,7 +159,6 @@ const EmailListBlock = () => {
       return;
     }
     
-    // Open default mail client
     window.location.href = `mailto:Hotelcrew@gmail.com?subject=Contact Request&body=From: ${email}`;
     
     // Clear form

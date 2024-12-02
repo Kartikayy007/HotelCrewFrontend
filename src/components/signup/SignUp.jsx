@@ -91,73 +91,112 @@ const SignUp = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    if (!user || !email || !pwd || !matchPwd) {
-      setErrorMsg("Enter all fields");
-      return;
-    }
+const pwdRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setErrorMsg("Invalid email");
-      return;
-    }
+const validatePassword = (pwd) => {
+  if (pwd.length < 8) {
+    return "Password must be at least 8 characters long";
+  }
+  if (!/[A-Z]/.test(pwd)) {
+    return "Password must contain at least one capital letter";
+  }
+  if (!/[a-z]/.test(pwd)) {
+    return "Password must contain at least one lowercase letter";
+  }
+  if (!/\d/.test(pwd)) {
+    return "Password must contain at least one number";
+  }
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd)) {
+    return "Password must contain at least one special character";
+  }
+  return null;
+};
 
-    const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
-    if (!pwdRegex.test(pwd)) {
-      if (!/[A-Z]/.test(pwd)) {
-        setErrorMsg("Password must contain at least one capital letter");
-      } else if (!/\d/.test(pwd)) {
-        setErrorMsg("Password must contain at least one number");
-      } else if (!/[a-z]/.test(pwd)) {
-        setErrorMsg("Password must contain at least one small character");
-      } else {
-        setErrorMsg("Password must contain at least one capital letter, one number, and one small character");
-      }
-      return;
-    }
+  
 
-    if (pwd !== matchPwd) {
-      setErrorMsg("Passwords do not match");
-      return;
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    setErrorMsg("");
-    const userCredentials = {
-      user_name: user,
-      email: email,
-      password: pwd,
-      confirm_password: matchPwd,
-    };
+  // Trim the username and check if it's empty or contains only whitespace
+  const trimmedUsername = user.trim();
+  if (!trimmedUsername) {
+    setErrorMsg("Enter a valid name");
+    return;
+  }
 
-    localStorage.setItem("userEmail", email);
+  if (!email || !pwd || !matchPwd) {
+    setErrorMsg("Enter all fields");
+    return;
+  }
 
-    dispatch(registerUser({ userCredentials, rememberMe })).then((result) => {
-      if (registerUser.fulfilled.match(result)) {
-        setShowOtpInput(true);
-      }
-    });
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    setErrorMsg("Invalid email");
+    return;
+  }
+
+  if (pwd !== matchPwd) {
+    setErrorMsg("Passwords do not match");
+    return;
+  }
+
+  if (!pwdRegex.test(pwd)) {
+    const error = validatePassword(pwd);
+    setErrorMsg(error || "Invalid password");
+    return;
+  }
+
+  setErrorMsg("");
+  const userCredentials = {
+    user_name: trimmedUsername,
+    email: email,
+    password: pwd,
+    confirm_password: matchPwd,
   };
 
-  const handleVerifyOtp = (e) => {
-    e.preventDefault();
-    if (otp.join("").length < 4) {
-      otpSetErrorMsg("Please enter the complete OTP");
-      return;
+  localStorage.setItem("userEmail", email);
+
+  dispatch(registerUser({ userCredentials, rememberMe })).then((result) => {
+    if (registerUser.fulfilled.match(result)) {
+      setShowOtpInput(true);
+    } else {
+      // Display backend error message
+      setErrorMsg(result.payload.message);
+      
+      // Clear specific fields based on error
+      if (result.payload.message.includes("email")) {
+        setEmail("");
+      }
+      if (result.payload.message.includes("password")) {
+        setPwd("");
+        setMatchPwd("");
+      }
     }
-    dispatch(verifyOtp({ email, otp: otp.join("") })).then((result) => {
-      if (verifyOtp.fulfilled.match(result)) {
-        localStorage.setItem("otpVerified", "true");
-        localStorage.setItem("multiStepCompleted", "false");
+  });
+};
+
+const handleVerifyOtp = (e) => {
+  e.preventDefault();
+  if (otp.join("").length < 4) {
+    otpSetErrorMsg("Please enter the complete OTP");
+    return;
+  }
+  dispatch(verifyOtp({ email, otp: otp.join("") })).then((result) => {
+    if (verifyOtp.fulfilled.match(result)) {
+      const isHotelRegistered = result.payload["hotel details"] !== "not registered";
+      
+      if (isHotelRegistered) {
+        navigate("/admin/dashboard");
+      } else {
         navigate("/signup/hoteldetails");
-      } else {
-        setOtpResentMessage("");
-        otpSetErrorMsg(result.payload.error || "OTP verification failed");
       }
-    });
-  };
+    } else {
+      setOtpResentMessage("");
+      otpSetErrorMsg(result.payload.error || "OTP verification failed");
+    }
+  });
+};
 
   const handleResendOtp = () => {
     const userCredentials = {
@@ -206,6 +245,22 @@ const SignUp = () => {
     setShowAnimations(!showAnimations);
   };
 
+  useEffect(() => {
+    dispatch({ type: 'user/clearError' });
+    dispatch({ type: 'otp/clearError' });
+    
+    return () => {
+      dispatch({ type: 'user/clearError' });
+      dispatch({ type: 'otp/clearError' });
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    setErrorMsg("");
+    otpSetErrorMsg("");
+    setOtpResentMessage("");
+  }, []);
+
   return (
     <div className="font-Montserrat lg:min-h-screen lg:w-full lg:flex lg:justify-center">
       <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] lg:hidden">
@@ -237,7 +292,7 @@ const SignUp = () => {
                       onChange={(e) => handleChange(index, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(index, e)}
                       className="w-12 h-12 text-center text-lg border-2 border-transparent rounded-lg 
-                               bg-[#D2E0F3] focus:border-[#5663AC] focus:outline-none"
+                              bg-[#D2E0F3] focus:border-[#5663AC] focus:outline-none"
                     />
                   ))}
                 </div>

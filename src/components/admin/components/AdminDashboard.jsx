@@ -270,16 +270,20 @@ function AdminDashboard() {
   ];
 
   const tasks = useSelector(selectAllTasks);
-  const staffPerDepartment = useSelector(selectStaffPerDepartment);
+  const staffPerDepartment = useSelector(state => state.staff?.staffPerDepartment) || {};
 
-  "Staff per department:", staffPerDepartment;
-  "All tasks:", tasks;
+  const totalStaff = useMemo(() => {
+    if (!staffPerDepartment || typeof staffPerDepartment !== 'object') {
+      return 0;
+    }
+    
+    return Object.values(staffPerDepartment).reduce(
+      (sum, count) => sum + (Number(count) || 0),
+      0
+    );
+  }, [staffPerDepartment]);
 
-  const totalStaff = Object.values(staffPerDepartment).reduce(
-    (sum, count) => sum + count,
-    0
-  );
-  "Total staff count:", totalStaff;
+  console.log("Total staff count:", totalStaff);
 
   const inProgressCount = Array.isArray(tasks)
     ? tasks.filter((task) => task.status.toLowerCase() === "in_progress").length
@@ -296,15 +300,15 @@ function AdminDashboard() {
     {
       id: 0,
       value: staffStatus.busy,
-      label: "Busy",
-      color: "#252941",
+      label: `Busy (${staffStatus.busy})`,
+      color: "#252941"
     },
     {
       id: 1,
       value: staffStatus.available,
-      label: "Available",
-      color: "#8094D4",
-    },
+      label: `Available (${staffStatus.available})`,
+      color: "#8094D4"
+    }
   ];
 
   const detailedStaffStatus = [
@@ -621,18 +625,16 @@ function AdminDashboard() {
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
       {isInitialLoading ? (
-        <div className="w-full h-full flex flex-col gap-4 p-4">
+        <><div className="w-full h-full flex flex-col gap-4 p-4">
           <Skeleton variant="rectangular" height={60} />
-          <div className="flex flex-col xl:flex-row gap-4">
-            <div className="flex-1">
-              <Skeleton variant="rectangular" height={320} />
-            </div>
-            <div className="w-full xl:w-[30%]">
-              <Skeleton variant="rectangular" height={320} />
-            </div>
+          <div className="flex flex-col xl:flex-row gap-4"></div>
+          <div className="flex-1">
+            <Skeleton variant="rectangular" height={320} />
           </div>
-          <Skeleton variant="rectangular" height={400} />
-        </div>
+          <div className="w-full xl:w-[30%]">
+            <Skeleton variant="rectangular" height={320} />
+          </div>
+        </div><Skeleton variant="rectangular" height={400} /></>
       ) : (
         <>
           <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
@@ -720,7 +722,9 @@ function AdminDashboard() {
                           <h3 className="font-medium mb-2 text-center">
                             Staff Status
                           </h3>
-                          {totalStaff === 0 ? (
+                          {staffStatus.loading ? (
+                            <Skeleton variant="circular" width={220} height={220} />
+                          ) : staffStatus.total === 0 ? (
                             <div className="flex items-center justify-center h-[180px] text-gray-500">
                               No Staff Data Available
                             </div>
@@ -731,12 +735,12 @@ function AdminDashboard() {
                                   data: staffStatusData,
                                   highlightScope: {
                                     fade: "global",
-                                    highlight: "item",
+                                    highlight: "item"
                                   },
                                   innerRadius: 45,
                                   paddingAngle: 1,
                                   cornerRadius: 1,
-                                },
+                                }
                               ]}
                               height={220}
                               margin={{top: 0, bottom: 40, left: 0, right: 0}}
@@ -745,16 +749,16 @@ function AdminDashboard() {
                                   direction: "row",
                                   position: {
                                     vertical: "bottom",
-                                    horizontal: "center",
+                                    horizontal: "center"
                                   },
                                   padding: 0,
                                   markSize: 10,
                                   itemGap: 15,
                                   labelStyle: {
-                                    fontSize: 15,
-                                    fontWeight: 500,
-                                  },
-                                },
+                                    fontSize: 12,
+                                    fontWeight: 500
+                                  }
+                                }
                               }}
                             />
                           )}

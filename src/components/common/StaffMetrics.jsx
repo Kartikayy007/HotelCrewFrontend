@@ -19,7 +19,8 @@ const StaffMetrics = () => {
   const [dailyPerformance, setDailyPerformance] = useState(0);
 
   const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 

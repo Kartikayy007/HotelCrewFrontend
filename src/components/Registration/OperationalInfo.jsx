@@ -16,22 +16,97 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
     }
   }, [initialData]);
 
+  // Format time to match required format
+  const formatTime = (time) => {
+    if (!time) return '';
+    // Convert time to HH:mm:ss format
+    const [hours, minutes] = time.split(':');
+    return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:00`;
+  };
+
   const handleNextClick = (e) => {
     e.preventDefault();
-  
-    if (!checkInTime || !checkOutTime || !paymentMethods) {
+
+    // Validate fields
+    if (!checkInTime || !checkOutTime || !paymentMethods.trim()) {
       setError('Please fill out all required fields.');
       return;
     }
+
+    // Format time strings with seconds
+    const formattedTime = (time) => {
+      const [hours, minutes] = time.split(':');
+      return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:00`;
+    };
+
+    const formData = {
+      check_in_time: formattedTime(checkInTime),
+      check_out_time: formattedTime(checkOutTime),
+      payment_methods: paymentMethods.trim()
+    };
+
+    console.log('Sending operational data:', formData);
+    updateFormData(formData, 5);
+    onNext(formData);
+  };
+
+  const handleOperationalInfoSubmit = async (operationalData) => {
+    try {
+      // Format times and validate data
+      const formattedData = {
+        ...operationalData,
+        check_in_time: formatTime(operationalData.check_in_time),
+        check_out_time: formatTime(operationalData.check_out_time),
+        payment_methods: operationalData.payment_methods.trim(),
+        // Use the first room type's price as room_price
+        room_price: formData.room_types[0]?.price || 0
+      };
   
-    const formData = { check_in_time: checkInTime, check_out_time: checkOutTime, payment_methods: paymentMethods };
-    console.log('Updating form data with:', formData); 
-    updateFormData(formData, 5); 
-    onNext();
+      const currentFormData = {
+        ...formData,
+        ...formattedData
+      };
+      
+      const transformedData = transformFormData(currentFormData);
+      
+      // Log the data being sent
+      console.log('Sending data:', transformedData);
+      
+      const result = await dispatch(completeMultiStepForm(transformedData)).unwrap();
+      
+      if (result) {
+        setSnackbar({
+          open: true,
+          message: "Hotel details registered successfully!",
+          severity: "success",
+        });
+        handleNext();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setSnackbar({
+        open: true,
+        message: error.message || "Failed to register hotel details",
+        severity: "error",
+      });
+    }
   };
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
+      <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-6">
+        {[1, 2, 3, 4, 5].map((num) => (
+          <div
+            key={num}
+            className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
+              num === 5 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
+            }`}
+          >
+            {num}
+          </div>
+        ))}
+      </div>
+
       <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
         <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-6">
           {[1, 2, 3, 4, 5, 6].map((num) => (
@@ -111,7 +186,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               htmlFor="payment-methods"
               className="block text-sm font-sans font-[600] mb-1"
             >
-              Payment Methods
+              Payment Methods*
             </label>
             <input
               type="text"
@@ -121,11 +196,12 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               className={`h-8 w-[330px] xl:w-[623px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
                 !paymentMethods && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
-              placeholder='Add Methods'
+              placeholder='e.g., Cash, Credit Card, UPI'
             />
           </div>
-              <div className='h-5'>
-          {error && <p className="text-[#99182C] fixed">{error}</p>}
+
+          <div className='h-5'>
+            {error && <p className="text-[#99182C] fixed">{error}</p>}
           </div>
           <div className="px-1 xl:px-0 xl:left-auto xl:right-auto xl:fixed xl:top-[80vh]">
             <div className="flex justify-between xl:w-[42rem]">
@@ -143,7 +219,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
         <div>
           <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
             <div className="flex gap-5 text-[32px]">
-              {[1, 2, 3, 4, 5, 6].map((num) => (
+              {[1, 2, 3, 4, 5].map((num) => (
                 <div
                   key={num}
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${

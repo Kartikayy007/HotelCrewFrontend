@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-// Components
 import Admin from './components/admin/Admin';
 import MainLayout from './components/Manager/MainLayout';
 import Reception from './components/receptionist/Reception'
@@ -14,77 +13,58 @@ import Onboarding from './components/Onboarding';
 import Page404 from './components/common/Page404';
 
 const RoleBasedRoute = ({ children, allowedRoles }) => {
+  const { token, userData } = useSelector(state => state.user);
   const location = useLocation();
-  const accessToken = localStorage.getItem('token') || sessionStorage.getItem('token');
-  let user = null;
 
-  try {
-    const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
-    user = userStr ? JSON.parse(userStr) : null;
-  } catch (e) {
-    localStorage.clear();
-    sessionStorage.clear();
+  console.log('RoleBasedRoute Check:', {
+    token: !!token,
+    userRole: userData?.role,
+    allowedRoles,
+    currentPath: location.pathname
+  });
+
+  if (!token || !userData) {
+    console.log('No token or user data, redirecting to login');
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!accessToken || !user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  if (!user.role || !allowedRoles.includes(user.role)) {
+  if (!userData.role || !allowedRoles.includes(userData.role)) {
+    console.log('Role not allowed:', {
+      userRole: userData?.role,
+      allowedRoles
+    });
     return <Navigate to="/unauthorized" replace />;
   }
 
+  console.log('Route access granted for role:', userData.role);
   return children;
 };
 
-// Registration Flow Guard
 const RegistrationFlowGuard = ({ children }) => {
   const location = useLocation();
-  const isRegistrationStarted = localStorage.getItem('registrationStarted');
-  const isOtpVerified = localStorage.getItem('otpVerified');
-  const multiStepCompleted = localStorage.getItem('multiStepCompleted');
-  const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-  let user = null;
-
-  try {
-    const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
-    user = userStr ? JSON.parse(userStr) : null;
-  } catch (e) {
-    return <Navigate to="/login" replace />;
-  }
-
+  const { isHotelRegistered } = useSelector(state => state.user);
+  const accessToken = localStorage.getItem('accessToken');
+  const storedIsHotelRegistered = localStorage.getItem('isHotelRegistered') === 'true';
 
   if (location.pathname === '/signup/hoteldetails') {
-    if (multiStepCompleted === 'false' && user?.role === 'Admin') {
+    if (isHotelRegistered || storedIsHotelRegistered) {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
+
+    if (!isHotelRegistered && accessToken) {
       return children;
     }
 
-    if (isRegistrationStarted && isOtpVerified) {
-      return children;
-    }
-
-    // Case 3: Authenticated admin
-    if (accessToken && user?.role === 'Admin') {
-      return children;
-    }
-
-    // Redirect to signup if registration not started
-    if (!isRegistrationStarted) {
-      return <Navigate to="/signup" replace />;
-    }
-
-    // Redirect to unauthorized for others
     return <Navigate to="/unauthorized" replace />;
   }
 
   return children;
 };
 
-// PublicRoute component with allowAccess prop
 const PublicRoute = ({ children, allowAccess = false }) => {
   const location = useLocation();
   const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  const { isHotelRegistered } = useSelector(state => state.user);
   let user = null;
 
   try {
@@ -96,12 +76,10 @@ const PublicRoute = ({ children, allowAccess = false }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Allow access to specified routes even when logged in
   if (allowAccess) {
     return children;
   }
 
-  // Redirect to role-specific dashboard if already logged in
   if (accessToken && user?.role) {
     const roleRoutes = {
       'Admin': '/admin/dashboard',
@@ -119,7 +97,7 @@ const PublicRoute = ({ children, allowAccess = false }) => {
 
 const App = () => {
   return (
-    <Router>
+    <Router> 
       <Routes>
         {/* Landing/Public Routes */}
         <Route path="/" element={

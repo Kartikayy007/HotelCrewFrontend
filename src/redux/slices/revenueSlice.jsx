@@ -7,7 +7,8 @@ const CACHE_DURATION = 6 * 60 * 60 * 1000;
 */
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
   if (!token) {
     throw new Error('Authentication token not found');
   }

@@ -14,7 +14,8 @@ const CHECK_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/ch
 
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
   if (!token) {
     throw new Error('Authentication token not found');
   }

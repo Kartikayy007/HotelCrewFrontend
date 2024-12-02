@@ -1,42 +1,28 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, createAction} from "@reduxjs/toolkit";
 import axios from "axios";
+
+// Add action
+export const setAuthTokens = createAction('user/setAuthTokens');
 
 export const verifyOtp = createAsyncThunk(
   "otp/verifyOtp",
-  async ({email, otp}, {rejectWithValue}) => {
+  async ({email, otp}, { dispatch, rejectWithValue }) => {
     try {
-      const payload = {
-        email: email,
-        otp: otp.toString(),
-      };
-
-       ("Sending payload:", payload);
-
       const response = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/register/",
-        payload,
+        { email, otp: otp.toString() },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" }
         }
       );
       
-       ("Response:", response.data);
-      localStorage.setItem("id", response.data.user_id);
-      localStorage.setItem("token", response.data.access_token);
+      // Store only tokens in localStorage
+      localStorage.setItem('accessToken', response.data.access_token);
+      localStorage.setItem('refreshToken', response.data.refresh_token);
+      
       return response.data;
     } catch (error) {
-      if (!error.response) {
-        return rejectWithValue({
-          message:
-            "Network error. Please check your internet connection and try again.",
-        });
-      } else {
-        return rejectWithValue(
-          error.response?.data || {message: "Invalid OTP"}
-        );
-      }
+      return rejectWithValue(error.response?.data || { message: 'OTP verification failed' });
     }
   }
 );

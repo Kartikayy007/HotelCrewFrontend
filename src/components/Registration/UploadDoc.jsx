@@ -97,14 +97,20 @@ function UploadDoc({onSubmit, onBack, updateFormData, initialData}) {
 
   const handleSubmitClick = async (e) => {
     e.preventDefault();
-    if (files.length === 0) {
-      setErrorMessage("Please upload a staff Excel sheet");
-      return;
-    }
     setIsLoading(true);
-    updateFormData({staff_excel_sheet: files[0]});
-    await onSubmit();
-    setIsLoading(false);
+    
+    try {
+      if (files.length > 0) {
+        updateFormData({ staff_excel_sheet: files[0] });
+      }
+      await onSubmit();
+    } catch (error) {
+      console.error('Upload error:', error);
+    } finally {
+      setIsLoading(false);
+      // Always navigate after skip or upload attempt
+      setTimeout(() => onSubmit(), 2000);
+    }
   };
 
   const triggerFileInput = () => {
@@ -136,7 +142,7 @@ function UploadDoc({onSubmit, onBack, updateFormData, initialData}) {
             className="h-24 mb-4 text-[#5663AC]"
           />
           <h2 className="text-[32px] font-medium font-Montserrat">
-            Upload Staff Excel Sheet
+            Upload Staff Excel Sheet <span className="text-gray-500 text-sm">(Optional)</span>
           </h2>
           <p className="font-sans font-normal text-center">
             Fill out the form below.
@@ -157,7 +163,7 @@ function UploadDoc({onSubmit, onBack, updateFormData, initialData}) {
         <form className="space-y-2 xl:w-full max-w-[330px]">
           <div className="flex justify-between items-center">
             <h1 className="text-[32px] font-semibold hidden xl:block xl:text-left">
-              Upload Staff Excel Sheet
+              Upload Staff Excel Sheet <span className="text-gray-500 text-sm">(Optional)</span>
             </h1>
           </div>
 
@@ -245,7 +251,7 @@ function UploadDoc({onSubmit, onBack, updateFormData, initialData}) {
                 {isLoading ? (
                   <LoadingAnimation size={24} color="#FFFFFF" />
                 ) : (
-                  "Submit ➔"
+                  files.length > 0 ? "Submit ➔" : "Skip ➔"
                 )}
               </button>
             </div>

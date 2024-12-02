@@ -1,10 +1,16 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { verifyOtp } from './OtpSlice';
 
 export const loginUser = createAsyncThunk(
   'user/loginUser',
   async ({userCredentials, rememberMe}, { rejectWithValue }) => {
     try {
+      console.log('Login attempt with:', {
+        email: userCredentials.email,
+        rememberMe
+      });
+
       const request = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/login/",
         userCredentials,
@@ -14,23 +20,28 @@ export const loginUser = createAsyncThunk(
           }
         }
       );
+      
       const response = await request.data;
-      const storageMethod = rememberMe ? localStorage : sessionStorage;
-
-      // Store complete user data
-      const userData = {
+      console.log('Login response:', {
+        hasToken: !!response.access_token,
         role: response.role,
-        ...response.user_data
-      };
+        userData: response.user_data
+      });
 
-      storageMethod.setItem('token', response.access_token);
-      storageMethod.setItem('refreshToken', response.refresh_token);
-      storageMethod.setItem('user', JSON.stringify(userData)); 
+      localStorage.setItem('accessToken', response.access_token);
+      localStorage.setItem('refreshToken', response.refresh_token);
+      localStorage.setItem('userData', JSON.stringify(response.user_data));
+      localStorage.setItem('role', response.role);
+
+      console.log('Local storage updated, clearing registration state');
       
-      localStorage.removeItem('registrationStarted');
-      localStorage.removeItem('otpVerified');
-      
-      return response;
+      return {
+        ...response,
+        userData: {
+          role: response.role,
+          ...response.user_data
+        }
+      };
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: 'Login failed' });
     }
@@ -39,9 +50,9 @@ export const loginUser = createAsyncThunk(
 
 export const registerUser = createAsyncThunk(
   'user/registerUser',
-  async ({userCredentials,rememberMe}, { rejectWithValue }) => {
+  async ({userCredentials}, { rejectWithValue }) => {
     try {
-      const request = await axios.post(
+      const response = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/registrationOTP/",
         userCredentials,
         {
@@ -50,39 +61,82 @@ export const registerUser = createAsyncThunk(
           }
         }
       );
-      const response = await request.data;
-       (request)
-      localStorage.setItem('registrationStarted', 'true');
-      const storageMethod = rememberMe ? localStorage : sessionStorage;
-      storageMethod.setItem('userEmail', userCredentials.email);
-      localStorage.setItem(email, userCredentials.email);
-
-      if(rememberMe)
-        localStorage.setItem('rememberMe', true);
-      
-      localStorage.setItem('registrationStarted', 'true');
-      storageMethod.setItem('userEmail', userCredentials.email);
-      storageMethod.setItem('email', userCredentials.email);
-      
-      return response;
+      return response.data;
     } catch (error) {
-      if (!error.response) {
-        return rejectWithValue({ message: 'Network error. Please check your internet connection and try again.' });
-      } else {
-        return rejectWithValue({ message: 'User with this E-mail already exists.' });
+      if (error.response) {
+        const errorData = error.response.data;
+        
+        if (errorData.non_field_errors) {
+          return rejectWithValue({
+            message: errorData.non_field_errors[0]
+          });
+        }
+
+        if (errorData.email) {
+          return rejectWithValue({
+            message: errorData.email[0]
+          });
+        }
+
+        if (errorData.message) {
+          return rejectWithValue({
+            message: errorData.message
+          });
+        }
+
+        return rejectWithValue({
+          message: "Registration failed"
+        });
       }
+      
+      return rejectWithValue({
+        message: "Network error"
+      });
     }
   }
 );
 
+// UserSlice.jsx - Update completeMultiStepForm
 export const completeMultiStepForm = createAsyncThunk(
   'user/completeMultiStepForm',
-  async (formData, { rejectWithValue }) => {
+  async (formData, { dispatch, rejectWithValue }) => {
     try {
-      localStorage.setItem('multiStepCompleted', 'true');
-      return formData;
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        return rejectWithValue({ message: 'No access token found' });
+      }
+
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (key === 'staff_excel_sheet' && formData[key]) {
+          formDataToSend.append(key, formData[key]);
+        } else if (key === 'room_types' || key === 'department_names') {
+          formDataToSend.append(key, JSON.stringify(formData[key]));
+        } else {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+
+      const response = await axios.post(
+        "https://hotelcrew-1.onrender.com/api/hoteldetails/register/",
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${accessToken}`
+          },
+        }
+      );
+      
+      if (response.data.status === "success") {
+        dispatch(setHotelRegistration(true));
+      }
+      
+      return response.data;
     } catch (error) {
-      return rejectWithValue({ message: 'Failed to save hotel details' });
+      return rejectWithValue({ 
+        message: error.response?.data?.message || 'Failed to save hotel details' 
+      });
     }
   }
 );
@@ -90,21 +144,28 @@ export const completeMultiStepForm = createAsyncThunk(
 const userSlice = createSlice({
   name: 'user',
   initialState: {
+    isHotelRegistered: localStorage.getItem('isHotelRegistered') === 'true',
     email: null,
+    username: null,  
     error: null,
     loading: false,
-    registrationStep: null,
+    currentRegistrationStep: 1
   },
   reducers: {
     clearError: (state) => {
       state.error = null;
     },
     logout: (state) => {
-      state.email = null;
-      state.error = null;
       localStorage.clear();
-      sessionStorage.clear();
+      return { ...userSlice.initialState };
     },
+    setHotelRegistration: (state, action) => {
+      state.isHotelRegistered = action.payload;
+      localStorage.setItem('isHotelRegistered', action.payload);
+    },
+    setCurrentStep: (state, action) => {
+      state.currentRegistrationStep = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -114,34 +175,64 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.email = action.payload;
+        state.token = action.payload.access_token;
+        state.refreshToken = action.payload.refresh_token;
+        state.userData = action.payload.user_data;
+        state.role = action.payload.role;
         state.error = null;
+
+        // Store in localStorage
+        localStorage.setItem('accessToken', action.payload.access_token);
+        localStorage.setItem('refreshToken', action.payload.refresh_token);
+        localStorage.setItem('role', action.payload.role);
+        localStorage.setItem('userData', JSON.stringify(action.payload.user_data));
+
+        const isHotelRegistered = action.payload["hotel details"] !== "not registered";
+        state.isHotelRegistered = isHotelRegistered;
+        localStorage.setItem('isHotelRegistered', isHotelRegistered);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.email = null;
         state.error = action.payload?.message || 'Login failed';
       })
-      // Register cases
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.email = action.payload;
+        state.email = action.payload.email;
+        state.username = action.payload.user_name;
+        state.isRegistrationStarted = true;
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
-        state.email = null;
         state.error = action.payload?.message || 'Registration failed';
       })
       .addCase(completeMultiStepForm.fulfilled, (state) => {
-        state.registrationStep = 'completed';
+        state.isHotelRegistered = true;
+        localStorage.setItem('isHotelRegistered', 'true');
+      })
+      .addCase(verifyOtp.fulfilled, (state, action) => {
+        const isHotelRegistered = action.payload["hotel details"] !== "not registered";
+        state.isHotelRegistered = isHotelRegistered;
+        localStorage.setItem('isHotelRegistered', isHotelRegistered);
+      })
+      .addCase(verifyOtp.rejected, (state) => {
+        state.isOtpVerified = false;
       });
-  },
+  }
 });
 
-export const { clearError, logout } = userSlice.actions;
+export const { 
+  clearError, 
+  logout,  
+  setUserEmail,
+  setAuthData,
+  setRegistrationStatus,
+  setHotelRegistration,
+  setCurrentStep
+} = userSlice.actions;
+
 export default userSlice.reducer;

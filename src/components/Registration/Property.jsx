@@ -5,7 +5,9 @@ import hotelIcon from '/property.svg';
 import line from '/Line.svg';
 
 const Property = ({ onNext, onBack, updateFormData, initialData }) => {
-  const [roomTypes, setRoomTypes] = useState([]);
+  const [roomTypes, setRoomTypes] = useState([
+    { type: "", count: "", price: "" }
+  ]);
   const [numberOfRooms, setNumberOfRooms] = useState("");
   const [numberOfFloors, setNumberOfFloors] = useState("");
   const [valetParking, setValetParking] = useState(false);
@@ -38,8 +40,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
   };
 
   const handleDeleteRoomType = (index) => {
-    const newRoomTypes = roomTypes.filter((_, i) => i !== index);
-    setRoomTypes(newRoomTypes);
+    if (roomTypes.length > 1) {
+      const newRoomTypes = roomTypes.filter((_, i) => i !== index);
+      setRoomTypes(newRoomTypes);
+    }
   };
 
   const handleRoomTypeChange = (index, field, value) => {
@@ -67,13 +71,21 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
       return;
     }  
   
+    // Convert price strings to numbers
+    const formattedRoomTypes = roomTypes.map(room => ({
+      ...room,
+      price: parseFloat(room.price),
+      count: parseInt(room.count)
+    }));
+  
     updateFormData(
       {
-        total_number_of_rooms: numberOfRooms,
-        room_types: roomTypes,
-        number_of_floors: numberOfFloors,
+        total_number_of_rooms: parseInt(numberOfRooms),
+        room_types: formattedRoomTypes,
+        number_of_floors: parseInt(numberOfFloors),
         valet_parking_available: valetParking,
-        valet_parking_capacity: valetParking ? parkingCapacity : "",
+        valet_parking_capacity: valetParking ? parseInt(parkingCapacity) : "",
+        room_price: formattedRoomTypes[0].price // Use first room type's price as base price
       },
       4
     );
