@@ -97,7 +97,7 @@ export const resendOtp = createAsyncThunk(
       if (!error.response) {
         return rejectWithValue({
           message:
-            "Network error. Please check your internet connection and try again.",
+            "Network error.",
         });
       } else {
         return rejectWithValue(

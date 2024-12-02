@@ -1,6 +1,8 @@
 import React, {useState, useRef, useEffect} from "react";
 import axios from "axios";
 import Lottie from "react-lottie";
+import { Snackbar, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const eyeOpenAnimationDataUrl = "/eyeOpen.json";
 
@@ -19,6 +21,14 @@ const Verify = ({email}) => {
     useState(false);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
   const [showPasswords, setShowPasswords] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  const [passwordMatchError, setPasswordMatchError] = useState(false);
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPasswords(!showPasswords);
@@ -33,9 +43,27 @@ const Verify = ({email}) => {
     }
   }, [timeLeft]);
 
+  const isOtpComplete = (otpArray) => {
+    return otpArray.every(digit => digit !== '');
+  };
+
   const handleKeyDown = (index, e) => {
-    if (e.key === "Backspace" && index > 0 && otp[index] === "") {
-      inputRefs[index - 1].current.focus();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const isComplete = isOtpComplete(otp);
+      
+      if (!isComplete) {
+        setErrorMessage('Please enter complete OTP');
+        return;
+      }
+      
+      handleVerifyOtp();
+    } else if (e.key === 'Backspace') {
+      if (index > 0 && !otp[index]) {
+        setTimeout(() => {
+          inputRefs[index - 1].current?.focus();
+        }, 0);
+      }
     }
   };
 
@@ -53,14 +81,15 @@ const Verify = ({email}) => {
     }
   };
 
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    if (otp.join("").length < 4) {
-      setErrorMessage("Please enter the complete OTP");
+  const handleVerifyOtp = async () => {
+    if (!isOtpComplete(otp)) {
+      setErrorMessage('Please enter complete OTP');
       return;
     }
 
     setLoading(true);
+    setErrorMessage('');
+    
     try {
       const response = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/verify-otp/",
@@ -69,15 +98,18 @@ const Verify = ({email}) => {
           otp: otp.join(""),
         }
       );
-       ("OTP verified:", response);
       setShowOtpInput(false);
     } catch (err) {
+      console.log('Raw backend response:', err.response?.data);
+      
       if (!err.response) {
         setErrorMessage(
-          "Network error. Please check your internet connection and try again."
+          "Network error."
         );
       } else {
-        setErrorMessage("Invalid OTP. Please try again.");
+        // Extract and display the exact error message from backend
+        const errorMessage = err.response.data.error?.[0] || err.response.data.error || "Verification failed";
+        setErrorMessage(errorMessage);
       }
     } finally {
       setLoading(false);
@@ -102,7 +134,7 @@ const Verify = ({email}) => {
     } catch (err) {
       if (!err.response) {
         setErrorMessage(
-          "Network error. Please check your internet connection and try again."
+          "Network error."
         );
       } else {
         setErrorMessage("Failed to resend OTP. Please try again.");
@@ -114,38 +146,47 @@ const Verify = ({email}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
 
-    if (!passwordRegex.test(password)) {
-      setErrorMessage("Invalid password format");
+    if (!password || !confirmPassword) {
+      setErrorMessage('Please fill in all fields');
       return;
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
+      setErrorMessage('Passwords do not match');
       return;
     }
-    setErrorMessage("");
+
+    const passwordValidationError = validatePassword(password);
+    if (passwordValidationError) {
+      setPasswordError(passwordValidationError);
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://hotelcrew-1.onrender.com/api/auth/reset-password/",
+        'https://hotelcrew-1.onrender.com/api/auth/reset-password/',
         {
-          email: email,
+          email,
           new_password: password,
-          confirm_password: confirmPassword,
+          confirm_password: confirmPassword
         }
       );
-       ("Response:", response);
-      window.location.reload();
-    } catch (err) {
-      if (!err.response) {
-        setErrorMessage(
-          "Network error. Please check your internet connection and try again."
-        );
-      } else {
-        setErrorMessage("An error occurred. Please try again.");
-      }
+
+      setSnackbar({
+        open: true,
+        message: 'Password changed successfully! Redirecting...',
+        severity: 'success'
+      });
+
+      setTimeout(() => {
+        navigate('/login', { replace: true });
+        window.location.reload();
+      }, 2000);
+
+    } catch (error) {
+      setErrorMessage(error.response?.data?.message || 'Failed to reset password');
     } finally {
       setLoading(false);
     }
@@ -158,6 +199,57 @@ const Verify = ({email}) => {
     rendererSettings: {
       preserveAspectRatio: "xMidYMid slice",
     },
+  };
+
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+  const validatePassword = (password) => {
+    if (!passwordRegex.test(password)) {
+      if (password.length < 8) {
+        return 'Password must be at least 8 characters long';
+      }
+      if (!/(?=.*[a-z])/.test(password)) {
+        return 'Password must include at least one lowercase letter';
+      }
+      if (!/(?=.*[A-Z])/.test(password)) {
+        return 'Password must include at least one uppercase letter';
+      }
+      if (!/(?=.*\d)/.test(password)) {
+        return 'Password must include at least one number';
+      }
+    }
+    return '';
+  };
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    setPasswordError(validatePassword(newPassword));
+    
+    if (confirmPassword) {
+      setPasswordMatchError(newPassword !== confirmPassword);
+    }
+  };
+  
+  const handleConfirmPasswordChange = (e) => {
+    const newConfirmPassword = e.target.value;
+    setConfirmPassword(newConfirmPassword);
+    
+    if (password) {
+      setPasswordMatchError(password !== newConfirmPassword);
+    }
+  };
+  
+  const handlePasswordBlur = () => {
+    if (password && confirmPassword) {
+      setPasswordMatchError(password !== confirmPassword);
+    }
+  };
+  
+  const handleConfirmBlur = () => {
+    if (password && confirmPassword) {
+      setPasswordMatchError(password !== confirmPassword);
+    }
   };
 
   return (
@@ -261,11 +353,15 @@ const Verify = ({email}) => {
                 <div className="relative">
                   <input
                     type={showPasswords ? "text" : "password"}
-                    className="w-full p-2 text-xl pl-4 border-b border-gray-700 focus:outline-none"
-                    placeholder="New Password"
                     value={password}
-                    maxLength={20}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
+                    className={`w-full p-2 pl-4 text-xl placeholder:text-base border-b ${
+                      passwordError || passwordMatchError ? 'border-[#99182C]' : 'border-gray-700'
+                    } focus:outline-none`}
+                    placeholder="New Password"
+                    autoComplete="new-password"
+                    maxLength={24}
+                    onBlur={handlePasswordBlur}
                   />
                   <button
                     type="button"
@@ -279,16 +375,20 @@ const Verify = ({email}) => {
                     )}
                   </button>
                 </div>
+                
 
                 <div className="relative">
                   <input
                     type={showPasswords ? "text" : "password"}
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full p-2 pl-4 text-xl placeholder:text-base border-b border-gray-700 focus:outline-none"
+                    onChange={handleConfirmPasswordChange}
+                    className={`w-full p-2 pl-4 text-xl placeholder:text-base border-b ${
+                      passwordMatchError ? 'border-[#99182C]' : 'border-gray-700'
+                    } focus:outline-none`}
                     placeholder="Confirm Password"
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                     maxLength={24}
+                    onBlur={handleConfirmBlur}
                   />
                   <button
                     type="button"
@@ -305,7 +405,9 @@ const Verify = ({email}) => {
               </div>
 
               {errorMessage && <p className="text-[#99182C]">{errorMessage}</p>}
-
+              {passwordError && (
+                  <p className="text-[#99182C] mt-1">{passwordError}</p>
+                )}
               <div className="">
                 <button
                   type="submit"
@@ -329,6 +431,15 @@ const Verify = ({email}) => {
       <div className=" hidden lg:flex w-full lg:w-[95vw] items-center justify-center h-[380px] lg:h-auto bg-[#8094D4]">
         <img className="h-full" src="/web2 1.svg" alt="Login Hero" />
       </div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={2000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert severity={snackbar.severity} variant="filled">
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

@@ -192,7 +192,7 @@ const Login = () => {
       } else if (error.response?.status === 429) {
         setErrorMsg("Too many requests. Please try again later.");
       } else if (error.response?.status === 400) {
-        setErrorMsg("User not found. Please check your email address");
+        setErrorMsg("User doesn't exist, Please check your email.");
       } else {
         setErrorMsg(
           error.message || "Failed to send reset email. Please try again later."
@@ -237,7 +237,12 @@ const Login = () => {
           <div className="space-y-9">
             <form
               className="lg:w-96 w-80 lg:space-y-7 space-y-4"
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!resetLoading) {
+                  resetMail();
+                }
+              }}
             >
               <h1 className="text-[45px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
                 Forgot Password
@@ -279,8 +284,7 @@ const Login = () => {
                 </button>
               </div>
               <button
-                type="button"
-                onClick={resetMail}
+                type="submit" // Changed from type="button"
                 disabled={resetLoading}
                 className="w-full h-9 bg-[#5663AC] text-white rounded-lg hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -397,7 +401,7 @@ const Login = () => {
                 <span className="text-sm text-gray-500">Need an account? </span>
                 <button
                   type="button"
-                  onClick={() => navigate("/signup")}
+                  onClick={() => navigate("/signup", { replace: true })}
                   className="text-sm text-[#5663AC] hover:text-[#6773AC] font-medium"
                 >
                   Register

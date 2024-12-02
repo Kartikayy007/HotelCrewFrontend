@@ -34,6 +34,7 @@ const SignUp = () => {
   const [otpResentMessage, setOtpResentMessage] = useState("");
   const [hasInteractedAfterResend, setHasInteractedAfterResend] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   const handleInputChange = (set) => (e) => {
     const value = e.target.value;
@@ -111,28 +112,31 @@ const SignUp = () => {
   };
 
 
-const pwdRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
-const validatePassword = (pwd) => {
-  if (pwd.length < 8) {
-    return "Password must be at least 8 characters long";
+const validatePassword = (password) => {
+  if (!passwordRegex.test(password)) {
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long';
+    }
+    if (!/(?=.*[a-z])/.test(password)) {
+      return 'Password must include at least one lowercase letter';
+    }
+    if (!/(?=.*[A-Z])/.test(password)) {
+      return 'Password must include at least one uppercase letter';
+    }
+    if (!/(?=.*\d)/.test(password)) {
+      return 'Password must include at least one number';
+    }
   }
-  if (!/[A-Z]/.test(pwd)) {
-    return "Password must contain at least one capital letter";
-  }
-  if (!/[a-z]/.test(pwd)) {
-    return "Password must contain at least one lowercase letter";
-  }
-  if (!/\d/.test(pwd)) {
-    return "Password must contain at least one number";
-  }
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd)) {
-    return "Password must contain at least one special character";
-  }
-  return null;
+  return '';
 };
 
-  
+const handlePasswordChange = (e) => {
+  const newPassword = e.target.value;
+  setPwd(newPassword);
+  setPasswordError(validatePassword(newPassword));
+};
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -236,19 +240,10 @@ const handleVerifyOtp = (e) => {
     setIsResendDisabled(true);
   };
 
-  const defaultOptions1 = {
+  const defaultOptions = {
     loop: true,
     autoplay: true,
     path: eyeOpenAnimationDataUrl1,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-
-  const defaultOptions2 = {
-    loop: true,
-    autoplay: true,
-    path: eyeOpenAnimationDataUrl2,
     rendererSettings: {
       preserveAspectRatio: "xMidYMid slice",
     },
@@ -418,44 +413,27 @@ const handleVerifyOtp = (e) => {
                 <div className="relative">
                   <input
                     type={showPwd ? "text" : "password"}
-                    id="pwd"
-                    placeholder={
-                      errorMsg === "Enter all fields" && !pwd
-                        ? "Enter Password"
-                        : "Password"
-                    }
-                    onChange={handleInputChange(setPwd)}
+                    className={`w-full p-2 text-xl pl-4 border-b ${
+                      passwordError ? 'border-[#99182C]' : 'border-gray-700'
+                    } focus:outline-none`}
+                    placeholder="Password"
                     value={pwd}
-                    maxLength={24}
-                    className={`w-full p-2 pl-4 text-xl placeholder:text-base border-b  
-                        focus:outline-none focus:ring-0  pr-4 ${
-                          (errorMsg === "Enter all fields" && !pwd) ||
-                          errorMsg === "Password must contain at least one capital letter" ||
-                          errorMsg === "Password must contain at least one number" ||
-                          errorMsg === "Password must contain at least one small character"
-                            ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
-                            : "border-gray-500 placeholder-gray-500"
-                        }`}
+                    maxLength={20}
+                    onChange={handlePasswordChange}
                   />
                   <button
                     type="button"
                     onClick={togglePasswordAnimations}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                    aria-label={
-                      showMatchPwd ? "Hide password" : "Show password"
-                    }
                   >
                     {showPwd ? (
-                      <Lottie
-                        options={defaultOptions1}
-                        width={35}
-                        height={35}
-                      />
+                      <Lottie options={defaultOptions} width={35} height={35} />
                     ) : (
                       <img src="/eyeMP_000.svg" width={35} height={35} />
                     )}
                   </button>
                 </div>
+                
 
                 <div className="relative">
                   <input
@@ -484,7 +462,7 @@ const handleVerifyOtp = (e) => {
                   >
                     {showMatchPwd ? (
                       <Lottie
-                        options={defaultOptions2}
+                        options={defaultOptions}
                         width={35}
                         height={35}
                       />
@@ -502,6 +480,9 @@ const handleVerifyOtp = (e) => {
                       {errorMsg}
                     </div>
                   )}
+                  {passwordError && (
+                  <p className="text-[#99182C] text-sm mt-1">{passwordError}</p>
+                )}
                 </div>
 
                 <div className="flex justify-end items-center text-base">
@@ -540,7 +521,7 @@ const handleVerifyOtp = (e) => {
                   </span>
                   <button
                     type="button"
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate("/login", { replace: true })}
                     className="text-sm text-[#5663AC] hover:text-[#6773AC] font-medium"
                   >
                     Login
