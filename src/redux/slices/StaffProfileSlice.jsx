@@ -3,8 +3,8 @@ import axios from 'axios';
 
 // Function to retrieve the authentication token
 const getAuthToken = () => {
-  const token=localStorage.getItem('token');
-    // const token  ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NDU2OTIxLCJpYXQiOjE3MzI4NjQ5MjEsImp0aSI6ImI4NWVlMzZlMDJhNjQzMDViY2Y0ODA2MTAzNGQzMDc5IiwidXNlcl9pZCI6MTc4fQ.hY-3Fh7NzOBcOwiO0yY1XLBRe-s6CygICH0TLLqBzo8';
+  // const token=localStorage.getItem('token');
+    const token  ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NjU3NDk0LCJpYXQiOjE3MzMwNjU0OTQsImp0aSI6ImJmZDY4YzkxOGFjYTQ1MmFhNDRhZDNmY2EzNzc2ZDU2IiwidXNlcl9pZCI6MzEyfQ._g8wBkvMZQjLDn_TpEREshVKK-C8xqCy0tBUItwFXfU';
     if (!token) {
       throw new Error('Authentication token not found');
     }
@@ -120,7 +120,7 @@ const staffProfileSlice = createSlice({
 });
 
 // Selectors to access the staff profile state
-export const selectStaffProfile = (state) => state.staffProfile.profile;
+export const selectStaffProfile = (state) => state.staffProfile.profile;//line 123
 export const selectStaffProfileLoading = (state) => state.staffProfile.loading;
 export const selectStaffProfileError = (state) => state.staffProfile.error;
 export const selectStaffProfileSuccessMessage = (state) => state.staffProfile.successMessage;

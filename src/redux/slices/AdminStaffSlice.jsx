@@ -8,7 +8,8 @@ const DELETE_STAFF_URL = "https://hotelcrew-1.onrender.com/api/edit/delete/";
 const STAFF_STATUS_URL = "https://hotelcrew-1.onrender.com/api/taskassignment/staff/available/";
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token');
+  const token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs'
+  // const token = localStorage.getItem('token');
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -16,7 +17,7 @@ const getAuthToken = () => {
 };
 
 export const fetchStaffData = createAsyncThunk(
-  "staff/fetchStaffData",
+  "adminStaff/fetchStaffData",
   async (_, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
@@ -37,9 +38,9 @@ export const fetchStaffData = createAsyncThunk(
 );
 
 export const editStaff = createAsyncThunk(
-  "staff/editStaff",
+  "adminStaff/editStaff",
   async ({ employeeId, updatedData }, { rejectWithValue, dispatch, getState }) => {
-    const previousState = getState().staff.staffList;
+    const previousState = getState().adminStaff.staffList;
     
     try {
       const token = getAuthToken();
@@ -65,7 +66,7 @@ export const editStaff = createAsyncThunk(
 );
 
 export const deleteStaff = createAsyncThunk(
-  "staff/deleteStaff",
+  "adminStaff/deleteStaff",
   async (employeeId, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
@@ -85,7 +86,7 @@ export const deleteStaff = createAsyncThunk(
 );
 
 export const fetchStaffStatus = createAsyncThunk(
-  "staff/fetchStaffStatus",
+  "adminStaff/fetchStaffStatus",
   async (_, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
@@ -106,7 +107,7 @@ export const fetchStaffStatus = createAsyncThunk(
 );
 
 export const createStaff = createAsyncThunk(
-  'staff/createStaff',
+  'adminStaff/createStaff',
   async (staffData, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
@@ -143,7 +144,7 @@ const initialState = {
 };
 
 const AdminStaffSlice = createSlice({
-  name: "staff",
+  name: "adminStaff",
   initialState,
   reducers: {
     clearStaffCache: (state) => {
@@ -215,15 +216,19 @@ const AdminStaffSlice = createSlice({
 
 export const { clearStaffCache, resetEditState } = AdminStaffSlice.actions;
 
-export const selectStaffPerDepartment = (state) => state.staff.staffPerDepartment;
-export const selectStaffList = (state) => state.staff.staffList;
-export const selectStaffLoading = (state) => state.staff.loading;
-export const selectStaffError = (state) => state.staff.error;
-export const selectEditLoading = (state) => state.staff.editLoading;
-export const selectEditError = (state) => state.staff.editError;
+export const selectStaffPerDepartment = (state) => state.adminStaff.staffPerDepartment;
+export const selectStaffList = (state) => state.adminStaff.staffList;
+export const selectStaffLoading = (state) => state.adminStaff.loading;
+export const selectStaffError = (state) => state.adminStaff.error;
+export const selectEditLoading = (state) => state.adminStaff.editLoading;
+export const selectEditError = (state) => state.adminStaff.editError;
 
 export const selectDepartments = (state) => {
-  const departments = state.staff.staffList
+   // Default to an empty array if staffList is undefined or null
+   const staffList = state.adminStaff.staffList || [];
+  
+   const departments = staffList
+  // const departments = state.staff.staffList
     .map(staff => staff.department)
     .filter(Boolean)
     .filter((dept, index, self) => self.indexOf(dept) === index)
@@ -238,7 +243,7 @@ export const selectDepartments = (state) => {
 
 export const selectTotalStaff = (state) => {
   // Get staff list from state
-  const staffList = state.staff.staffList;
+  const staffList = state.adminStaff.staffList;
   
   // Return the length of staff list if it exists and is an array
   if (Array.isArray(staffList)) {
@@ -250,16 +255,16 @@ export const selectTotalStaff = (state) => {
 };
 
 export const selectStaffStatus = (state) => ({
-  available: state.staff.availableStaff,
-  busy: state.staff.staffBusy,
-  total: state.staff.totalStaff,
-  loading: state.staff.staffStatusLoading,
-  error: state.staff.staffStatusError
+  available: state.adminStaff.availableStaff,
+  busy: state.adminStaff.staffBusy,
+  total: state.adminStaff.totalStaff,
+  loading: state.adminStaff.staffStatusLoading,
+  error: state.adminStaff.staffStatusError
 });
 
 export const selectShifts = (state) => {
-  const shifts = state.staff.staffList
-    .map(staff => staff.shift)
+  const shifts = state.adminStaff.staffList
+    .map(adminStaff => adminStaff.shift)
     .filter(Boolean)
     .filter((shift, index, self) => self.indexOf(shift) === index)
     .map(shift => ({

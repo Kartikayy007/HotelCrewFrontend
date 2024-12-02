@@ -28,7 +28,6 @@ import Slider from "@mui/material/Slider";
 import { fetchGuestData, selectCheckins, selectCheckouts, selectDates, selectGuestError, selectGuestLoading } from '../../redux/slices/GuestSlice';
 import { Skeleton } from "@mui/material";
 import Box from "@mui/material/Box";
-import MTaskAssignment from "./MTaskAssignment";
 import AdminTaskAssignment from "../admin/components/AdminTaskAssignment";
 import LoadingAnimation from "../common/LoadingAnimation";
 import {
@@ -40,7 +39,7 @@ import {
   selectLeaveRequests,
   selectUpdateStatus
 }
-  from "../../redux/slices/LeaveSlice";
+  from "../../redux/slices/leaveSlice";
 import {
   selectLatestRevenue,
   fetchRevenueStats,
@@ -50,6 +49,8 @@ import {
   fetchRoomStats,
   selectOccupiedRooms,
   selectAvailableRooms,
+  selectOccupancyLoading,
+  selectOccupancyError
 } from "../../redux/slices/OcupancyRateSlice";
 import {
   createTask,
@@ -134,7 +135,7 @@ const MDashboard = () => {
 
   const latestRevenue = useSelector(selectLatestRevenue);
   const revenueLoading = useSelector((state) => state.revenue.loading);
-  // const departments = useSelector(selectDepartments);
+  const departments = useSelector(selectDepartments);
   const availableRooms = useSelector(selectAvailableRooms);
   const occupiedRooms = useSelector(selectOccupiedRooms);
 
@@ -150,10 +151,12 @@ const MDashboard = () => {
 
 
   useEffect(() => {
+
     dispatch(fetchGuestData());
     dispatch(fetchRoomStats());
     dispatch(fetchRevenueStats());
     dispatch(fetchStaffData());
+  
     // dispatch(fetchTasks());
     const interval = setInterval(() => {
       dispatch(fetchRoomStats());
@@ -161,6 +164,31 @@ const MDashboard = () => {
 
     return () => clearInterval(interval);
   }, [dispatch]);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       await Promise.all([
+  //         dispatch(fetchGuestData()),
+  //         dispatch(fetchRoomStats()),
+  //         dispatch(fetchRevenueStats()),
+  //         dispatch(fetchStaffData()),
+  //         dispatch(fetchRevenueStats())
+  //       ]);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+  
+  //   fetchData();
+  
+  //   const interval = setInterval(() => {
+  //     dispatch(fetchRoomStats());
+  //   }, 30 * 60 * 1000); // 30 minutes
+  
+  //   return () => clearInterval(interval);
+  // }, [dispatch]);
+  
 
   const [cumulativeRevenue, setCumulativeRevenue] = useState(0);
 
@@ -351,15 +379,16 @@ const MDashboard = () => {
     },
   };
 
-
-  const departments = [
-    // { value: '', label: 'Select Department', disabled: true },
-    { value: 'security', label: 'Security' },
-    { value: 'housekeeping', label: 'HouseKeeping' },
-    { value: 'maintainence', label: 'Maintainence' },
-    { value: 'kitchen', label: 'Kitchen' },
-    { value: 'reception', label: 'Reception' },
-  ];
+ const occupancyloading=useSelector(selectOccupancyLoading);
+ const occupancyError=useSelector(selectOccupancyError);
+  // const departments = [
+  //   // { value: '', label: 'Select Department', disabled: true },
+  //   { value: 'security', label: 'Security' },
+  //   { value: 'housekeeping', label: 'HouseKeeping' },
+  //   { value: 'maintainence', label: 'Maintainence' },
+  //   { value: 'kitchen', label: 'Kitchen' },
+  //   { value: 'reception', label: 'Reception' },
+  // ];
 
   const [selected, setSelected] = useState({ label: 'Department', value: '' });
 
@@ -387,17 +416,19 @@ const MDashboard = () => {
     },
   ];
 
-
+  // if (!Array.isArray(staffList)) {
+  //   return <div>Loading staff list...</div>;
+  // }
   const tasks = useSelector(selectAllTasks);
   const staffPerDepartment = useSelector(selectStaffPerDepartment);
 
   "Staff per department:", staffPerDepartment;
   "All tasks:", tasks;
 
-  const totalStaff = Object.values(staffPerDepartment).reduce(
+  const totalStaff = staffPerDepartment?Object.values(staffPerDepartment).reduce(
     (sum, count) => sum + count,
     0
-  );
+  ):0;
   "Total staff count:", totalStaff;
 
   const inProgressCount = Array.isArray(tasks)
@@ -708,18 +739,18 @@ const MDashboard = () => {
       <h1 className="text-[#252941] text-3xl mt-6 mb-4  pl-16 font-semibold">
         Dashboard
       </h1>
-      <div className="grid grid-cols-1 lg:grid-cols-[70%,30%] gap-5 p-3">
+      <div className="grid grid-cols-1 xl:grid-cols-[70%,30%] gap-5 p-3">
 
         {/* First Column */}
         <div className="space-y-5">
 
-          <div className="bg-white w-full  scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
+          <div className="bg-white w-full  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
 
             <div className="mb-4">
               <h2 className="text-lg sm:text-xl font-semibold">Hotel Status</h2>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-2">
+            <div className="flex flex-col lg:flex-row justify-between gap-4 sm:gap-1">
               {loading ? (
                 <>
                   <Skeleton
@@ -743,11 +774,17 @@ const MDashboard = () => {
                 </>
               ) : (
                 <>
-                  <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row overflow-hidden flex-1">
+                  <div className="flex flex-col lg:flex-row overflow-hidden flex-1">
                     <div className="flex-1 min-w-[250px] ">
                       <h3 className="font-medium mb-2 text-center">
                         Occupancy Rate
                       </h3>
+                      {occupancyError ? (
+                        <div className="flex items-center justify-center h-[180px] text-gray-500">
+                          {occupancyError}
+                          {/* No Room Data Available */}
+                        </div>
+                      ) : (
                       <PieChart
                         series={[
                           {
@@ -767,6 +804,7 @@ const MDashboard = () => {
                           }
                         }}
                       />
+                      )}
                     </div>
 
                     <div className="flex-1 min-w-[250px]">
@@ -811,9 +849,9 @@ const MDashboard = () => {
                         </div> */}
                         
                       {statLoading ? (
-                        <p>Loading...</p>
+                        <></>
                       ) : statError ? (
-                        <p className="text-red-500 text-center">No Data Available</p>
+                        <p className="flex items-center justify-center text-gray-500">No Data Available</p>
                       ) : (
                         <>
                         {console.log('Staff Attendance Data:', staffAttendanceData)}
@@ -1118,25 +1156,25 @@ const MDashboard = () => {
                 <div className="space-y-4">
                   <Skeleton
                     variant="text"
-                    width="60%"
-                    height={24}
+                    width="100%"
+                    height={100}
                     {...skeletonProps}
                   />
                   <Skeleton
                     variant="rectangular"
                     width="100%"
-                    height={60}
+                    height={150}
                     {...skeletonProps}
                   />
                   <Skeleton
                     variant="rectangular"
                     width="100%"
-                    height={60}
+                    height={100}
                     {...skeletonProps}
                   />
                 </div>
               ) : announcementsError ? (
-                <div className="text-red-500 text-center mt-4">
+                <div className="text-gray-500 text-center mt-4 min-h-full">
                   {announcementsError}
                 </div>
               ) : (
@@ -1148,7 +1186,7 @@ const MDashboard = () => {
                         className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
                         onClick={() => handleViewAnnouncement(announcement)}
                       >
-                        <div className="flex justify-between items-start mb-2">
+                        <div className="flex sm:justify-between sm:flex-row flex-col items-start mb-2">
                           <h3 className="font-semibold text-lg">
                             {announcement.title}
                           </h3>

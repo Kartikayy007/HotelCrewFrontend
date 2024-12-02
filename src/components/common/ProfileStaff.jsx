@@ -35,7 +35,7 @@ const SProfile = () => {
     // Handle successful updates
     useEffect(() => {
         if (updatemsg) {
-            setSnackbarMessage(updatemsg);
+            setSnackbarMessage('profile updated successfully');
             setSnackbarSeverity('success');
             setSnackbarOpen(true);
         }
@@ -71,6 +71,9 @@ const SProfile = () => {
 
             // Dispatch the FormData to updateStaffProfile
             dispatch(updateStaffProfile(formData));
+            if(updatemsg){
+                dispatch(getStaffProfile);
+            }
 
 
             setImage(imageUrl);
@@ -87,12 +90,12 @@ const SProfile = () => {
     return (
         <section className=" h-screen py-2 mr-1 px-0 font-Montserrat">
 
-            <h2 className="text-[#252941] text-3xl  my-3 lg:my-6 pl-12 ml-5 font-semibold">Profile</h2>
+            <h2 className="text-[#252941] text-3xl  mt-6 mb-4  lg:my-6 pl-12 ml-5 font-semibold">Profile</h2>
 
             {loading ? (
                 <Skeleton variant="rectangular" width="100%" height="85%" sx={{ backgroundColor: 'white', margin: "16px", paddingRight: "16px" }} />
             ) : (
-                <div className="bg-white z-10 w-[95%] lg:ml-7 h-auto xl:mt-1 mt-2  mx-4 pt-2 pb-1 px-7 rounded-lg shadow">
+                <div className="bg-white z-10 w-[95%] lg:ml-7 h-auto xl:mt-1 mt-2 ml-4 mr-9 pt-2 pb-1 px-2 rounded-lg shadow-xl">
 
                     <div className=" xl:flex-row flex-col  flex  w-full  xl:items-start items-center xl:justify-evenly ">
                         <div
@@ -121,7 +124,7 @@ const SProfile = () => {
 
                         </div>
                         <div className='relative w-full lg:w-auto  px-3 xl:px-8 mt-4'>
-                            <h2 className="text-[#000000] text-2xl mt-5 font-semibold">Personal Details</h2>
+                            <h2 className="text-[#000000] lg:text-2xl text-xl mt-5 font-semibold">Personal Details</h2>
 
                             <form className='lg:mt-10 mt-8 flex flex-col gap-6 lg:gap-10'>
 
@@ -142,7 +145,7 @@ const SProfile = () => {
                                             className='border border-gray-300 text-gray-600 rounded-[4px] w-full px-2 text-lg focus:outline-none'
                                             // value={username}
                                             value={profile?.user_name}
-                                            readOnly
+                                            disabled
                                         />
                                         {/* )} */}
                                         {/* <Pencil
@@ -160,7 +163,7 @@ const SProfile = () => {
                                     <input type="text"
                                         id='department'
                                         value={profile?.department || ''}
-                                        readOnly
+                                        disabled
                                         className='border border-gray-300 text-gray-600 rounded-[4px] px-2  text-lg focus:outline-none' />
                                 </div>
 
@@ -171,7 +174,7 @@ const SProfile = () => {
                                     <input type="text"
                                         id='email'
                                         value={profile?.email || ''}
-                                        readOnly
+                                        disabled
                                         className='border border-gray-300 text-gray-600 rounded-[4px]  text-lg px-2 focus:outline-none' />
                                 </div>
 
@@ -224,7 +227,7 @@ const SProfile = () => {
               backgroundColor: '#4CAF50'
             }
           }}
-        >
+        >{snackbarMessage}
           {/* {draggedStaff && targetShift ? 
             `Shift updated successfully` : 
             'Shift updated successfully'

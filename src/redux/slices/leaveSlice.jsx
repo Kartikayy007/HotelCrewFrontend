@@ -4,7 +4,7 @@ import axios from "axios";
 const API_BASE_URL = "https://hotelcrew-1.onrender.com/api/attendance"; // Replace with your actual API base URL
 
 const getAuthHeaders = () => {
-    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NDU5MzUwLCJpYXQiOjE3MzI4NjczNTAsImp0aSI6ImYyZWIyMWIzZGVlZjQ0MWQ5YThlNzY2OWFmMWIxNGQ1IiwidXNlcl9pZCI6MTg1fQ.YkgvzmHmNKwR3bvQ9KiZvc1lZd_xf0ZgKmLg1KujQ4Y'
+    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NjU3NDk0LCJpYXQiOjE3MzMwNjU0OTQsImp0aSI6ImJmZDY4YzkxOGFjYTQ1MmFhNDRhZDNmY2EzNzc2ZDU2IiwidXNlcl9pZCI6MzEyfQ._g8wBkvMZQjLDn_TpEREshVKK-C8xqCy0tBUItwFXfU';
 
 
     if (!token) {
@@ -55,7 +55,7 @@ export const updateLeaveStatus = createAsyncThunk(
   "leave/updateLeaveStatus",
   async ({ leaveId, status }, { rejectWithValue }) => {
     try {
-      const response = await axios.patch(`${API_BASE_URL}/leave_approve/${leaveId}`,
+      const response = await axios.patch(`${API_BASE_URL}/leave_approve/${leaveId}/`,
          { status },
          {
           headers: getAuthHeaders(), // Correctly invoke and pass headers

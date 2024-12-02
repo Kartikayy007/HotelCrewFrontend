@@ -4,7 +4,8 @@ import axios from 'axios';
 const CACHE_EXPIRY_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token');
+  // const token = localStorage.getItem('token');
+  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
   if (!token) {
     throw new Error('Authentication token not found');
   }

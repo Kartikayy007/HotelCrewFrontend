@@ -268,7 +268,7 @@ useEffect(() => {
   const [department, setDepartment] = useState([]);
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-auto scrollbar-thin p-1 xs:p-2 sm:p-4">
-      <h1 className="text-[#252941] text-3xl my-4 pl-12 font-semibold">
+      <h1 className="text-[#252941] text-3xl mb-5 mt-7 sm:mt-4 ml-16 lg:my-4 lg:pl-1 font-semibold">
         Schedule status
       </h1>
 

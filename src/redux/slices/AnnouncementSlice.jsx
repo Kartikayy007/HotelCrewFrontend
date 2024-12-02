@@ -4,7 +4,8 @@ import axios from 'axios';
 const BASE_URL = 'https://hotelcrew-1.onrender.com/api/taskassignment/announcements/day/';
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token');
+  // const token = localStorage.getItem('token');
+  const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NjU3NDk0LCJpYXQiOjE3MzMwNjU0OTQsImp0aSI6ImJmZDY4YzkxOGFjYTQ1MmFhNDRhZDNmY2EzNzc2ZDU2IiwidXNlcl9pZCI6MzEyfQ._g8wBkvMZQjLDn_TpEREshVKK-C8xqCy0tBUItwFXfU';
   if (!token) {
     throw new Error('Authentication token not found');
   }
