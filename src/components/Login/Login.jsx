@@ -94,8 +94,8 @@ const Login = () => {
           JSON.stringify({ count: 0, timestamp: Date.now() })
         );
 
-        // Get user role and navigate accordingly
-        const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user'));
+        // Use role from the response data
+        const { role } = result.payload;
         const roleRoutes = {
           'Admin': '/admin/dashboard',
           'Manager': '/manager/dashboard',
@@ -103,7 +103,7 @@ const Login = () => {
           'Staff': '/staff/dashboard'
         };
 
-        const redirectPath = roleRoutes[user.role];
+        const redirectPath = roleRoutes[role];
         if (redirectPath) {
           setEmail("");
           setPassword("");

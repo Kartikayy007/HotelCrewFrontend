@@ -109,7 +109,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
 
       <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
         <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-6">
-          {[1, 2, 3, 4, 5, 6].map((num) => (
+          {[1, 2, 3, 4, 5].map((num) => (
             <div
               key={num}
               className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${

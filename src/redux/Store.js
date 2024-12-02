@@ -34,7 +34,6 @@ const store = configureStore({
     tasks: taskReducer,
     announcements: announcementReducer,
     staff: AdminStaffSlice,
-    staff: staffReducer,
     hotelCheckIn: hotelCheckInReducer,
     revenue: revenueReducer, 
     schedule: scheduleReducer,

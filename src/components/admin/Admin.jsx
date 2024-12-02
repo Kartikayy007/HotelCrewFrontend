@@ -11,14 +11,28 @@ import { RevealBento } from '../common/IncompleteRegisteration';
 const Admin = () => {
   const dispatch = useDispatch();
   const { activeComponent } = useSelector(state => state.admin);
-  const { multiStepCompleted, token } = useSelector(state => state.user);
+  const { token } = useSelector(state => state.user);
   const [notificationStatus, setNotificationStatus] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [severity, setSeverity] = useState('success');
-  const [showOverlay, setShowOverlay] = useState(!multiStepCompleted);
+  
+  // Initial state setup with debug logging
+  const [showOverlay, setShowOverlay] = useState(() => {
+    const isHotelRegistered = localStorage.getItem('isHotelRegistered');
+    const shouldShowOverlay = isHotelRegistered === 'false' || !isHotelRegistered;
+    
+    console.log('Initial State Setup:', {
+      isHotelRegistered,
+      fromLocalStorage: isHotelRegistered === null ? 'null' : isHotelRegistered,
+      shouldShowOverlay,
+      typeof: typeof isHotelRegistered
+    });
+    
+    return shouldShowOverlay;
+  });
 
   const registerDeviceToken = async (fcmToken) => {
     try {
@@ -93,8 +107,24 @@ const Admin = () => {
 
   useEffect(() => {
     initializeNotifications();
-    setShowOverlay(multiStepCompleted);
-  }, [multiStepCompleted]);
+    
+    const isHotelRegistered = localStorage.getItem('isHotelRegistered');
+    const shouldShowOverlay = isHotelRegistered === 'false' || !isHotelRegistered;
+    
+    console.log('UseEffect Overlay Check:', {
+      isHotelRegistered,
+      fromLocalStorage: isHotelRegistered === null ? 'null' : isHotelRegistered,
+      shouldShowOverlay,
+      typeof: typeof isHotelRegistered,
+      comparison: {
+        isExactlyFalse: isHotelRegistered === 'false',
+        isNull: isHotelRegistered === null,
+        isFalsy: !isHotelRegistered
+      }
+    });
+    
+    setShowOverlay(shouldShowOverlay);
+  }, []); 
 
   const handleMenuItemClick = (component) => {
     dispatch(setActiveComponent(component));
@@ -102,30 +132,36 @@ const Admin = () => {
 
   return (
     <>
-      {showOverlay && <RevealBento />}
-      <div className="flex h-screen">
-        <AdminSidebar onMenuItemClick={handleMenuItemClick} />
-        <div className='flex-1'>
-          {activeComponent && React.createElement(activeComponent)}
+      {console.log('Render - showOverlay:', showOverlay)}
+      {showOverlay ? (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
+          <RevealBento />
         </div>
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
-          onClose={() => setSnackbarOpen(false)}
-          message={snackbarMessage}
-        />
-        <Snackbar 
-          open={open} 
-          autoHideDuration={6000} 
-          onClose={handleClose}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        >
-          <Alert severity={severity} onClose={handleClose}>
-            <AlertTitle>{severity.charAt(0).toUpperCase() + severity.slice(1)}</AlertTitle>
-            {message}
-          </Alert>
-        </Snackbar>
-      </div>
+      ) : (
+        <div className="flex h-screen">
+          <AdminSidebar onMenuItemClick={handleMenuItemClick} />
+          <div className='flex-1'>
+            {activeComponent && React.createElement(activeComponent)}
+          </div>
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={() => setSnackbarOpen(false)}
+            message={snackbarMessage}
+          />
+          <Snackbar 
+            open={open} 
+            autoHideDuration={6000} 
+            onClose={handleClose}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          >
+            <Alert severity={severity} onClose={handleClose}>
+              <AlertTitle>{severity.charAt(0).toUpperCase() + severity.slice(1)}</AlertTitle>
+              {message}
+            </Alert>
+          </Snackbar>
+        </div>
+      )}
     </>
   );
 };

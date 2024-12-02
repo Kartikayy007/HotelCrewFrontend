@@ -15,28 +15,31 @@ import Page404 from './components/common/Page404';
 const RoleBasedRoute = ({ children, allowedRoles }) => {
   const { token, userData } = useSelector(state => state.user);
   const location = useLocation();
+  
+  // Get token from both Redux state and localStorage
+  const accessToken = token || localStorage.getItem('accessToken');
+  const userRole = userData?.role || localStorage.getItem('role');
 
   console.log('RoleBasedRoute Check:', {
-    token: !!token,
-    userRole: userData?.role,
+    token: !!accessToken,
+    userRole,
     allowedRoles,
     currentPath: location.pathname
   });
 
-  if (!token || !userData) {
-    console.log('No token or user data, redirecting to login');
+  if (!accessToken) {
+    console.log('No token, redirecting to login');
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!userData.role || !allowedRoles.includes(userData.role)) {
+  if (!userRole || !allowedRoles.includes(userRole)) {
     console.log('Role not allowed:', {
-      userRole: userData?.role,
+      userRole,
       allowedRoles
     });
     return <Navigate to="/unauthorized" replace />;
   }
 
-  console.log('Route access granted for role:', userData.role);
   return children;
 };
 

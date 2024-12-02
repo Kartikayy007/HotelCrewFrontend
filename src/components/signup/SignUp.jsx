@@ -69,8 +69,27 @@ const SignUp = () => {
   }, [otpError]);
 
   const handleKeyDown = (index, e) => {
-    if (e.key === "Backspace" && index > 0 && otp[index] === "") {
+    // Handle backspace
+    if (e.key === 'Backspace') {
+      if (index > 0 && otp[index] === '') {
+        inputRefs[index - 1].current.focus();
+        const newOtp = [...otp];
+        newOtp[index - 1] = '';
+        setOtp(newOtp);
+      }
+    } 
+    // Handle Enter key
+    else if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent default form submission
+      if (index === 3 && otp[3] !== '') { // If on last input and has value
+        handleVerifyOtp(e);
+      }
+    }
+    // Handle arrow keys
+    else if (e.key === 'ArrowLeft' && index > 0) {
       inputRefs[index - 1].current.focus();
+    } else if (e.key === 'ArrowRight' && index < 3) {
+      inputRefs[index + 1].current.focus();
     }
   };
 
@@ -155,7 +174,6 @@ const handleSubmit = async (e) => {
     confirm_password: matchPwd,
   };
 
-  localStorage.setItem("userEmail", email);
 
   dispatch(registerUser({ userCredentials, rememberMe })).then((result) => {
     if (registerUser.fulfilled.match(result)) {
@@ -193,7 +211,7 @@ const handleVerifyOtp = (e) => {
       }
     } else {
       setOtpResentMessage("");
-      otpSetErrorMsg(result.payload.error || "OTP verification failed");
+      otpSetErrorMsg(result.payload.error);
     }
   });
 };

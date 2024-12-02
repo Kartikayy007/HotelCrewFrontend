@@ -22,28 +22,51 @@ export const loginUser = createAsyncThunk(
       );
       
       const response = await request.data;
-      console.log('Login response:', {
-        hasToken: !!response.access_token,
-        role: response.role,
-        userData: response.user_data
-      });
+      console.log('Login response:', response);
 
+      // Store auth data
       localStorage.setItem('accessToken', response.access_token);
-      localStorage.setItem('refreshToken', response.refresh_token);
+      localStorage.setItem('refreshToken', response.refresh_token || response.refress_token); // Handle typo in API
       localStorage.setItem('userData', JSON.stringify(response.user_data));
       localStorage.setItem('role', response.role);
 
-      console.log('Local storage updated, clearing registration state');
+      // Set hotel registration status
+      const isHotelRegistered = response["hotel details"] !== "not registered";
+      localStorage.setItem('isHotelRegistered', isHotelRegistered.toString());
       
       return {
         ...response,
+        isHotelRegistered,
         userData: {
           role: response.role,
           ...response.user_data
         }
       };
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: 'Login failed' });
+      console.error('Login Error:', error);
+
+      // Handle different error scenarios
+      if (error.response) {
+        // Server responded with error
+        console.log('Server Error Response:', error.response.data);
+        
+        // Return the exact error message from backend
+        return rejectWithValue({
+          message: error.response.data.message || error.response.data.detail || 'Server error occurred'
+        });
+      } else if (error.request) {
+        // Request made but no response
+        console.log('No Response Error:', error.request);
+        return rejectWithValue({
+          message: 'No response from server. Please check your connection.'
+        });
+      } else {
+        // Request setup error
+        console.log('Request Setup Error:', error.message);
+        return rejectWithValue({
+          message: error.message || 'Failed to make login request'
+        });
+      }
     }
   }
 );
@@ -144,9 +167,13 @@ export const completeMultiStepForm = createAsyncThunk(
 const userSlice = createSlice({
   name: 'user',
   initialState: {
+    token: localStorage.getItem('accessToken'),
+    refreshToken: localStorage.getItem('refreshToken'),
+    role: localStorage.getItem('role'),
+    userData: JSON.parse(localStorage.getItem('userData')) || null,
     isHotelRegistered: localStorage.getItem('isHotelRegistered') === 'true',
     email: null,
-    username: null,  
+    username: null,
     error: null,
     loading: false,
     currentRegistrationStep: 1
@@ -165,7 +192,14 @@ const userSlice = createSlice({
     },
     setCurrentStep: (state, action) => {
       state.currentRegistrationStep = action.payload;
-    }
+    },
+    setAuthData: (state, action) => {
+      const { token, refreshToken, userData, role } = action.payload;
+      state.token = token;
+      state.refreshToken = refreshToken;
+      state.userData = userData;
+      state.role = role;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -176,20 +210,11 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.access_token;
-        state.refreshToken = action.payload.refresh_token;
+        state.refreshToken = action.payload.refresh_token || action.payload.refress_token;
         state.userData = action.payload.user_data;
         state.role = action.payload.role;
         state.error = null;
-
-        // Store in localStorage
-        localStorage.setItem('accessToken', action.payload.access_token);
-        localStorage.setItem('refreshToken', action.payload.refresh_token);
-        localStorage.setItem('role', action.payload.role);
-        localStorage.setItem('userData', JSON.stringify(action.payload.user_data));
-
-        const isHotelRegistered = action.payload["hotel details"] !== "not registered";
-        state.isHotelRegistered = isHotelRegistered;
-        localStorage.setItem('isHotelRegistered', isHotelRegistered);
+        state.isHotelRegistered = action.payload.isHotelRegistered;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -215,6 +240,11 @@ const userSlice = createSlice({
         localStorage.setItem('isHotelRegistered', 'true');
       })
       .addCase(verifyOtp.fulfilled, (state, action) => {
+        state.token = action.payload.access_token;
+        state.refreshToken = action.payload.refresh_token;
+        state.userData = action.payload.userData;
+        state.role = action.payload.role;
+        state.isOtpVerified = true;
         const isHotelRegistered = action.payload["hotel details"] !== "not registered";
         state.isHotelRegistered = isHotelRegistered;
         localStorage.setItem('isHotelRegistered', isHotelRegistered);
