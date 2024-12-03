@@ -9,11 +9,27 @@ const STAFF_STATUS_URL = "https://hotelcrew-1.onrender.com/api/taskassignment/st
 
 const getAuthToken = () => {
   const token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs'
-  // const token = localStorage.getItem('token');
+  // const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
   if (!token) {
     throw new Error('Authentication token not found');
   }
   return token;
+};
+
+const initialState = {
+  staffPerDepartment: {},
+  totalDepartments: 0,
+  staffList: [],
+  loading: false,
+  error: null,
+  editLoading: false,
+  editError: null,
+  availableStaff: 0,
+  staffBusy: 0,
+  totalStaff: 0,
+  staffStatusLoading: false,
+  staffStatusError: null,
 };
 
 export const fetchStaffData = createAsyncThunk(
@@ -128,24 +144,16 @@ export const createStaff = createAsyncThunk(
   }
 );
 
-const initialState = {
-  staffPerDepartment: {},
-  totalDepartments: 0,
-  staffList: [],
-  loading: false,
-  error: null,
-  editLoading: false,
-  editError: null,
-  availableStaff: 0,
-  staffBusy: 0,
-  totalStaff: 0,
-  staffStatusLoading: false,
-  staffStatusError: null,
-};
+
 
 const AdminStaffSlice = createSlice({
-  name: "adminStaff",
-  initialState,
+  name: "staff",
+  initialState: {
+    ...initialState,
+    availableStaff: 0,
+    staffBusy: 0,
+    totalStaff: 0
+  },
   reducers: {
     clearStaffCache: (state) => {
       localStorage.removeItem(CACHE_KEY);
@@ -223,43 +231,37 @@ export const selectStaffError = (state) => state.adminStaff.error;
 export const selectEditLoading = (state) => state.adminStaff.editLoading;
 export const selectEditError = (state) => state.adminStaff.editError;
 
-export const selectDepartments = (state) => {
-   // Default to an empty array if staffList is undefined or null
-   const staffList = state.adminStaff.staffList || [];
-  
-   const departments = staffList
-  // const departments = state.staff.staffList
-    .map(staff => staff.department)
-    .filter(Boolean)
-    .filter((dept, index, self) => self.indexOf(dept) === index)
-    .map(dept => ({
-      label: dept.charAt(0).toUpperCase() + dept.slice(1),
-      value: dept
-    }));
-    console.log('Departments:', departments);
-  return departments;
+export const selectDepartments = () => {
+  // Dummy department data
+  return [
+    { label: "Housekeeping", value: "housekeeping" },
+    { label: "Kitchen", value: "kitchen" },
+    { label: "Maintenance", value: "maintenance" },
+    { label: "Security", value: "security" }
+  ];
 };
 
 
 export const selectTotalStaff = (state) => {
   // Get staff list from state
-  const staffList = state.adminStaff.staffList;
+  if (!state?.staff?.staffList || !Array.isArray(state.staff.staffList)) {
+    return []; 
+  }
   
-  // Return the length of staff list if it exists and is an array
+  const staffList = state.staff.staffList;
+  
   if (Array.isArray(staffList)) {
     return staffList.length;
   }
-  
-  // Return 0 if staff list is invalid
+
   return 0;
 };
 
 export const selectStaffStatus = (state) => ({
-  available: state.adminStaff.availableStaff,
-  busy: state.adminStaff.staffBusy,
-  total: state.adminStaff.totalStaff,
-  loading: state.adminStaff.staffStatusLoading,
-  error: state.adminStaff.staffStatusError
+  available: state.staff?.availableStaff || 0,
+  busy: state.staff?.staffBusy || 0,
+  total: state.staff?.totalStaff || 0,
+  loading: state.staff?.loading || false
 });
 
 export const selectShifts = (state) => {

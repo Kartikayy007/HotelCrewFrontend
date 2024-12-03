@@ -97,14 +97,20 @@ function UploadDoc({onSubmit, onBack, updateFormData, initialData}) {
 
   const handleSubmitClick = async (e) => {
     e.preventDefault();
-    if (files.length === 0) {
-      setErrorMessage("Please upload a staff Excel sheet");
-      return;
-    }
     setIsLoading(true);
-    updateFormData({staff_excel_sheet: files[0]});
-    await onSubmit();
-    setIsLoading(false);
+    
+    try {
+      if (files.length > 0) {
+        updateFormData({ staff_excel_sheet: files[0] });
+      }
+      await onSubmit();
+    } catch (error) {
+      console.error('Upload error:', error);
+    } finally {
+      setIsLoading(false);
+      // Always navigate after skip or upload attempt
+      setTimeout(() => onSubmit(), 2000);
+    }
   };
 
   const triggerFileInput = () => {
@@ -115,7 +121,7 @@ function UploadDoc({onSubmit, onBack, updateFormData, initialData}) {
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
       <div className="flex flex-col xl:flex-row justify-center items-center gap-10 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
         <div className="flex xl:hidden bg-white font-medium gap-3 mb-4 relative top-0">
-          {[1, 2, 3, 4, 5, 6].map((num) => (
+          {[1, 2, 3, 4, 5].map((num) => (
             <div
               key={num}
               className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
@@ -136,7 +142,7 @@ function UploadDoc({onSubmit, onBack, updateFormData, initialData}) {
             className="h-24 mb-4 text-[#5663AC]"
           />
           <h2 className="text-3xl text-center font-medium font-Montserrat">
-            Upload Staff Excel Sheet
+            Upload Staff Excel Sheet <span className="text-gray-500 text-sm">(Optional)</span>
           </h2>
           <p className="font-sans text-lg font-medium text-center">
             Fill out the form below.
@@ -157,7 +163,7 @@ function UploadDoc({onSubmit, onBack, updateFormData, initialData}) {
         <form className="space-y-2 xl:w-full max-w-[330px]">
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-semibold hidden xl:block xl:text-left">
-              Upload Staff Excel Sheet
+              Upload Staff Excel Sheet <span className="text-gray-500 text-sm">(Optional)</span>
             </h1>
           </div>
 
@@ -245,7 +251,7 @@ function UploadDoc({onSubmit, onBack, updateFormData, initialData}) {
                 {isLoading ? (
                   <LoadingAnimation size={24} color="#FFFFFF" />
                 ) : (
-                  "Submit ➔"
+                  files.length > 0 ? "Submit ➔" : "Skip ➔"
                 )}
               </button>
             </div>
@@ -254,7 +260,7 @@ function UploadDoc({onSubmit, onBack, updateFormData, initialData}) {
 
         <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
           <div className="flex gap-5 text-[32px]">
-            {[1, 2, 3, 4, 5, 6].map((num) => (
+            {[1, 2, 3, 4, 5].map((num) => (
               <div
                 key={num}
                 className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${

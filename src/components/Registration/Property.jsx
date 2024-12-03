@@ -5,7 +5,9 @@ import hotelIcon from '/property.svg';
 import line from '/Line.svg';
 
 const Property = ({ onNext, onBack, updateFormData, initialData }) => {
-  const [roomTypes, setRoomTypes] = useState([]);
+  const [roomTypes, setRoomTypes] = useState([
+    { type: "", count: "", price: "" }
+  ]);
   const [numberOfRooms, setNumberOfRooms] = useState("");
   const [numberOfFloors, setNumberOfFloors] = useState("");
   const [valetParking, setValetParking] = useState(false);
@@ -38,8 +40,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
   };
 
   const handleDeleteRoomType = (index) => {
-    const newRoomTypes = roomTypes.filter((_, i) => i !== index);
-    setRoomTypes(newRoomTypes);
+    if (roomTypes.length > 1) {
+      const newRoomTypes = roomTypes.filter((_, i) => i !== index);
+      setRoomTypes(newRoomTypes);
+    }
   };
 
   const handleRoomTypeChange = (index, field, value) => {
@@ -67,13 +71,21 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
       return;
     }  
   
+    // Convert price strings to numbers
+    const formattedRoomTypes = roomTypes.map(room => ({
+      ...room,
+      price: parseFloat(room.price),
+      count: parseInt(room.count)
+    }));
+  
     updateFormData(
       {
-        total_number_of_rooms: numberOfRooms,
-        room_types: roomTypes,
-        number_of_floors: numberOfFloors,
+        total_number_of_rooms: parseInt(numberOfRooms),
+        room_types: formattedRoomTypes,
+        number_of_floors: parseInt(numberOfFloors),
         valet_parking_available: valetParking,
-        valet_parking_capacity: valetParking ? parkingCapacity : "",
+        valet_parking_capacity: valetParking ? parseInt(parkingCapacity) : "",
+        room_price: formattedRoomTypes[0].price // Use first room type's price as base price
       },
       4
     );
@@ -100,7 +112,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
       <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
         <div className="flex xl:hidden gap-3 mb-4 bg-white relative font-medium top-3">
-          {[1, 2, 3, 4, 5, 6].map((num) => (
+          {[1, 2, 3, 4, 5].map((num) => (
             <div
               key={num}
               className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
@@ -317,7 +329,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
         <div>
           <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
             <div className="flex gap-5 text-[32px]">
-              {[1, 2, 3, 4, 5, 6].map((num) => (
+              {[1, 2, 3, 4, 5].map((num) => (
                 <div
                   key={num}
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${

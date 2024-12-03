@@ -11,22 +11,37 @@ import { RevealBento } from '../common/IncompleteRegisteration';
 const Admin = () => {
   const dispatch = useDispatch();
   const { activeComponent } = useSelector(state => state.admin);
+  const { token } = useSelector(state => state.user);
   const [notificationStatus, setNotificationStatus] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [severity, setSeverity] = useState('success');
-  const [showOverlay, setShowOverlay] = useState(false);
+  
+  // Initial state setup with debug logging
+  const [showOverlay, setShowOverlay] = useState(() => {
+    const isHotelRegistered = localStorage.getItem('isHotelRegistered');
+    const shouldShowOverlay = isHotelRegistered === 'false' || !isHotelRegistered;
+    
+    console.log('Initial State Setup:', {
+      isHotelRegistered,
+      fromLocalStorage: isHotelRegistered === null ? 'null' : isHotelRegistered,
+      shouldShowOverlay,
+      typeof: typeof isHotelRegistered
+    });
+    
+    return shouldShowOverlay;
+  });
 
-  const registerDeviceToken = async (fcmToken, accessToken) => {
+  const registerDeviceToken = async (fcmToken) => {
     try {
       const response = await axios.post(
         'https://hotelcrew-1.onrender.com/api/auth/register-device-token/',
         { fcm_token: fcmToken },
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         }
@@ -60,12 +75,11 @@ const Admin = () => {
         throw new Error('Failed to get FCM token.');
       }
 
-      const accessToken = localStorage.getItem('token');
-      if (!accessToken) {
+      if (!token) {
         throw new Error('Access token not available.');
       }
 
-      await registerDeviceToken(fcmToken, accessToken);
+      await registerDeviceToken(fcmToken);
       onMessage(messaging, (payload) => {
         console.log('Received foreground message:', payload);
         setSnackbarMessage(payload.notification?.body || 'New Notification');
@@ -93,11 +107,24 @@ const Admin = () => {
 
   useEffect(() => {
     initializeNotifications();
-    const multiStepCompleted = localStorage.getItem('multiStepCompleted');
-    if (multiStepCompleted === 'false') {
-      setShowOverlay(true);
-    }
-  }, []);
+    
+    const isHotelRegistered = localStorage.getItem('isHotelRegistered');
+    const shouldShowOverlay = isHotelRegistered === 'false' || !isHotelRegistered;
+    
+    console.log('UseEffect Overlay Check:', {
+      isHotelRegistered,
+      fromLocalStorage: isHotelRegistered === null ? 'null' : isHotelRegistered,
+      shouldShowOverlay,
+      typeof: typeof isHotelRegistered,
+      comparison: {
+        isExactlyFalse: isHotelRegistered === 'false',
+        isNull: isHotelRegistered === null,
+        isFalsy: !isHotelRegistered
+      }
+    });
+    
+    setShowOverlay(shouldShowOverlay);
+  }, []); 
 
   const handleMenuItemClick = (component) => {
     dispatch(setActiveComponent(component));
@@ -105,30 +132,36 @@ const Admin = () => {
 
   return (
     <>
-      {showOverlay && <RevealBento />}
-      <div className="flex h-screen">
-        <AdminSidebar onMenuItemClick={handleMenuItemClick} />
-        <div className='flex-1'>
-          {activeComponent && React.createElement(activeComponent)}
+      {console.log('Render - showOverlay:', showOverlay)}
+      {showOverlay ? (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
+          <RevealBento />
         </div>
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={6000}
-          onClose={() => setSnackbarOpen(false)}
-          message={snackbarMessage}
-        />
-        <Snackbar 
-          open={open} 
-          autoHideDuration={6000} 
-          onClose={handleClose}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        >
-          <Alert severity={severity} onClose={handleClose}>
-            <AlertTitle>{severity.charAt(0).toUpperCase() + severity.slice(1)}</AlertTitle>
-            {message}
-          </Alert>
-        </Snackbar>
-      </div>
+      ) : (
+        <div className="flex h-screen">
+          <AdminSidebar onMenuItemClick={handleMenuItemClick} />
+          <div className='flex-1'>
+            {activeComponent && React.createElement(activeComponent)}
+          </div>
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={() => setSnackbarOpen(false)}
+            message={snackbarMessage}
+          />
+          <Snackbar 
+            open={open} 
+            autoHideDuration={6000} 
+            onClose={handleClose}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          >
+            <Alert severity={severity} onClose={handleClose}>
+              <AlertTitle>{severity.charAt(0).toUpperCase() + severity.slice(1)}</AlertTitle>
+              {message}
+            </Alert>
+          </Snackbar>
+        </div>
+      )}
     </>
   );
 };

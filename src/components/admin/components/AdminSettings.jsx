@@ -78,10 +78,10 @@ const BasicInfo = () => {
   useEffect(() => {
     if (hotelDetails) {
       setFormData({
-        hotel_name: hotelDetails.hotel_name,
-        legal_business_name: hotelDetails.legal_business_name,
-        year_established: hotelDetails.year_established,
-        license_registration_numbers: hotelDetails.license_registration_numbers
+        hotel_name: hotelDetails.hotel_name || '',
+        legal_business_name: hotelDetails.legal_business_name || '',
+        year_established: hotelDetails.year_established || '',
+        license_registration_numbers: hotelDetails.license_registration_numbers || ''
       });
     }
   }, [hotelDetails]);
@@ -958,7 +958,8 @@ const Profile = () => {
     setIsUploading(true);
 
     const getAuthToken = () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
       if (!token) throw new Error('Authentication token not found');
       return token;
     }

@@ -4,10 +4,12 @@ import { twMerge } from "tailwind-merge";
 import { FiArrowRight, FiMail, FiMapPin } from "react-icons/fi";
 import { Navigate, useNavigate } from "react-router-dom";
 import {  SiGmail, SiInstagram,  SiLinkedin, SiYoutube } from "react-icons/si";
+import { useSelector } from "react-redux";
 
 export const RevealBento = () => {
+  // Remove the registration status check since we're controlling this with isHotelRegistered
   return (
-        <div className="min-h-screen w-full  px-12 py-12 text-zinc-50 fixed z-50 backdrop-filter backdrop-blur-md bg-white/5">
+    <div className="min-h-screen w-full px-12 py-12 text-zinc-50 fixed z-50 backdrop-filter backdrop-blur-md bg-white/5">
       <motion.div
         initial="initial"
         animate="animate"
@@ -150,7 +152,6 @@ const EmailListBlock = () => {
       return;
     }
     
-    // Open default mail client
     window.location.href = `mailto:Hotelcrew@gmail.com?subject=Contact Request&body=From: ${email}`;
     
     // Clear form
@@ -175,18 +176,13 @@ const EmailListBlock = () => {
           />
           <button
             type="submit"
+            // href="mailto:hotelcrew.noreply@gmail.com"
             className="flex items-center gap-2 whitespace-nowrap rounded bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-300"
           >
             <FiMail /> contact us
           </button>
         </form>
       </Block>
-      <a
-        href="mailto:hotelcrew.noreply@gmail.com"
-        className="mt-2 flex items-center gap-2 whitespace-nowrap rounded bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-300"
-      >
-        <FiMail /> Send email directly
-      </a>
     </>
   );
 };

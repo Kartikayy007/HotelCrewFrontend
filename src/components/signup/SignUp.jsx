@@ -34,6 +34,7 @@ const SignUp = () => {
   const [otpResentMessage, setOtpResentMessage] = useState("");
   const [hasInteractedAfterResend, setHasInteractedAfterResend] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   const handleInputChange = (set) => (e) => {
     const value = e.target.value;
@@ -69,8 +70,27 @@ const SignUp = () => {
   }, [otpError]);
 
   const handleKeyDown = (index, e) => {
-    if (e.key === "Backspace" && index > 0 && otp[index] === "") {
+    // Handle backspace
+    if (e.key === 'Backspace') {
+      if (index > 0 && otp[index] === '') {
+        inputRefs[index - 1].current.focus();
+        const newOtp = [...otp];
+        newOtp[index - 1] = '';
+        setOtp(newOtp);
+      }
+    } 
+    // Handle Enter key
+    else if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent default form submission
+      if (index === 3 && otp[3] !== '') { // If on last input and has value
+        handleVerifyOtp(e);
+      }
+    }
+    // Handle arrow keys
+    else if (e.key === 'ArrowLeft' && index > 0) {
       inputRefs[index - 1].current.focus();
+    } else if (e.key === 'ArrowRight' && index < 3) {
+      inputRefs[index + 1].current.focus();
     }
   };
 
@@ -91,73 +111,114 @@ const SignUp = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    if (!user || !email || !pwd || !matchPwd) {
-      setErrorMsg("Enter all fields");
-      return;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+const validatePassword = (password) => {
+  if (!passwordRegex.test(password)) {
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long';
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setErrorMsg("Invalid email");
-      return;
+    if (!/(?=.*[a-z])/.test(password)) {
+      return 'Password must include at least one lowercase letter';
     }
-
-    const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,24}$/;
-    if (!pwdRegex.test(pwd)) {
-      if (!/[A-Z]/.test(pwd)) {
-        setErrorMsg("Password must contain at least one capital letter");
-      } else if (!/\d/.test(pwd)) {
-        setErrorMsg("Password must contain at least one number");
-      } else if (!/[a-z]/.test(pwd)) {
-        setErrorMsg("Password must contain at least one small character");
-      } else {
-        setErrorMsg("Password must contain at least one capital letter, one number, and one small character");
-      }
-      return;
+    if (!/(?=.*[A-Z])/.test(password)) {
+      return 'Password must include at least one uppercase letter';
     }
-
-    if (pwd !== matchPwd) {
-      setErrorMsg("Passwords do not match");
-      return;
+    if (!/(?=.*\d)/.test(password)) {
+      return 'Password must include at least one number';
     }
+  }
+  return '';
+};
 
-    setErrorMsg("");
-    const userCredentials = {
-      user_name: user,
-      email: email,
-      password: pwd,
-      confirm_password: matchPwd,
-    };
+const handlePasswordChange = (e) => {
+  const newPassword = e.target.value;
+  setPwd(newPassword);
+  setPasswordError(validatePassword(newPassword));
+};
 
-    localStorage.setItem("userEmail", email);
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    dispatch(registerUser({ userCredentials, rememberMe })).then((result) => {
-      if (registerUser.fulfilled.match(result)) {
-        setShowOtpInput(true);
-      }
-    });
+  // Trim the username and check if it's empty or contains only whitespace
+  const trimmedUsername = user.trim();
+  if (!trimmedUsername) {
+    setErrorMsg("Enter a valid name");
+    return;
+  }
+
+  if (!email || !pwd || !matchPwd) {
+    setErrorMsg("Enter all fields");
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    setErrorMsg("Invalid email");
+    return;
+  }
+
+  if (pwd !== matchPwd) {
+    setErrorMsg("Passwords do not match");
+    return;
+  }
+
+  if (!pwdRegex.test(pwd)) {
+    const error = validatePassword(pwd);
+    setErrorMsg(error || "Invalid password");
+    return;
+  }
+
+  setErrorMsg("");
+  const userCredentials = {
+    user_name: trimmedUsername,
+    email: email,
+    password: pwd,
+    confirm_password: matchPwd,
   };
 
-  const handleVerifyOtp = (e) => {
-    e.preventDefault();
-    if (otp.join("").length < 4) {
-      otpSetErrorMsg("Please enter the complete OTP");
-      return;
+
+  dispatch(registerUser({ userCredentials, rememberMe })).then((result) => {
+    if (registerUser.fulfilled.match(result)) {
+      setShowOtpInput(true);
+    } else {
+      // Display backend error message
+      setErrorMsg(result.payload.message);
+      
+      // Clear specific fields based on error
+      if (result.payload.message.includes("email")) {
+        setEmail("");
+      }
+      if (result.payload.message.includes("password")) {
+        setPwd("");
+        setMatchPwd("");
+      }
     }
-    dispatch(verifyOtp({ email, otp: otp.join("") })).then((result) => {
-      if (verifyOtp.fulfilled.match(result)) {
-        localStorage.setItem("otpVerified", "true");
-        localStorage.setItem("multiStepCompleted", "false");
+  });
+};
+
+const handleVerifyOtp = (e) => {
+  e.preventDefault();
+  if (otp.join("").length < 4) {
+    otpSetErrorMsg("Please enter the complete OTP");
+    return;
+  }
+  dispatch(verifyOtp({ email, otp: otp.join("") })).then((result) => {
+    if (verifyOtp.fulfilled.match(result)) {
+      const isHotelRegistered = result.payload["hotel details"] !== "not registered";
+      
+      if (isHotelRegistered) {
+        navigate("/admin/dashboard");
+      } else {
         navigate("/signup/hoteldetails");
-      } else {
-        setOtpResentMessage("");
-        otpSetErrorMsg(result.payload.error || "OTP verification failed");
       }
-    });
-  };
+    } else {
+      setOtpResentMessage("");
+      otpSetErrorMsg(result.payload.error);
+    }
+  });
+};
 
   const handleResendOtp = () => {
     const userCredentials = {
@@ -179,19 +240,10 @@ const SignUp = () => {
     setIsResendDisabled(true);
   };
 
-  const defaultOptions1 = {
+  const defaultOptions = {
     loop: true,
     autoplay: true,
     path: eyeOpenAnimationDataUrl1,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-
-  const defaultOptions2 = {
-    loop: true,
-    autoplay: true,
-    path: eyeOpenAnimationDataUrl2,
     rendererSettings: {
       preserveAspectRatio: "xMidYMid slice",
     },
@@ -205,6 +257,22 @@ const SignUp = () => {
     setShowMatchPwd(!showMatchPwd);
     setShowAnimations(!showAnimations);
   };
+
+  useEffect(() => {
+    dispatch({ type: 'user/clearError' });
+    dispatch({ type: 'otp/clearError' });
+    
+    return () => {
+      dispatch({ type: 'user/clearError' });
+      dispatch({ type: 'otp/clearError' });
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    setErrorMsg("");
+    otpSetErrorMsg("");
+    setOtpResentMessage("");
+  }, []);
 
   return (
     <div className="font-Montserrat min-h-screen xl:w-full xl:flex xl:justify-center">
@@ -237,7 +305,7 @@ const SignUp = () => {
                       onChange={(e) => handleChange(index, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(index, e)}
                       className="w-12 h-12 text-center text-lg border-2 border-transparent rounded-lg 
-                               bg-[#D2E0F3] focus:border-[#5663AC] focus:outline-none"
+                              bg-[#D2E0F3] focus:border-[#5663AC] focus:outline-none"
                     />
                   ))}
                 </div>
@@ -345,44 +413,27 @@ const SignUp = () => {
                 <div className="relative">
                   <input
                     type={showPwd ? "text" : "password"}
-                    id="pwd"
-                    placeholder={
-                      errorMsg === "Enter all fields" && !pwd
-                        ? "Enter Password"
-                        : "Password"
-                    }
-                    onChange={handleInputChange(setPwd)}
+                    className={`w-full p-2 text-xl pl-4 border-b ${
+                      passwordError ? 'border-[#99182C]' : 'border-gray-700'
+                    } focus:outline-none`}
+                    placeholder="Password"
                     value={pwd}
-                    maxLength={24}
-                    className={`w-full p-2 pl-4 text-xl placeholder:text-base border-b  
-                        focus:outline-none focus:ring-0  pr-4 ${
-                          (errorMsg === "Enter all fields" && !pwd) ||
-                          errorMsg === "Password must contain at least one capital letter" ||
-                          errorMsg === "Password must contain at least one number" ||
-                          errorMsg === "Password must contain at least one small character"
-                            ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
-                            : "border-gray-500 placeholder-gray-500"
-                        }`}
+                    maxLength={20}
+                    onChange={handlePasswordChange}
                   />
                   <button
                     type="button"
                     onClick={togglePasswordAnimations}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                    aria-label={
-                      showMatchPwd ? "Hide password" : "Show password"
-                    }
                   >
                     {showPwd ? (
-                      <Lottie
-                        options={defaultOptions1}
-                        width={35}
-                        height={35}
-                      />
+                      <Lottie options={defaultOptions} width={35} height={35} />
                     ) : (
                       <img src="/eyeMP_000.svg" width={35} height={35} />
                     )}
                   </button>
                 </div>
+                
 
                 <div className="relative">
                   <input
@@ -411,7 +462,7 @@ const SignUp = () => {
                   >
                     {showMatchPwd ? (
                       <Lottie
-                        options={defaultOptions2}
+                        options={defaultOptions}
                         width={35}
                         height={35}
                       />
@@ -429,6 +480,9 @@ const SignUp = () => {
                       {errorMsg}
                     </div>
                   )}
+                  {passwordError && (
+                  <p className="text-[#99182C] text-sm mt-1">{passwordError}</p>
+                )}
                 </div>
 
                 <div className="flex justify-end items-center text-base">
@@ -467,7 +521,7 @@ const SignUp = () => {
                   </span>
                   <button
                     type="button"
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate("/login", { replace: true })}
                     className="text-sm text-[#5663AC] hover:text-[#6773AC] font-medium"
                   >
                     Login

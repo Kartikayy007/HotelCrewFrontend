@@ -4,7 +4,8 @@ import { updateAvailableRooms } from './HotelDetailsSlice';
 
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
   if (!token) {
     throw new Error('Authentication token not found');
   }
