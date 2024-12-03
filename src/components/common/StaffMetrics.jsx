@@ -14,23 +14,39 @@ const StaffMetrics = () => {
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
+  const formatDateRange = (dateString) => {
+    const [startDate, endDate] = dateString.split(' - ').map(date => {
+      const d = new Date(date);
+      return d.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      });
+    });
+    return `${startDate} - ${endDate}`;
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const weekday = date.toLocaleDateString('en-US', { weekday: 'short' });
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${weekday}\n${month}/${day}`;
+  };
+
   const fetchWeeklyData = async () => {
     try {
       const response = await axios.get('https://hotelcrew-1.onrender.com/api/statics/performance/hotel/week/', {
         headers: getAuthHeaders(),
       });
       
-      // Format data for graph with full date labels
+      // Format data for graph with weekday and date
       const formattedData = response.data.weekly_stats.map(stat => ({
-        date: new Date(stat.date).toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric' 
-        }),
+        date: formatDate(stat.date),
         performance: stat.performance_percentage
       }));
       
       setWeeklyData(formattedData);
-      setWeekRange(response.data.week_range);
+      setWeekRange(formatDateRange(response.data.week_range));
       setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);

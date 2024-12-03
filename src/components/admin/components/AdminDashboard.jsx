@@ -1052,7 +1052,7 @@ function AdminDashboard() {
                         }
                       },
                     ]}
-                    sx={{
+                    sx={{ 
                       ".MuiLineElement-root": {
                         strokeWidth: 2,
                       },
