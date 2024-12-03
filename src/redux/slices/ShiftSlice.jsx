@@ -7,7 +7,7 @@ const UPDATE_SHIFT_URL = 'https://hotelcrew-1.onrender.com/api/edit/schedule_cha
 
 // Utility to get auth headers
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
 
   if (!token) {

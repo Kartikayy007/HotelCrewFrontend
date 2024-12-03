@@ -4,13 +4,15 @@ import {
   selectStaffPerDepartment, 
   createStaff,
   fetchStaffData  // Add this import
-} from '../../redux/slices/AdminStaffSlice';
+} from '../../redux/slices/staffslice';
 import { selectCustomers } from '../../redux/slices/customerSlice'; // Adjust path as needed
 import StaffDB from "./DB/StaffDB";
 import CustomerDB from "./DB/CustomerDB";
 import {Search, ChevronLeft, ChevronRight} from "lucide-react";
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import LoadingAnimation from './LoadingAnimation'; // Adjust path as needed
+import AddIcon from '@mui/icons-material/Add'; // Add this import
+import { fetchHotelDetails, selectDepartmentNames } from '../../redux/slices/HotelDetailsSlice';
 
 function DataBase() {
   const [activeComponent, setActiveComponent] = React.useState("StaffDB");
@@ -41,13 +43,28 @@ function DataBase() {
   const [isCreating, setIsCreating] = useState(false);
   const [isDepartmentsLoading, setIsDepartmentsLoading] = useState(true);
   const dispatch = useDispatch();
+  const departments = useSelector(selectDepartmentNames);
 
   const handleCreateStaff = async () => {
     try {
       setIsCreating(true);
-      await dispatch(createStaff(newStaffData)).unwrap();
+      
+      // Format the data according to API requirements
+      const formattedData = {
+        email: newStaffData.email,
+        user_name: newStaffData.user_name,
+        role: newStaffData.role,
+        salary: newStaffData.salary,
+        upi_id: newStaffData.upi_id,
+        shift: newStaffData.shift,
+        department: newStaffData.department
+      };
+
+      await dispatch(createStaff(formattedData)).unwrap();
       await dispatch(fetchStaffData());
       setCreateDialogOpen(false);
+      
+      // Reset form
       setNewStaffData({
         email: '',
         user_name: '',
@@ -55,7 +72,7 @@ function DataBase() {
         salary: '',
         upi_id: '',
         shift: 'morning',
-        department: 'housekeeping'
+        department: ''
       });
     } catch (error) {
       console.error('Failed to create staff:', error);
@@ -90,8 +107,12 @@ function DataBase() {
 
   useEffect(() => {
     setIsDepartmentsLoading(true);
-    dispatch(fetchStaffData())
-      .finally(() => setIsDepartmentsLoading(false));
+    Promise.all([
+      dispatch(fetchStaffData()),
+      dispatch(fetchHotelDetails())
+    ]).finally(() => {
+      setIsDepartmentsLoading(false);
+    });
   }, [dispatch]);
 
   const scroll = (direction) => {
@@ -107,11 +128,6 @@ function DataBase() {
   const staffPerDepartment = useSelector(selectStaffPerDepartment);
   const customers = useSelector(selectCustomers);
   
-  const departments = Object.keys(staffPerDepartment).map(dept => ({
-    value: dept,
-    label: dept.charAt(0).toUpperCase() + dept.slice(1)
-  }));
-
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
       <div className="w-[95vw] sm:w-[95vw] md:w-[95vw] lg:w-[95vw] xl:w-[95vw] 2xl:w-[80vw]">
@@ -330,29 +346,42 @@ function DataBase() {
                 onChange={handleInputChange}
                 sx={{ mb: 2 }}
               />
-              <Select
-                fullWidth
-                name="department"
-                value={newStaffData.department}
-                onChange={handleInputChange}
-                sx={{ mb: 2 }}
-                disabled={isDepartmentsLoading}
-              >
-                {isDepartmentsLoading ? (
-                  <MenuItem value="" disabled>
-                    <div className="flex items-center">
-                      <LoadingAnimation size={20} />
-                      <span className="ml-2">Loading departments...</span>
-                    </div>
-                  </MenuItem>
-                ) : (
-                  departments.map(dept => (
-                    <MenuItem key={dept.value} value={dept.value}>
-                      {dept.label}
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Department</InputLabel>
+                <Select
+                  name="department"
+                  value={newStaffData.department}
+                  onChange={handleInputChange}
+                  disabled={isDepartmentsLoading}
+                >
+                  {isDepartmentsLoading ? (
+                    <MenuItem value="" disabled>
+                      <div className="flex items-center">
+                        <LoadingAnimation size={20} />
+                        <span className="ml-2">Loading departments...</span>
+                      </div>
                     </MenuItem>
-                  ))
-                )}
-              </Select>
+                  ) : (
+                    departments.map(dept => (
+                      <MenuItem key={dept.value} value={dept.value}>
+                        {dept.label}
+                    
+                      </MenuItem>
+                    ))
+                  )}
+                </Select>
+              </FormControl>
+
+              {newStaffData.department === 'add_new' && (
+                <TextField
+                  margin="dense"
+                  name="new_department"
+                  label="New Department Name"
+                  fullWidth
+                  value={newStaffData.new_department || ''}
+                  onChange={handleInputChange}
+                />
+              )}
               <Select
                 fullWidth
                 name="role"

@@ -9,7 +9,7 @@ export const registerDeviceToken = async () => {
     console.log(fcmToken);
     if (!fcmToken) throw new Error('Failed to get FCM token');
 
-    const authToken = localStorage.getItem('token');
+    const authToken = localStorage.getItem('accessToken');
     
     const response = await axios.post(
       API_URL,

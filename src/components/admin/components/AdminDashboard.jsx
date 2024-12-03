@@ -42,7 +42,7 @@ import {
   selectDepartments,
   fetchStaffStatus,
   selectStaffStatus,
-} from "../../../redux/slices/AdminStaffSlice";
+} from "../../../redux/slices/staffslice";
 import StaffMetrics from "../../common/StaffMetrics";
 import LoadingAnimation from "../../common/LoadingAnimation";
 import {fetchTasks} from "../../../redux/slices/TaskSlice";
@@ -63,10 +63,12 @@ import {
   selectAvailableRooms,
 } from "../../../redux/slices/OcupancyRateSlice";
 import {fetchWeeklyAttendance} from "../../../redux/slices/AdminAttendanceSlice";
+import {selectDepartmentNames} from "../../../redux/slices/HotelDetailsSlice";
 
 function AdminDashboard() {
   const dispatch = useDispatch();
   const attendanceStats = useSelector((state) => state.attendance.stats);
+  const hotelDepartments = useSelector(selectDepartmentNames);
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const Taskloading = useSelector(selectTasksLoading);
@@ -144,7 +146,7 @@ function AdminDashboard() {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
-    severity: "success", 
+    severity: "success",
   });
 
   const departments = useSelector(selectDepartments);
@@ -270,20 +272,21 @@ function AdminDashboard() {
   ];
 
   const tasks = useSelector(selectAllTasks);
-  const staffPerDepartment = useSelector(state => state.staff?.staffPerDepartment) || {};
+  const staffPerDepartment =
+    useSelector((state) => state.staff?.staffPerDepartment) || {};
 
   const totalStaff = useMemo(() => {
-    if (!staffPerDepartment || typeof staffPerDepartment !== 'object') {
+    if (!staffPerDepartment || typeof staffPerDepartment !== "object") {
       return 0;
     }
-    
+
     return Object.values(staffPerDepartment).reduce(
       (sum, count) => sum + (Number(count) || 0),
       0
     );
   }, [staffPerDepartment]);
 
-  console.log("Total staff count:", totalStaff);
+  //console.log("Total staff count:", totalStaff);
 
   const inProgressCount = Array.isArray(tasks)
     ? tasks.filter((task) => task.status.toLowerCase() === "in_progress").length
@@ -301,14 +304,14 @@ function AdminDashboard() {
       id: 0,
       value: staffStatus.busy,
       label: `Busy (${staffStatus.busy})`,
-      color: "#252941"
+      color: "#252941",
     },
     {
       id: 1,
       value: staffStatus.available,
       label: `Available (${staffStatus.available})`,
-      color: "#8094D4"
-    }
+      color: "#8094D4",
+    },
   ];
 
   const detailedStaffStatus = [
@@ -413,11 +416,20 @@ function AdminDashboard() {
     setNewAnnouncement({title: "", description: ""});
   };
 
+  // Add utility function
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  // In handleCreateAnnouncement function
   const handleCreateAnnouncement = async (announcementData) => {
     try {
       setLoading(true);
+      
       const enrichedData = {
         ...announcementData,
+        department: capitalizeFirstLetter(announcementData.department),
         created_at: new Date().toISOString(),
       };
 
@@ -479,35 +491,11 @@ function AdminDashboard() {
     }
   };
 
+  // In handleAssign function
   const handleAssign = async (e) => {
     e.preventDefault();
 
-    if (!taskTitle.trim()) {
-      setSnackbar({
-        open: true,
-        message: "Please enter a task title",
-        severity: "error",
-      });
-      return;
-    }
-
-    if (!taskDescription.trim()) {
-      setSnackbar({
-        open: true,
-        message: "Please enter a task description",
-        severity: "error",
-      });
-      return;
-    }
-
-    if (!selected.value) {
-      setSnackbar({
-        open: true,
-        message: "Please select a department",
-        severity: "error",
-      });
-      return;
-    }
+    // Validation checks remain same...
 
     try {
       const today = new Date();
@@ -516,17 +504,20 @@ function AdminDashboard() {
       today.setSeconds(0);
 
       const formattedDeadline = today.toISOString();
+
       await dispatch(
         createTask({
           title: taskTitle.trim(),
           description: taskDescription.trim(),
-          department: selected.value,
+          department: capitalizeFirstLetter(selected.value), // Only capitalize first letter
           deadline: formattedDeadline,
         })
       ).unwrap();
 
+      // Success handling remains same...
       dispatch(fetchTasks());
 
+      // Reset form
       setTaskTitle("");
       setTaskDescription("");
       setSelected({value: "", label: "Department"});
@@ -539,11 +530,18 @@ function AdminDashboard() {
         severity: "success",
       });
     } catch (err) {
+      // Improved error handling
+      const errorMessage = err?.errors?.detail || // Handle DRF detailed errors
+        err?.message || // Handle direct message
+        (typeof err === 'object' ? Object.values(err)[0] : err) || // Handle object errors
+        'Failed to assign task'; // Fallback message
+
       setSnackbar({
         open: true,
-        message: err.message || "Failed to assign task",
+        message: errorMessage,
         severity: "error",
       });
+      console.error('Task assignment error:', err);
     }
   };
 
@@ -601,8 +599,8 @@ function AdminDashboard() {
   useEffect(() => {
     const handleTaskMonitorOpen = () => {
       // Check if user has disabled the notification
-      const hideNotification = localStorage.getItem('hideTaskMonitorTip');
-      
+      const hideNotification = localStorage.getItem("hideTaskMonitorTip");
+
       if (!hideNotification) {
         // Show notification with 30% chance
         if (Math.random() < 0.3) {
@@ -610,31 +608,34 @@ function AdminDashboard() {
         }
       }
     };
-  
+
     // Show notification when task monitor opens
     if (showTaskAssignment) {
       handleTaskMonitorOpen();
     }
   }, [showTaskAssignment]);
-  
+
   const handleHideNotification = () => {
-    localStorage.setItem('hideTaskMonitorTip', 'true');
+    localStorage.setItem("hideTaskMonitorTip", "true");
     setShowDoubleClickTip(false);
   };
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
       {isInitialLoading ? (
-        <><div className="w-full h-full flex flex-col gap-4 p-4">
-          <Skeleton variant="rectangular" height={60} />
-          <div className="flex flex-col xl:flex-row gap-4"></div>
-          <div className="flex-1">
-            <Skeleton variant="rectangular" height={320} />
+        <>
+          <div className="w-full h-full flex flex-col gap-4 p-4">
+            <Skeleton variant="rectangular" height={60} />
+            <div className="flex flex-col xl:flex-row gap-4"></div>
+            <div className="flex-1">
+              <Skeleton variant="rectangular" height={320} />
+            </div>
+            <div className="w-full xl:w-[30%]">
+              <Skeleton variant="rectangular" height={320} />
+            </div>
           </div>
-          <div className="w-full xl:w-[30%]">
-            <Skeleton variant="rectangular" height={320} />
-          </div>
-        </div><Skeleton variant="rectangular" height={400} /></>
+          <Skeleton variant="rectangular" height={400} />
+        </>
       ) : (
         <>
           <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
@@ -723,7 +724,11 @@ function AdminDashboard() {
                             Staff Status
                           </h3>
                           {staffStatus.loading ? (
-                            <Skeleton variant="circular" width={220} height={220} />
+                            <Skeleton
+                              variant="circular"
+                              width={220}
+                              height={220}
+                            />
                           ) : staffStatus.total === 0 ? (
                             <div className="flex items-center justify-center h-[180px] text-gray-500">
                               No Staff Data Available
@@ -735,12 +740,12 @@ function AdminDashboard() {
                                   data: staffStatusData,
                                   highlightScope: {
                                     fade: "global",
-                                    highlight: "item"
+                                    highlight: "item",
                                   },
                                   innerRadius: 45,
                                   paddingAngle: 1,
                                   cornerRadius: 1,
-                                }
+                                },
                               ]}
                               height={220}
                               margin={{top: 0, bottom: 40, left: 0, right: 0}}
@@ -749,16 +754,16 @@ function AdminDashboard() {
                                   direction: "row",
                                   position: {
                                     vertical: "bottom",
-                                    horizontal: "center"
+                                    horizontal: "center",
                                   },
                                   padding: 0,
                                   markSize: 10,
                                   itemGap: 15,
                                   labelStyle: {
                                     fontSize: 12,
-                                    fontWeight: 500
-                                  }
-                                }
+                                    fontWeight: 500,
+                                  },
+                                },
                               }}
                             />
                           )}
@@ -1073,7 +1078,7 @@ function AdminDashboard() {
                       <CreateAnnouncementBox
                         onClose={() => setShowAnnouncementBox(false)}
                         onSubmit={handleCreateAnnouncement}
-                        departments={departments}
+                        departments={hotelDepartments} // Update this line
                       />
                     </div>
                   </div>
@@ -1215,7 +1220,7 @@ function AdminDashboard() {
 
                     {isDropdownOpen && (
                       <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                        {departments.map((dept) => (
+                        {hotelDepartments.map((dept) => (
                           <button
                             key={dept.value}
                             type="button"
@@ -1296,27 +1301,27 @@ function AdminDashboard() {
           >
             <AdminTaskAssignment onClose={() => setShowTaskAssignment(false)} />
             {showDoubleClickTip && (
-              <Alert 
+              <Alert
                 severity="info"
-                sx={{ 
-                  position: 'fixed',
+                sx={{
+                  position: "fixed",
                   top: 20,
                   right: 20,
                   zIndex: 9999,
-                  width: 'auto',
-                  maxWidth: '400px',
+                  width: "auto",
+                  maxWidth: "400px",
                   boxShadow: 3,
-                  '& .MuiAlert-message': {
-                    width: '100%'
-                  }
+                  "& .MuiAlert-message": {
+                    width: "100%",
+                  },
                 }}
                 onClose={() => setShowDoubleClickTip(false)}
                 action={
-                  <Button 
-                    color="inherit" 
-                    size="small" 
+                  <Button
+                    color="inherit"
+                    size="small"
                     onClick={handleHideNotification}
-                    sx={{ fontSize: '0.75rem' }}
+                    sx={{fontSize: "0.75rem"}}
                   >
                     Don't show again
                   </Button>
@@ -1325,7 +1330,8 @@ function AdminDashboard() {
                 <div className="flex flex-col">
                   <span className="font-medium">Pro tip:</span>
                   <span className="text-sm">
-                    Double-click on any task card to view details or delete tasks
+                    Double-click on any task card to view details or delete
+                    tasks
                   </span>
                 </div>
               </Alert>

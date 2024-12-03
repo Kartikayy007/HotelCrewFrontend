@@ -7,7 +7,7 @@ import { PieChart } from '@mui/x-charts/PieChart';
 import { createTask, selectTasksLoading, selectTasksError, selectTaskMetrics, fetchTasks } from '../../../redux/slices/TaskSlice';
 import TaskAssignment from './TaskAssignment';
 import LoadingAnimation from '../../common/LoadingAnimation';
-import { selectDepartments, fetchStaffData } from '../../../redux/slices/AdminStaffSlice'
+import { selectDepartments, fetchStaffData } from '../../../redux/slices/staffslice'
 
 interface SnackbarState {
   open: boolean;

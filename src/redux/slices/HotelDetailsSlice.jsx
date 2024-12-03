@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
   if (!token) {
     throw new Error('Authentication token not found');
@@ -138,3 +138,24 @@ export const selectHotelLoading = (state) => state.hotelDetails.loading;
 export const selectHotelError = (state) => state.hotelDetails.error;
 export const selectHotelUpdateLoading = (state) => state.hotelDetails.updateLoading;
 export const selectHotelUpdateError = (state) => state.hotelDetails.updateError;
+
+// In HotelDetailsSlice.jsx - update the selectDepartmentNames selector
+export const selectDepartmentNames = (state) => {
+  if (!state.hotelDetails.details?.department_names) return [];
+  
+  try {
+    // Split the comma-separated string and trim whitespace
+    const departments = state.hotelDetails.details.department_names
+      .split(',')
+      .map(dept => dept.trim());
+    
+    // Map to required format
+    return departments.map(dept => ({
+      value: dept.toLowerCase(),
+      label: dept.charAt(0).toUpperCase() + dept.slice(1)
+    }));
+  } catch (error) {
+    console.error('Error parsing department names:', error);
+    return [];
+  }
+};

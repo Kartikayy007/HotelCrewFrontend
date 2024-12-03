@@ -8,7 +8,7 @@ const DELETE_STAFF_URL = "https://hotelcrew-1.onrender.com/api/edit/delete/";
 const STAFF_STATUS_URL = "https://hotelcrew-1.onrender.com/api/taskassignment/staff/available/";
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
   if (!token) {
     throw new Error('Authentication token not found');
