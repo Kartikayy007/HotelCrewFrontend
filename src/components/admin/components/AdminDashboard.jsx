@@ -3,6 +3,7 @@ import {PieChart} from "@mui/x-charts/PieChart";
 import {LineChart} from "@mui/x-charts/LineChart";
 import {BarChart} from "@mui/x-charts/BarChart";
 import Box from "@mui/material/Box";
+import {Tooltip} from "@mui/material";
 import {
   Dialog,
   TextField,
@@ -11,8 +12,10 @@ import {
   Alert,
   IconButton,
   Slider,
+  Skeleton,
+  Grid,
+  Card,
 } from "@mui/material";
-import Skeleton from "@mui/material/Skeleton";
 import {useDispatch, useSelector} from "react-redux";
 import {
   fetchAttendanceStats,
@@ -65,6 +68,129 @@ import {
 import {fetchWeeklyAttendance} from "../../../redux/slices/AdminAttendanceSlice";
 import {selectDepartmentNames} from "../../../redux/slices/HotelDetailsSlice";
 
+const DeleteConfirmationDialog = ({open, onClose, onConfirm, loading}) => (
+  <Dialog
+    open={open}
+    onClose={onClose}
+    sx={{
+      "& .MuiDialog-paper": {
+        margin: "16px",
+        maxWidth: "400px",
+      },
+      zIndex: 1400,
+    }}
+  >
+    <div className="p-6">
+      <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
+      <p className="text-gray-600 mb-6">
+        Are you sure you want to delete this announcement? This action cannot be
+        undone.
+      </p>
+      <div className="flex justify-end gap-3">
+        <Button variant="outlined" onClick={onClose} disabled={loading}>
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={onConfirm}
+          disabled={loading}
+        >
+          {loading ? "Deleting..." : "Delete"}
+        </Button>
+      </div>
+    </div>
+  </Dialog>
+);
+
+const DashboardLoadingState = () => {
+  const currentHour = new Date().getHours();
+  const greeting =
+  currentHour < 12
+    ? "Good Morning"
+    : currentHour < 18
+    ? "Good Afternoon"
+    : "Good Evening";
+  return (
+      <><h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
+      {greeting}
+    </h1><div className="flex flex-col xl:flex-row justify-around">
+        <div className="flex flex-col space-y-6 w-full xl:w-4/6">
+          <div className="bg-white rounded-xl shadow-lg min-h-[320px] w-full p-4">
+            <Skeleton variant="text" width="200px" height={32} className="mb-4" />
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex-1 min-w-[250px]">
+                  <Skeleton variant="text" width="150px" height={24} className="mx-auto mb-2" />
+                  <Skeleton variant="circular" width={220} height={220} className="mx-auto" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg w-full p-4">
+            <div className="flex justify-between items-center mb-4">
+              <Skeleton variant="text" width="200px" height={32} />
+              <div className="text-right">
+                <Skeleton variant="text" width="120px" height={20} />
+                <Skeleton variant="text" width="80px" height={32} />
+              </div>
+            </div>
+            <Skeleton variant="rectangular" width="100%" height={300} className="mb-4" />
+            <Skeleton variant="rectangular" width="100%" height={40} />
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg w-full p-4">
+            <div className="flex justify-between items-center mb-4">
+              <Skeleton variant="text" width="200px" height={32} />
+              <Skeleton variant="text" width="100px" height={32} />
+            </div>
+            <Skeleton variant="rectangular" width="100%" height={300} className="mb-4" />
+            <Skeleton variant="rectangular" width="100%" height={40} />
+          </div>
+        </div>
+
+        <div className="flex flex-col space-y-6 w-full xl:w-[30%] mt-5 xl:mt-0">
+          <div className="bg-white rounded-xl shadow-lg min-h-[416px] w-full p-4">
+            <Skeleton variant="text" width="180px" height={32} className="mb-4" />
+            <Skeleton variant="rectangular" width="100%" height={340} />
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg w-full p-4 flex flex-col h-[40rem] xl:h-[calc(40vh)]">
+            <div className="flex justify-between items-center mb-4">
+              <Skeleton variant="text" width="200px" height={32} />
+              <Skeleton variant="circular" width={24} height={24} />
+            </div>
+            <div className="flex-1 overflow-y-auto mb-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="border-b border-gray-200 py-4 last:border-0">
+                  <Skeleton variant="text" width="60%" height={24} className="mb-2" />
+                  <Skeleton variant="text" width="100%" height={20} />
+                  <Skeleton variant="text" width="80%" height={20} />
+                </div>
+              ))}
+            </div>
+            <Skeleton variant="rectangular" width="100%" height={40} className="mt-auto" />
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex justify-between items-center mb-4">
+              <Skeleton variant="text" width="150px" height={32} />
+              <Skeleton variant="circular" width={24} height={24} />
+            </div>
+            <div className="space-y-4">
+              <Skeleton variant="rectangular" width="100%" height={40} />
+              <Skeleton variant="rectangular" width="100%" height={40} />
+              <Skeleton variant="rectangular" width="100%" height={40} />
+              <Skeleton variant="rectangular" width="100%" height={200} />
+              <Skeleton variant="rectangular" width="100%" height={40} />
+            </div>
+          </div>
+        </div>
+      </div></>
+  );
+};
+
 function AdminDashboard() {
   const dispatch = useDispatch();
   const attendanceStats = useSelector((state) => state.attendance.stats);
@@ -95,6 +221,8 @@ function AdminDashboard() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const [showDoubleClickTip, setShowDoubleClickTip] = useState(false);
+
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -141,7 +269,7 @@ function AdminDashboard() {
     };
   }, [dispatch]);
 
-  console.log(latestRevenue);
+  latestRevenue;
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -286,7 +414,7 @@ function AdminDashboard() {
     );
   }, [staffPerDepartment]);
 
-  //console.log("Total staff count:", totalStaff);
+  // ("Total staff count:", totalStaff);
 
   const inProgressCount = Array.isArray(tasks)
     ? tasks.filter((task) => task.status.toLowerCase() === "in_progress").length
@@ -312,12 +440,6 @@ function AdminDashboard() {
       label: `Available (${staffStatus.available})`,
       color: "#8094D4",
     },
-  ];
-
-  const detailedStaffStatus = [
-    {id: 0, value: inProgressCount, label: "In Progress", color: "#252941"},
-    {id: 1, value: pendingCount, label: "Pending", color: "#6B46C1"},
-    {id: 2, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
   ];
 
   const weeklyStats = useSelector(selectWeeklyStats);
@@ -416,44 +538,55 @@ function AdminDashboard() {
     setNewAnnouncement({title: "", description: ""});
   };
 
-  // Add utility function
   const capitalizeFirstLetter = (str) => {
     if (!str) return str;
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  // In handleCreateAnnouncement function
-  const handleCreateAnnouncement = async (announcementData) => {
-    try {
-      setLoading(true);
-      
-      const enrichedData = {
-        ...announcementData,
-        department: capitalizeFirstLetter(announcementData.department),
-        created_at: new Date().toISOString(),
-      };
-
-      await dispatch(createAnnouncement(enrichedData)).unwrap();
-      setShowAnnouncementBox(false);
-
-      await dispatch(fetchAnnouncements());
-
-      setSnackbar({
-        open: true,
-        message: "Announcement created successfully",
-        severity: "success",
-      });
-    } catch (error) {
-      console.error("Create announcement error:", error);
-      setSnackbar({
-        open: true,
-        message: error || "Failed to create announcement",
-        severity: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleCreateAnnouncement = async (announcementData) => {
+      try {
+        setLoading(true);
+    
+        const enrichedData = {
+          ...announcementData,
+          department: capitalizeFirstLetter(announcementData.department),
+          created_at: new Date().toISOString(),
+        };
+    
+        await dispatch(createAnnouncement(enrichedData)).unwrap();
+        setShowAnnouncementBox(false);
+        await dispatch(fetchAnnouncements());
+    
+        setSnackbar({
+          open: true,
+          message: "Announcement created successfully",
+          severity: "success",
+        });
+      } catch (error) {
+        console.error("Create announcement error:", error);
+        
+        // Extract the specific error message and customize it with department name
+        let errorMessage;
+        if (error?.department) {
+          const departmentName = enrichedData.department || "selected department";
+          errorMessage = `No staff found in ${departmentName} department`;
+        } else {
+          // Fallback error message
+          errorMessage = 
+            typeof error === 'string' ? error : 
+            error?.message || 
+            "Failed to create announcement";
+        }
+    
+        setSnackbar({
+          open: true,
+          message: errorMessage,
+          severity: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const handleViewAnnouncement = (announcement) => {
     setSelectedAnnouncement(announcement);
@@ -464,84 +597,119 @@ function AdminDashboard() {
   };
 
   const handleDelete = async () => {
-    if (!selectedAnnouncement?.id) {
-      setSnackbar({
-        open: true,
-        message: "Invalid announcement ID",
-        severity: "error",
-      });
-      return;
-    }
+    if (!selectedAnnouncement?.id) return;
 
     try {
+      setDeleteLoading(true);
       await dispatch(deleteAnnouncement(selectedAnnouncement.id)).unwrap();
-      handleViewClose();
+
+      // Close both dialogs and reset states
+      setShowConfirmDialog(false);
+      setSelectedAnnouncement(null);
+
+      // Show success message (optional)
       setSnackbar({
         open: true,
         message: "Announcement deleted successfully",
         severity: "success",
       });
     } catch (error) {
-      console.error("Delete error:", error);
       setSnackbar({
         open: true,
-        message: error?.message || "Failed to delete announcement",
+        message: error.message || "Failed to delete announcement",
         severity: "error",
       });
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
   // In handleAssign function
-  const handleAssign = async (e) => {
+    const handleAssign = async (e) => {
     e.preventDefault();
-
-    // Validation checks remain same...
-
+    setFormSubmitted(true);
+  
+    // Validation check
+    if (!taskTitle || !selected.value || !taskDescription || !selectedHour || !selectedMinute) {
+      const timeout = setTimeout(() => {
+        setFormSubmitted(false);
+      }, 3000);
+  
+      const handleClick = () => {
+        setFormSubmitted(false);
+        document.removeEventListener('click', handleClick);
+        clearTimeout(timeout);
+      };
+  
+      document.addEventListener('click', handleClick);
+      return;
+    }
+  
     try {
       const today = new Date();
       today.setHours(parseInt(selectedHour, 10));
       today.setMinutes(parseInt(selectedMinute, 10));
       today.setSeconds(0);
-
+  
       const formattedDeadline = today.toISOString();
-
+  
       await dispatch(
         createTask({
           title: taskTitle.trim(),
           description: taskDescription.trim(),
-          department: capitalizeFirstLetter(selected.value), // Only capitalize first letter
+          department: capitalizeFirstLetter(selected.value),
           deadline: formattedDeadline,
         })
       ).unwrap();
-
-      // Success handling remains same...
-      dispatch(fetchTasks());
-
+  
+      await Promise.all([dispatch(fetchTasks()), dispatch(fetchStaffStatus())]);
+  
       // Reset form
       setTaskTitle("");
       setTaskDescription("");
       setSelected({value: "", label: "Department"});
       setSelectedHour("09");
       setSelectedMinute("00");
-
+      setFormSubmitted(false); // Reset tooltip state
+  
       setSnackbar({
         open: true,
         message: "Task assigned successfully",
         severity: "success",
       });
     } catch (err) {
-      // Improved error handling
-      const errorMessage = err?.errors?.detail || // Handle DRF detailed errors
-        err?.message || // Handle direct message
-        (typeof err === 'object' ? Object.values(err)[0] : err) || // Handle object errors
-        'Failed to assign task'; // Fallback message
-
+      let errorMessage;
+  
+      if (err?.non_field_errors?.[0]?.includes("No staff in the specified department")) {
+        const deptName = selected?.label || "selected department";
+        errorMessage = `No staff members available in ${deptName} department`;
+      } else {
+        errorMessage =
+          err?.errors?.detail ||
+          err?.message ||
+          (typeof err === "object" ? Object.values(err)[0] : err) ||
+          "Failed to assign task";
+      }
+  
       setSnackbar({
         open: true,
         message: errorMessage,
         severity: "error",
       });
-      console.error('Task assignment error:', err);
+      console.error("Task assignment error:", err);
+      
+      // Auto-hide error tooltips after 3 seconds
+      const timeout = setTimeout(() => {
+        setFormSubmitted(false);
+      }, 3000);
+  
+      const handleClick = () => {
+        setFormSubmitted(false);
+        document.removeEventListener('click', handleClick);
+        clearTimeout(timeout);
+      };
+  
+      document.addEventListener('click', handleClick);
     }
   };
 
@@ -620,22 +788,13 @@ function AdminDashboard() {
     setShowDoubleClickTip(false);
   };
 
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
       {isInitialLoading ? (
-        <>
-          <div className="w-full h-full flex flex-col gap-4 p-4">
-            <Skeleton variant="rectangular" height={60} />
-            <div className="flex flex-col xl:flex-row gap-4"></div>
-            <div className="flex-1">
-              <Skeleton variant="rectangular" height={320} />
-            </div>
-            <div className="w-full xl:w-[30%]">
-              <Skeleton variant="rectangular" height={320} />
-            </div>
-          </div>
-          <Skeleton variant="rectangular" height={400} />
-        </>
+        <DashboardLoadingState />
       ) : (
         <>
           <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
@@ -1030,7 +1189,7 @@ function AdminDashboard() {
                             onClick={() => handleViewAnnouncement(announcement)}
                           >
                             <div className="flex justify-between items-start mb-2">
-                              <h3 className="font-semibold text-lg">
+                              <h3 className="font-semibold text-lg truncate max-w-[150px]">
                                 {announcement.title}
                               </h3>
                               <span className="text-sm text-gray-500">
@@ -1073,12 +1232,12 @@ function AdminDashboard() {
                 </div>
 
                 {showAnnouncementBox && (
-                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
                     <div className="bg-white rounded-xl w-full max-w-2xl mx-4">
                       <CreateAnnouncementBox
                         onClose={() => setShowAnnouncementBox(false)}
                         onSubmit={handleCreateAnnouncement}
-                        departments={hotelDepartments} // Update this line
+                        departments={hotelDepartments} 
                       />
                     </div>
                   </div>
@@ -1089,12 +1248,7 @@ function AdminDashboard() {
                   onClose={handleViewClose}
                   maxWidth="sm"
                   fullWidth
-                  BackdropProps={{
-                    sx: {
-                      backgroundColor: "rgba(0, 0, 0, 0.4)",
-                      backdropFilter: "blur(5px)",
-                    },
-                  }}
+                  sx={{zIndex: 1300}}
                 >
                   <div className="p-6">
                     <h2 className="text-xl font-semibold mb-4">
@@ -1152,12 +1306,9 @@ function AdminDashboard() {
                       </div>
                       <div className="flex justify-end gap-2 mt-4">
                         <Button
-                          onClick={handleDelete}
+                          onClick={() => setShowConfirmDialog(true)}
                           variant="contained"
-                          sx={{
-                            backgroundColor: "#dc2626",
-                            "&:hover": {backgroundColor: "#b91c1c"},
-                          }}
+                          color="error"
                         >
                           Delete
                         </Button>
@@ -1181,7 +1332,7 @@ function AdminDashboard() {
                 onSubmit={handleAssign}
                 className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg lg:flex-1"
               >
-                <div className="flex justify-between items-center mb-2 ">
+                <div className="flex justify-between items-center mb-2">
                   <h2 className="text-lg sm:text-xl font-semibold">
                     Assign Task
                   </h2>
@@ -1194,82 +1345,114 @@ function AdminDashboard() {
                   </IconButton>
                 </div>
 
-                <input
-                  type="text"
-                  placeholder="Task Title"
-                  value={taskTitle}
-                  onChange={(e) => setTaskTitle(e.target.value)}
-                  className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
-                />
-                <div className="flex justify-between gap-4">
-                  <div className="relative w-full">
-                    <button
-                      type="button"
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
-                        selected.value ? "text-black" : "text-gray-400"
-                      } focus:outline-none flex justify-between items-center`}
-                    >
-                      {selected.label}
-                      {isDropdownOpen ? (
-                        <FaChevronUp className="text-gray-600" />
-                      ) : (
-                        <FaChevronDown className="text-gray-600" />
-                      )}
-                    </button>
+                <Tooltip
+                  open={formSubmitted && taskTitle === ""}
+                  title="Task title is required"
+                  arrow
+                  placement="top"
+                >
+                  <input
+                    type="text"
+                    placeholder="Task Title"
+                    value={taskTitle}
+                    onChange={(e) => setTaskTitle(e.target.value)}
+                    className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
+                  />
+                </Tooltip>
 
-                    {isDropdownOpen && (
-                      <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                        {hotelDepartments.map((dept) => (
-                          <button
-                            key={dept.value}
-                            type="button"
-                            onClick={() => handleSelect(dept)}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                          >
-                            {dept.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                <div className="flex justify-between gap-4">
+                  <Tooltip
+                    open={formSubmitted && !selected.value}
+                    title="Please select a department"
+                    arrow
+                    placement="top"
+                  >
+                    <div className="relative w-full">
+                      <button
+                        type="button"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                          selected.value ? "text-black" : "text-gray-400"
+                        } focus:outline-none flex justify-between items-center`}
+                      >
+                        {selected.label}
+                        {isDropdownOpen ? (
+                          <FaChevronUp className="text-gray-600" />
+                        ) : (
+                          <FaChevronDown className="text-gray-600" />
+                        )}
+                      </button>
+
+                      {isDropdownOpen && (
+                        <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+                          {hotelDepartments.map((dept) => (
+                            <button
+                              key={dept.value}
+                              type="button"
+                              onClick={() => handleSelect(dept)}
+                              className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                            >
+                              {dept.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Tooltip>
                 </div>
+
                 <div className="relative w-full mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Deadline
                   </label>
-                  <div className="flex space-x-2">
-                    <select
-                      value={selectedHour}
-                      onChange={(e) => setSelectedHour(e.target.value)}
-                      className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
-                    >
-                      {hours.map((hour) => (
-                        <option key={hour} value={hour}>
-                          {hour}:00
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      value={selectedMinute}
-                      onChange={(e) => setSelectedMinute(e.target.value)}
-                      className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
-                    >
-                      {minutes.map((minute) => (
-                        <option key={minute} value={minute}>
-                          {minute}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Tooltip
+                    open={formSubmitted && (!selectedHour || !selectedMinute)}
+                    title="Please select deadline time"
+                    arrow
+                    placement="top"
+                  >
+                    <div className="flex space-x-2">
+                      <select
+                        value={selectedHour}
+                        onChange={(e) => setSelectedHour(e.target.value)}
+                        className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                      >
+                        {hours.map((hour) => (
+                          <option key={hour} value={hour}>
+                            {hour}:00
+                          </option>
+                        ))}
+                      </select>
+                      <select
+                        value={selectedMinute}
+                        onChange={(e) => setSelectedMinute(e.target.value)}
+                        className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                      >
+                        {minutes.map((minute) => (
+                          <option key={minute} value={minute}>
+                            {minute}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </Tooltip>
                 </div>
-                <textarea
-                  value={taskDescription}
-                  onChange={(e) => setTaskDescription(e.target.value)}
-                  placeholder="Task Description"
-                  maxLength={350}
-                  className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
-                />
+
+                <Tooltip
+                  open={formSubmitted && taskDescription === ""}
+                  title="Task description is required"
+                  arrow
+                  placement="top"
+                >
+                  <textarea
+                    value={taskDescription}
+                    onChange={(e) => setTaskDescription(e.target.value)}
+                    placeholder="Task Description"
+                    maxLength={350}
+                    className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+                  />
+                </Tooltip>
+
                 <div className="flex justify-end">
                   <button
                     type="submit"
@@ -1356,6 +1539,12 @@ function AdminDashboard() {
           <AllAnnouncementsDialog
             open={showAllAnnouncements}
             onClose={() => setShowAllAnnouncements(false)}
+          />
+          <DeleteConfirmationDialog
+            open={showConfirmDialog}
+            onClose={() => setShowConfirmDialog(false)}
+            onConfirm={handleDelete}
+            loading={deleteLoading}
           />
         </>
       )}

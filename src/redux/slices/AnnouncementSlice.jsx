@@ -38,12 +38,9 @@ export const createAnnouncement = createAsyncThunk(
       const response = await axios.post('https://hotelcrew-1.onrender.com/api/taskassignment/announcements/', formattedData, config);
       return response.data;
     } catch (error) {
-      console.error('Create announcement error:', error.response?.data || error);
-      return rejectWithValue(
-        error.response?.data?.detail || 
-        error.response?.data?.message ||
-        'Failed to create announcement'
-      );
+      console.error('Create announcement error:', error.response?.data);
+      // Return the exact error response
+      return rejectWithValue(error.response?.data || 'Failed to create announcement');
     }
   }
 );

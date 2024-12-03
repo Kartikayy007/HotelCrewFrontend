@@ -25,7 +25,7 @@ export const fetchLeaveRequests = createAsyncThunk(
       const response = await axios.get(`https://hotelcrew-1.onrender.com/api/attendance/leave_list/`, {
         headers: getAuthHeaders(), // Correctly invoke the function and pass as headers
       });
-      console.log(response.data.data)
+       (response.data.data)
       return response.data.data; // Assuming "data" contains the leave requests
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching leave requests");
@@ -42,7 +42,7 @@ export const fetchLeaveCount = createAsyncThunk(
         params: { date },
         headers: getAuthHeaders(),
       });
-      console.log("leave",response.data.data)
+       ("leave",response.data.data)
       return response.data.data; // Assuming "data" contains the leave count
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching leave count");
@@ -96,7 +96,7 @@ const leaveSlice = createSlice({
         })
         .addCase(fetchLeaveRequests.fulfilled, (state, action) => {
           state.leaveLoading = false;
-          console.log(action.payload);
+           (action.payload);
           state.leaveRequests = action.payload;
         })
         .addCase(fetchLeaveRequests.rejected, (state, action) => {
@@ -112,7 +112,7 @@ const leaveSlice = createSlice({
         })
         .addCase(fetchLeaveCount.fulfilled, (state, action) => {
           state.leaveLoading = false;
-          console.log("P",action.payload.leave_count);
+           ("P",action.payload.leave_count);
           state.leaveCount = action.payload.leave_count;
         })
         .addCase(fetchLeaveCount.rejected, (state, action) => {
@@ -128,7 +128,7 @@ const leaveSlice = createSlice({
         })
         .addCase(updateLeaveStatus.fulfilled, (state, action) => {
           state.leaveLoading = false;
-          console.log(action.payload.message);
+           (action.payload.message);
           state.updateStatus = action.payload.message;
         })
         .addCase(updateLeaveStatus.rejected, (state, action) => {

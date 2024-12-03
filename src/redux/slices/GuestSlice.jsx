@@ -24,7 +24,7 @@ export const fetchGuestData = createAsyncThunk(
       const response = await axios.get(API_URL, {
         headers: getAuthHeaders(), // Include headers if necessary, like authorization
       });
-      console.log(response.data);
+       (response.data);
       return response.data; // Assume it returns dates, checkins, checkouts
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Error fetching guest data');

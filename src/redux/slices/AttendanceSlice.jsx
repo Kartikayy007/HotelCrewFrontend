@@ -56,7 +56,7 @@ export const fetchAttendanceStats = createAsyncThunk(
     const response = await axios.get(FETCH_ATTENDANCE_STATS_URL, {
       headers: getAuthHeaders(),
     });
-    console.log("Astats",response.data)
+     ("Astats",response.data)
     return response.data;
   }
 );

@@ -42,7 +42,7 @@ export const fetchStaffAttendance = createAsyncThunk(
         }
       );
 
-      console.log(response.data);
+       (response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch staff attendance');

@@ -27,7 +27,7 @@ export const fetchStaffData = createAsyncThunk(
         }
       };
       const response = await axios.get(API_URL, config);
-      console.log('Fetched staff data:', response);
+       ('Fetched staff data:', response);
       return response.data;
     } catch (error) {
       console.error('Failed to fetch staff data:');
@@ -96,7 +96,7 @@ export const fetchStaffStatus = createAsyncThunk(
         }
       };
       const response = await axios.get(STAFF_STATUS_URL, config);
-      // console.log('Fetched staff status:', response);
+      console.log('Staff status response:', response.data); // Debug log
       return response.data;
     } catch (error) {
       console.error('Failed to fetch staff status:', error);
@@ -231,21 +231,18 @@ export const selectDepartments = (state) => {
       label: dept.charAt(0).toUpperCase() + dept.slice(1),
       value: dept
     }));
-    console.log('Departments:', departments);
+     ('Departments:', departments);
   return departments;
 };
 
 
 export const selectTotalStaff = (state) => {
-  // Get staff list from state
   const staffList = state.staff.staffList;
   
-  // Return the length of staff list if it exists and is an array
   if (Array.isArray(staffList)) {
     return staffList.length;
   }
   
-  // Return 0 if staff list is invalid
   return 0;
 };
 

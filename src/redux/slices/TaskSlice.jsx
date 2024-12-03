@@ -13,7 +13,7 @@ const initialState = {
 };
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
   return token;
 };
@@ -31,7 +31,7 @@ export const fetchTasks = createAsyncThunk(
           }
         }
       );
-      console.log('Fetched tasks:', response.data.tasks);
+       ('Fetched tasks:', response.data.tasks);
       return {
         tasks: Array.isArray(response.data.tasks) ? response.data.tasks : [],
         metrics: {
@@ -76,7 +76,7 @@ export const deleteTask = createAsyncThunk(
         throw new Error('Task ID is required');
       }
 
-      console.log('Deleting task with ID:', taskId); // Debug log
+       ('Deleting task with ID:', taskId); // Debug log
       
       const token = getAuthToken();
       await axios.delete(

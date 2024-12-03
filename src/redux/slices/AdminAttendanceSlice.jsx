@@ -105,7 +105,7 @@ export const fetchWeeklyAttendance = createAsyncThunk(
         }
       });
 
-      console.log('Weekly attendance data:', response.data);
+       ('Weekly attendance data:', response.data);
 
       // Validate response structure
       const { dates, total_crew_present, total_staff_absent } = response.data;

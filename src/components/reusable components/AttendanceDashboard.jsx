@@ -143,7 +143,7 @@ const AttendanceDashboard = () => {
 
   useEffect(() => {
     // Fetch leave requests on component mount
-    console.log("Fetching leave requests on mount");
+     ("Fetching leave requests on mount");
     dispatch(fetchLeaveRequests());
 
     // Set an interval to fetch leave requests every 10 minutes
@@ -168,7 +168,7 @@ const AttendanceDashboard = () => {
 
   // if (error) {
   //   return (
-  //     console.log({error}),
+  //      ({error}),
   //     <div className="flex justify-center text-2xl items-center h-full">    
   //       <p >No data Available</p>
   //     </div>

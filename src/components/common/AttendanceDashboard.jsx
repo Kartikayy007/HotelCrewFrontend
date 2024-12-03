@@ -97,7 +97,7 @@ const error=useSelector(selectError);
 
 
   useEffect(() => {
-    console.log('Staff:', staff); // Debug the staff data
+     ('Staff:', staff); // Debug the staff data
   }, [staff]);
 
   const [demoMode, setDemoMode] = useState(false);
@@ -152,7 +152,7 @@ const error=useSelector(selectError);
 
   useEffect(() => {
     // Fetch leave requests on component mount
-    console.log("Fetching leave requests on mount");
+     ("Fetching leave requests on mount");
     dispatch(fetchLeaveRequests());
 
     // Set an interval to fetch leave requests every 10 minutes
@@ -177,7 +177,7 @@ const error=useSelector(selectError);
 
   // if (error) {
   //   return (
-  //     console.log({error}),
+  //      ({error}),
   //     <div className="flex justify-center text-2xl items-center h-full">    
   //       <p >No data Available</p>
   //     </div>

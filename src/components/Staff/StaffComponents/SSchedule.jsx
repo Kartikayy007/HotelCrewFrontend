@@ -141,7 +141,7 @@ const SSchedule = () => {
       return;
     }
     dispatch(staffLeaveApply(leaveDetails));
-    console.log(appliedLeave);
+     (appliedLeave);
   };
   const monthlyAttendance = useSelector((state) => state.staffAttendance.monthlyAttendance);
   const {
@@ -282,7 +282,7 @@ const SSchedule = () => {
     }
 
     if (applyLeaveError) {
-      console.log(applyLeaveError);
+       (applyLeaveError);
       setSnackbar({
         open: true,
         message: 'Error submitting leave request. Please try again.',

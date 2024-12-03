@@ -20,7 +20,7 @@ export const fetchHotelDetails = createAsyncThunk(
           'Authorization': `Bearer ${token}`
         }
       });
-      console.log('Fetched hotel details:', response.data.hotel_details);
+       ('Fetched hotel details:', response.data.hotel_details);
       return response.data.hotel_details;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -59,7 +59,7 @@ export const massCreateStaff = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
-      console.log('Sending staff excel sheet...');
+       ('Sending staff excel sheet...');
       
       const response = await axios.post(
         'https://hotelcrew-1.onrender.com/api/edit/mass-create/',

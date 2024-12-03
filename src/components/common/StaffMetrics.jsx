@@ -44,8 +44,8 @@ const StaffMetrics = () => {
       setWeeklyData(formattedData);
 
       const todayData = getTodayData(response.data.weekly_stats);
-      console.log('Today data:', todayData);
-      console.log('Current hour:', response.data);
+       ('Today data:', todayData);
+       ('Current hour:', response.data);
       setDailyPerformance(todayData.performance_percentage);
       calculateDailyData(todayData.performance_percentage);
     } catch (error) {

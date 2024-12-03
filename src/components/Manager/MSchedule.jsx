@@ -22,13 +22,13 @@ function MSchedule() {
   const { loading, error, updateLoading, updateError, updatedShift } = useSelector((state) => state.shifts?.scheduleList || {});
   const scheduleList = useSelector((state) => state.shifts.scheduleList);
 
-  console.log("xnfcnfn" ,scheduleList)
+   ("xnfcnfn" ,scheduleList)
   // const { scheduleList=[], loading, error } = useSelector((state) => state.shifts);
   // const scheduleList = useSelector(state => state.shifts.scheduleList);
-  // console.log(scheduleList);
+  //  (scheduleList);
 
   // useEffect(() => {
-  //   console.log("Dispatching Shifts...")
+  //    ("Dispatching Shifts...")
   //   dispatch(fetchShifts());
   // }, [dispatch]);
 
@@ -110,7 +110,7 @@ if(!scheduleList) return <div>no data in scgedulelist</div>;
   //     setEveningShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "evening"));
   //     setNightShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "night"));
   
-  //     console.log("dragged: ",draggedStaff)
+  //      ("dragged: ",draggedStaff)
       
   //     setDraggedStaff(null);
   //   }
@@ -160,16 +160,16 @@ if(!scheduleList) return <div>no data in scgedulelist</div>;
   const toggleShiftChangeMode = () => {
     setIsShiftChangeMode(!isShiftChangeMode);
   };
-  console.log("activeFilter:", activeFilter);
-  console.log("searchTerm:", searchTerm);
-  console.log("selectedShift:", selectedShift);
+   ("activeFilter:", activeFilter);
+   ("searchTerm:", searchTerm);
+   ("selectedShift:", selectedShift);
   const [filteredStaff, setFilteredStaff] = useState([]);
 const [dayShiftStaff, setDayShiftStaff] = useState([]);
 const [eveningShiftStaff, setEveningShiftStaff] = useState([]);
 const [nightShiftStaff, setNightShiftStaff] = useState([]);
-console.log("M",dayShiftStaff);
-console.log("E",eveningShiftStaff);
-console.log("N",nightShiftStaff);
+ ("M",dayShiftStaff);
+ ("E",eveningShiftStaff);
+ ("N",nightShiftStaff);
   
 useEffect(() => {
   if (Array.isArray(scheduleList)) {

@@ -816,7 +816,7 @@ const MDashboard = () => {
                         <p className="text-red-500 text-center">No Data Available</p>
                       ) : (
                         <>
-                        {console.log('Staff Attendance Data:', staffAttendanceData)}
+                        { ('Staff Attendance Data:', staffAttendanceData)}
                         <PieChart
                           series={[
                             {

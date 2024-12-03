@@ -100,7 +100,7 @@ const Verify = ({email}) => {
       );
       setShowOtpInput(false);
     } catch (err) {
-      console.log('Raw backend response:', err.response?.data);
+       ('Raw backend response:', err.response?.data);
       
       if (!err.response) {
         setErrorMessage(

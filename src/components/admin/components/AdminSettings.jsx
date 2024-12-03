@@ -784,7 +784,7 @@ const StaffData = () => {
     const selectedFile = e.target.files[0];
     if (selectedFile && validateFile(selectedFile)) {
       setFile(selectedFile);
-      // console.log('File selected:', selectedFile); // Debug log
+      //  ('File selected:', selectedFile); // Debug log
     }
   };
 
@@ -799,7 +799,7 @@ const StaffData = () => {
       const formData = new FormData();
       formData.append('staff_excel_sheet', file); // Updated field name
       
-      // console.log('Uploading file:', file.name);
+      //  ('Uploading file:', file.name);
       const result = await dispatch(massCreateStaff(formData)).unwrap();
       
       toast.success('Staff data uploaded successfully');

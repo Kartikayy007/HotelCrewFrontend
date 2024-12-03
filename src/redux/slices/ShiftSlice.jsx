@@ -26,8 +26,8 @@ export const fetchShifts = createAsyncThunk(
       const response = await axios.get(FETCH_SHIFTS_URL, {
         headers: getAuthHeaders(),
       });
-      console.log(response);
-      console.log(response.data.schedule_list);
+       (response);
+       (response.data.schedule_list);
       return response.data.schedule_list; // Extract the schedule_list array
     } catch (error) {
       return rejectWithValue(

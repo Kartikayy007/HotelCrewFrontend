@@ -111,12 +111,12 @@ function AdminScheduleStatus() {
   const toggleShiftChangeMode = () => {
     setIsShiftChangeMode(!isShiftChangeMode);
   };
-  console.log("activeFilter:", activeFilter);
-  console.log("searchTerm:", searchTerm);
-  console.log("selectedShift:", selectedShift);
-  console.log("M",dayShiftStaff);
-  console.log("E",eveningShiftStaff);
-  console.log("N",nightShiftStaff);
+   ("activeFilter:", activeFilter);
+   ("searchTerm:", searchTerm);
+   ("selectedShift:", selectedShift);
+   ("M",dayShiftStaff);
+   ("E",eveningShiftStaff);
+   ("N",nightShiftStaff);
   
 useEffect(() => {
   if (Array.isArray(scheduleList)) {

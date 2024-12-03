@@ -45,7 +45,7 @@ const GuestRequest: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log('Departments:', departments);
+     ('Departments:', departments);
   }, [departments]);
 
   const handleSelect = (dept: { label: string, value: string }) => {

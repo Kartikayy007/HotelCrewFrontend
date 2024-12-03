@@ -43,7 +43,7 @@ export const fetchStaffData = createAsyncThunk(
         }
       };
       const response = await axios.get(API_URL, config);
-      console.log('Fetched staff data:', response);
+       ('Fetched staff data:', response);
       return response.data;
     } catch (error) {
       console.error('Failed to fetch staff data:');
@@ -112,7 +112,7 @@ export const fetchStaffStatus = createAsyncThunk(
         }
       };
       const response = await axios.get(STAFF_STATUS_URL, config);
-      console.log('Fetched staff status:', response);
+       ('Fetched staff status:', response);
       return response.data;
     } catch (error) {
       console.error('Failed to fetch staff status:', error);

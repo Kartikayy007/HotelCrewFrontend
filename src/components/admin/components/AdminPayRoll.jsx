@@ -80,7 +80,7 @@ function AdminPayRoll() {
 
   const handleCheckWallet = () => {
     // Logic to check wallet
-    console.log("Checking wallet status");
+     ("Checking wallet status");
   };
 
   const [openDialog, setOpenDialog] = useState(false);

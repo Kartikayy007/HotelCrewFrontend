@@ -191,7 +191,7 @@ const RoomManagement = () => {
   };
 
   const confirmCheckout = () => {
-    console.log('Checking out guest:', selectedGuest);
+     ('Checking out guest:', selectedGuest);
     setCheckoutConfirm(false);
     setOpenDialog(false);
   };

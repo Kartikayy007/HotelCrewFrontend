@@ -99,7 +99,7 @@ const AdminAnalytics = () => {
   const todaysCheckIns = roomStats?.daily_checkins[roomStats.daily_checkins.length - 1] || 0;
   const todaysCheckOuts = roomStats?.daily_checkouts[roomStats.daily_checkouts.length - 1] || 0;
 
-  console.log("todays revenue:", todaysRevenue);
+   ("todays revenue:", todaysRevenue);
 
   const animatedRevenue = useCountAnimation(loading ? 0 : todaysRevenue);
   const animatedCheckIns = useCountAnimation(loading ? 0 : todaysCheckIns);
@@ -203,7 +203,7 @@ const AdminAnalytics = () => {
     ];
   };
 
-  // console.log(animatedRevenue, animatedCheckIns, animatedCheckOuts, animatedStaff);
+  //  (animatedRevenue, animatedCheckIns, animatedCheckOuts, animatedStaff);
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">

@@ -49,7 +49,7 @@ export const getStaffLeaveHistory = createAsyncThunk(
           },
         }
       );
-      console.log(response.data); // Log the data for debugging
+       (response.data); // Log the data for debugging
       return response.data; // Return the response data on success
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch leave history'); // Handle errors gracefully
@@ -86,7 +86,7 @@ const leaveSlice = createSlice({
       })
       .addCase(staffLeaveApply.fulfilled, (state, action) => {
         state.applyLeaveLoading = false;
-        console.log(action.payload.message)
+         (action.payload.message)
         state.leaveStatus = action.payload.message; 
       })
       .addCase(staffLeaveApply.rejected, (state, action) => {

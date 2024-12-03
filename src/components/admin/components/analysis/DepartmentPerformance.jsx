@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllTasks, fetchTasks } from '../../../../redux/slices/TaskSlice';
-import { fetchStaffData, selectStaffPerDepartment } from '../../../../redux/slices/staffslice';
+import { fetchStaffData, selectStaffPerDepartment } from '../../../../redux/slices/AdminStaffSlice';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart } from '@mui/x-charts/PieChart';
@@ -201,7 +201,7 @@ const DepartmentPerformance = () => {
   }
 
   if (!departmentMetrics.length) {
-    return <div className="text-center text-gray-500">No departments available</div>;
+    return <div className="text-center text-gray-500 mt-72">No departments available</div>; 
   }
 
   return (

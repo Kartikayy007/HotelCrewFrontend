@@ -10,6 +10,7 @@ import {
   selectTasksByStatus,
   selectTaskMetrics,
 } from '../../../redux/slices/TaskSlice';
+import { fetchStaffStatus } from '../../../redux/slices/StaffSlice';
 import LoadingAnimation from '../../common/LoadingAnimation';
 import { Button, Dialog, DialogTitle, DialogContent } from '@mui/material';
 
@@ -41,7 +42,6 @@ const getStatusIcon = (status) => {
   }
 };
 
-// Add EmptyState component
 const EmptyTaskState = ({ status }) => (
   <div className="flex flex-col items-center justify-center h-48 text-gray-500">
     <svg 
@@ -96,7 +96,8 @@ const TaskDetailDialog = ({ task, open, onClose }) => {
       
       setIsDeleting(true);
       await dispatch(deleteTask(task.id)).unwrap();
-      await dispatch(fetchTasks()); // Refetch tasks after deletion
+      await dispatch(fetchTasks());
+      dispatch(fetchStaffStatus())
       setIsDeleting(false);
       onClose();
     } catch (err) {
@@ -280,6 +281,8 @@ const TaskCard = ({ task }) => {
   );
 };
 
+const POLLING_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
+
 const AdminTaskAssignment = ({ onClose }) => {
   const dispatch = useDispatch();
   const loading = useSelector(selectTasksLoading);
@@ -291,7 +294,16 @@ const AdminTaskAssignment = ({ onClose }) => {
   const completedTasks = useSelector(state => selectTasksByStatus(state, 'completed'));
 
   useEffect(() => {
-    dispatch(fetchTasks()); 
+    // Initial fetch
+    dispatch(fetchTasks());
+
+    // Setup polling
+    const intervalId = setInterval(() => {
+      dispatch(fetchTasks());
+    }, POLLING_INTERVAL);
+
+    // Cleanup on unmount
+    return () => clearInterval(intervalId);
   }, [dispatch]);
 
   if (loading && !pendingTasks.length && !inProgressTasks.length && !completedTasks.length) {
