@@ -113,6 +113,7 @@ const SignUp = () => {
 
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 const validatePassword = (password) => {
   if (!passwordRegex.test(password)) {
@@ -143,33 +144,37 @@ const handleSubmit = async (e) => {
 
   // Trim the username and check if it's empty or contains only whitespace
   const trimmedUsername = user.trim();
-  if (!trimmedUsername) {
-    setErrorMsg("Enter a valid name");
-    return;
-  }
-
-  if (!email || !pwd || !matchPwd) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   if (!email || !pwd || !matchPwd) {
     setErrorMsg("Enter all fields");
     return;
   }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  else if (!trimmedUsername) {
+    setErrorMsg("Enter a valid name");
+    return;
+  }
+  else if (!emailRegex.test(email)) {
     setErrorMsg("Invalid email");
     return;
   }
 
-  if (pwd !== matchPwd) {
+ else if (!email || !pwd || !matchPwd) {
+    setErrorMsg("Enter all fields");
+    return;
+  }
+  else if (!pwdRegex.test(pwd)) {
+    const error = validatePassword(pwd);
+    console.log(error)
+    setErrorMsg(error || "Invalid password");
+    return;
+  }
+  else if (pwd !== matchPwd) {
     setErrorMsg("Passwords do not match");
     return;
   }
 
-  if (!pwdRegex.test(pwd)) {
-    const error = validatePassword(pwd);
-    setErrorMsg(error || "Invalid password");
-    return;
-  }
-
+  
+else{
   setErrorMsg("");
   const userCredentials = {
     user_name: trimmedUsername,
@@ -196,6 +201,7 @@ const handleSubmit = async (e) => {
       }
     }
   });
+}
 };
 
 const handleVerifyOtp = (e) => {
@@ -290,7 +296,7 @@ const handleVerifyOtp = (e) => {
               className="w-full :sxlpace-y-3 space-y-4 "
               onSubmit={handleVerifyOtp}
             >
-              <h2 className="text-[40px] font-bold xl:mt-0 mt-5 text-center">
+              <h2 className="text-4xl font-bold xl:mt-0 mt-5 text-center">
                 Verify E-mail
               </h2>
               <div className="flex flex-col justify-center items-center gap-4 xl:gap-5">
@@ -363,9 +369,9 @@ const handleVerifyOtp = (e) => {
           <div className="space-y-9">
             <form
               onSubmit={handleSubmit}
-              className="w-full lg:w-96  lg:space-y-7 space-y-1"
+              className="w-80 lg:w-96  lg:space-y-7 space-y-1"
             >
-              <h2 className="text-[40px] font-bold lg:mt-0 mt-3 text-center xl:text-left">
+              <h2 className="text-4xl font-bold lg:mt-0 mt-3 text-center xl:text-left">
                 Register
               </h2>
               <div className="lg:space-y-4 space-y-2">
@@ -380,7 +386,7 @@ const handleVerifyOtp = (e) => {
                   autoComplete="off"
                   onChange={handleInputChange(setUser)}
                   value={user}
-                  className={`w-full p-2 text-xl placeholder:text-base pl-4 border-b
+                  className={`w-full p-2 text-base lg:text-lg placeholder:text-base pl-4 border-b
                         focus:outline-none focus:ring-0  pr-4 ${
                           errorMsg === "Enter all fields" && !user
                             ? "border-[#99182C] placeholder-[#99182C]"
@@ -401,10 +407,10 @@ const handleVerifyOtp = (e) => {
                     onChange={handleInputChange(setEmail)}
                     value={email}
                     className={`w-full border-b transition duration-200 
-                        focus:outline-none focus:ring-0 text-xl placeholder:text-base pl-4 pr-4 p-2 ${
+                        focus:outline-none focus:ring-0 text-base lg:text-lg placeholder:text-base pl-4 pr-4 p-2 ${
                           errorMsg === "Invalid email" ||
                           (errorMsg === "Enter all fields" && !email)
-                            ? "border-[#99182C] placeholder-[#99182C] text-[#99182C]"
+                            ? "border-[#99182C] placeholder-[#99182C] "
                             : "border-gray-500 placeholder-gray-500"
                         }`}
                   />
@@ -413,12 +419,12 @@ const handleVerifyOtp = (e) => {
                 <div className="relative">
                   <input
                     type={showPwd ? "text" : "password"}
-                    className={`w-full p-2 text-xl pl-4 border-b ${
-                      passwordError ? 'border-[#99182C]' : 'border-gray-700'
-                    } focus:outline-none`}
                     placeholder="Password"
+                    className={`w-full p-2 text-base lg:text-lg pl-4 placeholder:text-base border-b ${
+                     ( passwordError )||(errorMsg==="Enter all fields" && !pwd) ? 'border-[#99182C] placeholder-[#99182C] text-[#99182C]' : 'border-gray-700 placeholder-gray-500'
+                    } focus:outline-none`}
                     value={pwd}
-                    maxLength={20}
+                    maxLength={18}
                     onChange={handlePasswordChange}
                   />
                   <button
@@ -442,9 +448,9 @@ const handleVerifyOtp = (e) => {
                     placeholder="Confirm Password"
                     onChange={handleInputChange(setMatchPwd)}
                     value={matchPwd}
-                    maxLength={24}
+                    maxLength={18}
                     className={`w-full border-b transition duration-200 
-                      focus:outline-none focus:ring-0 text-xl placeholder:text-base pl-4 pr-4 p-2 ${
+                      focus:outline-none focus:ring-0 text-base lg:text-lg placeholder:text-base pl-4 pr-4 p-2 ${
                         (errorMsg === "Passwords do not match" &&
                           pwd !== matchPwd) ||
                         (errorMsg === "Enter all fields" && !matchPwd)
@@ -474,31 +480,31 @@ const handleVerifyOtp = (e) => {
                 <div className="h-2 ">
                   {errorMsg && (
                     <div
-                      className="text-[#99182C] text-sm text-left lg:top-[55%] top-[72.1%] lg:w-40"
+                      className="text-[#99182C] text-base lg:text-lg leading-[0.8rem] text-left lg:top-[55%] top-[72.1%] lg:w-full "
                       role="alert"
                     >
                       {errorMsg}
                     </div>
                   )}
-                  {passwordError && (
-                  <p className="text-[#99182C] text-sm mt-1">{passwordError}</p>
+                  {!errorMsg && passwordError && (
+                  <p className="text-[#99182C] leading-[0.8rem] text-base lg:text-lg mt-1">{passwordError}</p>
                 )}
                 </div>
 
-                <div className="flex justify-end items-center text-base">
+                <div className="flex justify-end items-center text-sm lg:text-base">
                   <div className="flex items-center gap-2">
                     <input 
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)} 
                     />
-                    <label className=" text-gray-500">Remember me</label>
+                    <label className=" text-gray-500 text-sm lg:text-base">Remember me</label>
                   </div>
                 </div>
                 <div className="text-center ">
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || errorMsg || passwordError}
                     className="w-full h-9 bg-[#5663AC] text-white rounded-lg hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? (
@@ -516,13 +522,13 @@ const handleVerifyOtp = (e) => {
                 </div>
 
                 <div className="text-center mt-4">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm lg:text-base text-gray-500">
                     Already have an account?{" "}
                   </span>
                   <button
                     type="button"
                     onClick={() => navigate("/login", { replace: true })}
-                    className="text-sm text-[#5663AC] hover:text-[#6773AC] font-medium"
+                    className="text-sm lg:text-base text-[#5663AC] hover:text-[#6773AC] font-medium"
                   >
                     Login
                   </button>

@@ -268,7 +268,7 @@ const Verify = ({email}) => {
               className="w-full xl:space-y-3 space-y-4 "
               onSubmit={handleVerifyOtp}
             >
-              <h2 className="text-[40px] font-bold xl:mt-0 mt-5 text-center">
+              <h2 className="text-4xl font-bold xl:mt-0 mt-5 text-center">
                 Verify E-mail
               </h2>
               <div className="flex flex-col justify-center items-center gap-4 xl:gap-5">
@@ -288,12 +288,12 @@ const Verify = ({email}) => {
                   ))}
                 </div>
 
-                <p className="text-base font-normal leading-[16.34px] text-left">
+                <p className="text-sm lg:text-base font-normal leading-[16.34px] text-left">
                   An OTP has been sent to your E-mail
                 </p>
                 <div className="text-center">
-                  <p className="text-base">Didn't receive a mail? </p>
-                  <p className="text-base">
+                  <p className="text-sm lg:text-base">Didn't receive a mail? </p>
+                  <p className="text-sm lg:text-base">
                     {isResendDisabled ? (
                       <span className="text-gray-600">
                         Resend in {timeLeft} seconds
@@ -310,7 +310,7 @@ const Verify = ({email}) => {
                 </div>
 
                 {errorMessage && (
-                  <p className="text-[#99182C] text-base">{errorMessage}</p>
+                  <p className="text-[#99182C] text-sm lg:text-base leading-[0.8rem]">{errorMessage}</p>
                 )}
                 {successMessage &&
                   !hasInteractedAfterResend &&
@@ -346,7 +346,7 @@ const Verify = ({email}) => {
               className="w-full lg:w-96 lg:space-y-7 space-y-8"
               onSubmit={handleSubmit}
             >
-              <h1 className="text-[40px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
+              <h1 className="text-4xl font-bold lg:mt-0 mt-5 text-center lg:text-left">
                 Reset Password
               </h1>
               <div className="space-y-8">
@@ -404,9 +404,9 @@ const Verify = ({email}) => {
                 </div>
               </div>
 
-              {errorMessage && <p className="text-[#99182C]">{errorMessage}</p>}
+              {errorMessage && <p className="text-[#99182C] text-sm lg:text-base">{errorMessage}</p>}
               {passwordError && (
-                  <p className="text-[#99182C] mt-1">{passwordError}</p>
+                  <p className="text-[#99182C] mt-1 text-sm lg:text-base">{passwordError}</p>
                 )}
               <div className="">
                 <button

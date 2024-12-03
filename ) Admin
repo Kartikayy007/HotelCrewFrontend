@@ -1,0 +1,258 @@
+[33mf7949e6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mlayout_fixes[m[33m)[m merged Fix_Auth in layout_fixes
+[33mb18b97b[m[33m ([m[1;31morigin/layout_fixes[m[33m)[m fixed hotel details layout
+[33m833fb5c[m improved layout of manager components
+[33med8cd3f[m[33m ([m[1;31morigin/development_Fix[m[33m, [m[1;31morigin/Fix_mergeConflicts[m[33m, [m[1;31morigin/Fix_Auth[m[33m, [m[1;32mFix_Auth[m[33m)[m feat: update SVG graphic to enhance design and responsiveness; adjust dimensions and paths for improved rendering
+[33me79d8e2[m feat: improve error messages and password validation in login and signup components; enhance form submission handling
+[33m5169d97[m feat: refactor and fixed authentication flow to utilize role from response; streamline local storage management and remove unnecessary checks
+[33ma760572[m feat: update authentication token retrieval to check session storage as fallback; clean up Tailwind config
+[33m5dc394d[m improved layout of auth screens
+[33mc923b0a[m[33m ([m[1;32mdevelopment_Fix[m[33m)[m chore: update @vitejs/plugin-react to version 4.3.4 and vite to version 5.4.11
+[33me64853d[m feat: retrieve authentication token from local storage instead of hardcoded value
+[33ma2fdb06[m commit
+[33ma0c411a[m feat: update Onboarding links and enhance RevealLinks with social media URLs; refactor Schedule component to use SSchedule
+[33medeb0d7[m feat: add YouTube video embed to Onboarding component
+[33m16bfae8[m feat: add FloatingPhone component and update Onboarding layout
+[33mac8996f[m fix: correct condition for showing overlay in Admin component
+[33m2a59e0d[m fix: enhance error handling in login component with detailed messages
+[33m9583eca[m feat: add terser for JavaScript minification and update Vite configuration
+[33mef86dfa[m fix: correct import case for LoadingAnimation in Profile component
+[33mdc52f3a[m fix: correct import path for redux store in main entry file
+[33maa9dd8b[m fix: correct import path for createWallet in AdminPayRoll component
+[33mc6d732c[m feat: implement user authentication flow with Firebase integration
+[33m6036fa8[m feat: update Vite configuration to enhance build settings and server options
+[33ma8cd0ef[m[33m ([m[1;31morigin/development_dashboard[m[33m)[m refactor: remove unnecessary code and clean up leaveSlice for improved readability
+[33m4ed469b[m refactor: remove unused component imports from main entry file
+[33mf0f5ce5[m feat: add ClipPathLinks component for enhanced 404 page; refactor Page404 to utilize new component and remove unused styles
+[33m8fd8926[m Merge branch 'feature_firebase' into development_dashboard
+[33ma93f482[m[33m ([m[1;31morigin/feature_firebase[m[33m)[m feat: add payroll slice with CRUD operations for wallets and transactions; include createStaff action in staff slice; update store configuration to include payroll reducer; add react-hot-toast dependency
+[33mcc2e146[m feat: add EmptyState components for tasks and announcements; enhance UI with no data messages; added promise api and skeleton loading for better user experience
+[33m775f889[m Merge branch 'fixes' into development_dashboard
+[33m11538a1[m merge
+[33m75f9246[m Merge branch 'development_dashboard' of https://github.com/Kartikayy007/HotelCrewFrontend into development_dashboard
+[33m6758990[m[33m ([m[1;31morigin/fixes[m[33m)[m fixed ui errrs
+[33m3a76da0[m Merge branch 'development_dashboard' of https://github.com/Kartikayy007/HotelCrewFrontend into development_dashboard
+[33md277e8d[m feat: enhance Admin components with staff status fetching; add logging for debugging; update .gitignore to exclude .env file
+[33mffb41a1[m Remove .env from git tracking
+[33mfc2aae6[m feat: update authentication token handling to use 'token' from localStorage; modify Firebase configuration in manifest; add environment variables for Firebase; update dependencies for improved performance, also implemented deletion of tasks API
+[33m7219a2e[m made all componenets funtional,resolved import issues
+[33ma3c8c9b[m feat: improve Admin components with loading state adjustments; enhance AdminDashboard with today's attendance stats; add carousel styles; integrate IncompleteRegistration handling in Admin component
+[33m04b22da[m completed merge
+[33m8a4fdfb[m merging feature_manager
+[33m50bc164[m Merge branch 'feature_manager' into development_dashboard
+[33mcd5d1fb[m added department filtering in schedule,shift filtering in attendance and added snackbar in staff and manager
+[33m6fd470f[m[33m ([m[1;31morigin/feature_reception[m[33m)[m feat: integrate Firebase for messaging and notifications; add configuration files and service for device token registration; implement multi-step registration handling in Admin component; enhance login flow with role-based navigation
+[33medec666[m feat: enhance user profile management with loading state and profile preview; update color scheme in Dashboard and AdminDashboard components; implement confirmation dialog in AdminSettings; refactor task metrics display in GuestRequest and Dashboard components
+[33m4f9d896[m integrated staff performance api
+[33m53e1060[m feat: enhance AdminDashboard and AdminAnalytics components with linear curve for charts; update DepartmentPerformance component color; improve profile management in AdminSettings with snackbar notifications and loading animation
+[33m0b03966[m feat: add checkoutSlice for managing guest checkout process; integrate into Redux store; enhance Dashboard and AnnouncementSection components for improved UI and data handling
+[33meb232c0[m made staff profile a common component and used it in both manager and staff and removed profile image update error
+[33mac8d3c3[m added a reducer to the store
+[33m72053fd[m[33m ([m[1;31morigin/feature_manager[m[33m)[m Merge branch 'feature_staff' into feature_manager
+[33m5f51446[m improved attendance slice
+[33m3045a2f[m error handling
+[33mf80f5cd[m feat: add StaffAttendanceSlice for managing staff attendance data; implement fetch functionality with error handling; integrate into Redux store; enhance AdminAnalytics component with improved chart configuration
+[33ma8c247d[m handled pagination in announcement api
+[33m193dc7c[m integrated profile view and update api
+[33m49ba0a5[m feat: update dependencies; upgrade date-fns to version 3.6.0; add react-datepicker; enhance AdminSidebar to fetch user profile and display user information; improve AdminAnalytics to handle zero values for revenue and check-ins; refactor customerSlice for simplified state management
+[33m1b659c8[m fixed undefined AttendanceStat error
+[33m731c25f[m feat: implement user profile management; add fetch and update functionality in userProfileSlice; integrate profile data handling in AdminSettings component; enhance form validation and loading states
+[33m218c2e8[m fix: remove unnecessary console.log statements; add selectTotalStaff selector in StaffSlice; integrate occupancy reducer in Store; enhance AllAnnouncementsDialog and Admin components for better data handling
+[33m745a420[m[33m ([m[1;31morigin/feature_staff[m[33m)[m enhanced the calendar in the schedule component
+[33me8d1f17[m created staff attendance and profile slice and integrated attenance api
+[33m5a11a8f[m fix: remove unnecessary console.log statements; enhance error handling in customer and staff slices; add edit and delete functionality for staff; improve state management for staff data
+[33m2e7017b[m fix: remove unnecessary console.log statements across multiple components; enhance layout with BackdropProps in dialogs; refactor DepartmentPerformance for better task grouping
+[33md91dca6[m fix: improve performance rate calculation; adjust layout heights for task columns; update fetchAnnouncements to include query string; refactor staff and revenue slices for direct fetch; enhance revenue chart to display last 7 days of data
+[33m1cb8e97[m completed integration staff leave apis
+[33mc55ddde[m feat: update main component to render Admin instead of Reception; add new reducers for hotel details and check-ins; enhance layout responsiveness; update API endpoints, added pagination to task list and further improvements
+[33m9657d02[m integrated fetch announcement api
+[33mee78f85[m created StaffTaskSlice and integrated staff task api
+[33mc2a3f17[m added guestSlice, leaveSlice and ProfileSlice and modified shift,announcement and attendance dashboard
+[33m2399641[m fix: remove unnecessary console.log statements across multiple components and integrated more APIs
+[33m29ca672[m fix: update layout dimensions for StaffMetrics and DepartmentPerformance components
+[33m44b35b6[m scheduling api integrated
+[33maf4b504[m feat: add schedule and revenue slices; update task handling and fix status references and add other APIs
+[33m6931309[m Admin API integration completed
+[33mf181c56[m ehanced sidebar and attendanceDashboard
+[33m3eededa[m added modal and rejected request column  in attendance dashboard
+[33m09332db[m added skeleton in task and removed added multiple task selection error
+[33m0350f70[m added update status functionality in task component
+[33m2bb2f13[m fix: improve layout and responsiveness and completed screens
+[33m9dcedc4[m created the initial layout for task component
+[33mdcf1b63[m added skeleton loading to schedule component
+[33m9572b82[m created leave request form and attendance stat in schedule component
+[33m8ca80ba[m configered typrscript files; completed guest request, profile, schedule page of reception with complete responsiveness
+[33m4b80448[m created attendance in shift schedule component
+[33m1807940[m Skeleton Loading added in dashboard
+[33md23cf83[m Leave request status added
+[33m09fc6e9[m performance graph added
+[33m5504446[m updated dashboard layout and creted announcement section in dashboard
+[33m2a6d4bb[m Attendance graph added to the dashboard
+[33mba257d4[m Merge branch 'feature_admin' of https://github.com/Kartikayy007/HotelCrewFrontend into development_dashboard
+[33m5117e9a[m removed unused data from dashboard
+[33mf5ddfbf[m added staffperformance in staff
+[33m1211e33[m[33m ([m[1;31morigin/feature_admin[m[33m)[m fix: update styling and completed responsiveness for All components; update package dependencies
+[33m7ad4991[m Crested profile component
+[33mf3438fe[m created staff slice and modified redux store and enhanced sidebar
+[33m5160359[m Sidebar with image add functionality ready
+[33m27dc4af[m Staff Layout created
+[33m4ccf01c[m added inintial components
+[33m2a1b90e[m Merge branch 'feature_manager' into development
+[33mf5d0ac0[m updated the MSchedule component and changed page headings style
+[33m427cdbd[m improved button styling
+[33m3aa277f[m improved task assignment responsiveness and added date picker in manager component
+[33m7716e81[m integrated announcement api and updated announcement ui
+[33mf4e2a45[m improved task assignment in dashboard
+[33m066dab4[m fix: update styling for AdminSettings and remove unused SettingsForm component; completed admin Page
+[33m35b232c[m Merge branch 'feature_manager' of https://github.com/Kartikayy007/HotelCrewFrontend into feature_admin and completed settings page
+[33mf20075a[m improved responsiveness of profile page and updated guest overview graph
+[33m5dd7b71[m Merge branch 'feature_manager' of https://github.com/Kartikayy007/HotelCrewFrontend into feature_admin For getting latest Updates
+[33mf0e67fb[m fix: update import path for taskSlice in AdminDashboard.jsx
+[33m050c8c2[m fix: update import path for DataBase component in MDatabase.jsx
+[33mc3af72b[m fix: update import path for DataBase component in MDatabase.jsx
+[33m0a2f72c[m fix: update import path for DataBase component in MDatabase.jsx
+[33m52a2670[m fix: correct import path for taskReducer in Store.js
+[33m690e4e8[m Added Analytics page and updated revenue graph
+[33m2c4bf88[m Merge branch 'feature_manager' of https://github.com/Kartikayy007/HotelCrewFrontend into feature_admin
+[33m34c6c7c[m feat: enhance Admin Task assignment montioring with styling updates, improved shift handling, and snackbar notifications
+[33m08e4ae9[m renamed settings to profile and created its ui
+[33m3808111[m feat: update AdminSidebar and AdminAnalytics components with new schedule status and Leave managment components
+[33m791085d[m Skeleton component added in  attendance and date picker in schedule
+[33m0a44625[m Added filtering,info box and filtering logic in schedule component
+[33mcd007cc[m completed basic layout of Schedule
+[33md1485fb[m feat: add OccupancyHeatmap component and integrate it into AdminAnalytics with new data visualization
+[33m757bb48[m fix: improve announcement deletion logic and error handling in AdminDashboard and AnnouncementSlice
+[33m52b7f00[m added initial layout for schedule and reusable database component
+[33mef4153e[m feat: add AdminTaskAssignment component and integrate today's attendance list functionality in AdminAttendanceSlice
+[33mbad92c1[m improved staff filtering in attendance list , created task slice and integrated task creation api in dashboard
+[33m399e889[m enhance AdminDashboard, analytics component styling and functioning
+[33md70cf84[m attendance check api added in slice
+[33m5371e99[m feat: add task management functionality with redux integration and implement snackbar for notifications
+[33med69f39[m improved responsiveness of attendance ui
+[33m1ab565c[m integrated attendance stat api in the dashboard
+[33mec4a6bc[m removed  Non-Serializable State from redux and integrated attendance list and update api
+[33m62809c7[m feat: implement AdminAttendanceList component and integrate attendance stats in AdminDashboard using redux
+[33md60c860[m Merge branch 'feature_admin' of https://github.com/Kartikayy007/HotelCrewFrontend into feature_admin
+[33m157fae3[m refactor AdminSidebar and StaffDB components; enhance layout and usability with improved responsive design and scroll functionality in DataBase component
+[33mbd0b8bf[m added attended reusable component ,complete with responsiveness and attendance redux slice
+[33m620ecc1[m made attendance responsive
+[33m3289ca3[m leave mangement added in attendance
+[33m1cadc4b[m created attendance page ui
+[33mc5bf492[m refactor StaffDB component enhance usability with improved state management for menu interactions
+[33mb095194[m refactor CustomerDB component; enhance customer data display with dynamic rendering; add action menu for viewing and editing customer details, completed DB component
+[33m0e3e3a6[m attendance layout improved and present button changed
+[33m748c5ce[m Pulled latest updates from feature_manager, made basic structure of admin DB
+[33m07deb73[m attendance ui made
+[33m4a2ebd4[m refactor Admin components for improved layout; enhance AdminDataBase with new buttons; add AttendanceDashboard component; clean up AdminSidebar code
+[33me852076[m added graphs and updated side bar,changed dashboard menuitems
+[33mfec9f77[m refactor Admin components for improved structure; enhance AdminSidebar for better usability; fix minor bugs in AdminDashboard, admin dashboard complete
+[33me14a8bb[m add AdminDashboard and AdminLeaveManagement components; update AdminSidebar with new menu items; replace AminAnalaytics with AdminAnalaytics; implement department bar chart in AdminDashboard
+[33m2710fe8[m fix import path for setActiveComponent in Admin component
+[33m0536c7f[m fix import path for adminReducer in Store.js
+[33ma7fd0f7[m  update AdminSidebar for responsive menu; enhance AdminScheduleStatus layout
+[33ma5da7d6[m task assigment ui added
+[33mc188209[m removed routing and added redux to render components
+[33m245160b[m add Admin components and integrate Redux for state management; implement GSAP animations in Onboarding and Preloading components; update main entry point
+[33m473ebc9[m made sidebar responsive
+[33m6872fa2[m add profile image upload functionality and routing setup
+[33m5b6432d[m initial layout and sidebar ready
+[33mbec9fc0[m add Admin component; update password regex in SignUp and Verify components; enhance input styles in various registration forms
+[33m88e1ed7[m add Preloading component and integrate GSAP for animations; update Home component structure and remove redundant comment
+[33m30e9530[m remove unused scrollbar plugin from Tailwind configuration
+[33m9dc0baa[m Merge branch 'main' of https://github.com/Kartikayy007/HotelCrewFrontend
+[33mf7bf64c[m[33m ([m[1;31morigin/ui[m[33m)[m merge  branch 'main' into ui
+[33m81803f6[m updated reset password screen
+[33me8ac04b[m refactor UserSlice and improve Onboarding component layout; update button text and footer year
+[33mc4771a8[m Merge branch 'main' of https://github.com/Kartikayy007/HotelCrewFrontend
+[33m170b4ee[m Made onboarding page responsive
+[33m3b3b4c4[m upload documents ui improved
+[33m806eaba[m Merge branch 'main' into ui
+[33m6a4ba7e[m Merge branch 'main' of https://github.com/Kartikayy007/HotelCrewFrontend
+[33m4fa7949[m Added remember me functionality
+[33mf822a6f[m refactor Onboarding and SignUp components to use Link instead of anchor tags for navigation; improve accessibility with alt text for images
+[33m6fcfa65[m fixed button errors
+[33ma70f64a[m add SVG assets and new components for enhanced UI
+[33m2143f6f[m Merge branch 'main' of https://github.com/Kartikayy007/HotelCrewFrontend
+[33ma01d3a2[m add react-lottie dependency; include new SVG animations for eye and bouncing circles
+[33m04df36c[m ui of hotel detail pages improved
+[33m4b16a68[m Merge branch 'main' of https://github.com/Kartikayy007/HotelCrewFrontend
+[33mcb06f5a[m improved onboarding ui
+[33md196893[m Merge branch 'ui' of https://github.com/Kartikayy007/HotelCrewFrontend into ui
+[33m55c344e[m enhance validation for password and phone number; adjust layout in SignUp component
+[33mbaee091[m ui improved for hotel details
+[33m1bde432[m refactor registration components for improved layout and responsiveness
+[33m4c05f5b[m fixed login and register and otp pages
+[33m9031139[m Fixed designs at Login
+[33mc453835[m Merge branch 'ui' of https://github.com/Kartikayy007/HotelCrewFrontend into ui
+[33md376c8f[m forget password ui updated
+[33mf0af70f[m added password regex in forgot passwrod component
+[33m674a670[m Merge branch 'ui' of https://github.com/Kartikayy007/HotelCrewFrontend into ui
+[33m1f0ed6a[m Fixed role based Auth
+[33m8ae8b91[m userslice updated
+[33md77c211[m onboarding ui fixed
+[33m68e91ed[m Merge branch 'main' of https://github.com/Kartikayy007/HotelCrewFrontend into ui
+[33ma6d3f06[m Hotel detais API Fixed
+[33m72375c8[m chabges made to hotel details ui
+[33me46c8b8[m improved ui designs
+[33m19588e1[m forgot password ui fixed
+[33m33ad379[m registration button fixed
+[33m522ac95[m registration ui fixed
+[33m9f54457[m Refactor staff management layout in StaffManagment.jsx
+[33m4dbb1a7[m gerge branch 'main' of https://github.com/Kartikayy007/HotelCrewFro ia Lines starting with '#' will be ignored, and an empty message aborts
+[33m666099b[m Refactor error handling in registerUser function
+[33mf29da9b[m Merge branch 'main' of https://github.com/Kartikayy007/HotelCrewFrontend
+[33m87621a0[m resolved conflict
+[33m504e969[m Refactor error handling and import paths in Login.jsx
+[33mda54a37[m Merge branch 'main' of https://github.com/Kartikayy007/HotelCrewFrontend
+[33m92e4b4d[m new assets added
+[33m7c1edc3[m Add vercel.json for URL rewriting
+[33me8cfaed[m Merge branch 'Development'
+[33m39fc303[m Refactor import path for image in Login.jsx
+[33m2936134[m Refactor error handling in Verify.jsx and OtpSlice.jsx
+[33m8a2d1ec[m[33m ([m[1;31morigin/Development[m[33m)[m Conclude merge after resolving conflicts
+[33m8113ec9[m ui improved
+[33m0dcd9f6[m Refactor import paths for images in Login.jsx, Verify.jsx, and Onboarding.jsx
+[33m8b947cb[m Refactor import paths for images in Onboarding.jsx
+[33m7819b66[m Refactor import paths for images in Onboarding.jsx
+[33mfae30a4[m Refactor import path for lineIcon in ContactInfo.jsx and Hoteldetails.jsx
+[33m34be899[m Refactor import path for store in SignUp.jsx
+[33m26e53f7[m Refactor import path for store in SignUp.jsx
+[33m3e710ca[m Refactor import path for store in main.jsx
+[33m39d8cf0[m Refactor import path for store in main.jsx
+[33m662d296[m added readme
+[33m4bdd12c[m fix and added error handeling
+[33me42eb64[m some tweaks on signup and onboarding component
+[33m61a085f[m fixed hotel details api
+[33m2ddc33a[m improved on boarding
+[33m17ae70b[m Merge branch 'Development' of https://github.com/Kartikayy007/HotelCrewFrontend into Development
+[33mce704ee[m added routing and error handeling
+[33m2e0da03[m Refactor Onboarding component and fix indentation
+[33mf30542f[m Resolved merge conflicts
+[33m928889f[m changes made in the ui design
+[33m6ee683e[m imporved hotel details steps and added error handelling
+[33meb6688a[m added forgot password API integration including error handeling and bug fixes
+[33ma7f318d[m Merge branch 'Development' of https://github.com/Kartikayy007/HotelCrewFrontend into Development merge is neccary# the commit.
+[33m0a119b3[m completed signup flow and added crypto-js and validator
+[33maf03477[m onboarding screen added
+[33ma70b610[m Refactor file structure and import paths
+[33maf5d1c8[m[33m ([m[1;31morigin/feature_hotelDetails[m[33m)[m Refactor code structure and file organization
+[33m476ff63[m completed hotel details form
+[33m2be5eb1[m completed all hotel-details pages
+[33m8da6b3b[m - Created a new file, Store.js, to configure the Redux store. - Imported UserReducer from slices/UserSlice.js and added it to the store's reducer. - Exported the configured store from Store.js.
+[33m6e7a80f[m Merge branch 'feature_login' into feature_hotelDetails and complted basic structure of hotel details page
+[33mb66ab98[m made basis hotel details page
+[33mdac81b7[m adjusted button
+[33m348ebb0[m labels removed and error detection  added
+[33m078611f[m[33m ([m[1;31morigin/feature_login[m[33m)[m added forgot password components
+[33mcbd6291[m refined login page
+[33m6398e5d[m api integrated through redux
+[33mbd3e505[m updated the design for the login page
+[33m5f28a04[m added API integration for login page using redux
+[33ma7478fe[m alignment fixed
+[33m06c8a5d[m toggle password visiblity added
+[33m09bdea0[m sign up page ready
+[33mf51e558[m added signup branch
+[33m58c823e[m addded login
+[33mfcb60f1[m added login component
+[33m886470c[m Add Tailwind CSS, axios and react-router-dom dependencies
+[33md5a607e[m Add initial project files and configuration
+[33m36ad128[m Initial commit

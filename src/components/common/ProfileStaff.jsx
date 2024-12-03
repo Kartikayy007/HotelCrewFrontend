@@ -63,6 +63,13 @@ const SProfile = () => {
     const [image, setImage] = useState(profile?.user_profile);
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
+        const allowedTypes = ["image/jpeg", "image/png"];
+        if (!allowedTypes.includes(file.type)) {
+            setSnackbarMessage("Please upload a valid image file (JPEG, PNG).");
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+            return;
+        }
         if (file) {
 
             const imageUrl = URL.createObjectURL(file);
