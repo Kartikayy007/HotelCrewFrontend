@@ -10,7 +10,7 @@ import {
   selectStaffPerDepartment,
   selectStaffLoading,
   selectDepartments,
-} from "../../redux/slices/AdminStaffSlice";
+} from "../../redux/slices/StaffSlice";
 import { fetchAttendanceStats, selectError, selectStats, selectLoading } from '../../redux/slices/AttendanceSlice';
 import { Dialog, TextField, Button, Snackbar, Alert, IconButton } from "@mui/material";
 import { CreateAnnouncementBox } from "../common/CreateAnnouncementBox";

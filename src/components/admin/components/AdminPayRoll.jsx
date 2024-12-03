@@ -5,7 +5,7 @@ import {
   selectStaffList,
   selectDepartments,
   selectShifts,
-} from "../../../redux/slices/AdminStaffSlice";
+} from "../../../redux/slices/StaffSlice";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, CircularProgress } from '@mui/material';
 import { createWallet } from '../../../redux/slices/PayrollSlice';
 

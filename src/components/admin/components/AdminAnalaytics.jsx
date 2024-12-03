@@ -15,7 +15,7 @@ import {
   selectTotalStaff,
   fetchStaffData,
   fetchStaffStatus
-} from '../../../redux/slices/AdminStaffSlice';
+} from '../../../redux/slices/StaffSlice';
 import {
   fetchWeeklyAttendance,
   fetchAttendanceStats

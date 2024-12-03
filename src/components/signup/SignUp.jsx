@@ -113,6 +113,8 @@ const SignUp = () => {
 
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
 
 const validatePassword = (password) => {
   if (!passwordRegex.test(password)) {

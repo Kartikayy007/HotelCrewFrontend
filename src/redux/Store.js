@@ -3,12 +3,12 @@ import UserReducer from './slices/UserSlice.jsx'
 import OtpReducer from './slices/OtpSlice'
 import { adminReducer } from './slices/AdminSlice'
 import { receptionReducer } from './slices/ReceptionSlice'
-import AdminStaffSlice from './slices/AdminStaffSlice'
+import AdminStaffSlice from './slices/StaffSlice.jsx'
 import ManagerReducer from './slices/ManagerSlice.jsx'
 import AdminAttendanceSlice from './slices/AdminAttendanceSlice'
 import taskReducer from './slices/TaskSlice'
 import announcementReducer from './slices/AnnouncementSlice'
-import staffReducer from "./slices/StaffSlice"
+import staffReducer from "./slices/DashboardStaffSlice.jsx"
 import hotelCheckInReducer from './slices/hotelCheckInSlice'
 import revenueReducer from './slices/revenueSlice' 
 import scheduleReducer from './slices/scheduleSlice';

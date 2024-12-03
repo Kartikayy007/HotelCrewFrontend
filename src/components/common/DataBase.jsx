@@ -4,7 +4,7 @@ import {
   selectStaffPerDepartment, 
   createStaff,
   fetchStaffData  // Add this import
-} from '../../redux/slices/AdminStaffSlice';
+} from '../../redux/slices/StaffSlice';
 import { selectCustomers } from '../../redux/slices/customerSlice'; // Adjust path as needed
 import StaffDB from "./DB/StaffDB";
 import CustomerDB from "./DB/CustomerDB";

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllTasks, fetchTasks } from '../../../../redux/slices/TaskSlice';
-import { fetchStaffData, selectStaffPerDepartment } from '../../../../redux/slices/AdminStaffSlice';
+import { fetchStaffData, selectStaffPerDepartment } from '../../../../redux/slices/StaffSlice';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart } from '@mui/x-charts/PieChart';

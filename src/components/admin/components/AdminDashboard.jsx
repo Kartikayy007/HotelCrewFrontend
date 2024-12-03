@@ -42,7 +42,7 @@ import {
   selectDepartments,
   fetchStaffStatus,
   selectStaffStatus,
-} from "../../../redux/slices/AdminStaffSlice";
+} from "../../../redux/slices/StaffSlice";
 import StaffMetrics from "../../common/StaffMetrics";
 import LoadingAnimation from "../../common/LoadingAnimation";
 import {fetchTasks} from "../../../redux/slices/TaskSlice";

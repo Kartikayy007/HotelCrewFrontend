@@ -25,7 +25,7 @@ import {
   selectStaffLoading,
   editStaff,
   deleteStaff
-} from "../../../redux/slices/AdminStaffSlice";
+} from "../../../redux/slices/StaffSlice";
 
 const TableRowSkeleton = () => (
   <tr className="border-b">
