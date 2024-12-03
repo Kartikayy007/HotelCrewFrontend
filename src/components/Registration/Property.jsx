@@ -99,7 +99,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
       <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
-        <div className="flex xl:hidden gap-3 mb-4 bg-white fixed font-medium top-6">
+        <div className="flex xl:hidden gap-3 mb-4 bg-white relative font-medium top-3">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -112,16 +112,16 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
           ))}
         </div>
 
-        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-20">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-4">
           <img
             src={hotelIcon}
             alt="Hotel Icon"
             className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] text-center font-medium font-Montserrat">
+          <h2 className="text-3xl text-center font-medium font-Montserrat">
             Property Details
           </h2>
-          <p className="font-sans font-normal text-center">
+          <p className="font-sans text-lg font-medium text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -138,7 +138,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="number-of-rooms"
-              className="block text-sm font-sans font-semibold"
+              className="block text-lg font-sans font-semibold"
             >
               Number of Rooms
             </label>
@@ -158,7 +158,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
             <div className="flex justify-between mb-2">
               <label
                 htmlFor="types-of-rooms"
-                className="block text-sm font-sans font-semibold"
+                className="block text-lg font-sans font-semibold"
               >
                 Types of Rooms
               </label>
@@ -232,7 +232,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="number-of-floors"
-              className="block text-sm font-sans font-semibold mb-1"
+              className="block text-lg font-sans font-semibold mb-1"
             >
               Number of Floors
             </label>
@@ -264,7 +264,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               />
               <label
                 htmlFor="valetParking"
-                className="text-sm font-sans font-semibold"
+                className="text-lg font-sans font-semibold"
               >
                 Valet Parking Available
               </label>
@@ -274,7 +274,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               <div>
                 <label
                   htmlFor="parking-capacity"
-                  className="block text-sm font-sans font-semibold mb-1"
+                  className="block text-lg font-sans font-semibold mb-1"
                 >
                   Parking Capacity
                 </label>

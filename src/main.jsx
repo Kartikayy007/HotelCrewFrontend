@@ -9,8 +9,8 @@ import Admin from './components/admin/Admin.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
-      {/* <App /> */}
-      <MainLayout />
+      <App />
+      {/* <MainLayout /> */}
       {/* <Admin /> */}
     </Provider>
   </StrictMode>,

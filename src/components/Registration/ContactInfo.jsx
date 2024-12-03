@@ -58,8 +58,8 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
-        <div className="flex xl:hidden bg-white font-medium gap-3 mb-4 fixed  top-6">
+      <div className="flex flex-col xl:flex-row justify-center items-center gap-1 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
+        <div className="flex xl:hidden bg-white font-medium gap-3 mb-4 relative  top-0">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -78,10 +78,10 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
             alt="Contact Icon"
             className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] text-center font-medium font-Montserrat">
+          <h2 className="text-3xl text-center font-medium font-Montserrat">
             Contact & Location
           </h2>
-          <p className="font-sans font-normal text-center">
+          <p className="font-sans text-lg font-normal text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -90,15 +90,15 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
           </p>
         </div>
 
-        <form className="space-y-7 w-full xl:w-40-">
+        <form className="space-y-7 w-full xl:w-40 px-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-semibold hidden xl:block xl:text-left">Contact & Location</h1>
+            <h1 className="text-3xl font-semibold hidden xl:block xl:text-left">Contact & Location</h1>
           </div>
 
           <div>
             <label
               htmlFor="complete-address"
-              className="block text-sm font-sans font-semibold"
+              className=" text-lg font-sans font-semibold"
             >
               Complete Address*
             </label>
@@ -118,7 +118,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
             <div>
               <label
                 htmlFor="phone-number"
-                className="block text-sm font-sans font-semibold mb-1"
+                className="block text-lg font-sans font-semibold mb-1"
               >
                 Phone Numbers*
               </label>
@@ -152,7 +152,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
           <div>
             <label
               htmlFor="hotel-email"
-              className="block text-sm font-sans font-semibold mb-1"
+              className="block text-lg font-sans font-semibold mb-1"
             >
               Hotel Email*
             </label>

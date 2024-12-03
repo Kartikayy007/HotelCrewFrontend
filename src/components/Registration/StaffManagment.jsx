@@ -52,7 +52,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
       <div className="flex flex-col xl:flex-row justify-center items-center gap-12 xl:ml-[5.1rem] m-auto p-4 xl:p-0 xl:gap-52">
-        <div className="flex xl:hidden font-medium bg-white gap-3 mb-4 fixed top-6 ">
+        <div className="flex xl:hidden font-medium bg-white gap-3 mb-4 relative top-2 ">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -65,16 +65,16 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
           ))}
         </div>
 
-        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-4 mt-8">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 my-4">
           <img
             src={staffIcon}
             alt="staff"
             className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] font-medium font-Montserrat">
+          <h2 className="text-3xl font-medium font-Montserrat">
             Staff Management
           </h2>
-          <p className="font-sans font-normal text-center">
+          <p className="font-sans text-lg font-normal text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -89,7 +89,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
           </div>
 
           <div className="flex justify-between items-end gap-3">
-            <label htmlFor="hotel-name" className="block text-sm font-sans font-semibold text-neutral-950">
+            <label htmlFor="hotel-name" className="block text-lg font-sans font-semibold text-neutral-950">
               Departments
             </label>
             <button type="button" onClick={handleAddDepartment} className='xl:fixed xl:left-[42.8%]'>

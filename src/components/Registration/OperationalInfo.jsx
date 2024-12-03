@@ -32,8 +32,8 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
-        <div className="flex xl:hidden font-medium gap-3 mb-4 fixed top-6">
+      <div className="flex flex-col xl:flex-row justify-center items-center gap-10 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
+        <div className="flex xl:hidden font-medium gap-3 mb-4 relative top-0">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -46,16 +46,16 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
           ))}
         </div>
 
-        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 my-4">
           <img
             src={HotelIcon}
             alt="Hotel Icon"
             className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] text-center font-medium font-Montserrat">
+          <h2 className="text-3xl text-center font-medium text-neutral-950 font-Montserrat">
             Operational Information
           </h2>
-          <p className="font-sans font-normal text-center">
+          <p className="font-sans text-lg font-medium text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -72,7 +72,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
           <div>
             <label
               htmlFor="check-in-time"
-              className="block text-sm font-sans font-[600] text-neutral-950 mb-1"
+              className="block text-lg font-sans font-[600] text-neutral-950 mb-1"
             >
               Check-in Time
             </label>
@@ -81,7 +81,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-in-time"
               value={checkInTime}
               onChange={(e) => setCheckInTime(e.target.value)}
-              className={`placeholder:text-base h-8 w-[182px] xl:w-[299px] mr-6 py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
+              className={`placeholder:text-base h-8 w-[182px] xl:w-[299px] mr-6 py-2 px-4 border rounded-[4px] text-lg focus:outline-none ${
                 !checkInTime && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
@@ -90,7 +90,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
           <div>
             <label
               htmlFor="check-out-time"
-              className="block text-sm font-sans font-[450] text-gray-700 mb-1"
+              className="block text-lg font-sans font-[600] text-neutral-950 mb-1"
             >
               Check-out Time
             </label>
@@ -109,7 +109,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
           <div>
             <label
               htmlFor="payment-methods"
-              className="block text-sm font-sans font-[600] mb-1"
+              className="block text-lg font-sans font-[600] mb-1"
             >
               Payment Methods
             </label>

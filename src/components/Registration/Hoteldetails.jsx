@@ -51,7 +51,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
       <div className="flex flex-col xl:flex-row justify-center items-center gap-4 xl:ml-[5.1rem] m-auto p-4 xl:p-0 xl:gap-52">
-        <div className="flex xl:hidden bg-white gap-3 mb-4 fixed font-medium top-6">
+        <div className="flex xl:hidden bg-white gap-3 mb-4 relative font-medium top-2">
           {[1, 2, 3, 4, 5, 6].map((num) => (
             <div
               key={num}
@@ -64,16 +64,16 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           ))}
         </div>
 
-        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-4 mt-12">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-4 mt-2">
           <img
             src={hotelIcon}
             alt="Hotel Icon"
             className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] font-medium text-center font-Montserrat">
+          <h2 className="text-3xl font-medium text-center font-Montserrat">
             Hotel Information
           </h2>
-          <p className="font-sans font-normal text-center">
+          <p className="font-sans font-normal  text-lg text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -90,7 +90,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="hotel-name"
-              className="block text-sm font-sans font-semibold"
+              className="block text-lg font-sans font-semibold"
             >
               Hotel Name*
             </label>
@@ -106,7 +106,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="legal-business-name"
-              className="block text-sm font-sans font-semibold mb-1"
+              className="block text-lg font-sans font-semibold mb-1"
             >
               Legal Business Name 
             </label>
@@ -122,7 +122,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="year-established"
-              className="block text-sm font-sans font-semibold mb-1"
+              className="block text-lg font-sans font-semibold mb-1"
             >
               Year Established*
             </label>
@@ -140,7 +140,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="license-registration-numbers"
-              className="block text-sm font-sans font-semibold mb-1"
+              className="block text-lg font-sans font-semibold mb-1"
             >
               License/Registration Numbers*
             </label>
