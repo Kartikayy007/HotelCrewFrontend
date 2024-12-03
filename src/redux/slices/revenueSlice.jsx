@@ -42,8 +42,6 @@ const setCacheData = (data) => {
     console.error('Cache setting error:', error);
   }
 }; */
-
-// Direct fetch without caching
 export const fetchRevenueStats = createAsyncThunk(
   'revenue/fetchStats',
   async (_, { rejectWithValue }) => {
@@ -55,8 +53,6 @@ export const fetchRevenueStats = createAsyncThunk(
           'Content-Type': 'application/json'
         }
       });
-      //  ('Fetched revenue stats:', response.data);
-       ('Fetched revenue stats:', response.data.daily_revenues);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch revenue stats');

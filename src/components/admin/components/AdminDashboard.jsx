@@ -217,12 +217,16 @@ function AdminDashboard() {
 
   const latestRevenue = useSelector(selectLatestRevenue);
   const revenueLoading = useSelector((state) => state.revenue.loading);
+  const dailyRevenues = useSelector(state => state.revenue.dailyRevenues);
+  const dates = useSelector(state => state.revenue.dates);
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const [showDoubleClickTip, setShowDoubleClickTip] = useState(false);
 
   const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const [previousTotalRevenue, setPreviousTotalRevenue] = useState(0);
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -238,7 +242,7 @@ function AdminDashboard() {
           dispatch(fetchRoomStats()),
           dispatch(fetchStaffStatus()),
           dispatch(fetchWeeklyAttendance()),
-          dispatch(fetchAnnouncements()),
+          dispatch(fetchAnnouncements()), 
         ]);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -314,14 +318,22 @@ function AdminDashboard() {
   useEffect(() => {
     if (latestRevenue) {
       const currentHour = new Date().getHours();
+      const currentTotalRevenue = parseFloat(latestRevenue);
+      
       setHourlyRevenues((prev) => {
         const updated = [...prev];
-        updated[currentHour] = parseFloat(latestRevenue) - cumulativeRevenue;
+        if (currentTotalRevenue > previousTotalRevenue) {
+          updated[currentHour] = currentTotalRevenue - previousTotalRevenue;
+        } else {
+          updated[currentHour] = 0;
+        }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
         return updated;
       });
+      
+      setPreviousTotalRevenue(currentTotalRevenue);
     }
-  }, []);
+}, [latestRevenue]);
 
   useEffect(() => {
     const midnightClear = setInterval(() => {
@@ -341,10 +353,16 @@ function AdminDashboard() {
           const newRevenue = parseFloat(latestRevenue);
           setHourlyRevenues((prev) => {
             const updated = [...prev];
-            updated[currentHour] = newRevenue - cumulativeRevenue;
+            // Only update if there's actual new revenue
+            if (newRevenue > previousTotalRevenue) {
+              updated[currentHour] = newRevenue - previousTotalRevenue;
+            } else {
+              updated[currentHour] = 0; // No new revenue this hour
+            }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
             return updated;
           });
+          setPreviousTotalRevenue(newRevenue);
           setCumulativeRevenue(newRevenue);
         }
 
@@ -364,6 +382,18 @@ function AdminDashboard() {
       clearInterval(midnightClear);
     };
   }, [currentHour, latestRevenue, cumulativeRevenue]);
+
+  useEffect(() => {
+    // Initial fetch
+    dispatch(fetchRevenueStats());
+
+    // Set up hourly fetch
+    const interval = setInterval(() => {
+      dispatch(fetchRevenueStats());
+    }, 3600000); // 1 hour in milliseconds
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
 
   const generateTimeData = () => {
     const timeData = [];
@@ -981,11 +1011,12 @@ function AdminDashboard() {
               <div className="bg-white rounded-xl shadow-lg w-full p-4">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg sm:text-xl font-semibold">
-                    Revenue Overview
+                    Weekly Revenue Overview
                   </h2>
+    
                   <div className="text-right">
                     <p className="text-sm text-gray-500">
-                      Today's Total Revenue
+                      Latest Revenue
                     </p>
                     <p className="text-xl font-bold">
                       ₹{latestRevenue || "0.00"}
@@ -1001,59 +1032,35 @@ function AdminDashboard() {
                     {...skeletonProps}
                   />
                 ) : (
-                  <>
-                    <LineChart
-                      height={300}
-                      series={[
-                        {
-                          data: getFilteredRevenueData().map(
-                            (data) => data.revenue
-                          ),
-                          color: "#4C51BF",
-                          area: true,
-                          curve: "linear",
-                        },
-                      ]}
-                      xAxis={[
-                        {
-                          data: getFilteredRevenueData().map(
-                            (data) => data.hour
-                          ),
-                          scaleType: "band",
-                        },
-                      ]}
-                      sx={{
-                        ".MuiLineElement-root": {
-                          strokeWidth: 2,
-                        },
-                        ".MuiAreaElement-root": {
-                          fillOpacity: 0.1,
-                        },
-                      }}
-                    />
-                    <div className="mt-4 px-4">
-                      <Slider
-                        value={revenueRange}
-                        onChange={(_, newValue) => setRevenueRange(newValue)}
-                        valueLabelDisplay="auto"
-                        min={0}
-                        max={currentHour}
-                        marks={[
-                          {value: 0, label: "00:00"},
-                          {value: currentHour, label: `${currentHour}:00`},
-                        ]}
-                        sx={{
-                          color: "#4C51BF",
-                          "& .MuiSlider-thumb": {
-                            backgroundColor: "#4C51BF",
-                          },
-                          "& .MuiSlider-track": {
-                            backgroundColor: "#4C51BF",
-                          },
-                        }}
-                      />
-                    </div>
-                  </>
+                  <LineChart
+                    height={300}
+                    series={[
+                      {
+                        data: dailyRevenues?.length ? dailyRevenues : [0],
+                        color: "#4C51BF",
+                        area: true,
+                        curve: "linear",
+                      },
+                    ]}
+                    xAxis={[
+                      {
+                        data: dates?.length ? dates : ['No data'],
+                        scaleType: "band",
+                        tickLabelStyle: {
+                          angle: 0,
+                          fontSize: 12
+                        }
+                      },
+                    ]}
+                    sx={{
+                      ".MuiLineElement-root": {
+                        strokeWidth: 2,
+                      },
+                      ".MuiAreaElement-root": {
+                        fillOpacity: 0.1,
+                      },
+                    }}
+                  />
                 )}
               </div>
 
