@@ -1,39 +1,39 @@
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from 'react-redux';
-import { Plus, Trash2, Clock } from 'lucide-react';
-import {  
-  selectHotelDetails, 
+import React, {useState, useEffect} from "react";
+import {useSelector, useDispatch} from "react-redux";
+import {Plus, Trash2, Clock} from "lucide-react";
+import {
+  selectHotelDetails,
   updateHotelDetails,
   selectHotelUpdateLoading,
   selectHotelUpdateError,
-  massCreateStaff
-} from '../../../redux/slices/HotelDetailsSlice';
-import { 
-  selectUserProfile, 
-  selectUserProfileLoading, 
+  massCreateStaff,
+} from "../../../redux/slices/HotelDetailsSlice";
+import {
+  selectUserProfile,
+  selectUserProfileLoading,
   selectUserProfileError,
-  fetchUserProfile 
-} from '../../../redux/slices/userProfileSlice';
+  fetchUserProfile,
+} from "../../../redux/slices/userProfileSlice";
 import docupload from "/docupload.svg";
-import { toast } from 'react-toastify';
+import {toast} from "react-toastify";
 import axios from "axios";
-import LoadingAnimation from '../../common/LoadingAnimation';
-import { 
+import LoadingAnimation from "../../common/LoadingAnimation";
+import {
   Button,
-  Dialog, 
-  DialogActions, 
-  DialogContent, 
-  DialogContentText, 
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
   DialogTitle,
   Snackbar,
-  Alert
-} from '@mui/material';
+  Alert,
+} from "@mui/material";
 
 const useConfirmationDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [dialogConfig, setDialogConfig] = useState({
-    title: '',
-    message: '',
+    title: "",
+    message: "",
     onConfirm: () => {},
   });
 
@@ -47,14 +47,14 @@ const useConfirmationDialog = () => {
   };
 
   const ConfirmationDialog = () => (
-    <Dialog 
-      open={isOpen} 
+    <Dialog
+      open={isOpen}
       onClose={closeDialog}
       PaperProps={{
         style: {
-          borderRadius: '16px',
-          padding: '8px'
-        }
+          borderRadius: "16px",
+          padding: "8px",
+        },
       }}
     >
       <DialogTitle>{dialogConfig.title}</DialogTitle>
@@ -79,9 +79,8 @@ const useConfirmationDialog = () => {
     </Dialog>
   );
 
-  return { openDialog, ConfirmationDialog };
+  return {openDialog, ConfirmationDialog};
 };
-
 
 const BasicInfo = () => {
   const dispatch = useDispatch();
@@ -90,18 +89,18 @@ const BasicInfo = () => {
   const updateError = useSelector(selectHotelUpdateError);
 
   const [formData, setFormData] = useState({
-    hotel_name: '',
-    legal_business_name: '',
-    year_established: '',
-    license_registration_numbers: ''
+    hotel_name: "",
+    legal_business_name: "",
+    year_established: "",
+    license_registration_numbers: "",
   });
 
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success'
+    message: "",
+    severity: "success",
   });
-  
+
   const [isDirty, setIsDirty] = useState(false);
   const [lastChangedField, setLastChangedField] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -110,10 +109,11 @@ const BasicInfo = () => {
   useEffect(() => {
     if (hotelDetails) {
       const initialData = {
-        hotel_name: hotelDetails.hotel_name || '',
-        legal_business_name: hotelDetails.legal_business_name || '',
-        year_established: hotelDetails.year_established || '',
-        license_registration_numbers: hotelDetails.license_registration_numbers || ''
+        hotel_name: hotelDetails.hotel_name || "",
+        legal_business_name: hotelDetails.legal_business_name || "",
+        year_established: hotelDetails.year_established || "",
+        license_registration_numbers:
+          hotelDetails.license_registration_numbers || "",
       };
       setFormData(initialData);
       setOriginalData(initialData);
@@ -125,9 +125,9 @@ const BasicInfo = () => {
   };
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     setIsDirty(true);
     setLastChangedField(field);
@@ -138,7 +138,7 @@ const BasicInfo = () => {
   };
 
   const [openDialog, setOpenDialog] = useState(false);
-  
+
   const handleConfirmation = () => {
     setOpenDialog(true);
   };
@@ -147,34 +147,36 @@ const BasicInfo = () => {
     if (!hasChanges()) {
       setSnackbar({
         open: true,
-        message: 'No changes to save',
-        severity: 'info'
+        message: "No changes to save",
+        severity: "info",
       });
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await dispatch(updateHotelDetails({
-        ...formData,
-        lastChangedField
-      })).unwrap();
-      
+      await dispatch(
+        updateHotelDetails({
+          ...formData,
+          lastChangedField,
+        })
+      ).unwrap();
+
       setOriginalData(formData);
       setIsDirty(false);
       setLastChangedField(null);
       setOpenDialog(false);
-      
+
       setSnackbar({
         open: true,
-        message: 'Changes saved successfully',
-        severity: 'success'
+        message: "Changes saved successfully",
+        severity: "success",
       });
     } catch (err) {
       setSnackbar({
         open: true,
-        message: err.message || 'Failed to save changes',
-        severity: 'error'
+        message: err.message || "Failed to save changes",
+        severity: "error",
       });
     } finally {
       setIsSubmitting(false);
@@ -185,7 +187,7 @@ const BasicInfo = () => {
     <>
       <section className="bg-white rounded-3xl p-8 lg:h-[75vh] mx-5 h-full shadow-sm lg:w-2/3">
         <h2 className="text-2xl font-semibold mb-6">Basic Information</h2>
-        
+
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -241,12 +243,16 @@ const BasicInfo = () => {
         </div>
 
         <div className="flex justify-end mt-8">
-          <button 
+          <button
             onClick={handleConfirmation}
             disabled={!isDirty || isSubmitting || !hasChanges()}
             className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
               transition-colors flex items-center gap-2
-              ${(!isDirty || isSubmitting || !hasChanges()) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ${
+                !isDirty || isSubmitting || !hasChanges()
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
           >
             {isSubmitting ? (
               <>
@@ -254,7 +260,7 @@ const BasicInfo = () => {
                 Saving...
               </>
             ) : (
-              'Save Changes'
+              "Save Changes"
             )}
           </button>
         </div>
@@ -265,9 +271,9 @@ const BasicInfo = () => {
         onClose={() => setOpenDialog(false)}
         PaperProps={{
           style: {
-            borderRadius: '16px',
-            padding: '8px'
-          }
+            borderRadius: "16px",
+            padding: "8px",
+          },
         }}
       >
         <DialogTitle>Confirm Changes</DialogTitle>
@@ -295,14 +301,14 @@ const BasicInfo = () => {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClose={() => setSnackbar((prev) => ({...prev, open: false}))}
+        anchorOrigin={{vertical: "top", horizontal: "right"}}
       >
-        <Alert 
-          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        <Alert
+          onClose={() => setSnackbar((prev) => ({...prev, open: false}))}
           severity={snackbar.severity}
           variant="filled"
-          sx={{ width: '100%' }}
+          sx={{width: "100%"}}
         >
           {snackbar.message}
         </Alert>
@@ -317,27 +323,27 @@ const ContactInfo = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success'
+    message: "",
+    severity: "success",
   });
   const [originalData, setOriginalData] = useState({});
   const [formData, setFormData] = useState({
-    complete_address: '',
-    main_phone_number: '',
-    emergency_phone_number: '',
-    email_address: ''
+    complete_address: "",
+    main_phone_number: "",
+    emergency_phone_number: "",
+    email_address: "",
   });
   const [isDirty, setIsDirty] = useState(false);
   const [lastChangedField, setLastChangedField] = useState(null);
-  const { openDialog, ConfirmationDialog } = useConfirmationDialog();
+  const {openDialog, ConfirmationDialog} = useConfirmationDialog();
 
   useEffect(() => {
     if (hotelDetails) {
       const initialData = {
-        complete_address: hotelDetails.complete_address || '',
-        main_phone_number: hotelDetails.main_phone_number || '',
-        emergency_phone_number: hotelDetails.emergency_phone_number || '',
-        email_address: hotelDetails.email_address || ''
+        complete_address: hotelDetails.complete_address || "",
+        main_phone_number: hotelDetails.main_phone_number || "",
+        emergency_phone_number: hotelDetails.emergency_phone_number || "",
+        email_address: hotelDetails.email_address || "",
       };
       setFormData(initialData);
       setOriginalData(initialData);
@@ -349,10 +355,10 @@ const ContactInfo = () => {
   };
 
   const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({
+    const {id, value} = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [id]: value
+      [id]: value,
     }));
     setIsDirty(true);
     setLastChangedField(id);
@@ -362,42 +368,44 @@ const ContactInfo = () => {
     if (!hasChanges()) {
       setSnackbar({
         open: true,
-        message: 'No changes to save',
-        severity: 'info'
+        message: "No changes to save",
+        severity: "info",
       });
       return;
     }
 
     openDialog({
-      title: 'Save Changes?',
-      message: 'Are you sure you want to save these changes?',
+      title: "Save Changes?",
+      message: "Are you sure you want to save these changes?",
       onConfirm: async () => {
         setIsSubmitting(true);
         try {
-          await dispatch(updateHotelDetails({
-            ...formData,
-            lastChangedField
-          })).unwrap();
-          
+          await dispatch(
+            updateHotelDetails({
+              ...formData,
+              lastChangedField,
+            })
+          ).unwrap();
+
           setOriginalData(formData);
           setIsDirty(false);
           setLastChangedField(null);
-          
+
           setSnackbar({
             open: true,
-            message: 'Contact information updated successfully',
-            severity: 'success'
+            message: "Contact information updated successfully",
+            severity: "success",
           });
         } catch (err) {
           setSnackbar({
             open: true,
-            message: err.message || 'Failed to update contact information',
-            severity: 'error'
+            message: err.message || "Failed to update contact information",
+            severity: "error",
           });
         } finally {
           setIsSubmitting(false);
         }
-      }
+      },
     });
   };
 
@@ -407,7 +415,10 @@ const ContactInfo = () => {
 
       <div className="space-y-6">
         <div>
-          <label htmlFor="complete_address" className="block text-sm font-medium mb-2">
+          <label
+            htmlFor="complete_address"
+            className="block text-sm font-medium mb-2"
+          >
             Complete Address*
           </label>
           <input
@@ -431,7 +442,7 @@ const ContactInfo = () => {
               value={formData.main_phone_number}
               onChange={handleInputChange}
               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />  
+            />
             <input
               type="tel"
               id="emergency_phone_number"
@@ -444,7 +455,10 @@ const ContactInfo = () => {
         </div>
 
         <div>
-          <label htmlFor="email_address" className="block text-sm font-medium mb-2">
+          <label
+            htmlFor="email_address"
+            className="block text-sm font-medium mb-2"
+          >
             Hotel E-mail*
           </label>
           <input
@@ -462,7 +476,11 @@ const ContactInfo = () => {
             disabled={!isDirty || isSubmitting || !hasChanges()}
             className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
               transition-colors flex items-center gap-2
-              ${(!isDirty || isSubmitting || !hasChanges()) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ${
+                !isDirty || isSubmitting || !hasChanges()
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
           >
             {isSubmitting ? (
               <>
@@ -470,7 +488,7 @@ const ContactInfo = () => {
                 Saving...
               </>
             ) : (
-              'Save Changes'
+              "Save Changes"
             )}
           </button>
         </div>
@@ -481,14 +499,14 @@ const ContactInfo = () => {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClose={() => setSnackbar((prev) => ({...prev, open: false}))}
+        anchorOrigin={{vertical: "top", horizontal: "right"}}
       >
-        <Alert 
-          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        <Alert
+          onClose={() => setSnackbar((prev) => ({...prev, open: false}))}
           severity={snackbar.severity}
           variant="filled"
-          sx={{ width: '100%' }}
+          sx={{width: "100%"}}
         >
           {snackbar.message}
         </Alert>
@@ -503,64 +521,52 @@ const PropertyDetails = () => {
   const updateLoading = useSelector(selectHotelUpdateLoading);
   const updateError = useSelector(selectHotelUpdateError);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success'
-  });
-  
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     total_number_of_rooms: 0,
     room_types: [],
     number_of_floors: 0,
     valet_parking_capacity: 0,
-    valet_parking_available: false
+    valet_parking_available: false,
   });
-  
-  const [originalData, setOriginalData] = useState({});
   const [isDirty, setIsDirty] = useState(false);
   const [lastChangedField, setLastChangedField] = useState(null);
-  const { openDialog, ConfirmationDialog } = useConfirmationDialog();
 
   useEffect(() => {
     if (hotelDetails) {
-      const initialData = {
+      setFormData({
         total_number_of_rooms: hotelDetails.total_number_of_rooms,
         room_types: hotelDetails.room_types || [],
         number_of_floors: hotelDetails.number_of_floors,
         valet_parking_capacity: hotelDetails.valet_parking_capacity,
-        valet_parking_available: hotelDetails.valet_parking_available
-      };
-      setFormData(initialData);
-      setOriginalData(initialData);
+        valet_parking_available: hotelDetails.valet_parking_available,
+      });
     }
   }, [hotelDetails]);
 
-  const hasChanges = () => {
-    return JSON.stringify(formData) !== JSON.stringify(originalData);
-  };
-
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     setIsDirty(true);
     setLastChangedField(field);
   };
 
   const handleRoomTypes = (updatedRoomTypes) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      room_types: updatedRoomTypes
+      room_types: updatedRoomTypes,
     }));
     setIsDirty(true);
-    setLastChangedField('room_types');
+    setLastChangedField("room_types");
   };
 
   const addRoomType = () => {
-    const updatedRoomTypes = [...formData.room_types, { room_type: '', count: 0, price: 0 }];
+    const updatedRoomTypes = [
+      ...formData.room_types,
+      {room_type: "", count: 0, price: 0},
+    ];
     handleRoomTypes(updatedRoomTypes);
   };
 
@@ -573,94 +579,140 @@ const PropertyDetails = () => {
     const updatedRoomTypes = [...formData.room_types];
     updatedRoomTypes[index] = {
       ...updatedRoomTypes[index],
-      [field]: value
+      [field]: value,
     };
     handleRoomTypes(updatedRoomTypes);
   };
 
-  const validateForm = () => {
-    if (formData.room_types.some(room => !room.room_type)) {
-      setSnackbar({
-        open: true,
-        message: 'All room types must have a name',
-        severity: 'error'
-      });
-      return false;
-    }
-    return true;
+  const handleSaveClick = () => {
+    setConfirmDialogOpen(true);
   };
 
-  const handleSubmit = async () => {
-    if (!hasChanges()) {
-      setSnackbar({
-        open: true,
-        message: 'No changes to save',
-        severity: 'info'
-      });
-      return;
+  const handleConfirmSave = async () => {
+    try {
+      await dispatch(
+        updateHotelDetails({
+          ...formData,
+          lastChangedField,
+        })
+      ).unwrap();
+      setIsDirty(false);
+      setLastChangedField(null);
+      setConfirmDialogOpen(false);
+    } catch (err) {
+      console.error("Failed to update:", err);
     }
-
-    if (!validateForm()) {
-      return;
-    }
-
-    openDialog({
-      title: 'Save Changes?',
-      message: 'Are you sure you want to save these changes?',
-      onConfirm: async () => {
-        setIsSubmitting(true);
-        try {
-          await dispatch(updateHotelDetails({
-            ...formData,
-            lastChangedField
-          })).unwrap();
-          
-          setOriginalData(formData);
-          setIsDirty(false);
-          setLastChangedField(null);
-          
-          setSnackbar({
-            open: true,
-            message: 'Property details updated successfully',
-            severity: 'success'
-          });
-        } catch (err) {
-          setSnackbar({
-            open: true,
-            message: err.message || 'Failed to update property details',
-            severity: 'error'
-          });
-        } finally {
-          setIsSubmitting(false);
-        }
-      }
-    });
   };
 
   return (
     <section className="bg-white rounded-3xl p-8 lg:h-[75vh] mx-5 h-full shadow-sm lg:w-2/3">
       <h2 className="text-xl font-bold mb-4 sm:mb-8">Property Details</h2>
+      {updateError && (
+        <div className="text-red-500 mb-4">
+          Error updating property details: {updateError.message}
+        </div>
+      )}
 
       <div className="space-y-4 sm:space-y-1 w-full">
-        {/* ... existing room types section ... */}
+        <div className="h-80 w-full overflow-scroll">
+          <div className="flex justify-between items-center mb-4">
+            <label className="text-sm font-medium">Room Types</label>
+            <button
+              type="button"
+              onClick={addRoomType}
+              className="px-3 py-1 text-sm text-gray-400 hover:text-gray-600"
+            >
+              <Plus size={26} />
+            </button>
+          </div>
+
+          {formData.room_types.map((room, index) => (
+            <div key={index} className="grid grid-cols-12 gap-2 mb-4 items-end">
+              <div className="col-span-4">
+                <label className="block text-xs mb-2">Room Type</label>
+                <input
+                  type="text"
+                  value={room.room_type}
+                  onChange={(e) =>
+                    updateRoomType(index, "room_type", e.target.value)
+                  }
+                  placeholder="e.g. Single, Double"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div className="col-span-3">
+                <label className="block text-xs mb-2">Count</label>
+                <input
+                  type="number"
+                  value={room.count}
+                  onChange={(e) =>
+                    updateRoomType(
+                      index,
+                      "count",
+                      parseInt(e.target.value) || 0
+                    )
+                  }
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div className="col-span-4">
+                <label className="block text-xs mb-2">Price</label>
+                <input
+                  type="number"
+                  value={room.price}
+                  onChange={(e) =>
+                    updateRoomType(
+                      index,
+                      "price",
+                      parseFloat(e.target.value) || 0
+                    )
+                  }
+                  placeholder="0.00"
+                  step="0.01"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div className="col-span-1">
+                <button
+                  type="button"
+                  onClick={() => removeRoomType(index)}
+                  className="px-2 py-2 text-gray-400 hover:text-gray-600"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Number of Floors</label>
+            <label className="block text-sm font-medium mb-2">
+              Number of Floors
+            </label>
             <input
               type="number"
               value={formData.number_of_floors}
-              onChange={(e) => handleInputChange('number_of_floors', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("number_of_floors", parseInt(e.target.value) || 0)
+              }
               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Parking Capacity</label>
+            <label className="block text-sm font-medium mb-2">
+              Parking Capacity
+            </label>
             <input
               type="number"
               value={formData.valet_parking_capacity}
-              onChange={(e) => handleInputChange('valet_parking_capacity', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("valet_parking_capacity", parseInt(e.target.value) || 0)
+              }
               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -671,7 +723,9 @@ const PropertyDetails = () => {
             <input
               type="checkbox"
               checked={formData.valet_parking_available}
-              onChange={(e) => handleInputChange('valet_parking_available', e.target.checked)}
+              onChange={(e) =>
+                handleInputChange("valet_parking_available", e.target.checked)
+              }
               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <span className="text-sm font-medium">Valet Parking Available</span>
@@ -679,42 +733,56 @@ const PropertyDetails = () => {
         </div>
 
         <div className="flex justify-end mt-4 sm:mt-8">
-          <button 
-            onClick={handleSubmit}
-            disabled={!isDirty || isSubmitting || !hasChanges()}
-            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
-              transition-colors flex items-center gap-2
-              ${(!isDirty || isSubmitting || !hasChanges()) ? 'opacity-50 cursor-not-allowed' : ''}`}
+          <button
+            onClick={handleSaveClick}
+            disabled={!isDirty || updateLoading}
+            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] transition-colors ${
+              !isDirty || updateLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            {isSubmitting ? (
-              <>
-                <LoadingAnimation size={20} />
-                Saving...
-              </>
-            ) : (
-              'Save Changes'
-            )}
+            {updateLoading ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </div>
 
-      <ConfirmationDialog />
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      <Dialog
+        open={confirmDialogOpen}
+        onClose={() => setConfirmDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+          },
+        }}
       >
-        <Alert 
-          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+        <DialogTitle sx={{ bgcolor: "#252941", color: "white" }}>
+          Confirm Changes
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          Are you sure you want to save these changes to the property details?
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button
+            onClick={() => setConfirmDialogOpen(false)}
+            color="inherit"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmSave}
+            variant="contained"
+            sx={{
+              bgcolor: "#252941",
+              "&:hover": { bgcolor: "#1a1f36" },
+            }}
+          >
+            Save Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </section>
   );
 };
@@ -728,25 +796,25 @@ const StaffManagement = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success'
+    message: "",
+    severity: "success",
   });
-  
+
   const [formData, setFormData] = useState({
-    department_names: ''
+    department_names: "",
   });
   const [departments, setDepartments] = useState([]);
   const [isDirty, setIsDirty] = useState(false);
   const [lastChangedField, setLastChangedField] = useState(null);
   const [originalData, setOriginalData] = useState({});
-  const { openDialog, ConfirmationDialog } = useConfirmationDialog();
+  const {openDialog, ConfirmationDialog} = useConfirmationDialog();
 
   useEffect(() => {
     if (hotelDetails?.department_names) {
-      const initialDepartments = hotelDetails.department_names.split(', ');
+      const initialDepartments = hotelDetails.department_names.split(", ");
       setDepartments(initialDepartments);
       const initialData = {
-        department_names: hotelDetails.department_names
+        department_names: hotelDetails.department_names,
       };
       setFormData(initialData);
       setOriginalData(initialData);
@@ -758,11 +826,11 @@ const StaffManagement = () => {
   };
 
   const validateForm = () => {
-    if (departments.some(dept => !dept.trim())) {
+    if (departments.some((dept) => !dept.trim())) {
       setSnackbar({
         open: true,
-        message: 'All departments must have a name',
-        severity: 'error'
+        message: "All departments must have a name",
+        severity: "error",
       });
       return false;
     }
@@ -771,13 +839,13 @@ const StaffManagement = () => {
 
   const updateDepartments = (newDepartments) => {
     setDepartments(newDepartments);
-    const departmentString = newDepartments.filter(d => d).join(', ');
-    setFormData(prev => ({
+    const departmentString = newDepartments.filter((d) => d).join(", ");
+    setFormData((prev) => ({
       ...prev,
-      department_names: departmentString
+      department_names: departmentString,
     }));
     setIsDirty(true);
-    setLastChangedField('department_names');
+    setLastChangedField("department_names");
   };
 
   const addDepartment = () => {
@@ -798,8 +866,8 @@ const StaffManagement = () => {
     if (!hasChanges()) {
       setSnackbar({
         open: true,
-        message: 'No changes to save',
-        severity: 'info'
+        message: "No changes to save",
+        severity: "info",
       });
       return;
     }
@@ -809,42 +877,44 @@ const StaffManagement = () => {
     }
 
     openDialog({
-      title: 'Save Changes?',
-      message: 'Are you sure you want to save these changes?',
+      title: "Save Changes?",
+      message: "Are you sure you want to save these changes?",
       onConfirm: async () => {
         setIsSubmitting(true);
         try {
-          await dispatch(updateHotelDetails({
-            ...formData,
-            lastChangedField
-          })).unwrap();
-          
+          await dispatch(
+            updateHotelDetails({
+              ...formData,
+              lastChangedField,
+            })
+          ).unwrap();
+
           setOriginalData(formData);
           setIsDirty(false);
           setLastChangedField(null);
-          
+
           setSnackbar({
             open: true,
-            message: 'Departments updated successfully',
-            severity: 'success'
+            message: "Departments updated successfully",
+            severity: "success",
           });
         } catch (err) {
           setSnackbar({
             open: true,
-            message: err.message || 'Failed to update departments',
-            severity: 'error'
+            message: err.message || "Failed to update departments",
+            severity: "error",
           });
         } finally {
           setIsSubmitting(false);
         }
-      }
+      },
     });
   };
 
   return (
     <section className="bg-white mx-4 lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm lg:w-2/3">
       <h2 className="text-xl font-bold mb-8">Staff Management</h2>
-      
+
       <div className="space-y-6">
         <div>
           <div className="flex justify-between items-center mb-2">
@@ -880,7 +950,11 @@ const StaffManagement = () => {
             disabled={!isDirty || isSubmitting || !hasChanges()}
             className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
               transition-colors flex items-center gap-2
-              ${(!isDirty || isSubmitting || !hasChanges()) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ${
+                !isDirty || isSubmitting || !hasChanges()
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
           >
             {isSubmitting ? (
               <>
@@ -888,7 +962,7 @@ const StaffManagement = () => {
                 Saving...
               </>
             ) : (
-              'Save Changes'
+              "Save Changes"
             )}
           </button>
         </div>
@@ -899,14 +973,14 @@ const StaffManagement = () => {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClose={() => setSnackbar((prev) => ({...prev, open: false}))}
+        anchorOrigin={{vertical: "top", horizontal: "right"}}
       >
-        <Alert 
-          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        <Alert
+          onClose={() => setSnackbar((prev) => ({...prev, open: false}))}
           severity={snackbar.severity}
           variant="filled"
-          sx={{ width: '100%' }}
+          sx={{width: "100%"}}
         >
           {snackbar.message}
         </Alert>
@@ -919,30 +993,32 @@ const OperationalInfo = () => {
   const dispatch = useDispatch();
   const hotelDetails = useSelector(selectHotelDetails);
   const updateLoading = useSelector(selectHotelUpdateLoading);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success'
+    message: "",
+    severity: "success",
   });
 
   const [formData, setFormData] = useState({
-    check_in_time: '',
-    check_out_time: '',
-    payment_methods: []
+    check_in_time: "",
+    check_out_time: "",
+    payment_methods: [],
   });
-  
+
   const [originalData, setOriginalData] = useState({});
   const [isDirty, setIsDirty] = useState(false);
-  const { openDialog, ConfirmationDialog } = useConfirmationDialog();
+  const {openDialog, ConfirmationDialog} = useConfirmationDialog();
 
   useEffect(() => {
     if (hotelDetails) {
       const initialData = {
-        check_in_time: hotelDetails.check_in_time || '',
-        check_out_time: hotelDetails.check_out_time || '',
-        payment_methods: hotelDetails.payment_methods ? hotelDetails.payment_methods.split(', ') : []
+        check_in_time: hotelDetails.check_in_time || "",
+        check_out_time: hotelDetails.check_out_time || "",
+        payment_methods: hotelDetails.payment_methods
+          ? hotelDetails.payment_methods.split(", ")
+          : [],
       };
       setFormData(initialData);
       setOriginalData(initialData);
@@ -954,9 +1030,9 @@ const OperationalInfo = () => {
   };
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     setIsDirty(true);
   };
@@ -965,8 +1041,8 @@ const OperationalInfo = () => {
     if (!formData.check_in_time || !formData.check_out_time) {
       setSnackbar({
         open: true,
-        message: 'Check-in and Check-out times are required',
-        severity: 'error'
+        message: "Check-in and Check-out times are required",
+        severity: "error",
       });
       return false;
     }
@@ -975,12 +1051,12 @@ const OperationalInfo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!hasChanges()) {
       setSnackbar({
         open: true,
-        message: 'No changes to save',
-        severity: 'info'
+        message: "No changes to save",
+        severity: "info",
       });
       return;
     }
@@ -990,42 +1066,47 @@ const OperationalInfo = () => {
     }
 
     openDialog({
-      title: 'Save Changes?',
-      message: 'Are you sure you want to save these changes?',
+      title: "Save Changes?",
+      message: "Are you sure you want to save these changes?",
       onConfirm: async () => {
         setIsSubmitting(true);
         try {
           const updateData = {
             check_in_time: formData.check_in_time,
             check_out_time: formData.check_out_time,
-            payment_methods: formData.payment_methods.filter(method => method.trim()).join(', ')
+            payment_methods: formData.payment_methods
+              .filter((method) => method.trim())
+              .join(", "),
           };
 
           await dispatch(updateHotelDetails(updateData)).unwrap();
-          
+
           setOriginalData(formData);
           setIsDirty(false);
-          
+
           setSnackbar({
             open: true,
-            message: 'Operational information updated successfully',
-            severity: 'success'
+            message: "Operational information updated successfully",
+            severity: "success",
           });
         } catch (err) {
           setSnackbar({
             open: true,
-            message: err.message || 'Failed to update operational information',
-            severity: 'error'
+            message: err.message || "Failed to update operational information",
+            severity: "error",
           });
         } finally {
           setIsSubmitting(false);
         }
-      }
+      },
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm w-2/3 mx-4">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm w-2/3 mx-4"
+    >
       <h2 className="text-xl font-bold mb-8">Operational Information</h2>
       <div className="space-y-6">
         <div>
@@ -1036,7 +1117,9 @@ const OperationalInfo = () => {
             <input
               type="time"
               value={formData.check_in_time}
-              onChange={(e) => handleInputChange('check_in_time', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("check_in_time", e.target.value)
+              }
               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
             />
@@ -1055,7 +1138,9 @@ const OperationalInfo = () => {
             <input
               type="time"
               value={formData.check_out_time}
-              onChange={(e) => handleInputChange('check_out_time', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("check_out_time", e.target.value)
+              }
               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
             />
@@ -1067,23 +1152,31 @@ const OperationalInfo = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Payment Methods</label>
+          <label className="block text-sm font-medium mb-2">
+            Payment Methods
+          </label>
           <input
             type="text"
-            value={formData.payment_methods.join(', ')}
-            onChange={(e) => handleInputChange('payment_methods', e.target.value.split(', '))}
+            value={formData.payment_methods.join(", ")}
+            onChange={(e) =>
+              handleInputChange("payment_methods", e.target.value.split(", "))
+            }
             placeholder="Enter payment methods (comma separated)"
             className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
         <div className="flex justify-end mt-8">
-          <button 
+          <button
             type="submit"
             disabled={!isDirty || isSubmitting || !hasChanges()}
             className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
               transition-colors flex items-center gap-2
-              ${(!isDirty || isSubmitting || !hasChanges()) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ${
+                !isDirty || isSubmitting || !hasChanges()
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
           >
             {isSubmitting ? (
               <>
@@ -1091,7 +1184,7 @@ const OperationalInfo = () => {
                 Saving...
               </>
             ) : (
-              'Save Changes'
+              "Save Changes"
             )}
           </button>
         </div>
@@ -1102,14 +1195,14 @@ const OperationalInfo = () => {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        onClose={() => setSnackbar((prev) => ({...prev, open: false}))}
+        anchorOrigin={{vertical: "top", horizontal: "right"}}
       >
-        <Alert 
-          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        <Alert
+          onClose={() => setSnackbar((prev) => ({...prev, open: false}))}
           severity={snackbar.severity}
           variant="filled"
-          sx={{ width: '100%' }}
+          sx={{width: "100%"}}
         >
           {snackbar.message}
         </Alert>
@@ -1126,16 +1219,21 @@ const StaffData = () => {
   const validateFile = (file) => {
     // Updated MIME types for Excel files
     const validTypes = [
-      'application/vnd.ms-excel', // .xls
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-      'application/octet-stream' // Fallback for some systems
+      "application/vnd.ms-excel", // .xls
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+      "application/octet-stream", // Fallback for some systems
     ];
-    
-    const validExtensions = ['.xls', '.xlsx'];
-    const fileExtension = file.name.toLowerCase().slice((file.name.lastIndexOf(".")));
-    
-    if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
-      toast.error('Please upload only Excel files (.xls or .xlsx)');
+
+    const validExtensions = [".xls", ".xlsx"];
+    const fileExtension = file.name
+      .toLowerCase()
+      .slice(file.name.lastIndexOf("."));
+
+    if (
+      !validTypes.includes(file.type) &&
+      !validExtensions.includes(fileExtension)
+    ) {
+      toast.error("Please upload only Excel files (.xls or .xlsx)");
       return false;
     }
     return true;
@@ -1144,7 +1242,7 @@ const StaffData = () => {
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0]; // Take only first file
-    
+
     if (droppedFile && validateFile(droppedFile)) {
       setFile(droppedFile);
     }
@@ -1160,23 +1258,23 @@ const StaffData = () => {
 
   const handleUpload = async () => {
     if (!file) {
-      toast.error('Please select a file to upload');
+      toast.error("Please select a file to upload");
       return;
     }
 
     setIsUploading(true);
     try {
       const formData = new FormData();
-      formData.append('staff_excel_sheet', file); // Updated field name
-      
+      formData.append("staff_excel_sheet", file); // Updated field name
+
       //  ('Uploading file:', file.name);
       const result = await dispatch(massCreateStaff(formData)).unwrap();
-      
-      toast.success('Staff data uploaded successfully');
+
+      toast.success("Staff data uploaded successfully");
       setFile(null);
     } catch (error) {
-      console.error('Upload failed:', error);
-      toast.error(error?.message || 'Failed to upload staff data');
+      console.error("Upload failed:", error);
+      toast.error(error?.message || "Failed to upload staff data");
     } finally {
       setIsUploading(false);
     }
@@ -1195,13 +1293,13 @@ const StaffData = () => {
       <div
         onDragOver={(e) => {
           e.preventDefault();
-          e.currentTarget.classList.add('border-blue-500');
+          e.currentTarget.classList.add("border-blue-500");
         }}
         onDragLeave={(e) => {
-          e.currentTarget.classList.remove('border-blue-500');
+          e.currentTarget.classList.remove("border-blue-500");
         }}
         onDrop={(e) => {
-          e.currentTarget.classList.remove('border-blue-500');
+          e.currentTarget.classList.remove("border-blue-500");
           handleDrop(e);
         }}
         className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors bg-[#EFEFEF] h-1/2 flex flex-col justify-center items-center"
@@ -1242,18 +1340,12 @@ const StaffData = () => {
       )}
 
       <div className="flex justify-end mt-8">
-        <button 
+        <button
           onClick={handleUpload}
           disabled={isUploading || !file}
           className="bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          {isUploading ? (
-            <>
-              Uploading...
-            </>
-          ) : (
-            'Upload Staff Data'
-          )}
+          {isUploading ? <>Uploading...</> : "Upload Staff Data"}
         </button>
       </div>
     </section>
@@ -1264,18 +1356,18 @@ const Profile = () => {
   const dispatch = useDispatch();
   const profile = useSelector(selectUserProfile);
   const loading = useSelector(selectUserProfileLoading);
-  
+
   const [profileImage, setProfileImage] = useState(null);
   const [previewImage, setPreviewImage] = useState("");
   const [formData, setFormData] = useState({
-    user_name: ''
+    user_name: "",
   });
   const [isDirty, setIsDirty] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success'
+    message: "",
+    severity: "success",
   });
 
   useEffect(() => {
@@ -1285,17 +1377,17 @@ const Profile = () => {
   useEffect(() => {
     if (profile) {
       setFormData({
-        user_name: profile.user_name || ''
+        user_name: profile.user_name || "",
       });
-      setPreviewImage(profile.user_profile || '');
+      setPreviewImage(profile.user_profile || "");
     }
   }, [profile]);
 
   const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({
+    const {id, value} = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [id]: value
+      [id]: value,
     }));
     setIsDirty(true);
   };
@@ -1310,17 +1402,17 @@ const Profile = () => {
   };
 
   const handleSnackbarClose = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
+    setSnackbar((prev) => ({...prev, open: false}));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.user_name.trim()) {
       setSnackbar({
         open: true,
-        message: 'Username cannot be empty',
-        severity: 'error'
+        message: "Username cannot be empty",
+        severity: "error",
       });
       return;
     }
@@ -1328,45 +1420,45 @@ const Profile = () => {
     setIsUploading(true);
 
     const getAuthToken = () => {
-      const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
+      const token =
+        localStorage.getItem("accessToken") || sessionStorage.getItem("token");
 
-      if (!token) throw new Error('Authentication token not found');
+      if (!token) throw new Error("Authentication token not found");
       return token;
-    }
-    
+    };
 
     try {
       // Create form data for profile picture update
       const profileFormData = new FormData();
       if (profileImage) {
-        profileFormData.append('user_profile', profileImage);
+        profileFormData.append("user_profile", profileImage);
       }
-      profileFormData.append('user_name', formData.user_name.trim());
+      profileFormData.append("user_name", formData.user_name.trim());
 
       // Update profile picture and name
       await axios.put(
-        'https://hotelcrew-1.onrender.com/api/edit/user_profile/',
+        "https://hotelcrew-1.onrender.com/api/edit/user_profile/",
         profileFormData,
         {
           headers: {
-            'Authorization': `Bearer ${getAuthToken()}`,
-            'Content-Type': 'multipart/form-data'
-          }
+            Authorization: `Bearer ${getAuthToken()}`,
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
       setSnackbar({
         open: true,
-        message: 'Profile updated successfully',
-        severity: 'success'
+        message: "Profile updated successfully",
+        severity: "success",
       });
       setIsDirty(false);
       dispatch(fetchUserProfile()); // Refresh profile data
     } catch (error) {
       setSnackbar({
         open: true,
-        message: error?.response?.data?.message || 'Failed to update profile',
-        severity: 'error'
+        message: error?.response?.data?.message || "Failed to update profile",
+        severity: "error",
       });
     } finally {
       setIsUploading(false);
@@ -1397,20 +1489,39 @@ const Profile = () => {
                   onChange={handleImageChange}
                   className="hidden"
                 />
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
               </label>
             </div>
           </div>
-          
+
           <div className="relative w-full lg:w-auto pl-4 lg:pl-8 mt-4">
             <h2 className="text-[#000000] text-xl mt-5 font-semibold">
               Personal Details
             </h2>
 
-            <form onSubmit={handleSubmit} className="lg:mt-10 mt-8 flex flex-col gap-6">
+            <form
+              onSubmit={handleSubmit}
+              className="lg:mt-10 mt-8 flex flex-col gap-6"
+            >
               <div className="flex flex-col gap-2">
                 <label htmlFor="user_name" className="font-semibold text-sm">
                   User Name*
@@ -1430,23 +1541,25 @@ const Profile = () => {
                   type="submit"
                   disabled={!isDirty || loading}
                   className={`mt-2 mb-6 w-[195px] rounded-2xl text-white font-semibold p-1 bg-[#3F4870] 
-                    ${(!isDirty || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    ${
+                      !isDirty || loading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                 >
-                  {loading ? 'Saving...' : 'Save Changes'}
+                  {loading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
           </div>
         </div>
       </div>
-      <Snackbar 
+      <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{vertical: "top", horizontal: "right"}}
       >
-        <Alert 
-          onClose={handleSnackbarClose} 
+        <Alert
+          onClose={handleSnackbarClose}
           severity={snackbar.severity}
           variant="filled"
         >
@@ -1456,7 +1569,6 @@ const Profile = () => {
     </section>
   );
 };
-
 
 const AdminSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -1518,7 +1630,9 @@ const AdminSettings = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-tr-lg rounded-b-lg shadow lg:w-[75vw] -mt-7">{renderContent()}</div>
+      <div className="bg-white rounded-tr-lg rounded-b-lg shadow lg:w-[75vw] -mt-7">
+        {renderContent()}
+      </div>
     </section>
   );
 };
