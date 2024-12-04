@@ -415,13 +415,13 @@ function AdminDashboard() {
     {
       id: 0,
       value: occupiedRooms,
-      label: "Occupied",
+      label: `Occupied (${occupiedRooms})`,
       color: "#252941",
     },
     {
       id: 1,
       value: availableRooms,
-      label: "Vacant",
+      label: `Available (${availableRooms})`,
       color: "#8094D4",
     },
   ];
@@ -498,13 +498,13 @@ function AdminDashboard() {
     {
       id: 0,
       value: todayStats.present,
-      label: "Present",
+      label: `Present (${todayStats.present})`,
       color: "#8094D4",
     },
     {
       id: 1,
       value: todayStats.absent,
-      label: "Absent",
+      label: `Absent (${todayStats.absent})`,
       color: "#252941",
     },
   ];
