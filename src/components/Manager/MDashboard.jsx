@@ -1,26 +1,54 @@
-import { useState, useEffect } from "react";
-import * as React from 'react';
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import { PieChart } from '@mui/x-charts/PieChart';
-import { LineChart } from "@mui/x-charts/LineChart";
-import { BarChart } from '@mui/x-charts/BarChart';
-import { FaStar } from 'react-icons/fa';
-import { useDispatch, useSelector } from 'react-redux';
-import { BsThreeDots } from "react-icons/bs";
+import {useState, useEffect} from "react";
+import * as React from "react";
+import {FaChevronDown, FaChevronUp} from "react-icons/fa";
+import {PieChart} from "@mui/x-charts/PieChart";
+import {LineChart} from "@mui/x-charts/LineChart";
+import {BarChart} from "@mui/x-charts/BarChart";
+import {FaStar} from "react-icons/fa";
+import {useDispatch, useSelector} from "react-redux";
+import {BsThreeDots} from "react-icons/bs";
 import {
   fetchStaffData,
   selectStaffPerDepartment,
   selectStaffLoading,
   selectDepartments,
 } from "../../redux/slices/AdminStaffSlice";
-import { fetchAttendanceStats, selectError, selectStats,selectLoading } from '../../redux/slices/AttendanceSlice';
-import { Dialog, TextField, Button, Snackbar, Alert, IconButton } from "@mui/material";
-import { CreateAnnouncementBox } from "../common/CreateAnnouncementBox";
-import { createAnnouncement, fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsLoading, selectAnnouncementsError, deleteAnnouncement } from '../../redux/slices/AnnouncementSlice';
+import {
+  fetchAttendanceStats,
+  selectError,
+  selectStats,
+  selectLoading,
+} from "../../redux/slices/AttendanceSlice";
+import {
+  Dialog,
+  TextField,
+  Button,
+  Snackbar,
+  Alert,
+  IconButton,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import {CreateAnnouncementBox} from "../common/CreateAnnouncementBox";
+import {
+  createAnnouncement,
+  fetchAnnouncements,
+  selectAllAnnouncements,
+  selectAnnouncementsLoading,
+  selectAnnouncementsError,
+  deleteAnnouncement,
+} from "../../redux/slices/AnnouncementSlice";
 // import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";
-import { fetchGuestData,selectCheckins,selectCheckouts,selectDates,selectGuestError,selectGuestLoading } from '../../redux/slices/GuestSlice';
-import { Skeleton } from "@mui/material";
+import {
+  fetchGuestData,
+  selectCheckins,
+  selectCheckouts,
+  selectDates,
+  selectGuestError,
+  selectGuestLoading,
+} from "../../redux/slices/GuestSlice";
+import {Skeleton} from "@mui/material";
 import Box from "@mui/material/Box";
 import AdminTaskAssignment from "../admin/components/AdminTaskAssignment";
 import LoadingAnimation from "../common/LoadingAnimation";
@@ -55,6 +83,7 @@ import {
 } from "../../redux/slices/TaskSlice";
 import {MoreVertical} from "lucide-react";
 import {AllAnnouncementsDialog} from "../common/AllAnnouncementsDialog";
+import RevenueDashboard from "../common/RevenueDashboard";
 
 const MDashboard = () => {
   const dispatch = useDispatch();
@@ -85,64 +114,73 @@ const MDashboard = () => {
   const leaveRequests = useSelector(selectLeaveRequests);
   const leaveLoading = useSelector(selectLeaveLoading);
   const leaveError = useSelector(selectLeaveError);
-  const leaveCount=useSelector(selectLeaveCount);
-  const updateLeaveStatus=useSelector(selectUpdateStatus);
-  // const { leaveRequests,leaveLoading, leaveError,leaveCount} = useSelector((state) => state.leave);
-  // const [taskData, setTaskData] = useState({
-  //   title: '',
-  //   description: '',
-  //   department: '',
-  //   // priority: false, // For priority status
-  // });
-  // const { dates, checkins, checkouts, guestloading, guesterror } = useSelector((state) => state.attendance);
-  const dates=useSelector(selectDates);
-  const checkins=useSelector(selectCheckins);
-  const checkouts=useSelector(selectCheckouts);
-  const guestloading=useSelector(selectGuestLoading);
-  const guesterror=useSelector(selectGuestError);
+  const leaveCount = useSelector(selectLeaveCount);
+  const updateLeaveStatus = useSelector(selectUpdateStatus);
+  const checkins = useSelector(selectCheckins);
+  const checkouts = useSelector(selectCheckouts);
+  const guestloading = useSelector(selectGuestLoading);
+  const guesterror = useSelector(selectGuestError);
   const [sliderValue, setSliderValue] = useState([0, 6]);
   const [inOutData, setInOutData] = useState({
     xAxis: [
       {
         data: [],
-        scaleType: 'band',
+        scaleType: "band",
         categoryGapRatio: 0.5,
       },
     ],
     series: [
       {
-        id: 'checkin',
-        type: 'bar',
+        id: "checkin",
+        type: "bar",
         data: [],
-        color: '#8094D4',
-        label: 'Check-in',
+        color: "#8094D4",
+        label: "Check-in",
       },
       {
-        id: 'checkout',
-        type: 'bar',
+        id: "checkout",
+        type: "bar",
         data: [],
-        color: '#2A2AA9',
-        label: 'Check-out',
+        color: "#2A2AA9",
+        label: "Check-out",
       },
     ],
   });
 
-  const latestRevenue = useSelector(selectLatestRevenue);
-  const revenueLoading = useSelector((state) => state.revenue.loading);
-  const departments = useSelector(selectDepartments);
+  // const departments = useSelector(selectDepartments);
   const availableRooms = useSelector(selectAvailableRooms);
   const occupiedRooms = useSelector(selectOccupiedRooms);
+  const dailyRevenues = useSelector(state => {
+    console.log('Redux State:', state.revenue);
+    return state.revenue.dailyRevenues;
+  });
+  const dates = useSelector(state => state.revenue.dates);
+  const latestRevenue = useSelector(selectLatestRevenue);
+  const revenueLoading = useSelector(state => state.revenue.loading);
+
+  // Log the selected values
+  console.log('Selected Revenue Data:', {
+    dailyRevenues,
+    dates,
+    latestRevenue,
+    revenueLoading
+  });
 
   useEffect(() => {
-    dispatch(fetchRevenueStats());
+    const fetchData = async () => {
+      try {
+        const result = await dispatch(fetchRevenueStats()).unwrap();
+        console.log('Revenue API Response:', result);
+      } catch (error) {
+        console.error('Revenue API Error:', error);
+      }
+    };
 
-    const interval = setInterval(() => {
-      dispatch(fetchRevenueStats());
-    }, 3600000);
-
+    fetchData();
+    
+    const interval = setInterval(fetchData, 3600000);
     return () => clearInterval(interval);
   }, [dispatch]);
-
 
   useEffect(() => {
 
@@ -185,9 +223,9 @@ const MDashboard = () => {
 
   const [cumulativeRevenue, setCumulativeRevenue] = useState(0);
 
-  const STORAGE_KEY = 'hourlyRevenueData';
+  const STORAGE_KEY = "hourlyRevenueData";
   const HOURS_IN_DAY = 24;
-  
+
   const [hourlyRevenues, setHourlyRevenues] = useState(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     const initial = new Array(HOURS_IN_DAY).fill(0);
@@ -200,11 +238,11 @@ const MDashboard = () => {
     }
     return initial;
   });
-  
+
   useEffect(() => {
     if (latestRevenue) {
       const currentHour = new Date().getHours();
-      setHourlyRevenues(prev => {
+      setHourlyRevenues((prev) => {
         const updated = [...prev];
         updated[currentHour] = parseFloat(latestRevenue) - cumulativeRevenue;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
@@ -212,7 +250,7 @@ const MDashboard = () => {
       });
     }
   }, []);
-  
+
   useEffect(() => {
     const midnightClear = setInterval(() => {
       const now = new Date();
@@ -222,10 +260,10 @@ const MDashboard = () => {
         setCumulativeRevenue(0);
       }
     }, 60000);
-  
+
     const revenueUpdate = setInterval(() => {
       const newHour = new Date().getHours();
-      
+
       if (newHour !== currentHour) {
         if (latestRevenue) {
           const newRevenue = parseFloat(latestRevenue);
@@ -237,7 +275,7 @@ const MDashboard = () => {
           });
           setCumulativeRevenue(newRevenue);
         }
-        
+
         setCurrentHour(newHour);
         setPerformanceRange([0, newHour || 1]);
         setRevenueRange([0, newHour || 1]);
@@ -245,29 +283,30 @@ const MDashboard = () => {
         setTimeData(generateTimeData());
       }
     }, 60000);
-  
+
     setTimeData(generateTimeData());
     setLoading(false);
-  
+
     return () => {
       clearInterval(revenueUpdate);
       clearInterval(midnightClear);
     };
   }, [currentHour, latestRevenue, cumulativeRevenue]);
-  
+
   const generateTimeData = () => {
     const timeData = [];
     for (let i = 0; i <= currentHour; i++) {
       timeData.push({
         hour: `${i}:00`,
         revenue: hourlyRevenues[i],
-        cumulative: i === 0 ? hourlyRevenues[0] : 
-          timeData[i-1].cumulative + hourlyRevenues[i]
+        cumulative:
+          i === 0
+            ? hourlyRevenues[0]
+            : timeData[i - 1].cumulative + hourlyRevenues[i],
       });
     }
     return timeData;
   };
-
 
   const getFilteredRevenueData = () => {
     return timeData.slice(revenueRange[0], revenueRange[1] + 1);
@@ -288,31 +327,30 @@ const MDashboard = () => {
     },
   ];
 
-
   useEffect(() => {
     if (Array.isArray(dates) && dates.length > 0) {
       setInOutData({
         xAxis: [
           {
             data: dates,
-            scaleType: 'band',
+            scaleType: "band",
             categoryGapRatio: 0.5,
           },
         ],
         series: [
           {
-            id: 'checkin',
-            type: 'bar',
+            id: "checkin",
+            type: "bar",
             data: checkins,
-            color: '#8094D4',
-            label: 'Check-in',
+            color: "#8094D4",
+            label: "Check-in",
           },
           {
-            id: 'checkout',
-            type: 'bar',
+            id: "checkout",
+            type: "bar",
             data: checkouts,
-            color: '#2A2AA9',
-            label: 'Check-out',
+            color: "#2A2AA9",
+            label: "Check-out",
           },
         ],
       });
@@ -343,7 +381,6 @@ const MDashboard = () => {
     return () => clearInterval(intervalId);
   }, [dates]);
 
-
   useEffect(() => {
     // Define the date for fetchLeaveCount
     const currentDate = new Date().toISOString().split("T")[0]; // Format as "YYYY-MM-DD"
@@ -361,7 +398,6 @@ const MDashboard = () => {
     // Set up interval to fetch every 4 minutes (240,000 ms)
     const intervalId = setInterval(fetchData, 240000);
 
-  
     return () => clearInterval(intervalId);
   }, [dispatch]);
 
@@ -383,12 +419,12 @@ const MDashboard = () => {
   //   { value: 'reception', label: 'Reception' },
   // ];
 
-  const [selected, setSelected] = useState({ label: 'Department', value: '' });
+  const [selected, setSelected] = useState({label: "Department", value: ""});
 
   // const {  error } = useSelector((state) => state.attendance);
- const stats=useSelector(selectStats);
-const statError=useSelector(selectError);
-const statLoading=useSelector(selectLoading);
+  const stats = useSelector(selectStats);
+  const statError = useSelector(selectError);
+  const statLoading = useSelector(selectLoading);
   // const staffStatus = [
   //   { id: 0, value: 45, label: "Busy", color: "#252941" },
   //   { id: 1, value: 35, label: "Vacant", color: "#8094D4" },
@@ -409,14 +445,14 @@ const statLoading=useSelector(selectLoading);
     {
       id: 0,
       value: stats.total_present,
-      label: 'Present',
-      color: '#252941',
+      label: "Present",
+      color: "#252941",
     },
     {
       id: 1,
       value: stats.total_crew - stats.total_present,
-      label: 'Absent',
-      color: '#8094D4',
+      label: "Absent",
+      color: "#8094D4",
     },
   ];
 
@@ -444,16 +480,14 @@ const statLoading=useSelector(selectLoading);
   const busyStaffCount = inProgressCount + pendingCount;
   const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
 
-
   const staffStatus = [
     {id: 0, value: busyStaffCount, label: "Busy", color: "#252941"},
     {id: 1, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
   ];
 
-
   const rotateWeeklyData = (data, todayIndex) => {
     // Rotate the xAxis and series data to make todayIndex the last element
-    const { xAxis, series } = data;
+    const {xAxis, series} = data;
 
     const rotatedXAxis = [
       ...xAxis[0].data.slice(todayIndex + 1),
@@ -468,7 +502,7 @@ const statLoading=useSelector(selectLoading);
       ],
     }));
 
-    return { xAxis: [{ ...xAxis[0], data: rotatedXAxis }], series: rotatedSeries };
+    return {xAxis: [{...xAxis[0], data: rotatedXAxis}], series: rotatedSeries};
   };
 
   const getCurrentDayIndex = () => {
@@ -476,26 +510,23 @@ const statLoading=useSelector(selectLoading);
     return currentDay;
   };
 
-
   const getFilteredData = (range) => {
     return timeData.slice(range[0], range[1] + 1);
   };
- 
-
 
   const generateMarks = () => {
     const marks = [];
     const maxHour = currentHour || 1;
 
-    marks.push({ value: 0, label: "0h" });
+    marks.push({value: 0, label: "0h"});
 
-    if (maxHour >= 6) marks.push({ value: 6, label: "6h" });
-    if (maxHour >= 12) marks.push({ value: 12, label: "12h" });
-    if (maxHour >= 18) marks.push({ value: 18, label: "18h" });
-    if (maxHour === 24) marks.push({ value: 24, label: "24h" });
+    if (maxHour >= 6) marks.push({value: 6, label: "6h"});
+    if (maxHour >= 12) marks.push({value: 12, label: "12h"});
+    if (maxHour >= 18) marks.push({value: 18, label: "18h"});
+    if (maxHour === 24) marks.push({value: 24, label: "24h"});
 
     if (!marks.find((mark) => mark.value === maxHour)) {
-      marks.push({ value: maxHour, label: `${maxHour}h` });
+      marks.push({value: maxHour, label: `${maxHour}h`});
     }
 
     return marks;
@@ -520,9 +551,6 @@ const statLoading=useSelector(selectLoading);
 
     return () => clearInterval(interval);
   }, [currentHour]);
-
-  
-
 
   const handleSelect = (dept) => {
     //  (taskData);
@@ -594,13 +622,13 @@ const statLoading=useSelector(selectLoading);
           title: taskTitle.trim(),
           description: taskDescription.trim(),
           department: selected.value,
-          priority: selectedPriority
+          priority: selectedPriority,
         })
       ).unwrap();
 
       setTaskTitle("");
       setTaskDescription("");
-      setSelected({ label: "Select Department", value: "" });
+      setSelected({label: "Select Department", value: ""});
 
       setSnackbar({
         open: true,
@@ -616,7 +644,7 @@ const statLoading=useSelector(selectLoading);
     }
   };
   const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
+    setSnackbar({...snackbar, open: false});
   };
 
   const announcements = useSelector(selectAllAnnouncements);
@@ -631,7 +659,7 @@ const statLoading=useSelector(selectLoading);
   const handleModalOpen = () => setIsModalOpen(true);
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setNewAnnouncement({ title: "", description: "" });
+    setNewAnnouncement({title: "", description: ""});
   };
 
   useEffect(() => {
@@ -664,14 +692,12 @@ const statLoading=useSelector(selectLoading);
     setSelectedAnnouncement(null);
   };
 
-
-
   const handleDelete = async () => {
     if (!selectedAnnouncement?.id) {
       setSnackbar({
         open: true,
         message: "Invalid announcement ID",
-        severity: "error"
+        severity: "error",
       });
       return;
     }
@@ -682,14 +708,14 @@ const statLoading=useSelector(selectLoading);
       setSnackbar({
         open: true,
         message: "Announcement deleted successfully",
-        severity: "success"
+        severity: "success",
       });
     } catch (error) {
-      console.error('Delete error:', error);
+      console.error("Delete error:", error);
       setSnackbar({
         open: true,
         message: error?.message || "Failed to delete announcement",
-        severity: "error"
+        severity: "error",
       });
     }
   };
@@ -698,8 +724,21 @@ const statLoading=useSelector(selectLoading);
     (leave) => leave.status === "Pending"
   ).length;
 
+  const [selectedDataType, setSelectedDataType] = useState('checkins');
+  const daily_checkins = useSelector(state => state.revenue.daily_checkins);
+  const daily_checkouts = useSelector(state => state.revenue.daily_checkouts);
+  const weekRange = useSelector(state => state.revenue.weekRange);
 
-
+  // Format dates helper function
+  const formatDates = (date) => {
+    const d = new Date(date);
+    const day = d.toLocaleDateString("en-US", { weekday: "short" });
+    const monthDay = d.toLocaleDateString("en-US", {
+      month: "numeric",
+      day: "numeric",
+    });
+    return `${day}\n${monthDay}`;
+  };
 
   return (
     <section className=" h-screen p-2 mr-2 sm:mr-4 font-Montserrat">
@@ -756,19 +795,18 @@ const statLoading=useSelector(selectLoading);
                         series={[
                           {
                             data: occupancyData,
-                            highlightScope: { fade: "global", highlight: "item" },
+                            highlightScope: {fade: "global", highlight: "item"},
                             innerRadius: 45,
                             paddingAngle: 1,
                             cornerRadius: 1,
                           },
                         ]}
                         height={220}
-                        margin={{ top: 0, bottom: 40, left: 0, right: 0 }}
+                        margin={{top: 0, bottom: 40, left: 0, right: 0}}
                         slotProps={{
                           legend: {
                             hidden: true,
-
-                          }
+                          },
                         }}
                       />
                       )}
@@ -782,19 +820,18 @@ const statLoading=useSelector(selectLoading);
                         series={[
                           {
                             data: staffStatus,
-                            highlightScope: { fade: "global", highlight: "item" },
+                            highlightScope: {fade: "global", highlight: "item"},
                             innerRadius: 45,
                             paddingAngle: 1,
                             cornerRadius: 1,
                           },
                         ]}
                         height={220}
-                        margin={{ top: 0, bottom: 40, left: 0, right: 0 }}
+                        margin={{top: 0, bottom: 40, left: 0, right: 0}}
                         slotProps={{
                           legend: {
                             hidden: true,
-
-                          }
+                          },
                         }}
                       />
                     </div>
@@ -817,19 +854,21 @@ const statLoading=useSelector(selectLoading);
                           series={[
                             {
                               data: staffAttendanceData,
-                              highlightScope: { fade: 'global', highlight: 'item' },
+                              highlightScope: {
+                                fade: "global",
+                                highlight: "item",
+                              },
                               innerRadius: 45,
                               paddingAngle: 1,
                               cornerRadius: 1,
                             },
                           ]}
                           height={220}
-                          margin={{ top: 0, bottom: 40, left: 0, right: 0 }}
+                          margin={{top: 0, bottom: 40, left: 0, right: 0}}
                           slotProps={{
                             legend: {
                               hidden: true,
-
-                            }
+                            },
                           }}
                         />
                       )}
@@ -838,87 +877,30 @@ const statLoading=useSelector(selectLoading);
                 </>
               )}
             </div>
-
-
           </div>
-          <div className="bg-white rounded-lg shadow  w-full p-4">
-          <h2 className="text-lg sm:text-xl font-semibold">Guest Flow Overview</h2>
-            <Box sx={{ width: "100%" }}>
-              {/* Bar Chart with Weekly Data */}
-              {guestloading ? (
-                <Skeleton
-                  variant="rectangular"
-                  width="100%"
-                  height={250}
-                  {...skeletonProps}
-                />
-              ) : (
-                <>
-                  <BarChart
-                    xAxis={[
-                      {
-                        data: filteredData.xAxis[0], // Dynamically updated xAxis
-                        scaleType: "band",
-                        categoryGapRatio: 0.5,
-                      },
-                    ]}
-                    series={filteredData.series}
-                    margin={{ top: 20, right: 5, bottom: 28, left: 47 }}
-                    height={250}
-
-                    slotProps={{
-                      legend: { hidden: true },
-                      bar: {
-                        sx: {
-                          borderRadius: "15px", // Round the top corners of the bars
-                        },
-                      },
-                    }}
-                  />
-                  {/* Slider Component */}
-                  <Box sx={{ width: "100%", px: 2, mt: 2 }}>
-                    <Slider
-                      value={sliderValue}
-                      onChange={handleSliderChange}
-                      min={0}
-                      max={6}
-                      step={1}
-                      valueLabelDisplay="auto"
-                      valueLabelFormat={(value) => {
-                        const days = inOutData.xAxis[0].data; // Rotated xAxis labels
-                        return days[value];
-                      }}
-                      valueLabelPosition="top"
-                      disableSwap
-                      sx={{
-
-                        bottom: 20,
-                        height: 3,
-                        "& .MuiSlider-thumb": {
-                          height: 12,
-                          width: 12,
-                        },
-                      }}
-                    // marks={inOutData.xAxis[0].data.map((day, idx) => ({
-                    //   value: idx,
-                    //   label: day,
-                    // }))}
-                    />
-                  </Box>
-                </>
-              )}
-            </Box>
-
-          </div>
-          <div className="bg-white rounded-xl shadow-lg min-h-[384px] w-full p-4">
-            <h2 className="text-lg sm:text-xl font-semibold ">
-              Revenue (Hours {revenueRange[0]} - {revenueRange[1]})
-            </h2>
-            <div className="text-right pr-3">
-                <p className="text-sm text-gray-500">Today's Total Revenue</p>
-                <p className="text-xl font-bold">₹{latestRevenue || "0.00"}</p>
+          <div className="bg-white rounded-lg shadow w-full p-4">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-lg sm:text-xl font-semibold">
+                  Guest Flow Overview
+                </h2>
+                {weekRange && !revenueLoading && (
+                  <p className="text-sm text-gray-600">Week of: {weekRange}</p>
+                )}
               </div>
-            {/* <Box sx={{ width: "100%", mb: 4 }}> */}
+              <Select
+                value={selectedDataType}
+                onChange={(e) => setSelectedDataType(e.target.value)}
+                size="small"
+                sx={{ minWidth: 120 }}
+                disabled={revenueLoading}
+              >
+                <MenuItem value="checkins">Check-ins</MenuItem>
+                <MenuItem value="checkouts">Check-outs</MenuItem>
+              </Select>
+            </div>
+
+            <Box sx={{ width: "100%" }}>
               {revenueLoading ? (
                 <Skeleton
                   variant="rectangular"
@@ -927,82 +909,52 @@ const statLoading=useSelector(selectLoading);
                   {...skeletonProps}
                 />
               ) : (
-                <>
                 <LineChart
-                  height={240}
-                  series={[
-                    {
-                      data: getFilteredRevenueData().map(
-                        (data) => data.revenue
-                      ),
-                      color: "#4C51BF",
-                      area: true,
-                      curve: "linear",
-                    },
-                  ]}
-                  xAxis={[
-                    {
-                      data: getFilteredRevenueData().map((data) => data.hour),
-                      scaleType: "band",
-                    },
-                  ]}
+                  height={300}
+                  margin={{ top: 5, right: 20, bottom: 40, left: 40 }}
+                  series={[{
+                    data: selectedDataType === 'checkins' ? daily_checkins : daily_checkouts,
+                    color: selectedDataType === 'checkins' ? "#3331D1" : "#0B8FD9",
+                    area: true,
+                    curve: "linear"
+                  }]}
+                  xAxis={[{
+                    data: dates.map(date => formatDates(date)),
+                    scaleType: "band",
+                    tickLabelStyle: {
+                      angle: 0, 
+                      textAnchor: "middle"
+                    }
+                  }]}
                   sx={{
                     ".MuiLineElement-root": {
                       strokeWidth: 2,
                     },
                     ".MuiAreaElement-root": {
                       fillOpacity: 0.1,
-                    },
+                    }
                   }}
                 />
-                <div className="mt-2 px-4">
-                  <Slider
-                    value={revenueRange}
-                    onChange={(_, newValue) => setRevenueRange(newValue)}
-                    valueLabelDisplay="auto"
-                    min={0}
-                    max={currentHour}
-                    marks={[
-                      {value: 0, label: "00:00"},
-                      {value: currentHour, label: `${currentHour}:00`},
-                    ]}
-                    sx={{
-                      color: "#4C51BF",
-                      "& .MuiSlider-thumb": {
-                        backgroundColor: "#4C51BF",
-                      },
-                      "& .MuiSlider-track": {
-                        backgroundColor: "#4C51BF",
-                      },
-                    }}
-                  />
-                </div>
-              </>
               )}
-            {/* </Box> */}
-           
+            </Box>
           </div>
+
+                    <RevenueDashboard 
+            revenueLoading={revenueLoading}
+            dailyRevenues={dailyRevenues} // Make sure this is not undefined
+            dates={dates}
+            latestRevenue={latestRevenue}
+            skeletonProps={skeletonProps}
+          />
         </div>
         {/* Second Column */}
         <div className="space-y-5">
-
           <div className="w-full ">
             <div className="bg-white  h-[50%] p-4 pr-6 pl-6 shadow rounded-lg">
               <form className="flex flex-col gap-4" onSubmit={handleAssign}>
                 <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Task Assignment</h2>
-                  {/* <div
-                  className={`cursor-pointer ${isPriority ? 'text-gold' : 'text-gray-200'}`}
-                  onClick={togglePriority}
-                >
-                  {isPriority ? (
-                    <FaStar size={25} color="gold" />
-                  ) : (
-                    // <FaRegStar size={25} color="gray" />
-                    <p className="text-gray-400">Mark Priority</p>
-                  )}
+                  <h2 className="text-lg font-semibold">Task Assignment</h2>
 
-                </div> */}
                   <IconButton
                     onClick={handleShowTaskAssignment}
                     size="small"
@@ -1024,8 +976,9 @@ const statLoading=useSelector(selectLoading);
                     <button
                       type="button"
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${selected.value ? "text-black" : "text-gray-400"
-                        } focus:outline-none flex justify-between items-center`}
+                      className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                        selected.value ? "text-black" : "text-gray-400"
+                      } focus:outline-none flex justify-between items-center`}
                     >
                       {selected.label}
                       {isDropdownOpen ? (
@@ -1043,10 +996,11 @@ const statLoading=useSelector(selectLoading);
                             type="button"
                             onClick={() => handleSelect(dept)}
                             disabled={dept.disabled}
-                            className={`w-full text-left px-4 py-2 ${dept.disabled
-                              ? "text-gray-400 cursor-default"
-                              : "text-black hover:bg-gray-100"
-                              }`}
+                            className={`w-full text-left px-4 py-2 ${
+                              dept.disabled
+                                ? "text-gray-400 cursor-default"
+                                : "text-black hover:bg-gray-100"
+                            }`}
                           >
                             {dept.label}
                           </button>
@@ -1057,9 +1011,12 @@ const statLoading=useSelector(selectLoading);
                   <div className="relative w-full lg:w-40">
                     <button
                       type="button"
-                      onClick={() => setPriorityDropdownOpen(!isPriorityDropdownOpen)}
-                      className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${selectedPriority ? "text-black" : "text-gray-400"
-                        } focus:outline-none flex justify-between items-center`}
+                      onClick={() =>
+                        setPriorityDropdownOpen(!isPriorityDropdownOpen)
+                      }
+                      className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                        selectedPriority ? "text-black" : "text-gray-400"
+                      } focus:outline-none flex justify-between items-center`}
                     >
                       {selectedPriority || " Priority"}
                       {isPriorityDropdownOpen ? (
@@ -1081,10 +1038,15 @@ const statLoading=useSelector(selectLoading);
                             }}
                             className="w-full text-left px-4 py-2 hover:bg-gray-100"
                           >
-                            <span className={`inline-block w-2 h-2 rounded-full mr-2 ${priority === "High" ? "bg-red-500" :
-                              priority === "Medium" ? "bg-yellow-500" :
-                                "bg-green-500"
-                              }`}></span>
+                            <span
+                              className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                                priority === "High"
+                                  ? "bg-red-500"
+                                  : priority === "Medium"
+                                  ? "bg-yellow-500"
+                                  : "bg-green-500"
+                              }`}
+                            ></span>
                             {priority}
                           </button>
                         ))}
@@ -1120,7 +1082,7 @@ const statLoading=useSelector(selectLoading);
             <MTaskAssignment onClose={() => setShowTaskAssignment(false)} />
           </Dialog>
           <div className="bg-white rounded-lg flex flex-col shadow xl:min-h-[515px] w-full p-4">
-          <h2 className="text-lg font-semibold">Announcements</h2>
+            <h2 className="text-lg font-semibold">Announcements</h2>
             <div className="flex-1 overflow-y-auto mb-4">
               {announcementsLoading ? (
                 <div className="space-y-4">
@@ -1161,18 +1123,18 @@ const statLoading=useSelector(selectLoading);
                             {announcement.title}
                           </h3>
                           <span className="text-sm text-gray-500">
-                            {new Date(announcement.created_at).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
+                            {new Date(
+                              announcement.created_at
+                            ).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
                             })}
                           </span>
                         </div>
-                        <p className="text-gray-600">
-                          {announcement.content}
-                        </p>
+                        <p className="text-gray-600">{announcement.content}</p>
                       </div>
                     ))
                   ) : (
@@ -1191,7 +1153,7 @@ const statLoading=useSelector(selectLoading);
                 onClick={() => setShowAnnouncementBox(true)}
                 sx={{
                   backgroundColor: "#3A426F",
-                  "&:hover": { backgroundColor: "#3A426F" },
+                  "&:hover": {backgroundColor: "#3A426F"},
                   borderRadius: "12px",
                   fontFamily: "'Montserrat'", // Add Montserrat font
                   fontWeight: "bold",
@@ -1230,7 +1192,7 @@ const statLoading=useSelector(selectLoading);
                     label="Title"
                     fullWidth
                     value={selectedAnnouncement?.title || ""}
-                    InputProps={{ readOnly: true }}
+                    InputProps={{readOnly: true}}
                   />
                   <TextField
                     label="Description"
@@ -1238,36 +1200,42 @@ const statLoading=useSelector(selectLoading);
                     multiline
                     rows={4}
                     value={selectedAnnouncement?.description || ""}
-                    InputProps={{ readOnly: true }}
+                    InputProps={{readOnly: true}}
                   />
                   <div className="space-y-2">
                     <p className="text-sm text-gray-500">
-                      <span className="font-medium">Department:</span> {selectedAnnouncement?.department}
+                      <span className="font-medium">Department:</span>{" "}
+                      {selectedAnnouncement?.department}
                     </p>
                     <p className="text-sm text-gray-500">
-                      <span className="font-medium">Urgency:</span> {selectedAnnouncement?.urgency}
+                      <span className="font-medium">Urgency:</span>{" "}
+                      {selectedAnnouncement?.urgency}
                     </p>
                     <p className="text-sm text-gray-500">
-                      <span className="font-medium">Created By:</span> {selectedAnnouncement?.assigned_by}
+                      <span className="font-medium">Created By:</span>{" "}
+                      {selectedAnnouncement?.assigned_by}
                     </p>
                     <p className="text-sm text-gray-500">
-                      <span className="font-medium">Created At:</span> {' '}
+                      <span className="font-medium">Created At:</span>{" "}
                       {selectedAnnouncement?.created_at &&
-                        new Date(selectedAnnouncement.created_at).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })
-                      }
+                        new Date(
+                          selectedAnnouncement.created_at
+                        ).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                     </p>
                     <div className="text-sm text-gray-500">
                       <span className="font-medium">Assigned To:</span>
                       <ul className="list-disc pl-5 mt-1">
-                        {selectedAnnouncement?.assigned_to.map((person, index) => (
-                          <li key={index}>{person}</li>
-                        ))}
+                        {selectedAnnouncement?.assigned_to.map(
+                          (person, index) => (
+                            <li key={index}>{person}</li>
+                          )
+                        )}
                       </ul>
                     </div>
                   </div>
@@ -1277,7 +1245,7 @@ const statLoading=useSelector(selectLoading);
                       variant="contained"
                       sx={{
                         backgroundColor: "#dc2626",
-                        "&:hover": { backgroundColor: "#b91c1c" },
+                        "&:hover": {backgroundColor: "#b91c1c"},
                       }}
                     >
                       Delete
@@ -1287,7 +1255,7 @@ const statLoading=useSelector(selectLoading);
                       variant="contained"
                       sx={{
                         backgroundColor: "#3A426F",
-                        "&:hover": { backgroundColor: "#3A426F" },
+                        "&:hover": {backgroundColor: "#3A426F"},
                       }}
                     >
                       Close
@@ -1296,11 +1264,10 @@ const statLoading=useSelector(selectLoading);
                 </div>
               </div>
             </Dialog>
-
           </div>
           <div className="bg-white rounded-lg shadow h-auto w-full p-4">
             <h2 className="text-lg  font-semibold mb-1">Leave Management</h2>
-            
+
             <div className="grid grid-cols-2 gap-3">
               <div className="border rounded p-4">
                 <h3 className="font-medium">Pending Requests</h3>
@@ -1313,10 +1280,9 @@ const statLoading=useSelector(selectLoading);
             </div>
           </div>
         </div>
-
       </div>
     </section>
-  )
-}
+  );
+};
 
 export default MDashboard;
