@@ -109,7 +109,7 @@ const MultiStepForm = () => {
         : [],
     };
 
-    console.log("Final transformed data:", transformedData);
+     ("Final transformed data:", transformedData);
     return transformedData;
   };
 
@@ -130,7 +130,7 @@ const MultiStepForm = () => {
           },
         }
       );
-      console.log("accessToken");
+       ("accessToken");
 
       if (response.status === 201) {
         setSnackbar({

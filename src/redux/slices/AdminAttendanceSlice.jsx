@@ -4,7 +4,7 @@ import axios from 'axios';
 const CACHE_EXPIRY_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
 
 const getAuthToken = () => {
-  // const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  // const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
   const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
   if (!token) {
     throw new Error('Authentication token not found');
@@ -106,7 +106,7 @@ export const fetchWeeklyAttendance = createAsyncThunk(
         }
       });
 
-      console.log('Weekly attendance data:', response.data);
+       ('Weekly attendance data:', response.data);
 
       // Validate response structure
       const { dates, total_crew_present, total_staff_absent } = response.data;

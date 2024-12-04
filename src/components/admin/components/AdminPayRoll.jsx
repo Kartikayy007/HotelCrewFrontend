@@ -5,7 +5,7 @@ import {
   selectStaffList,
   selectDepartments,
   selectShifts,
-} from "../../../redux/slices/AdminStaffSlice";
+} from "../../../redux/slices/staffslice";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, CircularProgress } from '@mui/material';
 import { createWallet } from '../../../redux/slices/PayrollSlice';
 
@@ -80,7 +80,7 @@ function AdminPayRoll() {
 
   const handleCheckWallet = () => {
     // Logic to check wallet
-    console.log("Checking wallet status");
+     ("Checking wallet status");
   };
 
   const [openDialog, setOpenDialog] = useState(false);

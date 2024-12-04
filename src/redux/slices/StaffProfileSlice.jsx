@@ -5,6 +5,7 @@ import axios from 'axios';
 const getAuthToken = () => {
   // const token=localStorage.getItem('token');
     const token  ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NjU3NDk0LCJpYXQiOjE3MzMwNjU0OTQsImp0aSI6ImJmZDY4YzkxOGFjYTQ1MmFhNDRhZDNmY2EzNzc2ZDU2IiwidXNlcl9pZCI6MzEyfQ._g8wBkvMZQjLDn_TpEREshVKK-C8xqCy0tBUItwFXfU';
+  //  const token  =localStorage.getItem('accessToken'); // Retrieve token from local storage
     if (!token) {
       throw new Error('Authentication token not found');
     }
@@ -78,53 +79,54 @@ export const updateStaffProfile = createAsyncThunk(
 );
 
 
-// Slice to manage the staff profile state
-const staffProfileSlice = createSlice({
-  name: 'staffProfile', // Updated slice name to staffProfile
-  initialState: {
-    profile: null, // Initial state for the staff profile
+// First fix initial state structure
+const initialState = {
+    profile: null,
+    user: null, // Add user field
     loading: false,
     error: null,
-  },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(getStaffProfile.pending, (state) => {
-        state.loading = true; // Set loading to true while fetching data
-        state.error = null;
-      })
-      .addCase(getStaffProfile.fulfilled, (state, action) => {
-        state.loading = false; // Set loading to false once data is fetched
-        state.profile = action.payload; // Store the fetched staff profile data
-      })
-      .addCase(getStaffProfile.rejected, (state, action) => {
-        state.loading = false; // Set loading to false when request fails
-        state.error = action.payload; // Store error message in state
-      })
+    successMessage: null
+};
 
-      .addCase(updateStaffProfile.pending, (state) => {
-        state.loading = true; // Set loading to true while updating data
-        state.error = null;
-      })
-      .addCase(updateStaffProfile.fulfilled, (state, action) => {
-        state.loading = false; // Set loading to false once the data is updated
-        state.profile = action.payload; // Update the profile with new data
-        state.successMessage = 'Profile updated successfully.'; // Store success message
-      })
-      .addCase(updateStaffProfile.rejected, (state, action) => {
-        state.loading = false; // Set loading to false when request fails
-        state.error = action.payload; // Store error message in state
-      });
-
-  },
+const staffProfileSlice = createSlice({
+    name: 'staffProfile',
+    initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(getStaffProfile.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getStaffProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload; // Store in user field
+                state.error = null;
+            })
+            .addCase(getStaffProfile.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(updateStaffProfile.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateStaffProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+                state.successMessage = 'Profile updated successfully.';
+            })
+            .addCase(updateStaffProfile.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
+    },
 });
 
-// Selectors to access the staff profile state
-export const selectStaffProfile = (state) => state.staffProfile.profile;//line 123
-export const selectStaffProfileLoading = (state) => state.staffProfile.loading;
-export const selectStaffProfileError = (state) => state.staffProfile.error;
-export const selectStaffProfileSuccessMessage = (state) => state.staffProfile.successMessage;
-
+// Update selectors to match state structure
+export const selectStaffProfile = (state) => state.staffProfile?.user || null;
+export const selectStaffProfileLoading = (state) => state.staffProfile?.loading || false;
+export const selectStaffProfileError = (state) => state.staffProfile?.error || null;
+export const selectStaffProfileSuccessMessage = (state) => state.staffProfile?.successMessage || null;
 
 export default staffProfileSlice.reducer;
-

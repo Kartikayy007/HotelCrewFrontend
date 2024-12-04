@@ -37,7 +37,7 @@ const Reception: React.FC = () => {
           },
         }
       );
-      // console.log('Device token registereddd:', response.data);
+      //  ('Device token registereddd:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error registering device token:', error);
@@ -57,14 +57,14 @@ const Reception: React.FC = () => {
 
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-        console.log('ServiceWorker registered:', registration);
+         ('ServiceWorker registered:', registration);
       }
 
       const fcmToken = await getToken(messaging, { vapidKey: 'BOqhVdEkOMB9fFPor6H_d1a8DPgeIh-yTgwcD8NL12Jpm2XfIW9Os6e_QLxvn35vDBL5XwaFeAbLPyEVHgibqNE' });
       if (!fcmToken) {
         throw new Error('Failed to get FCM token.');
       }
-      console.log('FCM Token:', fcmToken);
+       ('FCM Token:', fcmToken);
 
       const accessToken = localStorage.getItem('accessToken'); 
       if (!accessToken) {
@@ -73,7 +73,7 @@ const Reception: React.FC = () => {
 
       const result = await registerDeviceToken(fcmToken, accessToken);
       onMessage(messaging, (payload) => {
-        console.log('Received foreground message:', payload);
+         ('Received foreground message:', payload);
         setSnackbarMessage(payload.notification?.body || 'New Notification');
         setSnackbarOpen(true);
         toast.info(payload.notification?.body, {

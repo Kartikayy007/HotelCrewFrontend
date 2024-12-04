@@ -28,7 +28,7 @@ export const createAnnouncement = createAsyncThunk(
 
       const response = await axios.post(BASE_URL, announcementData, config);
       
-      console.log(response)
+       (response)
       return response.data;
     } catch (error) {
       if (error.response) {
@@ -54,7 +54,7 @@ export const fetchAnnouncements = createAsyncThunk(
       
       const response = await axios.get(url, config);
       
-      console.log(response.data)
+       (response.data)
 
       return response.data;
     } catch (error) {
@@ -77,7 +77,7 @@ export const deleteAnnouncement = createAsyncThunk(
 
       const URL = `${BASE_URL}${id}/`;
 
-      console.log('Deleting announcement with ID:', id);
+       ('Deleting announcement with ID:', id);
       const response = await axios.delete(URL, config);
 
       if (response.status === 204) {

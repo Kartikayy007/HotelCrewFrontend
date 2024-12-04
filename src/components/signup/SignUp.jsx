@@ -7,6 +7,7 @@ import Lottie from "react-lottie";
 
 const eyeOpenAnimationDataUrl1 = "/eyeOpen.json";
 const eyeOpenAnimationDataUrl2 = "/eyeOpen.json";
+const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -116,21 +117,13 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 const validatePassword = (password) => {
-  if (!passwordRegex.test(password)) {
-    if (password.length < 8) {
-      return 'Password must be at least 8 characters long';
-    }
-    if (!/(?=.*[a-z])/.test(password)) {
-      return 'Password must include at least one lowercase letter';
-    }
-    if (!/(?=.*[A-Z])/.test(password)) {
-      return 'Password must include at least one uppercase letter';
-    }
-    if (!/(?=.*\d)/.test(password)) {
-      return 'Password must include at least one number';
-    }
-  }
-  return '';
+  if (!password) return "Password is required";
+  if (password.length < 8) return "Password must be at least 8 characters";
+  if (!/[A-Z]/.test(password)) return "Password must include an uppercase letter";
+  if (!/[a-z]/.test(password)) return "Password must include a lowercase letter";
+  if (!/[0-9]/.test(password)) return "Password must include a number";
+  if (!/[!@#$%^&*]/.test(password)) return "Password must include a special character (!@#$%^&*)";
+  return null;
 };
 
 const handlePasswordChange = (e) => {

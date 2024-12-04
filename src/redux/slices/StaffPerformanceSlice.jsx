@@ -20,7 +20,7 @@ export const fetchStaffPerformance = createAsyncThunk(
         const url = "https://hotelcrew-1.onrender.com/api/statics/performance/staff/week/";  // Define the URL
         const headers = getAuthHeaders();
       const response = await axios.get(url ,{ headers });
-      console.log(response.data);
+       (response.data);
       return response.data; // Assume the response contains the performance data
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch performance data');

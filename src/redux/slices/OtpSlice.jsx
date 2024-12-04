@@ -8,7 +8,7 @@ export const verifyOtp = createAsyncThunk(
   "otp/verifyOtp",
   async ({email, otp}, { dispatch, rejectWithValue }) => {
     try {
-      console.log('Verifying OTP for:', email);
+       ('Verifying OTP for:', email);
       
       const response = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/register/",
@@ -18,7 +18,7 @@ export const verifyOtp = createAsyncThunk(
         }
       );
 
-      console.log('OTP verification response:', response.data);
+       ('OTP verification response:', response.data);
 
       // Successful response handling
       if (response.data.access_token) {

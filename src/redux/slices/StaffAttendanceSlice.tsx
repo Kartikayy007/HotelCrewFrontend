@@ -22,7 +22,7 @@ const initialState: StaffAttendanceState = {
 };
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
   if (!token) throw new Error('Authentication token not found');
   return token;
@@ -42,7 +42,7 @@ export const fetchStaffAttendance = createAsyncThunk(
         }
       );
 
-      console.log(response.data);
+       (response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch staff attendance');

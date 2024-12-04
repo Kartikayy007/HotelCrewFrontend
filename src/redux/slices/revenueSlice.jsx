@@ -7,7 +7,7 @@ const CACHE_DURATION = 6 * 60 * 60 * 1000;
 */
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
   if (!token) {
     throw new Error('Authentication token not found');
@@ -42,8 +42,6 @@ const setCacheData = (data) => {
     console.error('Cache setting error:', error);
   }
 }; */
-
-// Direct fetch without caching
 export const fetchRevenueStats = createAsyncThunk(
   'revenue/fetchStats',
   async (_, { rejectWithValue }) => {
@@ -55,8 +53,7 @@ export const fetchRevenueStats = createAsyncThunk(
           'Content-Type': 'application/json'
         }
       });
-      //  ('Fetched revenue stats:', response.data);
-       ('Fetched revenue stats:', response.data.daily_revenues);
+      console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch revenue stats');
@@ -95,6 +92,18 @@ const revenueSlice = createSlice({
         state.dailyRevenues = action.payload.daily_revenues;
         state.daily_checkins = action.payload.daily_checkins;
         state.daily_checkouts = action.payload.daily_checkouts;
+        
+        // Format the week range
+        const firstDate = new Date(action.payload.dates[0]).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric'
+        });
+        const lastDate = new Date(action.payload.dates[action.payload.dates.length - 1]).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric'
+        });
+        state.weekRange = `${firstDate} - ${lastDate}`;
+        
         state.lastFetched = Date.now();
         state.error = null;
       })
@@ -115,8 +124,6 @@ export const selectLatestRevenue = (state) => {
   const dailyRevenues = state.revenue.dailyRevenues;
   return dailyRevenues[dailyRevenues.length - 1] || 0;
 };
-
- ('revenueSlice:', revenueSlice);
 
 
 export const { setInitialData } = revenueSlice.actions;

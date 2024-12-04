@@ -30,7 +30,7 @@ const STask = () => {
 
   useEffect(() => {
     dispatch(fetchStaffTasks()); // Fetch tasks immediately
-    console.log("fnjdnf",tasks)
+     ("fnjdnf",tasks)
     const intervalId = setInterval(() => {
       dispatch(fetchStaffTasks()); // Fetch every 5 minutes
     }, 5 * 60 * 1000);
@@ -39,7 +39,7 @@ const STask = () => {
   }, [dispatch], 2000); // Only depends on `dispatch`
 
   useEffect(() => {
-    console.log("Task LIST:", tasks);
+     ("Task LIST:", tasks);
     setPendingTasks(
       sortTasksByPriority(tasks.filter((task) => task.status === "Pending"))
     );
@@ -143,7 +143,7 @@ const STask = () => {
       .unwrap()
       .then((response) => {
         // Response from the backend
-        console.log("Task status updated:", response);
+         ("Task status updated:", response);
   
         // Update the tasks arrays locally
         const updatedTasks = tasks.map((task) =>

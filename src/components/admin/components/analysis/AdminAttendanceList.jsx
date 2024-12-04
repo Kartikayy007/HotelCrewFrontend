@@ -20,7 +20,7 @@ const AdminAttendanceList = ({ onBack }) => {
     dispatch(fetchAttendanceStats());
   }, [dispatch]);
 
-  console.log('Weekly stats:', weeklyStats);
+   ('Weekly stats:', weeklyStats);
 
   useEffect(() => {
     if (timeFilter === 'weekly') {

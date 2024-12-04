@@ -9,7 +9,7 @@ const STAFF_STATUS_URL = "https://hotelcrew-1.onrender.com/api/taskassignment/st
 
 const getAuthToken = () => {
   const token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs'
-  // const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  // const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
   if (!token) {
     throw new Error('Authentication token not found');
@@ -44,7 +44,7 @@ export const fetchStaffData = createAsyncThunk(
         }
       };
       const response = await axios.get(API_URL, config);
-      console.log('Fetched staff data:', response);
+       ('Fetched staff data:', response);
       return response.data;
     } catch (error) {
       console.error('Failed to fetch staff data:');
@@ -113,7 +113,7 @@ export const fetchStaffStatus = createAsyncThunk(
         }
       };
       const response = await axios.get(STAFF_STATUS_URL, config);
-      console.log('Fetched staff status:', response);
+       ('Fetched staff status:', response);
       return response.data;
     } catch (error) {
       console.error('Failed to fetch staff status:', error);

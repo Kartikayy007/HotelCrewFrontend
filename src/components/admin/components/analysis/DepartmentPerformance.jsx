@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllTasks, fetchTasks } from '../../../../redux/slices/TaskSlice';
-import { fetchStaffData, selectStaffPerDepartment } from '../../../../redux/slices/AdminStaffSlice';
+import { fetchStaffData, selectStaffPerDepartment } from '../../../../redux/slices/staffSlice';
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart } from '@mui/x-charts/PieChart';
@@ -41,26 +41,28 @@ const DepartmentPerformance = () => {
   }, [dispatch]);
 
   const departmentMetrics = useMemo(() => {
-    if (!tasks?.length) return [];
-
-    const metrics = Object.keys(staffPerDepartment).map(dept => {
-      const deptTasks = tasks.filter(task => 
+    // Get all departments from staffPerDepartment
+    const departments = Object.keys(staffPerDepartment);
+    
+    return departments.map(dept => {
+      const deptTasks = tasks?.filter(task => 
         task?.department?.toLowerCase() === dept.toLowerCase()
-      );
+      ) || [];
 
+      // Default values if no tasks
       const completed = deptTasks.filter(task => 
         task?.status?.toLowerCase() === 'completed'
-      ).length;
+      ).length || 0;
 
       const pending = deptTasks.filter(task => 
         task?.status?.toLowerCase() === 'pending'
-      ).length;
+      ).length || 0;
 
       const inProgress = deptTasks.filter(task => 
         task?.status?.toLowerCase() === 'in_progress'
-      ).length;
+      ).length || 0;
 
-      const total = deptTasks.length;
+      const total = deptTasks.length || 0;
       const performance = total ? 
         ((completed + (inProgress * 0.5)) / total * 100).toFixed(1) : 
         0;
@@ -72,11 +74,9 @@ const DepartmentPerformance = () => {
         completed,
         inProgress,
         pending,
-        performance
+        performance: isNaN(performance) ? 0 : performance
       };
-    });
-
-    return metrics.sort((a, b) => parseFloat(b.performance) - parseFloat(a.performance));
+    }).sort((a, b) => parseFloat(b.performance) - parseFloat(a.performance));
   }, [tasks, staffPerDepartment]);
 
   const DepartmentDetailsDialog = ({ open, onClose, department, metrics }) => {
@@ -200,8 +200,9 @@ const DepartmentPerformance = () => {
     );
   }
 
-  if (!departmentMetrics.length) {
-    return <div className="text-center text-gray-500">No departments available</div>;
+  // Only check for departments, not metrics
+  if (!Object.keys(staffPerDepartment).length) {
+    return <div className="text-center text-gray-500 mt-72">No departments available</div>;
   }
 
   return (

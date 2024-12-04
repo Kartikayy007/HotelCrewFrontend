@@ -24,7 +24,7 @@ const Admin = () => {
     const isHotelRegistered = localStorage.getItem('isHotelRegistered');
     const shouldShowOverlay = isHotelRegistered === 'false' || !isHotelRegistered;
     
-    console.log('Initial State Setup:', {
+     ('Initial State Setup:', {
       isHotelRegistered,
       fromLocalStorage: isHotelRegistered === null ? 'null' : isHotelRegistered,
       shouldShowOverlay,
@@ -46,8 +46,8 @@ const Admin = () => {
           },
         }
       );
-      console.log(fcmToken)
-      console.log('Device token registered:', response.data);
+       (fcmToken)
+       ('Device token registered:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error registering device token:', error);
@@ -67,7 +67,7 @@ const Admin = () => {
 
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-        console.log('ServiceWorker registered:', registration);
+         ('ServiceWorker registered:', registration);
       }
 
       const fcmToken = await getToken(messaging, { vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY });
@@ -81,7 +81,7 @@ const Admin = () => {
 
       await registerDeviceToken(fcmToken);
       onMessage(messaging, (payload) => {
-        console.log('Received foreground message:', payload);
+         ('Received foreground message:', payload);
         setSnackbarMessage(payload.notification?.body || 'New Notification');
         setSnackbarOpen(true);
         showNotification(payload.notification?.body || 'New Notification', 'info');
@@ -111,7 +111,7 @@ const Admin = () => {
     const isHotelRegistered = localStorage.getItem('isHotelRegistered');
     const shouldShowOverlay = isHotelRegistered === 'false' || !isHotelRegistered;
     
-    console.log('UseEffect Overlay Check:', {
+     ('UseEffect Overlay Check:', {
       isHotelRegistered,
       fromLocalStorage: isHotelRegistered === null ? 'null' : isHotelRegistered,
       shouldShowOverlay,
@@ -132,7 +132,7 @@ const Admin = () => {
 
   return (
     <>
-      {console.log('Render - showOverlay:', showOverlay)}
+      { ('Render - showOverlay:', showOverlay)}
       {showOverlay ? (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
           <RevealBento />

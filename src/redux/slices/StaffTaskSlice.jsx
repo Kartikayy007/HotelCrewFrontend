@@ -28,7 +28,7 @@ export const fetchStaffTasks = createAsyncThunk(
                 `https://hotelcrew-1.onrender.com/api/taskassignment/tasks/staff/`,  // No staffId in the URL
                 { headers: getAuthHeaders() } // Pass Authorization header here
             );
-            console.log("Fetched tasks:", response.data); // Log to check response data
+             ("Fetched tasks:", response.data); // Log to check response data
             return response.data; // Return the data
         } catch (err) {
             return rejectWithValue(err.response?.data || 'Failed to load tasks'); // Return error message
@@ -44,7 +44,7 @@ export const updateStaffTaskStatus = createAsyncThunk(
                 { status }, // Send status in the request body
                 { headers: getAuthHeaders() } // Include Authorization header
             );
-            console.log("Task status updated:", response.data); // Log to check response data
+             ("Task status updated:", response.data); // Log to check response data
             return response.data; // Return the success message and status
         } catch (err) {
             return rejectWithValue(err.response?.data || 'Failed to update task status'); // Return error message
@@ -79,7 +79,7 @@ const taskSlice = createSlice({
             .addCase(updateStaffTaskStatus.fulfilled, (state, action) => {
                 state.loading = false;
                 // Update task status locally in the tasks array
-                console.log(updatedTask);
+                 (updatedTask);
                 const updatedTask = action.payload;
                 // const index = state.tasks.findIndex((task) => task.id === updatedTask.id);
                 // if (index !== -1) {

@@ -4,7 +4,7 @@ import { updateAvailableRooms } from './HotelDetailsSlice';
 
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
   if (!token) {
     throw new Error('Authentication token not found');
@@ -25,7 +25,7 @@ export const fetchCheckIns = createAsyncThunk(
           'Authorization': `Bearer ${token}`
         }
       });
-      // console.log('Fetched check-ins:', response.data);
+      //  ('Fetched check-ins:', response.data);
       const occupiedRooms = response.data.length;
       dispatch(updateAvailableRooms(occupiedRooms));
       

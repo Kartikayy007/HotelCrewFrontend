@@ -141,7 +141,7 @@ const SSchedule = () => {
       return;
     }
     dispatch(staffLeaveApply(leaveDetails));
-    console.log(appliedLeave);
+     (appliedLeave);
   };
   const monthlyAttendance = useSelector((state) => state.staffAttendance.monthlyAttendance);
   const {
@@ -282,7 +282,7 @@ const SSchedule = () => {
     }
 
     if (applyLeaveError) {
-      console.log(applyLeaveError);
+       (applyLeaveError);
       setSnackbar({
         open: true,
         message: 'Error submitting leave request. Please try again.',
@@ -300,7 +300,7 @@ const SSchedule = () => {
   const shiftTime = (shift) => {
     if (shift === "Morning"|| shift==="morning") {
       return "05:00 AM to 01:00 PM";
-    } else if (shift === "Evening"|| shift==="evening") {
+    } else if (shift === "Evening"|| shift==="Evening") {
       return "01:00 PM to 09:00 PM";
     } else if (shift === "Night" || shift==="night") {
       return "09:00 PM to 05:00 AM";

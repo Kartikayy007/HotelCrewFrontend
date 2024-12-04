@@ -4,7 +4,7 @@ import axios from 'axios';
 const BASE_URL = 'https://hotelcrew-1.onrender.com/api/taskassignment/announcements/day/';
 
 const getAuthToken = () => {
-  // const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
   const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NjU3NDk0LCJpYXQiOjE3MzMwNjU0OTQsImp0aSI6ImJmZDY4YzkxOGFjYTQ1MmFhNDRhZDNmY2EzNzc2ZDU2IiwidXNlcl9pZCI6MzEyfQ._g8wBkvMZQjLDn_TpEREshVKK-C8xqCy0tBUItwFXfU';
   if (!token) {
@@ -39,12 +39,9 @@ export const createAnnouncement = createAsyncThunk(
       const response = await axios.post('https://hotelcrew-1.onrender.com/api/taskassignment/announcements/', formattedData, config);
       return response.data;
     } catch (error) {
-      console.error('Create announcement error:', error.response?.data || error);
-      return rejectWithValue(
-        error.response?.data?.detail || 
-        error.response?.data?.message ||
-        'Failed to create announcement'
-      );
+      console.error('Create announcement error:', error.response?.data);
+      // Return the exact error response
+      return rejectWithValue(error.response?.data || 'Failed to create announcement');
     }
   }
 );

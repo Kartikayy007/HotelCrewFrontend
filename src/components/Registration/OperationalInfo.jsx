@@ -45,7 +45,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
       payment_methods: paymentMethods.trim()
     };
 
-    console.log('Sending operational data:', formData);
+     ('Sending operational data:', formData);
     updateFormData(formData, 5);
     onNext(formData);
   };
@@ -70,7 +70,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
       const transformedData = transformFormData(currentFormData);
       
       // Log the data being sent
-      console.log('Sending data:', transformedData);
+       ('Sending data:', transformedData);
       
       const result = await dispatch(completeMultiStepForm(transformedData)).unwrap();
       

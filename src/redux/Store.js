@@ -12,17 +12,17 @@ import announcementReducer from './slices/AnnouncementSlice'
 import staffReducer from "./slices/StaffSlice"
 import hotelCheckInReducer from './slices/hotelCheckInSlice'
 import revenueReducer from './slices/revenueSlice' 
-import scheduleReducer from './slices/scheduleSlice';
-import leaveReducer from './slices/leaveSlice';
-import customerReducer from './slices/customerSlice';
+import scheduleReducer from './slices/scheduleSlice'
+import leaveReducer from './slices/leaveSlice'
+import customerReducer from './slices/customerSlice'
 import hotelDetailsReducer from './slices/HotelDetailsSlice'
 import checkInReducer from './slices/CheckInSlice'
-import occupancyReducer from './slices/OcupancyRateSlice';
+import occupancyReducer from './slices/OcupancyRateSlice'
 import userProfileReducer from './slices/userProfileSlice'
-import staffAttendanceReducer from './slices/StaffAttendanceSlice';
+import staffAttendanceReducer from './slices/StaffAttendanceSlice'
 import checkoutReducer from './slices/checkoutSlice'
-import payrollReducer from './slices/PayrollSlice';
-import shiftsReducer from './slices/ShiftSlice';
+import payrollReducer from './slices/PayrollSlice'
+import shiftsReducer from './slices/ShiftSlice'
 import staffPofileReducer from './slices/StaffProfileSlice.jsx'
 import guestReducer from './slices/GuestSlice.jsx'
 const store = configureStore({
@@ -38,7 +38,7 @@ const store = configureStore({
     announcements: announcementReducer,
     staff: AdminStaffSlice,
     hotelCheckIn: hotelCheckInReducer,
-    revenue: revenueReducer, 
+    revenue: revenueReducer,
     schedule: scheduleReducer,
     leave: leaveReducer,
     customers: customerReducer,

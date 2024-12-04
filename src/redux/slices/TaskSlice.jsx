@@ -13,7 +13,7 @@ const initialState = {
 };
 
 const getAuthToken = () => {
-  // const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  // const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
   const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NjU3NDk0LCJpYXQiOjE3MzMwNjU0OTQsImp0aSI6ImJmZDY4YzkxOGFjYTQ1MmFhNDRhZDNmY2EzNzc2ZDU2IiwidXNlcl9pZCI6MzEyfQ._g8wBkvMZQjLDn_TpEREshVKK-C8xqCy0tBUItwFXfU';
   return token;
@@ -32,7 +32,7 @@ export const fetchTasks = createAsyncThunk(
           }
         }
       );
-      console.log('Fetched tasks:', response.data.tasks);
+       ('Fetched tasks:', response.data.tasks);
       return {
         tasks: Array.isArray(response.data.tasks) ? response.data.tasks : [],
         metrics: {
@@ -77,7 +77,7 @@ export const deleteTask = createAsyncThunk(
         throw new Error('Task ID is required');
       }
 
-      console.log('Deleting task with ID:', taskId); // Debug log
+       ('Deleting task with ID:', taskId); // Debug log
       
       const token = getAuthToken();
       await axios.delete(
