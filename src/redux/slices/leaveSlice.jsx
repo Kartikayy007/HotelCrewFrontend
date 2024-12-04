@@ -91,6 +91,7 @@ const leaveSlice = createSlice({
       // Fetch Leave Requests
       builder
         .addCase(fetchLeaveRequests.pending, (state) => {
+          state.leaveRequests = [];
           state.leaveLoading = true;
           state.leaveError = null;
         })

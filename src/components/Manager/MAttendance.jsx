@@ -35,10 +35,10 @@ const MAttendance = () => {
   const dispatch = useDispatch();
   const [selectedDepartments, setSelectedDepartments] = useState(['All']);
   // const { leaveRequests,leaveLoading, leaveError, updateStatus } = useSelector((state) => state.leave);
-  const leaveRequests=useSelector(selectLeaveRequests);
-  const leaveLoading=useSelector(selectLeaveLoading);
-  const leaveError=useSelector(selectLeaveError);
-  const updateStatus=useSelector(selectUpdateStatus);
+  const leaveRequests = useSelector(selectLeaveRequests) || [];
+  const leaveLoading = useSelector(selectLeaveLoading);
+  const leaveError = useSelector(selectLeaveError);
+  const updateStatus = useSelector(selectUpdateStatus);
   
   // const leaveRequests = useSelector((state) => state.leave.leaveRequests || []);
 
@@ -467,8 +467,8 @@ const error=useSelector(selectError);
               ))
             ) : (
               // Render actual leave requests when data is loaded
-              leaveRequests
-                .filter((request) => request.status === "Pending")
+              (leaveRequests || [])
+                .filter((request) => request?.status === "Pending")
                 .map((request) => (
                   <div
                     key={request.id}
@@ -506,7 +506,7 @@ const error=useSelector(selectError);
             )}
 
             {/* Display a message when no leave requests are pending */}
-            {leaveRequests.filter((request) => request.status === 'Pending').length === 0 &&(
+            {(leaveRequests || []).filter((request) => request?.status === 'Pending').length === 0 &&(
               <p className="text-gray-600 font-semibold">No leave requests pending.</p>
             )}
           </div>
