@@ -6,10 +6,10 @@ const API_URL = 'https://hotelcrew-1.onrender.com/api/auth/register-device-token
 export const registerDeviceToken = async () => {
   try {
     const fcmToken = await requestPermissionAndGetToken();
-    console.log(fcmToken);
+     (fcmToken);
     if (!fcmToken) throw new Error('Failed to get FCM token');
 
-    const authToken = localStorage.getItem('token');
+    const authToken = localStorage.getItem('accessToken');
     
     const response = await axios.post(
       API_URL,
@@ -22,7 +22,7 @@ export const registerDeviceToken = async () => {
       }
     );
 
-    console.log('Device token registered:', response.data);
+     ('Device token registered:', response.data);
     
     return response.data;
   } catch (error) {

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Function to retrieve the authentication token
 const getAuthToken = () => {
-  const token  = localStorage.getItem('token');
+  const token  = localStorage.getItem('accessToken');
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -24,7 +24,7 @@ export const getMonthlyAttendance = createAsyncThunk(
             },
           }
         );
-        console.log("Monthly data: ",response.data);
+         ("Monthly data: ",response.data);
         return response.data; // Return the fetched data
       } catch (error) {
         return rejectWithValue(error.response?.data || 'Failed to fetch monthly attendance');
@@ -48,8 +48,8 @@ export const getAttendanceStats = createAsyncThunk(
             },
           }
         );
-        console.log(response);
-        console.log(response.data);
+         (response);
+         (response.data);
         return response.data; // Return the fetched data
       } catch (error) {
         return rejectWithValue(error.response?.data || 'Failed to fetch attendance stats');
@@ -79,7 +79,7 @@ const attendanceSlice = createSlice({
         state.monthlyError = null;
       })
       .addCase(getMonthlyAttendance.fulfilled, (state, action) => {
-        console.log("Monthly Payload",action.payload);
+         ("Monthly Payload",action.payload);
         state.monthlyLoading = false;
         state.monthlyAttendance = action.payload.results; // Set the monthly attendance data
       })

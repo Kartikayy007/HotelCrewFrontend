@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -21,6 +20,7 @@ import AdminSettings from './AdminSettings';
 import AdminScheduleStatus from './AdminScheduleStatus';
 import MSchedule from '../../Manager/MSchedule';
 import { selectUserProfile, selectUserProfileLoading, fetchUserProfile } from '../../../redux/slices/userProfileSlice';
+import styles from './bubble.module.css';
 
 const ProfileSkeleton = () => (
   <div className="flex flex-col items-center py-8 space-y-4">
@@ -49,6 +49,18 @@ const ProfilePreviewModal = ({ imageUrl, isOpen, onClose }) => {
         />
       </div>
     </div>
+  );
+};
+
+const BubbleText = ({ text }) => {
+  return (
+    <h2 className="text-xl font-semibold">
+      {text.split("").map((child, idx) => (
+        <span className={styles.hoverText} key={idx}>
+          {child}
+        </span>
+      ))}
+    </h2>
   );
 };
 
@@ -118,9 +130,7 @@ const AdminSidebar = ({ onMenuItemClick }) => {
                 className="w-full h-full object-cover"
               />
             </div>
-            <h2 className="text-xl font-semibold">
-              {userProfile?.user_name || 'User'}
-            </h2>
+            <BubbleText text={userProfile?.user_name || 'User'} />
           </div>
         )}
 
@@ -132,7 +142,9 @@ const AdminSidebar = ({ onMenuItemClick }) => {
                 className="flex items-center space-x-4 p-2 rounded-lg hover:bg-white/10 transition-colors w-full text-left"
               >
                 {item.icon}
-                <span className="text-lg">{item.label}</span>
+                <span className="text-lg">
+                  {item.label}
+                </span>
               </button>
             </li>
           ))}

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
   if (!token) {
     throw new Error('Authentication token not found');

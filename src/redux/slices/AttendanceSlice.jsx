@@ -14,7 +14,7 @@ const CHECK_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/ch
 
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
   if (!token) {
     throw new Error('Authentication token not found');
@@ -56,7 +56,7 @@ export const fetchAttendanceStats = createAsyncThunk(
     const response = await axios.get(FETCH_ATTENDANCE_STATS_URL, {
       headers: getAuthHeaders(),
     });
-    console.log("Astats",response.data)
+     ("Astats",response.data)
     return response.data;
   }
 );

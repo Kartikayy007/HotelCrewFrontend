@@ -128,7 +128,7 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
   //     created_at: "2024-11-18T21:14:23.162456Z",
   //     // "assigned_to": [
   //     //     "kfbwidfciwen544@jncnsd.com (Staff) (kitchen) (night)",
-  //     //     "bjkhjbbjb@gmail.com (Staff) (maintenance) (evening)"
+  //     //     "bjkhjbbjb@gmail.com (Staff) (maintenance) (Evening)"
   //     // ],
   //     assigned_by: "cawifon795@cpaurl.com (Admin)",
   //     department: "All",
@@ -292,10 +292,10 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
 
 
   // const totalDays = attendanceStats?.total_days_up_to_today || 0;
-  // console.log("tot",totalDays)
+  //  ("tot",totalDays)
   // const presentDays = attendanceStats?.days_present || 0;
   // const leaveDays = attendanceStats?.leaves || 0;
-  // console.log("ll",leaveDays)
+  //  ("ll",leaveDays)
   // const absentDays = totalDays - presentDays - leaveDays; // Remaining days are absences
 
   // const presentPercentage = ((presentDays / totalDays) * 100).toFixed(2);
@@ -304,8 +304,8 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
   //   { name: 'Absent', value: absentDays, label: 'Absent', color: '#A1B7FF' },
   //   { name: 'Leave', value: leaveDays, label: 'Leave', color: '#FFB700' },
   // ];
-  // console.log("Attendance Stats:", attendanceStats);
-  // console.log("Attendance Data:", AttendanceData);
+  //  ("Attendance Stats:", attendanceStats);
+  //  ("Attendance Data:", AttendanceData);
 
 
   const getUrgencyClass = (urgency) => {
@@ -323,9 +323,9 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
   });
   const dates = performance.map(stat => new Date(stat.date));
   const performanceValues = performance.map(stat => stat.performance_percentage);
-  console.log('Performance Data:', performance);
-  console.log('Dates:', formattedDates);
-  console.log('Performance Percentages:', performanceValues);
+   ('Performance Data:', performance);
+   ('Dates:', formattedDates);
+   ('Performance Percentages:', performanceValues);
 
   return (
     <section className=" h-screen py-2 mx-4 px-0 font-Montserrat ">

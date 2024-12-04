@@ -20,7 +20,7 @@ const RoleBasedRoute = ({ children, allowedRoles }) => {
   const accessToken = token || localStorage.getItem('accessToken');
   const userRole = userData?.role || localStorage.getItem('role');
 
-  console.log('RoleBasedRoute Check:', {
+   ('RoleBasedRoute Check:', {
     token: !!accessToken,
     userRole,
     allowedRoles,
@@ -28,12 +28,12 @@ const RoleBasedRoute = ({ children, allowedRoles }) => {
   });
 
   if (!accessToken) {
-    console.log('No token, redirecting to login');
+     ('No token, redirecting to login');
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (!userRole || !allowedRoles.includes(userRole)) {
-    console.log('Role not allowed:', {
+     ('Role not allowed:', {
       userRole,
       allowedRoles
     });

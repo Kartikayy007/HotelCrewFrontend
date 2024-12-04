@@ -1,16 +1,50 @@
 import React, {useState, useRef, useEffect} from "react";
-import { useSelector, useDispatch } from 'react-redux';
-import { 
-  selectStaffPerDepartment, 
+import {useSelector, useDispatch} from "react-redux";
+import {
+  selectStaffPerDepartment,
   createStaff,
-  fetchStaffData  // Add this import
-} from '../../redux/slices/StaffSlice';
-import { selectCustomers } from '../../redux/slices/customerSlice'; // Adjust path as needed
+  fetchStaffData, // Add this import
+} from "../../redux/slices/StaffSlice";
+import {selectCustomers} from "../../redux/slices/customerSlice"; // Adjust path as needed
 import StaffDB from "./DB/StaffDB";
 import CustomerDB from "./DB/CustomerDB";
 import {Search, ChevronLeft, ChevronRight} from "lucide-react";
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select, MenuItem } from '@mui/material';
-import LoadingAnimation from './LoadingAnimation'; // Adjust path as needed
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Tooltip,
+  tooltipClasses,
+} from "@mui/material";
+import LoadingAnimation from "./LoadingAnimation"; // Adjust path as needed
+import AddIcon from "@mui/icons-material/Add"; // Add this import
+import {
+  fetchHotelDetails,
+  selectDepartmentNames,
+} from "../../redux/slices/HotelDetailsSlice";
+
+// Add these validation functions
+const isValidEmail = (email) => {
+  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailPattern.test(email);
+};
+
+const isValidUPI = (upi) => {
+  const upiPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
+  return upiPattern.test(upi);
+};
+
+// Add utility function at the top
+const capitalizeFirstLetter = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
 
 function DataBase() {
   const [activeComponent, setActiveComponent] = React.useState("StaffDB");
@@ -19,56 +53,91 @@ function DataBase() {
   const scrollContainerRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
-    // Staff filters
     department: "All",
     role: "All",
     shift: "All",
-    // Customer filters
     customerType: "All",
-    roomType: "All"  // Replace bookingStatus with roomType
-  }); 
+    roomType: "All",
+  });
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newStaffData, setNewStaffData] = useState({
-    email: '',
-    user_name: '',
-    role: 'staff',
-    salary: '',
-    upi_id: '',
-    shift: 'morning',
-    department: 'housekeeping'
+    email: "",
+    user_name: "",
+    role: "staff",
+    salary: "",
+    upi_id: "",
+    shift: "morning",
+    department: "housekeeping",
   });
   const [isCreating, setIsCreating] = useState(false);
   const [isDepartmentsLoading, setIsDepartmentsLoading] = useState(true);
   const dispatch = useDispatch();
+  const departments = useSelector(selectDepartmentNames);
 
+  // Add error states
+  const [errors, setErrors] = useState({
+    email: false,
+    upi_id: false
+  });
+
+  // Add this to existing state declarations
+  const [isManager, setIsManager] = useState(false);
+
+  // Update handleCreateStaff function
   const handleCreateStaff = async () => {
+    setIsCreating(true);
     try {
-      setIsCreating(true);
-      await dispatch(createStaff(newStaffData)).unwrap();
-      await dispatch(fetchStaffData());
+      const staffDataForApi = {
+        ...newStaffData,
+        role: capitalizeFirstLetter(newStaffData.role), // Capitalize before API call
+      };
+      
+      await dispatch(createStaff(staffDataForApi));
       setCreateDialogOpen(false);
-      setNewStaffData({
-        email: '',
-        user_name: '',
-        role: 'staff',
-        salary: '',
-        upi_id: '',
-        shift: 'morning',
-        department: 'housekeeping'
-      });
+      dispatch(fetchStaffData()); // Refresh staff list
     } catch (error) {
-      console.error('Failed to create staff:', error);
+      console.error('Error creating staff:', error);
     } finally {
       setIsCreating(false);
     }
   };
 
-  const handleInputChange = (e) => {
-    setNewStaffData({
-      ...newStaffData,
-      [e.target.name]: e.target.value
-    });
+  // Update handleInputChange
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    
+    if (name === 'role') {
+      setIsManager(value === 'manager');
+      // Clear department if manager is selected
+      if (value === 'manager') {
+        setNewStaffData(prev => ({
+          ...prev,
+          [name]: value,
+          department: '' // Clear department
+        }));
+        return;
+      }
+    }
+    
+    setNewStaffData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Validate on change
+    if (name === 'email') {
+      setErrors(prev => ({
+        ...prev,
+        email: value ? !isValidEmail(value) : false
+      }));
+    }
+    if (name === 'upi_id') {
+      setErrors(prev => ({
+        ...prev, 
+        upi_id: value ? !isValidUPI(value) : false
+      }));
+    }
   };
 
   const checkScroll = () => {
@@ -90,8 +159,12 @@ function DataBase() {
 
   useEffect(() => {
     setIsDepartmentsLoading(true);
-    dispatch(fetchStaffData())
-      .finally(() => setIsDepartmentsLoading(false));
+    Promise.all([
+      dispatch(fetchStaffData()),
+      dispatch(fetchHotelDetails()),
+    ]).finally(() => {
+      setIsDepartmentsLoading(false);
+    });
   }, [dispatch]);
 
   const scroll = (direction) => {
@@ -106,11 +179,26 @@ function DataBase() {
 
   const staffPerDepartment = useSelector(selectStaffPerDepartment);
   const customers = useSelector(selectCustomers);
-  
-  const departments = Object.keys(staffPerDepartment).map(dept => ({
-    value: dept,
-    label: dept.charAt(0).toUpperCase() + dept.slice(1)
-  }));
+
+  // Update isAllFieldsFilled
+  const isAllFieldsFilled = () => {
+    const baseValidation = 
+      newStaffData.user_name &&
+      newStaffData.email &&
+      isValidEmail(newStaffData.email) &&
+      newStaffData.role &&
+      newStaffData.shift &&
+      newStaffData.salary &&
+      newStaffData.upi_id &&
+      isValidUPI(newStaffData.upi_id);
+      
+    // Skip department check for managers
+    if (isManager) {
+      return baseValidation;
+    }
+    
+    return baseValidation && newStaffData.department;
+  };
 
   return (
     <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
@@ -142,21 +230,25 @@ function DataBase() {
               >
                 {activeComponent === "StaffDB" && (
                   <>
-                    <select 
+                    <select
                       value={filters.department}
-                      onChange={(e) => setFilters({...filters, department: e.target.value})}
+                      onChange={(e) =>
+                        setFilters({...filters, department: e.target.value})
+                      }
                       className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
                     >
                       <option value="All">All Departments</option>
-                      {departments.map(dept => (
+                      {departments.map((dept) => (
                         <option key={dept.value} value={dept.value}>
                           {dept.label}
                         </option>
                       ))}
                     </select>
-                    <select 
+                    <select
                       value={filters.role}
-                      onChange={(e) => setFilters({...filters, role: e.target.value})}
+                      onChange={(e) =>
+                        setFilters({...filters, role: e.target.value})
+                      }
                       className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
                     >
                       <option value="All">Role</option>
@@ -166,39 +258,47 @@ function DataBase() {
                     </select>
                     <select
                       value={filters.shift}
-                      onChange={(e) => setFilters({...filters, shift: e.target.value})}
+                      onChange={(e) =>
+                        setFilters({...filters, shift: e.target.value})
+                      }
                       className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
                     >
                       <option value="All">Shift</option>
-                      <option value="Morning">Day Shift</option>
+                      <option value="Morning">Morning Shift</option>
                       <option value="Night">Night Shift</option>
-                      <option value="evening">Evening</option>
+                      <option value="Evening">Evening</option>
                     </select>
                   </>
                 )}
                 {activeComponent === "CustomerDB" && (
                   <>
-                    <select 
+                    <select
                       value={filters.customerType}
-                      onChange={(e) => setFilters({...filters, customerType: e.target.value})}
+                      onChange={(e) =>
+                        setFilters({...filters, customerType: e.target.value})
+                      }
                       className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
                     >
                       <option value="All">Customer Type</option>
                       <option value="Regular">Regular</option>
                       <option value="VIP">VIP</option>
                     </select>
-                    <select 
+                    <select
                       value={filters.roomType}
-                      onChange={(e) => setFilters({...filters, roomType: e.target.value})}
+                      onChange={(e) =>
+                        setFilters({...filters, roomType: e.target.value})
+                      }
                       className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full border-2 mr-2"
                     >
                       <option value="All">Room Type</option>
-                      {customers && Array.from(new Set(customers.map(c => c.room_type)))
-                        .filter(Boolean)
-                        .map(type => (
-                          <option key={type} value={type}>{type}</option>
-                        ))
-                      }
+                      {customers &&
+                        Array.from(new Set(customers.map((c) => c.room_type)))
+                          .filter(Boolean)
+                          .map((type) => (
+                            <option key={type} value={type}>
+                              {type}
+                            </option>
+                          ))}
                     </select>
                   </>
                 )}
@@ -252,15 +352,9 @@ function DataBase() {
           </div>
           <div>
             {activeComponent === "StaffDB" ? (
-              <StaffDB 
-                searchTerm={searchTerm}
-                filters={filters}
-              />
+              <StaffDB searchTerm={searchTerm} filters={filters} />
             ) : (
-              <CustomerDB 
-                searchTerm={searchTerm}
-                filters={filters}
-              />
+              <CustomerDB searchTerm={searchTerm} filters={filters} />
             )}
           </div>
         </div>
@@ -270,47 +364,48 @@ function DataBase() {
           variant="contained"
           onClick={() => setCreateDialogOpen(true)}
           sx={{
-            position: 'fixed',
+            position: "fixed",
             bottom: 32,
             right: 32,
-            bgcolor: '#252941',
-            '&:hover': { bgcolor: '#1a1f36' },
-            borderRadius: '50px',
-            padding: '12px 24px',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+            bgcolor: "#252941",
+            "&:hover": {bgcolor: "#1a1f36"},
+            borderRadius: "500px",
+            padding: "12px 24px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
             zIndex: 1000,
-            textTransform: 'none',
-            fontSize: '1rem'
+            textTransform: "none",
+            fontSize: "1rem",
           }}
         >
-          Add Staff <span className="ml-2">+</span>
+          <span className="text-6xl">+</span>
         </Button>
       )}
-      <Dialog 
-        open={createDialogOpen} 
+      <Dialog
+        open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
         maxWidth="sm"
         fullWidth
         PaperProps={{
           sx: {
             borderRadius: 2,
-            bgcolor: 'background.paper',
+            bgcolor: "background.paper",
             boxShadow: 24,
-          }
+          },
         }}
       >
-        <DialogTitle sx={{ bgcolor: '#252941', color: 'white' }}>
+        <DialogTitle sx={{bgcolor: "#252941", color: "white"}}>
           Create New Staff
         </DialogTitle>
-        <DialogContent sx={{ mt: 2, minHeight: '400px' }}>
+        <DialogContent sx={{mt: 2, minHeight: "400px"}}>
           {isCreating ? (
-            <div className="flex flex-col items-center justify-center h-full">
+            <div className="flex flex-col mt-36 items-center justify-center h-full">
               <LoadingAnimation size={60} />
               <p className="mt-4 text-gray-600">Creating staff member...</p>
             </div>
           ) : (
             <>
               <TextField
+                required
                 autoFocus
                 margin="dense"
                 name="user_name"
@@ -318,64 +413,117 @@ function DataBase() {
                 fullWidth
                 value={newStaffData.user_name}
                 onChange={handleInputChange}
-                sx={{ mb: 2 }}
+                sx={{mb: 2}}
               />
-              <TextField
-                margin="dense"
-                name="email"
-                label="Email"
-                type="email"
-                fullWidth
-                value={newStaffData.email}
-                onChange={handleInputChange}
-                sx={{ mb: 2 }}
-              />
-              <Select
-                fullWidth
-                name="department"
-                value={newStaffData.department}
-                onChange={handleInputChange}
-                sx={{ mb: 2 }}
-                disabled={isDepartmentsLoading}
+              <Tooltip 
+                open={newStaffData.email && !isValidEmail(newStaffData.email)}
+                title="Please enter a valid email address"
+                placement="top"
+                arrow
               >
-                {isDepartmentsLoading ? (
-                  <MenuItem value="" disabled>
-                    <div className="flex items-center">
-                      <LoadingAnimation size={20} />
-                      <span className="ml-2">Loading departments...</span>
-                    </div>
-                  </MenuItem>
-                ) : (
-                  departments.map(dept => (
-                    <MenuItem key={dept.value} value={dept.value}>
-                      {dept.label}
+                <TextField
+                  required
+                  margin="dense"
+                  name="email"
+                  label="Email"
+                  type="email"
+                  fullWidth
+                  value={newStaffData.email}
+                  onChange={handleInputChange}
+                  sx={{mb: 2}}
+                />
+              </Tooltip>
+              <FormControl fullWidth sx={{mb: 2}}>
+                <InputLabel
+                  id="department-label"
+                  sx={{
+                    backgroundColor: "white",
+                    px: 1,
+                  }}
+                >
+                  Department
+                </InputLabel>
+                <Select
+                  name="department"
+                  value={newStaffData.department}
+                  onChange={handleInputChange}
+                  disabled={isDepartmentsLoading || isManager}
+                >
+                  {isManager ? (
+                    <MenuItem value="" disabled>
+                      Not applicable for managers
                     </MenuItem>
-                  ))
-                )}
-              </Select>
-              <Select
-                fullWidth
-                name="role"
-                value={newStaffData.role}
-                onChange={handleInputChange}
-                sx={{ mb: 2 }}
-              >
-                <MenuItem value="staff">Staff</MenuItem>
-                <MenuItem value="manager">Manager</MenuItem>
-                <MenuItem value="receptionist">Receptionist</MenuItem>
-              </Select>
-              <Select
-                fullWidth
-                name="shift"
-                value={newStaffData.shift}
-                onChange={handleInputChange}
-                sx={{ mb: 2 }}
-              >
-                <MenuItem value="morning">Morning</MenuItem>
-                <MenuItem value="evening">Evening</MenuItem>
-                <MenuItem value="night">Night</MenuItem>
-              </Select>
+                  ) : isDepartmentsLoading ? (
+                    <MenuItem value="" disabled>
+                      <div className="flex items-center">
+                        <LoadingAnimation size={20} />
+                        <span className="ml-2">Loading departments...</span>
+                      </div>
+                    </MenuItem>
+                  ) : (
+                    departments.map((dept) => (
+                      <MenuItem key={dept.value} value={dept.value}>
+                        {dept.label}
+                      </MenuItem>
+                    ))
+                  )}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel 
+                  id="role-label"
+                  sx={{
+                    backgroundColor: 'white',
+                    px: 1
+                  }}
+                >
+                  Role
+                </InputLabel>
+                <Select
+                  labelId="role-label"
+                  name="role"
+                  value={newStaffData.role}
+                  onChange={(e) => {
+                    const role = e.target.value;
+                    handleInputChange({
+                      target: {
+                        name: 'role',
+                        value: role // Keep lowercase in state
+                      }
+                    });
+                  }}
+                  label="Role"
+                >
+                  <MenuItem value="staff">Staff</MenuItem>
+                  <MenuItem value="manager">Manager</MenuItem>
+                  <MenuItem value="receptionist">Receptionist</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel 
+                  id="shift-label"
+                  sx={{
+                    backgroundColor: 'white',
+                    px: 1
+                  }}
+                >
+                  Shift
+                </InputLabel>
+                <Select
+                  labelId="shift-label"
+                  name="shift"
+                  value={newStaffData.shift}
+                  onChange={handleInputChange}
+                  label="Shift"
+                  defaultValue="morning"
+                >
+                  <MenuItem value="morning">Morning</MenuItem>
+                  <MenuItem value="evening">Evening</MenuItem>
+                  <MenuItem value="night">Night</MenuItem>
+                </Select>
+              </FormControl>
               <TextField
+                required
                 margin="dense"
                 name="salary"
                 label="Salary"
@@ -383,38 +531,55 @@ function DataBase() {
                 fullWidth
                 value={newStaffData.salary}
                 onChange={handleInputChange}
-                sx={{ mb: 2 }}
+                sx={{mb: 2}}
               />
-              <TextField
-                margin="dense"
-                name="upi_id"
-                label="UPI ID"
-                fullWidth
-                value={newStaffData.upi_id}
-                onChange={handleInputChange}
-              />
+              <Tooltip
+                open={newStaffData.upi_id && !isValidUPI(newStaffData.upi_id)}
+                title="Please enter a valid UPI ID"
+                placement="top"
+                arrow
+              >
+                <TextField
+                  required
+                  margin="dense"
+                  name="upi_id"
+                  label="UPI ID"
+                  fullWidth
+                  value={newStaffData.upi_id}
+                  onChange={handleInputChange}
+                  sx={{mb: 2}}
+                />
+              </Tooltip>
             </>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button 
-            onClick={() => setCreateDialogOpen(false)} 
+        <DialogActions sx={{p: 2}}>
+          <Button
+            onClick={() => setCreateDialogOpen(false)}
             color="inherit"
             disabled={isCreating}
           >
             Cancel
           </Button>
-          <Button 
-            onClick={handleCreateStaff}
-            variant="contained"
-            disabled={isCreating}
-            sx={{ 
-              bgcolor: '#252941',
-              '&:hover': { bgcolor: '#1a1f36' }
-            }}
+          <Tooltip
+            open={!isAllFieldsFilled() && !isCreating}
+            placement="top"
+            arrow
           >
-            {isCreating ? 'Creating...' : 'Create'}
-          </Button>
+            <span>
+              <Button
+                onClick={handleCreateStaff}
+                variant="contained"
+                disabled={isCreating || !isAllFieldsFilled()}
+                sx={{
+                  bgcolor: "#252941",
+                  "&:hover": {bgcolor: "#1a1f36"},
+                }}
+              >
+                {isCreating ? "Creating..." : "Create"}
+              </Button>
+            </span>
+          </Tooltip>
         </DialogActions>
       </Dialog>
     </section>

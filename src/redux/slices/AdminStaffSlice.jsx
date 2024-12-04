@@ -8,21 +8,27 @@ const DELETE_STAFF_URL = "https://hotelcrew-1.onrender.com/api/edit/delete/";
 const STAFF_STATUS_URL = "https://hotelcrew-1.onrender.com/api/taskassignment/staff/available/";
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
   if (!token) {
     throw new Error('Authentication token not found');
   }
   return token;
 };
 
-// Add utility function at the top
-const capitalizeFirstLetter = (string) => {
-  return string ? string.charAt(0).toUpperCase() + string.slice(1).toLowerCase() : '';
-};
-
-// Add this with other utility functions at the top of the file
-const capitalizeShift = (shift) => {
-  return shift ? shift.charAt(0).toUpperCase() + shift.slice(1).toLowerCase() : '';
+const initialState = {
+  staffPerDepartment: {},
+  totalDepartments: 0,
+  staffList: [],
+  loading: false,
+  error: null,
+  editLoading: false,
+  editError: null,
+  availableStaff: 0,
+  staffBusy: 0,
+  totalStaff: 0,
+  staffStatusLoading: false,
+  staffStatusError: null,
 };
 
 export const fetchStaffData = createAsyncThunk(
@@ -37,7 +43,7 @@ export const fetchStaffData = createAsyncThunk(
         }
       };
       const response = await axios.get(API_URL, config);
-       ('Fetched staff data:', response);
+      console.log('Fetched staff data:', response);
       return response.data;
     } catch (error) {
       console.error('Failed to fetch staff data:');
@@ -46,7 +52,6 @@ export const fetchStaffData = createAsyncThunk(
   }
 );
 
-// Update editStaff thunk
 export const editStaff = createAsyncThunk(
   "staff/editStaff",
   async ({ employeeId, updatedData }, { rejectWithValue, dispatch, getState }) => {
@@ -54,16 +59,6 @@ export const editStaff = createAsyncThunk(
     
     try {
       const token = getAuthToken();
-      
-      // Capitalize fields before sending
-      const capitalizedData = {
-        ...updatedData,
-        role: capitalizeFirstLetter(updatedData.role),
-        shift: capitalizeFirstLetter(updatedData.shift),
-        department: capitalizeFirstLetter(updatedData.department),
-        user_name: capitalizeFirstLetter(updatedData.user_name)
-      };
-
       const config = {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -71,9 +66,9 @@ export const editStaff = createAsyncThunk(
         }
       };
 
-      const response = await axios.patch(
+      const response = await axios.put(
         `${EDIT_STAFF_URL}${employeeId}/`, 
-        capitalizedData, 
+        updatedData, 
         config
       );
 
@@ -117,7 +112,7 @@ export const fetchStaffStatus = createAsyncThunk(
         }
       };
       const response = await axios.get(STAFF_STATUS_URL, config);
-      console.log('Staff status response:', response.data); // Debug log
+      console.log('Fetched staff status:', response);
       return response.data;
     } catch (error) {
       console.error('Failed to fetch staff status:', error);
@@ -148,24 +143,16 @@ export const createStaff = createAsyncThunk(
   }
 );
 
-const initialState = {
-  staffPerDepartment: {},
-  totalDepartments: 0,
-  staffList: [],
-  loading: false,
-  error: null,
-  editLoading: false,
-  editError: null,
-  availableStaff: 0,
-  staffBusy: 0,
-  totalStaff: 0,
-  staffStatusLoading: false,
-  staffStatusError: null,
-};
 
-const staffSlice = createSlice({
+
+const AdminStaffSlice = createSlice({
   name: "staff",
-  initialState,
+  initialState: {
+    ...initialState,
+    availableStaff: 0,
+    staffBusy: 0,
+    totalStaff: 0
+  },
   reducers: {
     clearStaffCache: (state) => {
       localStorage.removeItem(CACHE_KEY);
@@ -234,7 +221,7 @@ const staffSlice = createSlice({
   },
 });
 
-export const { clearStaffCache, resetEditState } = staffSlice.actions;
+export const { clearStaffCache, resetEditState } = AdminStaffSlice.actions;
 
 export const selectStaffPerDepartment = (state) => state.staff.staffPerDepartment;
 export const selectStaffList = (state) => state.staff.staffList;
@@ -243,49 +230,49 @@ export const selectStaffError = (state) => state.staff.error;
 export const selectEditLoading = (state) => state.staff.editLoading;
 export const selectEditError = (state) => state.staff.editError;
 
-export const selectDepartments = (state) => {
-  const departments = state.staff.staffList
-    .map(staff => staff.department)
-    .filter(Boolean)
-    .filter((dept, index, self) => self.indexOf(dept) === index)
-    .map(dept => ({
-      label: dept.charAt(0).toUpperCase() + dept.slice(1),
-      value: dept
-    }));
-     ('Departments:', departments);
-  return departments;
+export const selectDepartments = () => {
+  // Dummy department data
+  return [
+    { label: "Housekeeping", value: "housekeeping" },
+    { label: "Kitchen", value: "kitchen" },
+    { label: "Maintenance", value: "maintenance" },
+    { label: "Security", value: "security" }
+  ];
 };
 
 
 export const selectTotalStaff = (state) => {
+  // Get staff list from state
+  if (!state?.staff?.staffList || !Array.isArray(state.staff.staffList)) {
+    return []; 
+  }
+  
   const staffList = state.staff.staffList;
   
   if (Array.isArray(staffList)) {
     return staffList.length;
   }
-  
+
   return 0;
 };
 
 export const selectStaffStatus = (state) => ({
-  available: state.staff.availableStaff,
-  busy: state.staff.staffBusy,
-  total: state.staff.totalStaff,
-  loading: state.staff.staffStatusLoading,
-  error: state.staff.staffStatusError
+  available: state.staff?.availableStaff || 0,
+  busy: state.staff?.staffBusy || 0,
+  total: state.staff?.totalStaff || 0,
+  loading: state.staff?.loading || false
 });
 
-// Update selectShifts selector to use the function
 export const selectShifts = (state) => {
   const shifts = state.staff.staffList
     .map(staff => staff.shift)
     .filter(Boolean)
     .filter((shift, index, self) => self.indexOf(shift) === index)
     .map(shift => ({
-      label: capitalizeShift(shift),
-      value: shift.toLowerCase()
+      label: shift.charAt(0).toUpperCase() + shift.slice(1),
+      value: shift
     }));
   return shifts;
 };
 
-export default staffSlice.reducer;
+export default AdminStaffSlice.reducer;

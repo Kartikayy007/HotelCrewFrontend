@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const getAuthToken = () => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
   if (!token) {
     throw new Error('Authentication token not found');
@@ -20,7 +20,7 @@ export const fetchHotelDetails = createAsyncThunk(
           'Authorization': `Bearer ${token}`
         }
       });
-      console.log('Fetched hotel details:', response.data.hotel_details);
+       ('Fetched hotel details:', response.data.hotel_details);
       return response.data.hotel_details;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -59,7 +59,7 @@ export const massCreateStaff = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const token = getAuthToken();
-      console.log('Sending staff excel sheet...');
+       ('Sending staff excel sheet...');
       
       const response = await axios.post(
         'https://hotelcrew-1.onrender.com/api/edit/mass-create/',
@@ -75,6 +75,18 @@ export const massCreateStaff = createAsyncThunk(
     } catch (error) {
       console.error('Staff upload error:', error.response?.data);
       return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const fetchRooms = createAsyncThunk(
+  'hotelDetails/fetchRooms',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('/api/rooms');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
     }
   }
 );
@@ -138,3 +150,25 @@ export const selectHotelLoading = (state) => state.hotelDetails.loading;
 export const selectHotelError = (state) => state.hotelDetails.error;
 export const selectHotelUpdateLoading = (state) => state.hotelDetails.updateLoading;
 export const selectHotelUpdateError = (state) => state.hotelDetails.updateError;
+export const selectRooms = (state) => state.hotelDetails.rooms;
+
+// In HotelDetailsSlice.jsx - update the selectDepartmentNames selector
+export const selectDepartmentNames = (state) => {
+  if (!state.hotelDetails.details?.department_names) return [];
+  
+  try {
+    // Split the comma-separated string and trim whitespace
+    const departments = state.hotelDetails.details.department_names
+      .split(',')
+      .map(dept => dept.trim());
+    
+    // Map to required format
+    return departments.map(dept => ({
+      value: dept.toLowerCase(),
+      label: dept.charAt(0).toUpperCase() + dept.slice(1)
+    }));
+  } catch (error) {
+    console.error('Error parsing department names:', error);
+    return [];
+  }
+};

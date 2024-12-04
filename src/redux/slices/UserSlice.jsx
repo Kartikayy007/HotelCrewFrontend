@@ -6,7 +6,7 @@ export const loginUser = createAsyncThunk(
   'user/loginUser',
   async ({userCredentials, rememberMe}, { rejectWithValue }) => {
     try {
-      console.log('Login attempt with:', {
+       ('Login attempt with:', {
         email: userCredentials.email,
         rememberMe
       });
@@ -22,7 +22,7 @@ export const loginUser = createAsyncThunk(
       );
       
       const response = await request.data;
-      console.log('Login response:', response);
+       ('Login response:', response);
 
       // Store auth data
       localStorage.setItem('accessToken', response.access_token);
@@ -48,7 +48,7 @@ export const loginUser = createAsyncThunk(
       // Handle different error scenarios
       if (error.response) {
         // Server responded with error
-        console.log('Server Error Response:', error.response.data);
+         ('Server Error Response:', error.response.data);
         
         // Return the exact error message from backend
         return rejectWithValue({
@@ -56,13 +56,13 @@ export const loginUser = createAsyncThunk(
         });
       } else if (error.request) {
         // Request made but no response
-        console.log('No Response Error:', error.request);
+         ('No Response Error:', error.request);
         return rejectWithValue({
           message: 'No response from server. Please check your connection.'
         });
       } else {
         // Request setup error
-        console.log('Request Setup Error:', error.message);
+         ('Request Setup Error:', error.message);
         return rejectWithValue({
           message: error.message || 'Failed to make login request'
         });

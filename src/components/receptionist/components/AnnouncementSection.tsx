@@ -81,7 +81,7 @@ const AnnouncementSection: React.FC = () => {
   //       });
 
   //       return onMessage(messaging, (payload) => {
-  //         console.log('Received message:', payload);
+  //          ('Received message:', payload);
   //         toast.info(payload.notification?.body, {
   //           title: payload.notification?.title,
   //           position: "top-right",
