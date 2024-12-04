@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from "react";
+import React, {useState, useEffect, useCallback, useMemo} from "react";
 import {MoreVertical, Edit2, Trash2, Eye, X} from "lucide-react";
 import {
   Menu,
@@ -16,7 +16,10 @@ import {
   Divider,
   TextField,
   Snackbar,
-  Alert
+  Alert,
+  FormControl,
+  InputLabel,
+  Select
 } from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {
@@ -25,7 +28,14 @@ import {
   selectStaffLoading,
   editStaff,
   deleteStaff
-} from "../../../redux/slices/staffslice";
+} from "../../../redux/slices/StaffSlice";
+
+// Add role values constant at the top of the file
+const ROLES = {
+  STAFF: 'staff',
+  RECEPTIONIST: 'receptionist',
+  MANAGER: 'manager'
+};
 
 const TableRowSkeleton = () => (
   <tr className="border-b">
@@ -55,13 +65,45 @@ const NoResults = () => (
 
 // Update EditDialog component
 const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
+  // Initialize formData with default role as 'staff' if no role is provided
   const [formData, setFormData] = useState(() => ({
-    ...staff
+    ...staff,
+    role: staff?.role || 'staff' // Set default role to 'staff'
   }));
+  
+  const staffList = useSelector(selectStaffList);
+  
+  const departments = useMemo(() => {
+    return [...new Set(staffList.map(s => s.department))]
+      .filter(Boolean)
+      .map(dept => ({
+        value: dept,
+        label: dept.charAt(0).toUpperCase() + dept.slice(1)
+      }));
+  }, [staffList]);
+
+  const shifts = useMemo(() => {
+    return [...new Set(staffList.map(s => s.shift))]
+      .filter(Boolean)
+      .map(shift => ({
+        value: shift,
+        label: shift.charAt(0).toUpperCase() + shift.slice(1)
+      }));
+  }, [staffList]);
+
+  // Roles array with staff as first option
+  const roles = [
+    { value: 'staff', label: 'Staff' },
+    { value: 'receptionist', label: 'Receptionist' },
+    { value: 'manager', label: 'Manager' }
+  ];
 
   useEffect(() => {
     if (open) {
-      setFormData({ ...staff });
+      setFormData({ 
+        ...staff,
+        role: staff?.role || 'staff' // Maintain default role even when dialog reopens
+      });
     }
   }, [open, staff]);
 
@@ -109,30 +151,71 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
           value={formData.email || ''}
           onChange={handleChange}
         />
-        <TextField
-          margin="dense"
-          name="department"
-          label="Department"
-          fullWidth
-          value={formData.department || ''}
-          onChange={handleChange}
-        />
-        <TextField
-          margin="dense"
-          name="role"
-          label="Role"
-          fullWidth
-          value={formData.role || ''}
-          onChange={handleChange}
-        />
-        <TextField
-          margin="dense"
-          name="shift"
-          label="Shift"
-          fullWidth
-          value={formData.shift || ''}
-          onChange={handleChange}
-        />
+        <FormControl fullWidth margin="dense">
+          <InputLabel>Department</InputLabel>
+          <Select
+            name="department"
+            value={formData.department || ''}
+            onChange={handleChange}
+            label="Department"
+          >
+            {departments.map(dept => (
+              <MenuItem key={dept.value} value={dept.value}>
+                {dept.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth margin="dense">
+          <InputLabel>Role</InputLabel>
+          <Select
+            name="role"
+            value={formData.role || 'staff'}
+            onChange={handleChange}
+            label="Role"
+            displayEmpty
+            MenuProps={{
+              anchorOrigin: {
+                vertical: 'bottom',
+                horizontal: 'left'
+              },
+              transformOrigin: {
+                vertical: 'top',
+                horizontal: 'left'
+              },
+              PaperProps: {
+                style: {
+                  maxHeight: 200
+                }
+              }
+            }}
+          >
+            {roles.map(role => (
+              <MenuItem 
+                key={role.value} 
+                value={role.value}
+                selected={role.value === formData.role}
+              >
+                {role.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth margin="dense">
+          <InputLabel>Shift</InputLabel>
+          <Select
+            name="shift"
+            value={formData.shift || ''}
+            onChange={handleChange}
+            label="Shift"
+          >
+            {shifts.map(shift => (
+              <MenuItem key={shift.value} value={shift.value}>
+                {shift.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <TextField
           margin="dense"
           name="salary"
@@ -302,24 +385,33 @@ function StaffDB({ searchTerm, filters }) {
     }));
   };
 
+  // Updated filtering logic
   const filteredEmployees = employees.filter(employee => {
     const matchesSearch = 
-      employee.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.user_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employee.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.role.toLowerCase().includes(searchTerm.toLowerCase());
+      employee.role?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesDepartment = 
       filters.department === "All" || 
-      employee.department === filters.department.toLowerCase();
+      employee.department?.toLowerCase() === filters.department?.toLowerCase();
 
     const matchesRole = 
       filters.role === "All" || 
-      employee.role === filters.role;
+      employee.role?.toLowerCase() === filters.role?.toLowerCase();
 
     const matchesShift = 
       filters.shift === "All" || 
-      employee.shift === filters.shift.toLowerCase();
+      employee.shift?.toLowerCase() === filters.shift?.toLowerCase();
+
+    // Debug logs
+    console.log('Employee:', {
+      name: employee.user_name,
+      role: employee.role,
+      filterRole: filters.role,
+      matchesRole
+    });
 
     return matchesSearch && matchesDepartment && matchesRole && matchesShift;
   });

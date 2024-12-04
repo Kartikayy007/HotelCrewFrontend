@@ -87,7 +87,7 @@ const StaffMetrics = () => {
         )}
       </div>
       
-      <Box sx={{ width: "100%", mb: 4, mt: 5 }}>
+      <Box sx={{ width: "100%", mb: 0, mt: 0 }}>
         {loading ? (
           <Skeleton
             variant="rectangular"
@@ -106,7 +106,7 @@ const StaffMetrics = () => {
               area: true
             }]}
             height={300}
-            margin={{ top: 5, right: 20, bottom: 30, left: 40 }}
+            margin={{ top: 5, right: 20, bottom: 40, left: 40 }}
             sx={{
               ".MuiLineElement-root": {
                 strokeWidth: 2,

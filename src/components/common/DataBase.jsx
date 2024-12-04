@@ -4,7 +4,7 @@ import {
   selectStaffPerDepartment, 
   createStaff,
   fetchStaffData  // Add this import
-} from '../../redux/slices/staffslice';
+} from '../../redux/slices/StaffSlice';
 import { selectCustomers } from '../../redux/slices/customerSlice'; // Adjust path as needed
 import StaffDB from "./DB/StaffDB";
 import CustomerDB from "./DB/CustomerDB";
@@ -21,13 +21,11 @@ function DataBase() {
   const scrollContainerRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
-    // Staff filters
     department: "All",
     role: "All",
     shift: "All",
-    // Customer filters
     customerType: "All",
-    roomType: "All"  // Replace bookingStatus with roomType
+    roomType: "All" 
   }); 
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -291,7 +289,7 @@ function DataBase() {
             right: 32,
             bgcolor: '#252941',
             '&:hover': { bgcolor: '#1a1f36' },
-            borderRadius: '50px',
+            borderRadius: '500px',
             padding: '12px 24px',
             boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
             zIndex: 1000,
@@ -299,7 +297,7 @@ function DataBase() {
             fontSize: '1rem'
           }}
         >
-          Add Staff <span className="ml-2">+</span>
+           <span className="text-6xl">+</span>
         </Button>
       )}
       <Dialog 

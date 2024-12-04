@@ -531,8 +531,10 @@ const AdminAnalytics = () => {
                           {!isAllDataLoaded ? (
                             <Skeleton variant="rectangular" width="100%" height={220} animation="wave" />
                           ) : (
+                            <Box sx={{ width: "100%", mb: 0, mt: 0 }}>  
                             <LineChart
-                              height={220}
+                            height={300}
+                            margin={{ top: 5, right: 20, bottom: 40, left: 40 }}
                               series={[{
                                 data: selectedDataType === 'checkins' 
                                   ? checkinsData.data
@@ -558,6 +560,7 @@ const AdminAnalytics = () => {
                                 },
                               }}
                             />
+                          </Box>
                           )}
                         </div>
                       </div>

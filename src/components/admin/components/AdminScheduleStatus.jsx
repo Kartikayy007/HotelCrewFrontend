@@ -1,104 +1,144 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState,useEffect } from "react";
+import { Search, Move } from "lucide-react";
+import { Snackbar, Alert } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { Search } from 'lucide-react';
-import { 
-  Snackbar, 
-  Alert
-} from '@mui/material';
-import { 
-  fetchShifts,
-  selectScheduleList,
-  selectShiftsLoading,
-  selectShiftsError
-} from '../../../redux/slices/ShiftSlice';
+import { fetchShifts, updateShift } from '../../../redux/slices/ShiftSlice';
 
-// Constants for filters
-const SHIFT_FILTERS = {
-  ALL: 'all',
-  MORNING: 'morning',
-  EVENING: 'evening',
-  NIGHT: 'night'
-};
 
 function AdminScheduleStatus() {
   const dispatch = useDispatch();
-  const scheduleList = useSelector(selectScheduleList);
-  const loading = useSelector(selectShiftsLoading);
-  const error = useSelector(selectShiftsError);
 
-  // Single declaration of all state variables
+  useEffect(() => {
+    dispatch(fetchShifts());
+  }, [dispatch]);
+  
+  
+  const { loading, error, updateLoading, updateError, updatedShift } = useSelector((state) => state.shifts?.scheduleList || {});
+  const scheduleList = useSelector((state) => state.shifts.scheduleList);
+
+
+  if (loading) return <div>Loading shifts...</div>;
+  if (error) return <div>Error: {error}</div>;
+if(!scheduleList) return <div>no data in scgedulelist</div>;
+//   if (!scheduleList || !Array.isArray(scheduleList) || scheduleList.length === 0) {
+//   return <div>No data in schedule list</div>;
+// }
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedShift, setSelectedShift] = useState("All Shifts");
+  const [isShiftChangeMode, setIsShiftChangeMode] = useState(false);
+  // const [staffData, setStaffData] = useState(scheduleList);
+
+//   const [staffData, setStaffData] = useState([
+//     {name: "Ben Smith", department: "Kitchen", shift: "Day Shift"},
+//   {name: "Sarah Johnson", department: "Housekeeping", shift: "Evening Shift"},
+//   {name: "Mike Chen", department: "Kitchen", shift: "Night Shift"},
+//   {name: "Maria Garcia", department: "Reception", shift: "Day Shift"},
+//   {name: "Alex Wong", department: "Security", shift: "Evening Shift"},
+//   {name: "Lisa Parker", department: "Housekeeping", shift: "Day Shift"},
+//   {name: "James Wilson", department: "Reception", shift: "Night Shift"},
+//   {name: "Thomas Anderson", department: "Maintenance", shift: "Day Shift"},
+//   {name: "Nina Patel", department: "F&B", shift: "Evening Shift"},
+//   {name: "Carlos Rodriguez", department: "Front Office", shift: "Night Shift"},
+//   {name: "Sophie Zhang", department: "Kitchen", shift: "Day Shift"},
+//   {name: "Omar Hassan", department: "Security", shift: "Evening Shift"},
+//   {name: "Emily Brown", department: "Housekeeping", shift: "Night Shift"},
+//   {name: "Daniel Lee", department: "Maintenance", shift: "Day Shift"},
+//   {name: "Isabella Silva", department: "F&B", shift: "Evening Shift"},
+//   {name: "Ryan Murphy", department: "Front Office", shift: "Night Shift"},
+//   {name: "Aisha Khan", department: "Kitchen", shift: "Day Shift"},
+//   {name: "Marcus Thompson", department: "Security", shift: "Evening Shift"},
+//   {name: "Julia Kim", department: "Housekeeping", shift: "Night Shift"},
+//   {name: "Mohammed Al-Said", department: "Maintenance", shift: "Day Shift"},
+//   {name: "Lucy Chen", department: "F&B", shift: "Evening Shift"},
+//   {name: "Samuel Jackson", department: "Front Office", shift: "Night Shift"}
+// ]);
+  
   const [draggedStaff, setDraggedStaff] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [targetShift, setTargetShift] = useState(null);
-  const [activeFilter, setActiveFilter] = useState(SHIFT_FILTERS.ALL);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedShift, setSelectedShift] = useState(SHIFT_FILTERS.ALL);
-  const [filteredStaff, setFilteredStaff] = useState([]); // Single declaration
-  const [dayShiftStaff, setDayShiftStaff] = useState([]);
-  const [eveningShiftStaff, setEveningShiftStaff] = useState([]);
-  const [nightShiftStaff, setNightShiftStaff] = useState([]);
-  const [isShiftChangeMode, setIsShiftChangeMode] = useState(false);
-
-  // Fetch shifts on mount
-  useEffect(() => {
-    dispatch(fetchShifts());
-    const interval = setInterval(() => {
-      dispatch(fetchShifts());
-    }, 300000);
-    return () => clearInterval(interval);
-  }, [dispatch]);
-
-  // Update filtered lists when scheduleList changes
-  useEffect(() => {
-    if (scheduleList) {
-      setFilteredStaff(scheduleList);
-      setDayShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === SHIFT_FILTERS.MORNING));
-      setEveningShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === SHIFT_FILTERS.EVENING));
-      setNightShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === SHIFT_FILTERS.NIGHT));
-    }
-  }, [scheduleList]);
-
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  const [isChangingShift, setIsChangingShift] = useState(false);
+  
   const handleDragStart = (e, staff) => {
-    setDraggedStaff(staff);
-    e.dataTransfer.setData('text/plain', '');
+    console.log('Drag Start Data:', staff); // Debug log
+    e.dataTransfer.setData('text/plain', JSON.stringify({
+      id: staff.id || staff.user_id || staff._id,
+      name: staff.user_name,
+      currentShift: staff.shift
+    }));
   };
-
+  
   const handleDragOver = (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
   };
-
-  const handleDrop = (e, newShift) => {
+  
+  const handleDrop = async (e, targetShift) => {
     e.preventDefault();
+    const staffData = JSON.parse(e.dataTransfer.getData('text/plain'));
+    
+    console.log('Dragged Staff Data:', staffData); // Debug log
+    console.log('Target Shift:', targetShift); // Debug log
   
-    if (draggedStaff && isShiftChangeMode) {
-      setTargetShift(newShift);
-      const updatedFilteredStaff = scheduleList.map(staff =>
-        staff.id === draggedStaff.id ? { ...staff, shift: newShift } : staff
-      );
-  
-      setFilteredStaff(updatedFilteredStaff);
-      setDayShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "morning"));
-      setEveningShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "evening"));
-      setNightShiftStaff(updatedFilteredStaff.filter(staff => staff.shift?.toLowerCase() === "night"));
-  
-  
-      dispatch(updateShift({ userId: draggedStaff.id, shift: newShift }))
-        .then(() => {
-          // Fetch the updated schedule list after backend update
-          dispatch(fetchShifts());
-        })
-        .catch((error) => {
-          console.error("Failed to update shift:", error);
-          // Revert the optimistic update if the backend call fails
-        setFilteredStaff(scheduleList);
-        setDayShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === "morning"));
-        setEveningShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === "evening"));
-        setNightShiftStaff(scheduleList.filter(staff => staff.shift?.toLowerCase() === "night"));
+    try {
+      setIsChangingShift(true);
+      setSnackbar({
+        open: true,
+        message: 'Changing shift...',
+        severity: 'info'
+      });
+
+      // Ensure we have the correct ID
+      const userId = staffData.id || staffData.user_id || staffData._id;
       
-        });
+      if (!userId) {
+        throw new Error('No valid user ID found');
+      }
   
-      setDraggedStaff(null);
-      setSnackbarOpen(true);
+      // Optimistically update UI first
+      dispatch({
+        type: 'shifts/updateShiftOptimistic',
+        payload: {
+          userId,
+          newShift: targetShift
+        }
+      });
+  
+      // Make API call to update shift
+      const result = await dispatch(updateShift({
+        userId: userId,
+        shift: targetShift
+      })).unwrap();
+  
+      console.log('Update Result:', result); // Debug log
+  
+      // Only fetch new data if update was successful
+      if (result) {
+        await dispatch(fetchShifts());
+        
+        setSnackbar({
+          open: true,
+          message: 'Shift updated successfully',
+          severity: 'success'
+        });
+      }
+  
+    } catch (error) {
+      console.error('Shift update failed:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to update shift. Please try again.',
+        severity: 'error'
+      });
+      
+      // Refresh to get correct state
+      await dispatch(fetchShifts());
+    } finally {
+      setIsChangingShift(false);
     }
   };
   
@@ -114,9 +154,13 @@ function AdminScheduleStatus() {
    ("activeFilter:", activeFilter);
    ("searchTerm:", searchTerm);
    ("selectedShift:", selectedShift);
-   ("M",dayShiftStaff);
-   ("E",eveningShiftStaff);
-   ("N",nightShiftStaff);
+  const [filteredStaff, setFilteredStaff] = useState([]);
+const [dayShiftStaff, setDayShiftStaff] = useState([]);
+const [eveningShiftStaff, setEveningShiftStaff] = useState([]);
+const [nightShiftStaff, setNightShiftStaff] = useState([]);
+ ("M",dayShiftStaff);
+ ("E",eveningShiftStaff);
+ ("N",nightShiftStaff);
   
 useEffect(() => {
   if (Array.isArray(scheduleList)) {
@@ -242,7 +286,7 @@ useEffect(() => {
               <button
               key="all"
               onClick={() => setActiveFilter("All")}
-              className={`px-4 py-1 w-auto rounded-3xl font-semibold  border-none ${activeFilter.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
+              className={`px-4 py-1 w-auto rounded-3xl min-w-16 font-semibold  border-none ${activeFilter.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
                 }`}
             >
               All
@@ -252,7 +296,7 @@ useEffect(() => {
                     key={department}
                     onClick={() => setActiveFilter(department)}
                     className={`p-1.5 xs:p-2 sm:p-2
-                      min-w-30 text-[14px] xs:text-lg sm:text-sm md:text-base lg:text-lg 
+                      min-w-24 text-[14px] xs:text-lg sm:text-sm md:text-base lg:text-lg 
                       rounded-3xl capitalize
                       whitespace-nowrap 
                       transition-colors 
@@ -311,8 +355,25 @@ useEffect(() => {
           }
         </Alert>
       </Snackbar>
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={3000} 
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))} 
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {isChangingShift ? 'Changing shift...' : snackbar.message}
+        </Alert>
+      </Snackbar>
     </section>
   );
 }
 
 export default AdminScheduleStatus;
+
+
