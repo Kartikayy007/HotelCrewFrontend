@@ -105,7 +105,7 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
               className="mb-2 flex items-center gap-2">
                 <input
                   type="text"
-                  className={`placeholder:text-base h-8 w-[285px] xl:w-[623px] py-2 px-4   border rounded-[4px] focus:outline-none ${
+                  className={`placeholder:text-base h-8 w-[285px] xl:w-[623px] py-2 px-4 text-xl  border rounded-[4px] focus:outline-none ${
                     !department && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                   } focus:border-purple-500`}
                   placeholder={'Department ' + (index + 1)}
@@ -170,13 +170,13 @@ function StaffManagement({ onNext, onBack, updateFormData, initialData }) {
                 alt="Hotel Icon"
                 className="h-24 mb-4 text-[#5663AC]"
               />
-              <h2 className="text-[32px] font-medium">Staff Management</h2>
-              <p className="font-[400] text-[14px] text-center">
+              <h2 className="text-2xl font-[500] font-Montserrat">Staff Management</h2>
+              <p className="font-sans font-normal text-center">
                 Fill out the form on the left.
                 <br />
-                <span className="font-[400] text-[14px]">You can always edit the data in the</span>
+                <span className="font-sans font-normal text-center">You can always edit the data in the</span>
                 <br />
-                <span className="font-[400] text-[14px]">setting menu.</span>
+                <span className="font-sans font-normal text-center">setting menu.</span>
               </p>
             </div>
           </div>

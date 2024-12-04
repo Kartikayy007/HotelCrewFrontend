@@ -176,15 +176,15 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               </label>
               <button
                 type="button"
-                className="xl:relative xl:left-[232px] relative right-12 "
+                className="xl:relative xl:left-[232px] relative right-4` "
                 onClick={handleAddRoomType}
               >
                 <img src={plus} alt="Add room type" />
               </button>
             </div>
 
-            <div className="h-32 xl:w-[630px] w-full overflow-y-auto overflow-x-hidden pr-3 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100">
-              <div className="space-y-2 overflow-x-scroll">
+            <div className="h-32 xl:w-[630px] w-full overflow-y-auto  pr-3 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100">
+              <div className="space-y-2  overflow-x-auto scrollbar-hidden">
                 {roomTypes.map((room, index) => (
                   <div 
                   key={index} 
@@ -192,10 +192,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                   className="flex items-center gap-2 xl:gap-4">
                     <input
                       type="text"
-                      className={`placeholder:text-base h-8 w-[100px] xl:w-[200px] py-2 xl:px-4 px-2 text-xl border rounded-[4px] focus:outline-none ${
+                      className={`placeholder:text-base h-8 w-[110px] xl:w-[220px] py-2 xl:px-4 px-2 text-xl border rounded-[4px] focus:outline-none ${
                         !room.type && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
-                      placeholder="Typ of Rooms"
+                      placeholder="Room Type"
                       value={room.type}
                       onChange={(e) =>
                         handleRoomTypeChange(index, "type", e.target.value)
@@ -203,10 +203,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                     />
                     <input
                       type="text"
-                      className={`placeholder:text-base h-8 w-[100px] xl:w-[180px] py-2 px-2 xl:px-4 text-xl border rounded-[4px] focus:outline-none ${
+                      className={`placeholder:text-base h-8 w-[70px] xl:w-[140px] py-2 px-2 xl:px-4 text-xl border rounded-[4px] focus:outline-none ${
                         !room.count && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
-                      placeholder="No. Rooms"
+                      placeholder="Count"
                       value={room.count}
                       onChange={(e) =>
                         handleNumberInput(e, (value) =>
@@ -216,10 +216,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                     />
                     <input
                       type="text"
-                      className={`placeholder:text-base h-8 w-[100px] xl:w-[160px] py-2 px-2 xl:px-4 text-xl border rounded-[4px] focus:outline-none ${
+                      className={`placeholder:text-base h-8 w-[70px] xl:w-[140px] py-2 px-2 xl:px-4 text-xl border rounded-[4px] focus:outline-none ${
                         !room.price && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
-                      placeholder="Price of Room"
+                      placeholder="Price"
                       value={room.price}
                       onChange={(e) =>
                         handleNumberInput(e, (value) =>
@@ -254,7 +254,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               placeholder="Total Floors "
               value={numberOfFloors}
               onChange={(e) => handleNumberInput(e, setNumberOfFloors)}
-              className={`h-8 w-full xl:w-[623px] py-2 text-xl px-4 border rounded-[4px] focus:outline-none ${
+              className={`h-8 placeholder:text-base w-full xl:w-[623px] py-2 text-xl px-4 border rounded-[4px] focus:outline-none ${
                 !numberOfFloors && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
@@ -351,17 +351,17 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                 alt="Hotel Icon"
                 className="h-24 mb-4 text-[#5663AC]"
               />
-              <h2 className="text-[24px] font-[450] font-Montserrat">
+              <h2 className="text-2xl font-medium font-Montserrat">
                 Property Details
               </h2>
-              <p className="text-gray-600 font-sans font-[300] text-center">
+              <p className="font-sans font-normal text-center">
                 Fill out the form on the left.
                 <br />
-                <span className="font-sans font-[300]">
+                <span className="font-sans font-normal text-center">
                   You can always edit the data in the
                 </span>
                 <br />
-                <span>setting menu.</span>
+                <span className="font-sans font-normal text-center">setting menu.</span>
               </p>
             </div>
           </div>

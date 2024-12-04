@@ -91,14 +91,14 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
         </div>
 
         <form className="space-y-7 w-full xl:w-40 px-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-semibold hidden xl:block xl:text-left">Contact & Location</h1>
-          </div>
+          {/* <div className="flex justify-between items-center"> */}
+            <h1 className="text-3xl font-semibold xl:whitespace-nowrap hidden xl:block xl:text-left">Contact & Location</h1>
+          {/* </div> */}
 
           <div>
             <label
               htmlFor="complete-address"
-              className=" text-lg font-sans font-semibold"
+              className="text-lg w-full font-sans font-semibold whitespace-nowrap"
             >
               Complete Address*
             </label>
@@ -107,7 +107,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="complete-address"
               value={completeAddress}
               onChange={(e) => setCompleteAddress(e.target.value)}
-              className={`h-8 w-full xl:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
+              className={`h-8 w-full xl:w-[623px] py-2 px-4 text-xl whitespace-nowrap border rounded-[4px] focus:outline-none ${
                 !completeAddress && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder="Enter full address"
@@ -219,19 +219,19 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
             <img className="relative top-36 left-[43.7%]" src={lineIcon} alt="" />
             <img className="relative top-[80%] left-[43.7%]" src={lineIcon} alt="" />
 
-            <div className="flex flex-col items-center justify-center h-full space-y4">
+            <div className="flex flex-col items-center justify-center h-full space-y-4">
               <img 
                 src={contactIcon} 
                 alt="Contact Icon" 
                 className="h-[96] mb-4 text-[#5663AC]"
               />
-              <h2 className="text-[24px] font-[500] font-Montserrat">Contact & Location</h2>
-              <p className="font-sans font-[400] text-center">
+              <h2 className="text-2xl font-[500] font-Montserrat">Contact & Location</h2>
+              <p className="font-sans font-normal text-center">
                 Fill out the form on the left.
                 <br />
-                <span className="font-sans font-[300]">You can always edit the data in the </span>
+                <span className="font-sans font-normal text-center">You can always edit the data in the </span>
                 <br />
-                <span className="font-sans font-[300]">setting menu.</span>
+                <span className="font-sans font-normal text-center">setting menu.</span>
               </p>
             </div>
           </div>

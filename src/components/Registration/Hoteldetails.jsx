@@ -24,6 +24,10 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
       setError('Please fill out all required fields.');
       return;
     }
+    if(yearEstablished.length<4){
+      setError("Enter a Valid Year");
+      return;
+    }
 
     const formData = {
       hotel_name: hotelName,
@@ -96,6 +100,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
             </label>
             <input
               type="text"
+              maxLength={120}
               id="hotel-name"
               value={hotelName}
               onChange={(e) => setHotelName(e.target.value)}
@@ -112,6 +117,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
             </label>
             <input
               type="text"
+              maxLength={150}
               id="legal-business-name"
               value={legalBusinessName}
               onChange={(e) => setLegalBusinessName(e.target.value)}
@@ -132,7 +138,8 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               value={yearEstablished}
               onChange={handleYearInput}
               placeholder="YYYY"
-              maxLength={4}
+              min={1000}
+              max={2024}
               className={inputClass(yearEstablished)}
             />
           </div>
@@ -190,17 +197,17 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
                 alt="Hotel Icon"
                 className="h-[96] mb-4 text-[#5663AC]"
               />
-              <h2 className="text-[24px] font-[450] font-Montserrat">
+              <h2 className="text-2xl font-[500] font-Montserrat">
                 Hotel Information
               </h2>
-              <p className="text-gray-600 font-sans font-[300] text-center">
+              <p className="font-sans font-normal text-center">
                 Fill out the form on the left.
                 <br />
-                <span className="font-sans font-[300]">
+                <span className="font-sans font-normal text-center">
                   You can always edit the data in the
                 </span>
                 <br />
-                <span>setting menu.</span>
+                <span className='font-sans font-normal text-center'>setting menu.</span>
               </p>
             </div>
           </div>

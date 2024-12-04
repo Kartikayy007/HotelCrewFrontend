@@ -94,7 +94,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col xl:flex-row justify-center items-center gap-10 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
+      <div className="flex flex-col xl:flex-row justify-center items-center gap-8 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
         <div className="flex xl:hidden font-medium gap-3 mb-4 relative top-0">
           {[1, 2, 3, 4, 5].map((num) => (
             <div
@@ -128,7 +128,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
 
         <form className="space-y-2 xl:w-full max-w-[330px]">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-semibold hidden xl:block xl:text-left">Operational Information</h1>
+            <h1 className="text-[32px] font-semibold hidden xl:block xl:whitespace-nowrap xl:text-left">Operational Information</h1>
           </div>
 
           <div>
@@ -143,7 +143,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-in-time"
               value={checkInTime}
               onChange={(e) => setCheckInTime(e.target.value)}
-              className={`placeholder:text-base h-8 w-[182px] xl:w-[299px] mr-6 py-2 px-4 border rounded-[4px] text-lg focus:outline-none ${
+              className={`placeholder:text-base h-8 w-[182px] xl:w-[299px] mr-6 py-1 px-4 border rounded-[4px] text-lg focus:outline-none ${
                 !checkInTime && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
@@ -161,7 +161,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-out-time"
               value={checkOutTime}
               onChange={(e) => setCheckOutTime(e.target.value)}
-              className={`h-8 w-[182px] xl:w-[299px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
+              className={`h-8 placeholder:text-base w-[182px] xl:w-[299px] py-1 px-4 border rounded-[4px] text-xl focus:outline-none ${
                 !checkOutTime && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder='Check-out timings'
@@ -180,7 +180,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="payment-methods"
               value={paymentMethods}
               onChange={(e) => setPaymentMethods(e.target.value)}
-              className={`h-8 w-[330px] xl:w-[623px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
+              className={`h-8 w-[330px]placeholder:text-base  xl:w-[623px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
                 !paymentMethods && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder='e.g., Cash, Credit Card, UPI'
@@ -228,12 +228,12 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
                 className=" h-[96] mb-4 text-[#5663AC]"
               />
               <h2 className="text-[24px] font-[500] font-Montserrat">Operational Information</h2>
-              <p className="font-sans font-[400] text-[16px] text-center">
+              <p className="font-sans font-normal text-center">
                 Fill out the form on the left.
                 <br />
-                <span > You can always edit the data in the </span>
+                <span className='font-sans font-normal text-center' > You can always edit the data in the </span>
                 <br />
-                <span> setting menu.</span>
+                <span className='font-sans font-normal text-center'> setting menu.</span>
               </p>
             </div>
           </div>

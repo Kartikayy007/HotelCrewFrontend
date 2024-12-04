@@ -281,7 +281,7 @@ const handleVerifyOtp = (e) => {
   }, []);
 
   return (
-    <div className="font-Montserrat min-h-screen xl:w-full xl:flex xl:justify-center">
+    <div className="font-Montserrat min-h-screen xl:w-full xl:flex xl:justify-center ">
       <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] xl:hidden">
         <img
           src="/Frame2.svg"
@@ -290,7 +290,7 @@ const handleVerifyOtp = (e) => {
         />
       </div>
       {showOtpInput ? (
-        <div className="w-full xl:w-1/2 flex justify-center items-center">
+        <div className="w-full xl:w-1/2 flex justify-center items-center ">
           <div className="space-y-6">
             <form
               className="w-full :sxlpace-y-3 space-y-4 "
