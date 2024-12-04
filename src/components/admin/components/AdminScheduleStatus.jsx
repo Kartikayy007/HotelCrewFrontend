@@ -81,8 +81,19 @@ if(!scheduleList) return <div>no data in scgedulelist</div>;
     e.preventDefault();
     const staffData = JSON.parse(e.dataTransfer.getData('text/plain'));
     
-    console.log('Dragged Staff Data:', staffData); // Debug log
-    console.log('Target Shift:', targetShift); // Debug log
+    // Convert both shifts to lowercase for consistent comparison
+    const currentShift = staffData.currentShift.toLowerCase();
+    const newShift = targetShift.toLowerCase();
+    
+    // Check if same shift
+    if (currentShift === newShift) {
+      setSnackbar({
+        open: true,
+        message: 'Staff is already in this shift',
+        severity: 'info'
+      });
+      return; // Exit early - no API call needed
+    }
   
     try {
       setIsChangingShift(true);
@@ -91,52 +102,32 @@ if(!scheduleList) return <div>no data in scgedulelist</div>;
         message: 'Changing shift...',
         severity: 'info'
       });
-
-      // Ensure we have the correct ID
+  
       const userId = staffData.id || staffData.user_id || staffData._id;
       
       if (!userId) {
         throw new Error('No valid user ID found');
       }
   
-      // Optimistically update UI first
-      dispatch({
-        type: 'shifts/updateShiftOptimistic',
-        payload: {
-          userId,
-          newShift: targetShift
-        }
-      });
-  
-      // Make API call to update shift
-      const result = await dispatch(updateShift({
-        userId: userId,
+      await dispatch(updateShift({
+        userId,
         shift: targetShift
-      })).unwrap();
+      }));
   
-      console.log('Update Result:', result); // Debug log
-  
-      // Only fetch new data if update was successful
-      if (result) {
-        await dispatch(fetchShifts());
-        
-        setSnackbar({
-          open: true,
-          message: 'Shift updated successfully',
-          severity: 'success'
-        });
-      }
-  
-    } catch (error) {
-      console.error('Shift update failed:', error);
       setSnackbar({
         open: true,
-        message: 'Failed to update shift. Please try again.',
-        severity: 'error'
+        message: `Successfully moved ${staffData.name} to ${targetShift} shift`,
+        severity: 'success'
       });
       
-      // Refresh to get correct state
-      await dispatch(fetchShifts());
+      dispatch(fetchShifts()); // Refresh data
+      
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Failed to update shift',
+        severity: 'error'
+      });
     } finally {
       setIsChangingShift(false);
     }
@@ -156,26 +147,23 @@ if(!scheduleList) return <div>no data in scgedulelist</div>;
    ("selectedShift:", selectedShift);
   const [filteredStaff, setFilteredStaff] = useState([]);
 const [dayShiftStaff, setDayShiftStaff] = useState([]);
-const [eveningShiftStaff, setEveningShiftStaff] = useState([]);
+const [EveningShiftStaff, setEveningShiftStaff] = useState([]);
 const [nightShiftStaff, setNightShiftStaff] = useState([]);
  ("M",dayShiftStaff);
- ("E",eveningShiftStaff);
+ ("E",EveningShiftStaff);
  ("N",nightShiftStaff);
   
 useEffect(() => {
   if (Array.isArray(scheduleList)) {
     const updatedFilteredStaff = scheduleList.filter((staff) => {
-      // Case-insensitive matching for department
       const departmentMatch =
         activeFilter === "All" || 
         staff.department?.toLowerCase() === activeFilter.toLowerCase();
 
-      // Case-insensitive matching for search term
       const searchMatch = staff.user_name
         ? staff.user_name.toLowerCase().includes(searchTerm.toLowerCase())
         : false;
 
-      // Case-insensitive matching for shift
       const shiftMatch =
         selectedShift === "All Shifts" || 
         staff.shift?.toLowerCase() === selectedShift.toLowerCase();
@@ -185,18 +173,25 @@ useEffect(() => {
 
     setFilteredStaff(updatedFilteredStaff);
 
-    // Update shift-specific lists
+    // Update shift-specific lists with case-insensitive comparison
     setDayShiftStaff(
-      updatedFilteredStaff.filter((staff) => staff.shift?.toLowerCase() === "morning")
+      updatedFilteredStaff.filter(
+        (staff) => staff.shift?.toLowerCase() === "morning"
+      )
     );
     setEveningShiftStaff(
-      updatedFilteredStaff.filter((staff) => staff.shift?.toLowerCase() === "evening")
+      updatedFilteredStaff.filter(
+        (staff) => staff.shift?.toLowerCase() === "evening" // Fixed Evening to evening
+      )
     );
     setNightShiftStaff(
-      updatedFilteredStaff.filter((staff) => staff.shift?.toLowerCase() === "night")
+      updatedFilteredStaff.filter(
+        (staff) => staff.shift?.toLowerCase() === "night"
+      )
     );
   }
 }, [scheduleList, activeFilter, searchTerm, selectedShift]);
+
 const [selectedDepartments, setSelectedDepartments] = useState(['All']);
 useEffect(() => {
   if (scheduleList && scheduleList.length > 0) {
@@ -327,7 +322,7 @@ useEffect(() => {
           </div>
 
           <ShiftSection title="Morning Shift" staff={dayShiftStaff} shiftType="morning" />
-          <ShiftSection title="Evening Shift" staff={eveningShiftStaff} shiftType="evening" />
+          <ShiftSection title="Evening Shift" staff={EveningShiftStaff} shiftType="evening" />
           <ShiftSection title="Night Shift" staff={nightShiftStaff} shiftType="night" />
         </div>
       </div>

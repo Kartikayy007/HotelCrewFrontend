@@ -15,6 +15,16 @@ const getAuthToken = () => {
   return token;
 };
 
+// Add utility function at the top
+const capitalizeFirstLetter = (string) => {
+  return string ? string.charAt(0).toUpperCase() + string.slice(1).toLowerCase() : '';
+};
+
+// Add this with other utility functions at the top of the file
+const capitalizeShift = (shift) => {
+  return shift ? shift.charAt(0).toUpperCase() + shift.slice(1).toLowerCase() : '';
+};
+
 export const fetchStaffData = createAsyncThunk(
   "staff/fetchStaffData",
   async (_, { rejectWithValue }) => {
@@ -36,6 +46,7 @@ export const fetchStaffData = createAsyncThunk(
   }
 );
 
+// Update editStaff thunk
 export const editStaff = createAsyncThunk(
   "staff/editStaff",
   async ({ employeeId, updatedData }, { rejectWithValue, dispatch, getState }) => {
@@ -43,6 +54,16 @@ export const editStaff = createAsyncThunk(
     
     try {
       const token = getAuthToken();
+      
+      // Capitalize fields before sending
+      const capitalizedData = {
+        ...updatedData,
+        role: capitalizeFirstLetter(updatedData.role),
+        shift: capitalizeFirstLetter(updatedData.shift),
+        department: capitalizeFirstLetter(updatedData.department),
+        user_name: capitalizeFirstLetter(updatedData.user_name)
+      };
+
       const config = {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -50,9 +71,9 @@ export const editStaff = createAsyncThunk(
         }
       };
 
-      const response = await axios.put(
+      const response = await axios.patch(
         `${EDIT_STAFF_URL}${employeeId}/`, 
-        updatedData, 
+        capitalizedData, 
         config
       );
 
@@ -254,14 +275,15 @@ export const selectStaffStatus = (state) => ({
   error: state.staff.staffStatusError
 });
 
+// Update selectShifts selector to use the function
 export const selectShifts = (state) => {
   const shifts = state.staff.staffList
     .map(staff => staff.shift)
     .filter(Boolean)
     .filter((shift, index, self) => self.indexOf(shift) === index)
     .map(shift => ({
-      label: shift.charAt(0).toUpperCase() + shift.slice(1),
-      value: shift
+      label: capitalizeShift(shift),
+      value: shift.toLowerCase()
     }));
   return shifts;
 };

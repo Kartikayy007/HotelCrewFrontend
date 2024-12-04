@@ -17,9 +17,71 @@ import {
 import docupload from "/docupload.svg";
 import { toast } from 'react-toastify';
 import axios from "axios";
-import { Snackbar, Alert } from '@mui/material';
 import LoadingAnimation from '../../common/LoadingAnimation';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { 
+  Button,
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogContentText, 
+  DialogTitle,
+  Snackbar,
+  Alert
+} from '@mui/material';
+
+const useConfirmationDialog = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
+  const openDialog = (config) => {
+    setDialogConfig(config);
+    setIsOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsOpen(false);
+  };
+
+  const ConfirmationDialog = () => (
+    <Dialog 
+      open={isOpen} 
+      onClose={closeDialog}
+      PaperProps={{
+        style: {
+          borderRadius: '16px',
+          padding: '8px'
+        }
+      }}
+    >
+      <DialogTitle>{dialogConfig.title}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>{dialogConfig.message}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={closeDialog} color="primary">
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            dialogConfig.onConfirm();
+            closeDialog();
+          }}
+          color="primary"
+          variant="contained"
+        >
+          Confirm
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
+  return { openDialog, ConfirmationDialog };
+};
+
 
 const BasicInfo = () => {
   const dispatch = useDispatch();
@@ -27,64 +89,40 @@ const BasicInfo = () => {
   const updateLoading = useSelector(selectHotelUpdateLoading);
   const updateError = useSelector(selectHotelUpdateError);
 
-  const useConfirmationDialog = (onConfirm) => {
-  const [open, setOpen] = useState(false);
-  
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const handleConfirm = () => {
-    handleClose();
-    onConfirm();
-  };
-
-  const ConfirmationDialog = () => (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Confirm Changes</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Are you sure you want to save these changes?
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <button 
-          className="px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100"
-          onClick={handleClose}
-        >
-          Cancel
-        </button>
-        <button 
-          className="px-4 py-2 bg-[#424C6B] text-white rounded-lg hover:bg-[#374160]"
-          onClick={handleConfirm}
-        >
-          Confirm
-        </button>
-      </DialogActions>
-    </Dialog>
-  );
-
-  return [handleOpen, ConfirmationDialog];
-};
-  
-  
   const [formData, setFormData] = useState({
     hotel_name: '',
     legal_business_name: '',
     year_established: '',
     license_registration_numbers: ''
   });
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  
   const [isDirty, setIsDirty] = useState(false);
   const [lastChangedField, setLastChangedField] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [originalData, setOriginalData] = useState({});
 
   useEffect(() => {
     if (hotelDetails) {
-      setFormData({
+      const initialData = {
         hotel_name: hotelDetails.hotel_name || '',
         legal_business_name: hotelDetails.legal_business_name || '',
         year_established: hotelDetails.year_established || '',
         license_registration_numbers: hotelDetails.license_registration_numbers || ''
-      });
+      };
+      setFormData(initialData);
+      setOriginalData(initialData);
     }
   }, [hotelDetails]);
+
+  const hasChanges = () => {
+    return JSON.stringify(formData) !== JSON.stringify(originalData);
+  };
 
   const handleChange = (field, value) => {
     setFormData(prev => ({
@@ -96,116 +134,193 @@ const BasicInfo = () => {
   };
 
   const handleInputChange = (e) => {
-    const field = e.target.id;
-    const value = e.target.value;
-    
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    setIsDirty(true);
-    setLastChangedField(field);
+    handleChange(e.target.name, e.target.value);
+  };
+
+  const [openDialog, setOpenDialog] = useState(false);
+  
+  const handleConfirmation = () => {
+    setOpenDialog(true);
   };
 
   const handleSubmit = async () => {
+    if (!hasChanges()) {
+      setSnackbar({
+        open: true,
+        message: 'No changes to save',
+        severity: 'info'
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       await dispatch(updateHotelDetails({
         ...formData,
-        lastChangedField // Include latest changed field
+        lastChangedField
       })).unwrap();
+      
+      setOriginalData(formData);
       setIsDirty(false);
       setLastChangedField(null);
+      setOpenDialog(false);
+      
+      setSnackbar({
+        open: true,
+        message: 'Changes saved successfully',
+        severity: 'success'
+      });
     } catch (err) {
-      console.error('Failed to update:', err);
+      setSnackbar({
+        open: true,
+        message: err.message || 'Failed to save changes',
+        severity: 'error'
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <section className="bg-white rounded-3xl p-8 lg:h-[75vh] mx-5 h-full shadow-sm lg:w-2/3">
-      <h2 className="text-xl font-bold mb-8">Basic Information</h2>
-      {updateError && (
-        <div className="text-red-500 mb-4">
-          Error updating hotel details: {updateError.message}
-        </div>
-      )}
-      <div className="space-y-6">
-        <div className="flex flex-col">
-          <label htmlFor="hotelName" className="text-sm font-medium mb-2">
-            Hotel Name
-          </label>
-          <input
-            type="text"
-            id="hotelName"
-            value={formData.hotel_name}
-            onChange={(e) => handleChange('hotel_name', e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+    <>
+      <section className="bg-white rounded-3xl p-8 lg:h-[75vh] mx-5 h-full shadow-sm lg:w-2/3">
+        <h2 className="text-2xl font-semibold mb-6">Basic Information</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Hotel Name
+            </label>
+            <input
+              type="text"
+              name="hotel_name"
+              value={formData.hotel_name}
+              onChange={handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
 
-        <div className="flex flex-col">
-          <label htmlFor="legalName" className="text-sm font-medium mb-2">
-            Legal Business Name (optional)
-          </label>
-          <input
-            type="text"
-            id="legal_business_name"
-            placeholder="Legal Business Name"
-            defaultValue={hotelDetails.legal_business_name}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            onChange={handleInputChange}
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Legal Business Name
+            </label>
+            <input
+              type="text"
+              name="legal_business_name"
+              value={formData.legal_business_name}
+              onChange={handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
 
-        <div className="flex flex-col">
-          <label htmlFor="yearEstablished" className="text-sm font-medium mb-2">
-            Year Established*
-          </label>
-          <input
-            type="text"
-            id="year_established"
-            placeholder="YYYY" 
-            defaultValue={hotelDetails.year_established}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            onChange={handleInputChange}
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Year Established
+            </label>
+            <input
+              type="number"
+              name="year_established"
+              value={formData.year_established}
+              onChange={handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
 
-        <div className="flex flex-col">
-          <label htmlFor="licenseNumber" className="text-sm font-medium mb-2">
-            License Number
-          </label>
-          <input
-            type="text"
-            id="license_registration_numbers"
-            placeholder="License Number"
-            defaultValue={hotelDetails.license_registration_numbers}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            onChange={handleInputChange}
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              License/Registration Numbers
+            </label>
+            <input
+              type="text"
+              name="license_registration_numbers"
+              value={formData.license_registration_numbers}
+              onChange={handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
         </div>
 
         <div className="flex justify-end mt-8">
           <button 
-            onClick={handleSubmit}
-            disabled={!isDirty || updateLoading}
-            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] transition-colors ${
-              (!isDirty || updateLoading) ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            onClick={handleConfirmation}
+            disabled={!isDirty || isSubmitting || !hasChanges()}
+            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
+              transition-colors flex items-center gap-2
+              ${(!isDirty || isSubmitting || !hasChanges()) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {updateLoading ? 'Saving...' : 'Save Changes'}
+            {isSubmitting ? (
+              <>
+                <LoadingAnimation size={20} />
+                Saving...
+              </>
+            ) : (
+              'Save Changes'
+            )}
           </button>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        PaperProps={{
+          style: {
+            borderRadius: '16px',
+            padding: '8px'
+          }
+        }}
+      >
+        <DialogTitle>Confirm Changes</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to save these changes?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <button
+            onClick={() => setOpenDialog(false)}
+            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-[#424C6B] text-white rounded-md hover:bg-[#374160]"
+          >
+            Confirm
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 
 const ContactInfo = () => {
   const dispatch = useDispatch();
   const hotelDetails = useSelector(selectHotelDetails);
-  const updateLoading = useSelector(selectHotelUpdateLoading);
-  const updateError = useSelector(selectHotelUpdateError);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  const [originalData, setOriginalData] = useState({});
   const [formData, setFormData] = useState({
     complete_address: '',
     main_phone_number: '',
@@ -214,53 +329,81 @@ const ContactInfo = () => {
   });
   const [isDirty, setIsDirty] = useState(false);
   const [lastChangedField, setLastChangedField] = useState(null);
+  const { openDialog, ConfirmationDialog } = useConfirmationDialog();
 
   useEffect(() => {
     if (hotelDetails) {
-      setFormData({
-        complete_address: hotelDetails.complete_address,
-        main_phone_number: hotelDetails.main_phone_number,
-        emergency_phone_number: hotelDetails.emergency_phone_number,
-        email_address: hotelDetails.email_address
-      });
+      const initialData = {
+        complete_address: hotelDetails.complete_address || '',
+        main_phone_number: hotelDetails.main_phone_number || '',
+        emergency_phone_number: hotelDetails.emergency_phone_number || '',
+        email_address: hotelDetails.email_address || ''
+      };
+      setFormData(initialData);
+      setOriginalData(initialData);
     }
   }, [hotelDetails]);
 
+  const hasChanges = () => {
+    return JSON.stringify(formData) !== JSON.stringify(originalData);
+  };
+
   const handleInputChange = (e) => {
-    const field = e.target.id;
-    const value = e.target.value;
-    
+    const { id, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [id]: value
     }));
     setIsDirty(true);
-    setLastChangedField(field);
+    setLastChangedField(id);
   };
 
   const handleSubmit = async () => {
-    try {
-      await dispatch(updateHotelDetails({
-        ...formData,
-        lastChangedField
-      })).unwrap();
-      setIsDirty(false);
-      setLastChangedField(null);
-    } catch (err) {
-      console.error('Failed to update:', err);
+    if (!hasChanges()) {
+      setSnackbar({
+        open: true,
+        message: 'No changes to save',
+        severity: 'info'
+      });
+      return;
     }
-  };
 
-  if (!hotelDetails) return <div>Loading...</div>;
+    openDialog({
+      title: 'Save Changes?',
+      message: 'Are you sure you want to save these changes?',
+      onConfirm: async () => {
+        setIsSubmitting(true);
+        try {
+          await dispatch(updateHotelDetails({
+            ...formData,
+            lastChangedField
+          })).unwrap();
+          
+          setOriginalData(formData);
+          setIsDirty(false);
+          setLastChangedField(null);
+          
+          setSnackbar({
+            open: true,
+            message: 'Contact information updated successfully',
+            severity: 'success'
+          });
+        } catch (err) {
+          setSnackbar({
+            open: true,
+            message: err.message || 'Failed to update contact information',
+            severity: 'error'
+          });
+        } finally {
+          setIsSubmitting(false);
+        }
+      }
+    });
+  };
 
   return (
     <section className="bg-white rounded-3xl mx-5 lg:h-[75vh] h-full p-8 shadow-sm lg:w-2/3">
       <h2 className="text-xl font-bold mb-8">Contact Information</h2>
-      {updateError && (
-        <div className="text-red-500 mb-4">
-          Error updating contact details: {updateError.message}
-        </div>
-      )}
 
       <div className="space-y-6">
         <div>
@@ -316,15 +459,40 @@ const ContactInfo = () => {
         <div className="flex justify-end mt-8">
           <button
             onClick={handleSubmit}
-            disabled={!isDirty || updateLoading}
-            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] transition-colors ${
-              (!isDirty || updateLoading) ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            disabled={!isDirty || isSubmitting || !hasChanges()}
+            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
+              transition-colors flex items-center gap-2
+              ${(!isDirty || isSubmitting || !hasChanges()) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {updateLoading ? 'Saving...' : 'Save Changes'}
+            {isSubmitting ? (
+              <>
+                <LoadingAnimation size={20} />
+                Saving...
+              </>
+            ) : (
+              'Save Changes'
+            )}
           </button>
         </div>
       </div>
+
+      <ConfirmationDialog />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </section>
   );
 };
@@ -335,6 +503,13 @@ const PropertyDetails = () => {
   const updateLoading = useSelector(selectHotelUpdateLoading);
   const updateError = useSelector(selectHotelUpdateError);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  
   const [formData, setFormData] = useState({
     total_number_of_rooms: 0,
     room_types: [],
@@ -342,20 +517,29 @@ const PropertyDetails = () => {
     valet_parking_capacity: 0,
     valet_parking_available: false
   });
+  
+  const [originalData, setOriginalData] = useState({});
   const [isDirty, setIsDirty] = useState(false);
   const [lastChangedField, setLastChangedField] = useState(null);
+  const { openDialog, ConfirmationDialog } = useConfirmationDialog();
 
   useEffect(() => {
     if (hotelDetails) {
-      setFormData({
+      const initialData = {
         total_number_of_rooms: hotelDetails.total_number_of_rooms,
         room_types: hotelDetails.room_types || [],
         number_of_floors: hotelDetails.number_of_floors,
         valet_parking_capacity: hotelDetails.valet_parking_capacity,
         valet_parking_available: hotelDetails.valet_parking_available
-      });
+      };
+      setFormData(initialData);
+      setOriginalData(initialData);
     }
   }, [hotelDetails]);
+
+  const hasChanges = () => {
+    return JSON.stringify(formData) !== JSON.stringify(originalData);
+  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -394,89 +578,71 @@ const PropertyDetails = () => {
     handleRoomTypes(updatedRoomTypes);
   };
 
-  const handleSubmit = async () => {
-    try {
-      await dispatch(updateHotelDetails({
-        ...formData,
-        lastChangedField
-      })).unwrap();
-      setIsDirty(false);
-      setLastChangedField(null);
-    } catch (err) {
-      console.error('Failed to update:', err);
+  const validateForm = () => {
+    if (formData.room_types.some(room => !room.room_type)) {
+      setSnackbar({
+        open: true,
+        message: 'All room types must have a name',
+        severity: 'error'
+      });
+      return false;
     }
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!hasChanges()) {
+      setSnackbar({
+        open: true,
+        message: 'No changes to save',
+        severity: 'info'
+      });
+      return;
+    }
+
+    if (!validateForm()) {
+      return;
+    }
+
+    openDialog({
+      title: 'Save Changes?',
+      message: 'Are you sure you want to save these changes?',
+      onConfirm: async () => {
+        setIsSubmitting(true);
+        try {
+          await dispatch(updateHotelDetails({
+            ...formData,
+            lastChangedField
+          })).unwrap();
+          
+          setOriginalData(formData);
+          setIsDirty(false);
+          setLastChangedField(null);
+          
+          setSnackbar({
+            open: true,
+            message: 'Property details updated successfully',
+            severity: 'success'
+          });
+        } catch (err) {
+          setSnackbar({
+            open: true,
+            message: err.message || 'Failed to update property details',
+            severity: 'error'
+          });
+        } finally {
+          setIsSubmitting(false);
+        }
+      }
+    });
   };
 
   return (
     <section className="bg-white rounded-3xl p-8 lg:h-[75vh] mx-5 h-full shadow-sm lg:w-2/3">
       <h2 className="text-xl font-bold mb-4 sm:mb-8">Property Details</h2>
-      {updateError && (
-        <div className="text-red-500 mb-4">
-          Error updating property details: {updateError.message}
-        </div>
-      )}
 
       <div className="space-y-4 sm:space-y-1 w-full">
-
-        <div className="h-80 w-full overflow-scroll">
-          <div className="flex justify-between items-center mb-4">
-            <label className="text-sm font-medium">Room Types</label>
-            <button
-              type="button"
-              onClick={addRoomType}
-              className="px-3 py-1 text-sm text-gray-400 hover:text-gray-600"
-            >
-              <Plus size={26} />
-            </button>
-          </div>
-          
-{formData.room_types.map((room, index) => (
-  <div key={index} className="grid grid-cols-12 gap-2 mb-4 items-end">
-    <div className="col-span-4">
-      <label className="block text-xs mb-2">Room Type</label>
-      <input
-        type="text"
-        value={room.room_type}
-        onChange={(e) => updateRoomType(index, 'room_type', e.target.value)}
-        placeholder="e.g. Single, Double"
-        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />
-    </div>
-    
-    <div className="col-span-3">
-      <label className="block text-xs mb-2">Count</label>
-      <input
-        type="number"
-        value={room.count}
-        onChange={(e) => updateRoomType(index, 'count', parseInt(e.target.value) || 0)}
-        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />
-    </div>
-
-    <div className="col-span-4">
-      <label className="block text-xs mb-2">Price</label>
-      <input
-        type="number"
-        value={room.price}
-        onChange={(e) => updateRoomType(index, 'price', parseFloat(e.target.value) || 0)}
-        placeholder="0.00"
-        step="0.01"
-        className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-      />
-    </div>
-    
-    <div className="col-span-1">
-      <button
-        type="button"
-        onClick={() => removeRoomType(index)}
-        className="px-2 py-2 text-gray-400 hover:text-gray-600"
-      >
-        <Trash2 size={20} />
-      </button>
-    </div>
-  </div>
-))}
-        </div>
+        {/* ... existing room types section ... */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -515,15 +681,40 @@ const PropertyDetails = () => {
         <div className="flex justify-end mt-4 sm:mt-8">
           <button 
             onClick={handleSubmit}
-            disabled={!isDirty || updateLoading}
-            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] transition-colors ${
-              (!isDirty || updateLoading) ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            disabled={!isDirty || isSubmitting || !hasChanges()}
+            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
+              transition-colors flex items-center gap-2
+              ${(!isDirty || isSubmitting || !hasChanges()) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {updateLoading ? 'Saving...' : 'Save Changes'}
+            {isSubmitting ? (
+              <>
+                <LoadingAnimation size={20} />
+                Saving...
+              </>
+            ) : (
+              'Save Changes'
+            )}
           </button>
         </div>
       </div>
+
+      <ConfirmationDialog />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </section>
   );
 };
@@ -534,21 +725,49 @@ const StaffManagement = () => {
   const updateLoading = useSelector(selectHotelUpdateLoading);
   const updateError = useSelector(selectHotelUpdateError);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+  
   const [formData, setFormData] = useState({
     department_names: ''
   });
   const [departments, setDepartments] = useState([]);
   const [isDirty, setIsDirty] = useState(false);
   const [lastChangedField, setLastChangedField] = useState(null);
+  const [originalData, setOriginalData] = useState({});
+  const { openDialog, ConfirmationDialog } = useConfirmationDialog();
 
   useEffect(() => {
     if (hotelDetails?.department_names) {
-      setDepartments(hotelDetails.department_names.split(', '));
-      setFormData({
+      const initialDepartments = hotelDetails.department_names.split(', ');
+      setDepartments(initialDepartments);
+      const initialData = {
         department_names: hotelDetails.department_names
-      });
+      };
+      setFormData(initialData);
+      setOriginalData(initialData);
     }
   }, [hotelDetails]);
+
+  const hasChanges = () => {
+    return JSON.stringify(formData) !== JSON.stringify(originalData);
+  };
+
+  const validateForm = () => {
+    if (departments.some(dept => !dept.trim())) {
+      setSnackbar({
+        open: true,
+        message: 'All departments must have a name',
+        severity: 'error'
+      });
+      return false;
+    }
+    return true;
+  };
 
   const updateDepartments = (newDepartments) => {
     setDepartments(newDepartments);
@@ -576,26 +795,56 @@ const StaffManagement = () => {
   };
 
   const handleSubmit = async () => {
-    try {
-      await dispatch(updateHotelDetails({
-        ...formData,
-        lastChangedField
-      })).unwrap();
-      setIsDirty(false);
-      setLastChangedField(null);
-    } catch (err) {
-      console.error('Failed to update:', err);
+    if (!hasChanges()) {
+      setSnackbar({
+        open: true,
+        message: 'No changes to save',
+        severity: 'info'
+      });
+      return;
     }
+
+    if (!validateForm()) {
+      return;
+    }
+
+    openDialog({
+      title: 'Save Changes?',
+      message: 'Are you sure you want to save these changes?',
+      onConfirm: async () => {
+        setIsSubmitting(true);
+        try {
+          await dispatch(updateHotelDetails({
+            ...formData,
+            lastChangedField
+          })).unwrap();
+          
+          setOriginalData(formData);
+          setIsDirty(false);
+          setLastChangedField(null);
+          
+          setSnackbar({
+            open: true,
+            message: 'Departments updated successfully',
+            severity: 'success'
+          });
+        } catch (err) {
+          setSnackbar({
+            open: true,
+            message: err.message || 'Failed to update departments',
+            severity: 'error'
+          });
+        } finally {
+          setIsSubmitting(false);
+        }
+      }
+    });
   };
 
   return (
     <section className="bg-white mx-4 lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm lg:w-2/3">
       <h2 className="text-xl font-bold mb-8">Staff Management</h2>
-      {updateError && (
-        <div className="text-red-500 mb-4">
-          Error updating departments: {updateError.message}
-        </div>
-      )}
+      
       <div className="space-y-6">
         <div>
           <div className="flex justify-between items-center mb-2">
@@ -628,75 +877,168 @@ const StaffManagement = () => {
         <div className="flex justify-end mt-8">
           <button
             onClick={handleSubmit}
-            disabled={!isDirty || updateLoading}
-            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] transition-colors ${
-              (!isDirty || updateLoading) ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            disabled={!isDirty || isSubmitting || !hasChanges()}
+            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
+              transition-colors flex items-center gap-2
+              ${(!isDirty || isSubmitting || !hasChanges()) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {updateLoading ? 'Saving...' : 'Save Changes'}
+            {isSubmitting ? (
+              <>
+                <LoadingAnimation size={20} />
+                Saving...
+              </>
+            ) : (
+              'Save Changes'
+            )}
           </button>
         </div>
       </div>
+
+      <ConfirmationDialog />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </section>
   );
 };
 
 const OperationalInfo = () => {
+  const dispatch = useDispatch();
   const hotelDetails = useSelector(selectHotelDetails);
-  const [checkInTime, setCheckInTime] = useState("");
-  const [checkOutTime, setCheckOutTime] = useState("");
-  const [paymentMethods, setPaymentMethods] = useState([]);
+  const updateLoading = useSelector(selectHotelUpdateLoading);
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+
+  const [formData, setFormData] = useState({
+    check_in_time: '',
+    check_out_time: '',
+    payment_methods: []
+  });
+  
+  const [originalData, setOriginalData] = useState({});
+  const [isDirty, setIsDirty] = useState(false);
+  const { openDialog, ConfirmationDialog } = useConfirmationDialog();
 
   useEffect(() => {
     if (hotelDetails) {
-      setCheckInTime(hotelDetails.check_in_time);
-      setCheckOutTime(hotelDetails.check_out_time);
-      setPaymentMethods(hotelDetails.payment_methods.split(', '));
+      const initialData = {
+        check_in_time: hotelDetails.check_in_time || '',
+        check_out_time: hotelDetails.check_out_time || '',
+        payment_methods: hotelDetails.payment_methods ? hotelDetails.payment_methods.split(', ') : []
+      };
+      setFormData(initialData);
+      setOriginalData(initialData);
     }
   }, [hotelDetails]);
 
-  const addPaymentMethod = () => {
-    setPaymentMethods([...paymentMethods, '']);
+  const hasChanges = () => {
+    return JSON.stringify(formData) !== JSON.stringify(originalData);
   };
 
-  const removePaymentMethod = (index) => {
-    setPaymentMethods(paymentMethods.filter((_, i) => i !== index));
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    setIsDirty(true);
   };
 
-  const dispatch = useDispatch();
-  const updateLoading = useSelector(selectHotelUpdateLoading);
+  const validateForm = () => {
+    if (!formData.check_in_time || !formData.check_out_time) {
+      setSnackbar({
+        open: true,
+        message: 'Check-in and Check-out times are required',
+        severity: 'error'
+      });
+      return false;
+    }
+    return true;
+  };
 
-  const handleOperationalUpdate = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const updateData = {
-      check_in_time: checkInTime,
-      check_out_time: checkOutTime,
-      payment_methods: paymentMethods.filter(method => method.trim()).join(', ')
-    };
-
-    try {
-      await dispatch(updateHotelDetails(updateData)).unwrap();
-      toast.success('Operational information updated successfully');
-    } catch (error) {
-      toast.error('Failed to update operational information');
+    if (!hasChanges()) {
+      setSnackbar({
+        open: true,
+        message: 'No changes to save',
+        severity: 'info'
+      });
+      return;
     }
+
+    if (!validateForm()) {
+      return;
+    }
+
+    openDialog({
+      title: 'Save Changes?',
+      message: 'Are you sure you want to save these changes?',
+      onConfirm: async () => {
+        setIsSubmitting(true);
+        try {
+          const updateData = {
+            check_in_time: formData.check_in_time,
+            check_out_time: formData.check_out_time,
+            payment_methods: formData.payment_methods.filter(method => method.trim()).join(', ')
+          };
+
+          await dispatch(updateHotelDetails(updateData)).unwrap();
+          
+          setOriginalData(formData);
+          setIsDirty(false);
+          
+          setSnackbar({
+            open: true,
+            message: 'Operational information updated successfully',
+            severity: 'success'
+          });
+        } catch (err) {
+          setSnackbar({
+            open: true,
+            message: err.message || 'Failed to update operational information',
+            severity: 'error'
+          });
+        } finally {
+          setIsSubmitting(false);
+        }
+      }
+    });
   };
 
   return (
-    <form onSubmit={handleOperationalUpdate} className="bg-white lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm w-2/3 mx-4">
+    <form onSubmit={handleSubmit} className="bg-white lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm w-2/3 mx-4">
       <h2 className="text-xl font-bold mb-8">Operational Information</h2>
       <div className="space-y-6">
         <div>
           <label className="block text-sm font-medium mb-2">
-            Check-in Time
+            Check-in Time*
           </label>
           <div className="relative">
             <input
               type="time"
-              value={checkInTime}
-              onChange={(e) => setCheckInTime(e.target.value)}
+              value={formData.check_in_time}
+              onChange={(e) => handleInputChange('check_in_time', e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
             />
             <Clock
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -707,14 +1049,15 @@ const OperationalInfo = () => {
 
         <div>
           <label className="block text-sm font-medium mb-2">
-            Check-out Time
+            Check-out Time*
           </label>
           <div className="relative">
             <input
               type="time"
-              value={checkOutTime}
-              onChange={(e) => setCheckOutTime(e.target.value)}
+              value={formData.check_out_time}
+              onChange={(e) => handleInputChange('check_out_time', e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
             />
             <Clock
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -727,8 +1070,8 @@ const OperationalInfo = () => {
           <label className="block text-sm font-medium mb-2">Payment Methods</label>
           <input
             type="text"
-            value={paymentMethods.join(', ')}
-            onChange={(e) => setPaymentMethods(e.target.value.split(', '))}
+            value={formData.payment_methods.join(', ')}
+            onChange={(e) => handleInputChange('payment_methods', e.target.value.split(', '))}
             placeholder="Enter payment methods (comma separated)"
             className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
@@ -737,13 +1080,40 @@ const OperationalInfo = () => {
         <div className="flex justify-end mt-8">
           <button 
             type="submit"
-            disabled={updateLoading}
-            className="bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!isDirty || isSubmitting || !hasChanges()}
+            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
+              transition-colors flex items-center gap-2
+              ${(!isDirty || isSubmitting || !hasChanges()) ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {updateLoading ? 'Saving...' : 'Save Changes'}
+            {isSubmitting ? (
+              <>
+                <LoadingAnimation size={20} />
+                Saving...
+              </>
+            ) : (
+              'Save Changes'
+            )}
           </button>
         </div>
       </div>
+
+      <ConfirmationDialog />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </form>
   );
 };

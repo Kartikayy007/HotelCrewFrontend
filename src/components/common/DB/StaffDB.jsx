@@ -13,13 +13,13 @@ import {
   Button,
   Typography,
   Grid,
-  Divider,
   TextField,
   Snackbar,
   Alert,
   FormControl,
   InputLabel,
-  Select
+  Select,
+  Tooltip
 } from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {
@@ -35,6 +35,23 @@ const ROLES = {
   STAFF: 'staff',
   RECEPTIONIST: 'receptionist',
   MANAGER: 'manager'
+};
+
+// Add at the top of StaffDB.jsx
+const capitalizeShift = (shift) => {
+  if (!shift) return '';
+  return shift.charAt(0).toUpperCase() + shift.slice(1).toLowerCase();
+};
+
+// Add validation functions at the top
+const isValidEmail = (email) => {
+  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailPattern.test(email);
+};
+
+const isValidUPI = (upi) => {
+  const upiPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/;
+  return upiPattern.test(upi);
 };
 
 const TableRowSkeleton = () => (
@@ -82,12 +99,13 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
       }));
   }, [staffList]);
 
+  // Update the shifts memo in EditDialog
   const shifts = useMemo(() => {
     return [...new Set(staffList.map(s => s.shift))]
       .filter(Boolean)
       .map(shift => ({
-        value: shift,
-        label: shift.charAt(0).toUpperCase() + shift.slice(1)
+        value: shift.toLowerCase(),
+        label: capitalizeShift(shift)
       }));
   }, [staffList]);
 
@@ -115,8 +133,13 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
     }));
   }, []);
 
+  // Update handleSave in EditDialog to capitalize shift before saving
   const handleSave = React.useCallback(async () => {
-    await onSave(formData);
+    const updatedData = {
+      ...formData,
+      shift: capitalizeShift(formData.shift)
+    };
+    await onSave(updatedData);
   }, [formData, onSave]);
 
   return (
@@ -143,14 +166,21 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
           onChange={handleChange}
           onClick={e => e.stopPropagation()}
         />
-        <TextField
-          margin="dense"
-          name="email"
-          label="Email"
-          fullWidth
-          value={formData.email || ''}
-          onChange={handleChange}
-        />
+        <Tooltip
+          open={formData.email && !isValidEmail(formData.email)}
+          title="Please enter a valid email address"
+          placement="top"
+          arrow
+        >
+          <TextField
+            margin="dense"
+            name="email"
+            label="Email"
+            fullWidth
+            value={formData.email || ''}
+            onChange={handleChange}
+          />
+        </Tooltip>
         <FormControl fullWidth margin="dense">
           <InputLabel>Department</InputLabel>
           <Select
@@ -170,31 +200,14 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
           <InputLabel>Role</InputLabel>
           <Select
             name="role"
-            value={formData.role || 'staff'}
+            value={formData.role || ''}
             onChange={handleChange}
             label="Role"
-            displayEmpty
-            MenuProps={{
-              anchorOrigin: {
-                vertical: 'bottom',
-                horizontal: 'left'
-              },
-              transformOrigin: {
-                vertical: 'top',
-                horizontal: 'left'
-              },
-              PaperProps: {
-                style: {
-                  maxHeight: 200
-                }
-              }
-            }}
           >
             {roles.map(role => (
               <MenuItem 
                 key={role.value} 
                 value={role.value}
-                selected={role.value === formData.role}
               >
                 {role.label}
               </MenuItem>
@@ -210,7 +223,10 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
             label="Shift"
           >
             {shifts.map(shift => (
-              <MenuItem key={shift.value} value={shift.value}>
+              <MenuItem 
+                key={shift.value} 
+                value={shift.value}
+              >
                 {shift.label}
               </MenuItem>
             ))}
@@ -225,18 +241,46 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
           onChange={handleChange}
           type="number"
         />
-        <TextField
-          margin="dense"
-          name="upi_id"
-          label="UPI ID"
-          fullWidth
-          value={formData.upi_id || ''}
-          onChange={handleChange}
-        />
+        <Tooltip
+          open={formData.upi_id && !isValidUPI(formData.upi_id)}
+          title="Please enter a valid UPI ID"
+          placement="top"
+          arrow
+        >
+          <TextField
+            margin="dense"
+            name="upi_id"
+            label="UPI ID"
+            fullWidth
+            value={formData.upi_id || ''}
+            onChange={handleChange}
+          />
+        </Tooltip>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSave}>Save</Button>
+        <Tooltip
+          open={
+            (formData.email && !isValidEmail(formData.email)) ||
+            (formData.upi_id && !isValidUPI(formData.upi_id))
+          }
+          placement="top"
+          arrow
+        >
+          <span>
+            <Button 
+              onClick={handleSave}
+              disabled={
+                !formData.email ||
+                !isValidEmail(formData.email) ||
+                !formData.upi_id ||
+                !isValidUPI(formData.upi_id)
+              }
+            >
+              Save
+            </Button>
+          </span>
+        </Tooltip>
       </DialogActions>
     </Dialog>
   );
@@ -587,7 +631,9 @@ function StaffDB({ searchTerm, filters }) {
                     {employee.department || "N/A"}
                   </td>
                   <td className="p-4 text-gray-700">{employee.role}</td>
-                  <td className="p-4 text-gray-700">{employee.shift}</td>
+                  <td className="p-4 text-gray-700">
+                    {capitalizeShift(employee.shift)}
+                  </td>
                   <td className="p-4 font-medium text-gray-900">
                     ₹{employee.salary}
                   </td>
