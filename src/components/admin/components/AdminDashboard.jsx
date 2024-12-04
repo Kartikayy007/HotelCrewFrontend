@@ -11,10 +11,7 @@ import {
   Snackbar,
   Alert,
   IconButton,
-  Slider,
-  Skeleton,
-  Grid,
-  Card,
+  Skeleton
 } from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {

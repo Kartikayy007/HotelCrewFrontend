@@ -89,7 +89,7 @@ const revenueSlice = createSlice({
       .addCase(fetchRevenueStats.fulfilled, (state, action) => {
         state.loading = false;
         state.dates = action.payload.dates;
-        state.dailyRevenues = action.payload.daily_revenues;
+        state.dailyRevenues = action.payload.daily_revenues; // Make sure this matches API response
         state.daily_checkins = action.payload.daily_checkins;
         state.daily_checkouts = action.payload.daily_checkouts;
         
@@ -106,6 +106,7 @@ const revenueSlice = createSlice({
         
         state.lastFetched = Date.now();
         state.error = null;
+        console.log('API Response:', action.payload); // Add this log
       })
       .addCase(fetchRevenueStats.rejected, (state, action) => {
         state.loading = false;
