@@ -79,6 +79,18 @@ export const massCreateStaff = createAsyncThunk(
   }
 );
 
+export const fetchRooms = createAsyncThunk(
+  'hotelDetails/fetchRooms',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('/api/rooms');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 const hotelDetailsSlice = createSlice({
   name: 'hotelDetails',
   initialState: {
@@ -138,6 +150,7 @@ export const selectHotelLoading = (state) => state.hotelDetails.loading;
 export const selectHotelError = (state) => state.hotelDetails.error;
 export const selectHotelUpdateLoading = (state) => state.hotelDetails.updateLoading;
 export const selectHotelUpdateError = (state) => state.hotelDetails.updateError;
+export const selectRooms = (state) => state.hotelDetails.rooms;
 
 // In HotelDetailsSlice.jsx - update the selectDepartmentNames selector
 export const selectDepartmentNames = (state) => {
