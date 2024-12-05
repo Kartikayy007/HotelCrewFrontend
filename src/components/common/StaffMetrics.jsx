@@ -35,7 +35,7 @@ const StaffMetrics = () => {
 
   const fetchWeeklyData = async () => {
     try {
-      const response = await axios.get('https://hotelcrew-1.onrender.com/api/statics/performance/hotel/week/', {
+      const response = await axios.get('https://hotelcrew-1.onrender.com/api/statics/performance/hotel/past7/', {
         headers: getAuthHeaders(),
       });
       
