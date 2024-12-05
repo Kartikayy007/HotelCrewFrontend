@@ -185,7 +185,7 @@ const BasicInfo = () => {
 
   return (
     <>
-      <section className="bg-white rounded-3xl p-8 lg:h-[75vh] mx-5 h-full shadow-sm lg:w-2/3">
+      <section className="bg-white rounded-3xl p-8 lg:h-[75vh] mx-5 h-full  lg:w-2/3">
         <h2 className="text-2xl font-semibold mb-6">Basic Information</h2>
 
         <div className="space-y-6">
@@ -416,7 +416,7 @@ const ContactInfo = () => {
   };
 
   return (
-    <section className="bg-white rounded-3xl mx-5 lg:h-[75vh] h-full p-8 shadow-sm lg:w-2/3">
+    <section className="bg-white rounded-3xl mx-5 lg:h-[75vh] h-full p-8  lg:w-2/3">
       <h2 className="text-xl font-bold mb-8">Contact Information</h2>
 
       <div className="space-y-6">
@@ -615,7 +615,7 @@ const PropertyDetails = () => {
   };
 
   return (
-    <section className="bg-white rounded-3xl p-8 lg:h-[75vh] mx-5 h-full shadow-sm lg:w-2/3">
+    <section className="bg-white rounded-3xl h-full  sm:p-8 lg:h-[75vh] sm:mx-5 mx-[16px] py-8 px-3   lg:w-2/3">
       <h2 className="text-xl font-bold mb-4 sm:mb-8">Property Details</h2>
       {updateError && (
         <div className="text-red-500 mb-4">
@@ -657,7 +657,7 @@ const PropertyDetails = () => {
                 <input
                   type="number"
                   value={room.count}
-                  min={0}
+                  min={1}
                   onChange={(e) =>
                     updateRoomType(
                       index,
@@ -927,7 +927,7 @@ const StaffManagement = () => {
   };
 
   return (
-    <section className="bg-white mx-4 lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm lg:w-2/3">
+    <section className="bg-white mx-4 lg:h-[75vh] h-full rounded-3xl p-8  lg:w-2/3">
       <h2 className="text-xl font-bold mb-8">Staff Management</h2>
 
       <div className="space-y-6 h-96 overflow-y-auto">
@@ -1122,7 +1122,7 @@ const OperationalInfo = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm w-2/3 mx-4"
+      className="bg-white lg:h-[75vh] h-full rounded-3xl p-8  w-2/3 mx-4"
     >
       <h2 className="text-xl font-bold mb-8">Operational Information</h2>
       <div className="space-y-6">
@@ -1298,7 +1298,7 @@ const StaffData = () => {
   };
 
   return (
-    <section className="bg-white lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm lg:w-2/3 mx-4">
+    <section className="bg-white lg:h-[75vh] h-full rounded-3xl p-8  lg:w-2/3 mx-4">
       <h2 className="text-xl font-bold mb-8">Staff Data</h2>
       {/* {file && (
         <div className="mb-4 p-2 bg-gray-100 rounded">
@@ -1622,14 +1622,14 @@ const AdminSettings = () => {
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] min-h-screen w-full overflow-y-auto p-2 sm:p-4">
       <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
         Settings
       </h1>
 
       <div className="mb-6 mt-6">
         <div>
-          <nav className="flex flex-wrap">
+          <nav className="flex overflow-x-auto w-screen   md:w-full">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -1647,7 +1647,7 @@ const AdminSettings = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-tr-lg rounded-b-lg shadow lg:w-[75vw] -mt-7">
+      <div className="bg-white rounded-tr-lg rounded-b-lg shadow xl:w-[75vw] -mt-7">
         {renderContent()}
       </div>
     </section>
