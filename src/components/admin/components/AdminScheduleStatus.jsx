@@ -259,7 +259,7 @@ useEffect(() => {
       </h1>
 
       <div>
-        <div className="bg-white rounded-lg shadow-lg mx-6 min-h-[calc(118vh-120px)] lg:h-[80rem]">
+        <div className="bg-white w-full rounded-lg shadow-lg mx-6 min-h-[calc(118vh-120px)] lg:h-[80rem]">
           <div className="z-10 pb-2 xs:pb-4 sm:pb-6">
             <div className="flex justify-between items-start sm:items-center p-2 xs:p-4 sm:p-6">
               <h1 className="font-semibold text-lg xs:text-xl sm:text-2xl mb-2 xs:mb-4 sm:mb-0">

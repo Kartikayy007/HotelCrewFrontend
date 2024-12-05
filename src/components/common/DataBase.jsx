@@ -201,7 +201,7 @@ function DataBase() {
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
       <div className="w-[95vw] sm:w-[95vw] md:w-[95vw] lg:w-[95vw] xl:w-[95vw] 2xl:w-[80vw]">
         <div>
           <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12 text-[#252941] mb-2">

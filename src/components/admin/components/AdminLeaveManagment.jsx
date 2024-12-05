@@ -378,12 +378,12 @@ const AdminLeaveManagement = () => {
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
       <h1 className="lg:text-3xl text-2xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
         Staff Leave Management
       </h1>
       <div className={`bg-white mx-6 ${
-        isMobile ? 'rounded-lg shadow-md' : 'h-[83vh] overflow-scroll rounded-lg shadow-lg'
+        isMobile ? 'rounded-lg shadow-md' : 'h-[83vh] overflow-auto rounded-lg shadow-lg'
       } p-4 sm:p-6`}>
         <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'} mt-3 mb-6`}>
           <div className={`flex ${isMobile ? 'justify-center' : 'space-x-2'} ${!isMobile && 'items-center'}`}>

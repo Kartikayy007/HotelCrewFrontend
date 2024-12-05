@@ -4,8 +4,7 @@ import axios from 'axios';
 const CACHE_EXPIRY_TIME = 60 * 60 * 1000; // 1 hour in milliseconds
 
 const getAuthToken = () => {
-  // const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1MjA1NDQ5LCJpYXQiOjE3MzI2MTM0NDksImp0aSI6Ijc5YzAzNWM4YTNjMjRjYWU4MDlmY2MxMWFmYTc2NTMzIiwidXNlcl9pZCI6OTB9.semxNFVAZZJreC9NWV7N0HsVzgYxpVG1ysjWG5qu8Xs';
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
   if (!token) {
     throw new Error('Authentication token not found');
   }
@@ -127,12 +126,33 @@ export const fetchWeeklyAttendance = createAsyncThunk(
   }
 );
 
+// const initialState = {
+//   stats: {
+//     total_crew: 0,
+//     total_present: 0,
+//     days_with_records_this_month: 0,
+//     total_present_month: 0
+//   },
+//   todayList: [],
+//   weeklyStats: {
+//     dates: [],
+//     total_crew_present: [],
+//     total_staff_absent: [],
+//     loading: false,
+//     error: null,
+//     lastFetched: null
+//   },
+//   lastWeeklyFetch: null,
+//   loading: false,
+//   error: null,
+//   lastFetched: null
+// };
 const initialState = {
   stats: {
     total_crew: 0,
     total_present: 0,
     days_with_records_this_month: 0,
-    total_present_month: 0
+    total_present_month: 0,
   },
   todayList: [],
   weeklyStats: {
@@ -141,14 +161,13 @@ const initialState = {
     total_staff_absent: [],
     loading: false,
     error: null,
-    lastFetched: null
+    lastFetched: null,
   },
   lastWeeklyFetch: null,
   loading: false,
   error: null,
-  lastFetched: null
+  lastFetched: null,
 };
-
 const adminAttendanceSlice = createSlice({
   name: 'attendance',
   initialState,
@@ -208,7 +227,7 @@ const adminAttendanceSlice = createSlice({
 });
 
 // Selectors
-export const selectWeeklyStats = (state) => state.attendance.weeklyStats;
+export const selectWeeklyStats = (state) => state.attendance.weeklyStats || initialState.weeklyStats;
 export const selectWeeklyStatsLoading = (state) => state.attendance.weeklyStats.loading;
 export const selectWeeklyStatsError = (state) => state.attendance.weeklyStats.error;
 

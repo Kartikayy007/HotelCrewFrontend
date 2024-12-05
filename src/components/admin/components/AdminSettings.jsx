@@ -196,6 +196,7 @@ const BasicInfo = () => {
             <input
               type="text"
               name="hotel_name"
+              maxLength={120}
               value={formData.hotel_name}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -209,6 +210,7 @@ const BasicInfo = () => {
             <input
               type="text"
               name="legal_business_name"
+              maxLength={150}
               value={formData.legal_business_name}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -222,6 +224,9 @@ const BasicInfo = () => {
             <input
               type="number"
               name="year_established"
+              min={1000}
+              max={2024}
+              minLength={3}
               value={formData.year_established}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -234,6 +239,7 @@ const BasicInfo = () => {
             </label>
             <input
               type="text"
+              maxLength={100}
               name="license_registration_numbers"
               value={formData.license_registration_numbers}
               onChange={handleInputChange}
@@ -424,6 +430,7 @@ const ContactInfo = () => {
           <input
             type="text"
             id="complete_address"
+            maxLength={150}
             value={formData.complete_address}
             onChange={handleInputChange}
             className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -438,6 +445,7 @@ const ContactInfo = () => {
             <input
               type="tel"
               id="main_phone_number"
+              maxLength={10}
               placeholder="Main number"
               value={formData.main_phone_number}
               onChange={handleInputChange}
@@ -446,6 +454,7 @@ const ContactInfo = () => {
             <input
               type="tel"
               id="emergency_phone_number"
+              maxLength={10}
               placeholder="Emergency number"
               value={formData.emergency_phone_number}
               onChange={handleInputChange}
@@ -463,6 +472,7 @@ const ContactInfo = () => {
           </label>
           <input
             type="email"
+            maxLength={150}
             id="email_address"
             value={formData.email_address}
             onChange={handleInputChange}
@@ -614,7 +624,7 @@ const PropertyDetails = () => {
       )}
 
       <div className="space-y-4 sm:space-y-1 w-full">
-        <div className="h-80 w-full overflow-scroll">
+        <div className="h-80 w-full overflow-auto">
           <div className="flex justify-between items-center mb-4">
             <label className="text-sm font-medium">Room Types</label>
             <button
@@ -632,6 +642,7 @@ const PropertyDetails = () => {
                 <label className="block text-xs mb-2">Room Type</label>
                 <input
                   type="text"
+                  maxLength={70}
                   value={room.room_type}
                   onChange={(e) =>
                     updateRoomType(index, "room_type", e.target.value)
@@ -646,6 +657,7 @@ const PropertyDetails = () => {
                 <input
                   type="number"
                   value={room.count}
+                  min={0}
                   onChange={(e) =>
                     updateRoomType(
                       index,
@@ -662,6 +674,7 @@ const PropertyDetails = () => {
                 <input
                   type="number"
                   value={room.price}
+                  min={0}
                   onChange={(e) =>
                     updateRoomType(
                       index,
@@ -695,6 +708,7 @@ const PropertyDetails = () => {
             </label>
             <input
               type="number"
+              min={1}
               value={formData.number_of_floors}
               onChange={(e) =>
                 handleInputChange("number_of_floors", parseInt(e.target.value) || 0)
@@ -709,6 +723,7 @@ const PropertyDetails = () => {
             </label>
             <input
               type="number"
+              min={0}
               value={formData.valet_parking_capacity}
               onChange={(e) =>
                 handleInputChange("valet_parking_capacity", parseInt(e.target.value) || 0)
@@ -915,9 +930,9 @@ const StaffManagement = () => {
     <section className="bg-white mx-4 lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm lg:w-2/3">
       <h2 className="text-xl font-bold mb-8">Staff Management</h2>
 
-      <div className="space-y-6">
+      <div className="space-y-6 h-96 overflow-y-auto">
         <div>
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between  items-center mb-2">
             <label className="block text-sm font-medium">Departments</label>
             <button
               onClick={addDepartment}
@@ -927,10 +942,11 @@ const StaffManagement = () => {
             </button>
           </div>
           {departments.map((department, index) => (
-            <div key={index} className="flex gap-4 mb-4 items-center">
+            <div key={index} className="flex gap-4 mb-4 items-center ">
               <input
                 type="text"
                 value={department}
+                maxLength={50}
                 onChange={(e) => handleDepartmentChange(index, e.target.value)}
                 placeholder="Department name"
                 className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -943,6 +959,7 @@ const StaffManagement = () => {
               </button>
             </div>
           ))}
+        </div>
         </div>
         <div className="flex justify-end mt-8">
           <button
@@ -966,7 +983,7 @@ const StaffManagement = () => {
             )}
           </button>
         </div>
-      </div>
+      
 
       <ConfirmationDialog />
 

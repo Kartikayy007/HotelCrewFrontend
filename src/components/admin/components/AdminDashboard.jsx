@@ -876,7 +876,7 @@ function AdminDashboard() {
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
       {isInitialLoading ? (
         <DashboardLoadingState />
       ) : (
@@ -1217,7 +1217,7 @@ function AdminDashboard() {
                       ))}
                     </div>
                   ) : (
-                    <div className="overflow-scroll">
+                    <div className="overflow-y-auto">
                       {sortedAnnouncements.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-8 px-4">
                           <svg
