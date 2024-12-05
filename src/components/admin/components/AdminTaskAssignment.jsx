@@ -352,7 +352,15 @@ const AdminTaskAssignment = ({ onClose }) => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Monitor Active Tasks</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Monitor Active Tasks</h1>
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-500" />
+        </button>
+      </div>
       
       <div className="mb-4 grid grid-cols-3 gap-4">
         <div className="bg-blue-50 p-4 rounded-lg">
