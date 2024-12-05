@@ -64,11 +64,11 @@ const useCountAnimation = (end, duration = 500) => {
 
 const StatsCard = ({ title, value, Icon, trend, previousValue, suffix = '', showTrend = true }) => {
   const getGradient = () => {
-    if (title === "Total Staff") return "from-green-400 to-emerald-600";
-    if (!showTrend) return "from-rose-500 to-pink-600";
+    if (title === "Total Staff") return "from-blue-400 to-blue-600";
+    if (!showTrend) return "from-blue-400 to-blue-600";
     return trend > (previousValue || 0) 
     ? "from-green-400 to-emerald-600" 
-    : "from-rose-500 to-pink-600";
+    : "from-blue-400 to-blue-600";
 };
 
   const getTrendIconColor = () => {
@@ -541,7 +541,7 @@ const AdminAnalytics = () => {
                                   : checkoutsData.data,
                                 color: selectedDataType === 'checkins' ? "#3331D1" : "#0B8FD9",
                                 area: true,
-                                curve: "linear",
+                                curve: "catmullRom",
                               }]}
                               xAxis={[{
                                 data: dates.map(formatDates),
@@ -594,7 +594,7 @@ const AdminAnalytics = () => {
                               data: dailyRevenues,
                               color: "#0B8FD9",
                               area: true,
-                              curve: "linear",
+                              curve: "catmullRom",
                             },
                           ]}
                           xAxis={[

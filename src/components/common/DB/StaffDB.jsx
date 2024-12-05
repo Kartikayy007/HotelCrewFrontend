@@ -612,7 +612,7 @@ function StaffDB({ searchTerm, filters }) {
                 <tr
                   key={employee.id}
                   className={`border-b hover:bg-gray-50 transition-colors ${
-                    employee.id % 2 === 0 ? "bg-[#DEE8FF]" : "bg-[#E6EEF9]"
+                    employee.id % 2 === 0 ? "bg-[#DEE8FF]" : "bg-[#F1F6FC]"
                   }`}
                 >
                   <td className="p-6">

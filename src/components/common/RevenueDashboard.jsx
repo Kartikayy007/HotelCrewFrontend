@@ -79,7 +79,7 @@ const RevenueDashboard = ({
             data: chartData.revenues?.length ? chartData.revenues : [0],
             color: "#4C51BF",
             area: true,
-            curve: "linear"
+            curve: "catmullRom"
           }]}
           xAxis={[{
             data: chartData.dates?.length ? chartData.dates : ['No data'],
