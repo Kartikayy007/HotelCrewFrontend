@@ -534,7 +534,7 @@ const MDashboard = () => {
   };
 
   const getCurrentDayIndex = () => {
-    const currentDay = new Date().getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const currentDay = new Date().getDay(); 
     return currentDay;
   };
 
@@ -584,32 +584,7 @@ const MDashboard = () => {
     setSelected(dept);
     setIsDropdownOpen(false);
   };
-  // useEffect(() => {
-  //    ("Updated taskData:", taskData);
-  // }, [taskData]);
 
-  // localStorage.setItem('accessToken',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9. tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY")
-
-  // const dataToSend = {
-  //   title,
-  //   description,
-  //   department,
-  //   // priority,
-  // };
-
-  //   try {
-  //     const response = await dispatch(createTask(taskData));
-  //     //  (response.data);
-  //     if (response.data.status === 'success') {
-  //       alert('Task created successfully');
-  //     } else {
-  //       alert('Failed to create task: ' + response.data.message);
-  //     }
-  //   } catch (error) {
-  //     alert('An error occurred: ' + error.message);
-  //   }
-  // };
-    // Add this helper function at the top of component
   const capitalizeFirstLetter = (str) => {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -648,6 +623,7 @@ const MDashboard = () => {
     };
   
     try {
+      
       await dispatch(createTask(taskData)).unwrap();
       setSnackbar({
         open: true,
@@ -666,6 +642,10 @@ const MDashboard = () => {
         deadline: false,
         description: false,
       });
+      
+      await Promise.all([dispatch(fetchTasks()), dispatch(fetchStaffData())]);
+
+
     } catch (err) {
       let errorMessage;
   

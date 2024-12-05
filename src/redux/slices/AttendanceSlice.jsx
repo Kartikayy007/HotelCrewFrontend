@@ -31,7 +31,8 @@ export const fetchAttendance = createAsyncThunk(
     const response = await axios.get(FETCH_ATTENDANCE_URL, {
       headers: getAuthHeaders(),
     });
-     (response.data);
+     console.log("response",response.data);
+     
     return response.data;
     
   }

@@ -12,10 +12,17 @@ const SProfile = () => {
     const updatemsg = useSelector(selectStaffProfileSuccessMessage);
 
     const [isEditing, setIsEditing] = useState(false);
-    const [username, setUsername] = useState(profile?.user_name || '');
+    const [username, setUsername] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('error');
+    const [image, setImage] = useState('');
+    const [isDirty, setIsDirty] = useState(false);
+    const [formData, setFormData] = useState({
+        user_name: '',
+        user_profile: ''
+    });
+
     useEffect(() => {
         if (error) {
             if (!navigator.onLine) {
@@ -30,7 +37,13 @@ const SProfile = () => {
         }
     }, [error]);
 
-
+    // Update profile data when it loads
+    useEffect(() => {
+        if (profile) {
+            setUsername(profile.user_name || '');
+            setImage(profile.user_profile || '');
+        }
+    }, [profile]);
 
     // Handle successful updates
     useEffect(() => {
@@ -44,10 +57,6 @@ const SProfile = () => {
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
     };
-    // const data = {
-    //   // user_name: username,
-    //   user_profile: image, // Assuming the user is uploading an image or providing a URL
-    // };
 
     const blobToFile = async (blobUrl, filename) => {
         const response = await fetch(blobUrl);
@@ -59,31 +68,69 @@ const SProfile = () => {
         dispatch(getStaffProfile());
     }, [dispatch]);
 
-    // const [loading, setLoading] = useState(true);
-    const [image, setImage] = useState(profile?.user_profile);
-    const handleImageUpload = (event) => {
+    // Initialize form data when profile loads
+    useEffect(() => {
+        if (profile) {
+            setFormData({
+                user_name: profile.user_name || '',
+                user_profile: profile.user_profile || ''
+            });
+        }
+    }, [profile]);
+
+    // Handle image upload
+    const handleImageUpload = async (event) => {
         const file = event.target.files[0];
         if (file) {
-
-            const imageUrl = URL.createObjectURL(file);
-            const formData = new FormData();
-            formData.append("user_profile", file);
-
-            // Dispatch the FormData to updateStaffProfile
-            dispatch(updateStaffProfile(formData));
-
-
-            setImage(imageUrl);
-
-            return () => URL.revokeObjectURL(imageUrl);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({
+                    ...prev,
+                    user_profile: reader.result
+                }));
+                setIsDirty(true);
+            };
+            reader.readAsDataURL(file);
         }
-    }
-    // useEffect(() => {
+    };
 
-    //   setTimeout(() => {
-    //     setLoading(false);  
-    //   }, 500); 
-    // }, []);
+    // Handle form submission
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!isDirty) return;
+
+        try {
+            await dispatch(updateStaffProfile(formData)).unwrap();
+            setIsDirty(false);
+            setSnackbarMessage('Profile updated successfully');
+            setSnackbarSeverity('success');
+            setSnackbarOpen(true);
+        } catch (error) {
+            setSnackbarMessage(error.message || 'Failed to update profile');
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+        }
+    };
+
+    if (loading) {
+        return (
+            <section className="h-screen py-2 mr-1 px-0 font-Montserrat">
+                <h2 className="text-[#252941] text-3xl my-3 lg:my-6 pl-12 ml-5 font-semibold">Profile</h2>
+                <div className="bg-white z-10 w-[95%] lg:ml-7 h-auto xl:mt-1 mt-2 mx-4 pt-2 pb-1 px-7 rounded-lg shadow">
+                    <Skeleton variant="rectangular" width="100%" height="85%" />
+                </div>
+            </section>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-red-500 p-4">
+                Error loading profile: {error.message || 'Failed to load profile'}
+            </div>
+        );
+    }
+
     return (
         <section className=" h-screen py-2 mr-1 px-0 font-Montserrat">
 
@@ -123,38 +170,22 @@ const SProfile = () => {
                         <div className='relative w-full lg:w-auto  px-3 xl:px-8 mt-4'>
                             <h2 className="text-[#000000] text-2xl mt-5 font-semibold">Personal Details</h2>
 
-                            <form className='lg:mt-10 mt-8 flex flex-col gap-6 lg:gap-10'>
+                            <form className='lg:mt-10 mt-8 flex flex-col gap-6 lg:gap-10' onSubmit={handleSubmit}>
 
                                 <div className='flex lg:w-[550px] flex-col gap-2'>
                                     <label htmlFor="firstName" className='font-semibold text-lg'>Username</label>
                                     <div className="flex items-center justify-between gap-2">
-                                        {/* {isEditing ? (
-                      <input type="text"
-                        id='firstName'
-                        className='border border-gray-300 rounded-[4px] cursor-default w-full px-2 text-lg focus:outline-none'
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                      />
-                    ) : ( */}
-
                                         < input type="text"
                                             id='firstNameseeonly'
                                             className='border border-gray-300 text-gray-600 rounded-[4px] w-full px-2 text-lg focus:outline-none'
-                                            // value={username}
                                             value={profile?.user_name}
                                             readOnly
                                         />
-                                        {/* )} */}
-                                        {/* <Pencil
-        size={24} // Icon size
-        className="cursor-pointer" // Make it clickable
-        onClick={() => setIsEditing(!isEditing)} // Toggle edit mode on click
-      /> */}
                                     </div>
                                 </div>
                                 <div className='flex flex-col gap-2'>
                                     <label htmlFor="lastName" className="font-semibold text-lg">
-                                        {profile.department?.toLowerCase() === "manager" ? "Role" : "Department"}
+                                        {profile?.department?.toLowerCase() === "manager" ? "Role" : "Department"}
                                     </label>
 
                                     <input type="text"
@@ -175,22 +206,14 @@ const SProfile = () => {
                                         className='border border-gray-300 text-gray-600 rounded-[4px]  text-lg px-2 focus:outline-none' />
                                 </div>
 
-                                {/* <h2 className="text-[#000000] text-2xl  font-semibold">Account Details</h2>
-                <div className='flex flex-col gap-2'>
-                  <label htmlFor="accountNumber" className='font-semibold text-lg'>UPI ID:</label>
-                  <input type="text"
-                    id='upiid'
-                    value={profile?.upi_id || ''}
-                    readOnly
-                    className='border border-gray-300  text-lg rounded-[4px] px-2 focus:outline-none' />
-                </div> */}
-
                                 <div className='flex lg:justify-end justify-center'>
 
                                     <button
                                         type='submit'
-                                        className='xl:mt-10 xl:mb-10 mb-5 w-[195px] rounded-2xl text-lg text-white font-semibold  py-2 bg-[#3F4870]'>
-                                        Logout
+                                        className='xl:mt-10 xl:mb-10 mb-5 w-[195px] rounded-2xl text-lg text-white font-semibold  py-2 bg-[#3F4870] disabled:bg-gray-400'
+                                        disabled={!isDirty}
+                                    >
+                                        save
                                     </button>
 
                                 </div>
@@ -202,35 +225,25 @@ const SProfile = () => {
 
                 </div>
             )};
-            {/* <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={5000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      > */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="success"
-          variant="filled"
-          sx={{ 
-            width: '100%',
-            '& .MuiAlert-filledSuccess': {
-              backgroundColor: '#4CAF50'
-            }
-          }}
-        >
-          {/* {draggedStaff && targetShift ? 
-            `Shift updated successfully` : 
-            'Shift updated successfully'
-          } */}
-        </Alert>
-      </Snackbar>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity="success"
+                    variant="filled"
+                    sx={{
+                        width: '100%',
+                        '& .MuiAlert-filledSuccess': {
+                            backgroundColor: '#4CAF50'
+                        }
+                    }}
+                >
+                </Alert>
+            </Snackbar>
         </section>
     );
 };

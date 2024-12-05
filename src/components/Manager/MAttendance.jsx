@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Maximize2, X } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAttendance, updateAttendance, checkAttendance,selectStaff,selectLoading,selectError } from '../../redux/slices/AttendanceSlice';
@@ -24,6 +24,8 @@ import {
   Alert,
 } from "@mui/material";
 import { Calendar, Check, Clock } from "lucide-react";
+import { selectStaffLoading } from "../../redux/slices/StaffSlice";
+
 
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
@@ -68,6 +70,8 @@ const MAttendance = () => {
     setOpenModal(false);
     setSelectedStaff(null);
   };
+  const staff = useSelector(selectStaff) || [];
+  const staffLoading = useSelector(selectStaffLoading);
 
   const modalStyle = {
     position: "absolute",
@@ -85,7 +89,6 @@ const MAttendance = () => {
   const [approvedLeaves, setApprovedLeaves] = useState([]);
   const [rejectedLeaves, setRejectedLeaves] = useState([]);
   // const { staff, loading, error } = useSelector((state) => state.attendance);
-const staff=useSelector(selectStaff);
 // const staff = useSelector((state) => state.attendance.staff || []);
 const loading=useSelector(selectLoading);
 const error=useSelector(selectError);
@@ -270,18 +273,15 @@ const error=useSelector(selectError);
   //   const shiftMatch = selectedShift === 'All' || member.shift === selectedShift;
   //   return departmentMatch && shiftMatch;
   // });
-  const filteredStaff = staff.filter((member) => {
-    const normalizedDepartments = selectedDepartments.map((dept) => dept.toLowerCase());
-    const departmentMatch =
-      normalizedDepartments.includes('all') || 
-      normalizedDepartments.includes(member.department.toLowerCase());
-  
-    const shiftMatch =
-      selectedShift.toLowerCase() === 'all' || 
-      member.shift.toLowerCase() === selectedShift.toLowerCase();
-  
-    return departmentMatch && shiftMatch;
-  });
+  const filteredStaff = useMemo(() => {
+    if (!staff) return [];
+    
+    return staff.filter(member => {
+      const departmentMatch = selectedDepartments.includes('All') || 
+        selectedDepartments.includes(member.department);
+      return departmentMatch;
+    });
+  }, [staff, selectedDepartments]);
 
   const toggleDepartmentSelection = (department) => {
     setSelectedDepartments([department]);
@@ -300,6 +300,20 @@ const error=useSelector(selectError);
 
     return durationInDays + 1; // Include the start day in the count
   };
+
+  if (staffLoading) {
+    return (
+      <div className="p-4">
+        <Skeleton variant="rectangular" height={200} />
+        <div className="mt-4 space-y-2">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} variant="rectangular" height={60} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section className=" h-screen p-2 mr-1 font-Montserrat">
       <h1 className="text-[#252941] text-3xl mt-6 mb-4 pl-16 font-semibold">
