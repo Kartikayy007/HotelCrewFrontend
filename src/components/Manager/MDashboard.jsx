@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import * as React from "react";
 import {FaChevronDown, FaChevronUp} from "react-icons/fa";
 import {PieChart} from "@mui/x-charts/PieChart";
@@ -27,15 +27,17 @@ import {
   IconButton,
   Select,
   MenuItem,
+  Menu,
 } from "@mui/material";
 import {CreateAnnouncementBox} from "../common/CreateAnnouncementBox";
 import {
   createAnnouncement,
-  fetchAnnouncements,
+  fetchTodayAnnouncements, // Add this
   selectAllAnnouncements,
   selectAnnouncementsLoading,
   selectAnnouncementsError,
   deleteAnnouncement,
+  selectTodayAnnouncements, // Add this
 } from "../../redux/slices/AnnouncementSlice";
 // import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";
@@ -432,6 +434,25 @@ const MDashboard = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [showTaskAssignment, setShowTaskAssignment] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const hotelDepartments = useSelector(selectDepartmentNames);
+  const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Add these handlers
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleShowAllAnnouncements = () => {
+    setShowAllAnnouncements(true);
+    handleMenuClose();
+  };
 
   const handleDotsClose = () => {
     setAnchorEl(null);
@@ -588,65 +609,44 @@ const MDashboard = () => {
   //     alert('An error occurred: ' + error.message);
   //   }
   // };
-
-  // Add these date handling functions at the top of your component
-  const isValidDate = (dateString) => {
-    const date = new Date(dateString);
-    return date instanceof Date && !isNaN(date);
+    // Add this helper function at the top of component
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    return new Date(dateString).toISOString().split('T')[0];
-  };
-
-  // Update your form submission handler
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Validate dates
-    if (!isValidDate(taskDescription)) {
-      setFieldErrors(prev => ({
-        ...prev,
-        date: true
-      }));
-      return;
-    }
   
-    // Rest of your submission logic
-  };
-
+  // Modified handleAssign with capitalized department
   const handleAssign = async (e) => {
     e.preventDefault();
-
+  
     const errors = {
       title: !taskTitle,
       department: !selected.value,
       deadline: !selectedHour || !selectedMinute,
       description: !taskDescription,
     };
-
+  
     setFieldErrors(errors);
-
+  
     if (Object.values(errors).some((error) => error)) {
       return;
     }
-
+  
     // Create deadline timestamp
     const today = new Date();
     today.setHours(parseInt(selectedHour, 10));
     today.setMinutes(parseInt(selectedMinute, 10));
     today.setSeconds(0);
-
+  
     const formattedDeadline = today.toISOString();
-
+  
     const taskData = {
       title: taskTitle,
       description: taskDescription,
-      department: selected.value,
+      department: capitalizeFirstLetter(selected.value), // Capitalize department
       deadline: formattedDeadline,
     };
-
+  
     try {
       await dispatch(createTask(taskData)).unwrap();
       setSnackbar({
@@ -666,12 +666,38 @@ const MDashboard = () => {
         deadline: false,
         description: false,
       });
-    } catch (error) {
+    } catch (err) {
+      let errorMessage;
+  
+      if (err?.non_field_errors?.[0]?.includes("No staff in the specified department")) {
+        const deptName = selected?.label || "selected department";
+        errorMessage = `No staff members available in ${deptName} department`;
+      } else {
+        errorMessage =
+          err?.errors?.detail ||
+          err?.message ||
+          (typeof err === "object" ? Object.values(err)[0] : err) ||
+          "Failed to assign task";
+      }
+  
       setSnackbar({
         open: true,
-        message: error.message || "Failed to create task",
+        message: errorMessage,
         severity: "error",
       });
+      console.error("Task assignment error:", err);
+      
+      const timeout = setTimeout(() => {
+        setFormSubmitted(false);
+      }, 3000);
+  
+      const handleClick = () => {
+        setFormSubmitted(false);
+        document.removeEventListener('click', handleClick);
+        clearTimeout(timeout);
+      };
+  
+      document.addEventListener('click', handleClick);
     }
   };
 
@@ -681,7 +707,7 @@ const MDashboard = () => {
     setSnackbar((prev) => ({...prev, open: false}));
   };
 
-  const announcements = useSelector(selectAllAnnouncements);
+  const announcements = useSelector(selectTodayAnnouncements);
   const announcementsLoading = useSelector(selectAnnouncementsLoading);
   const announcementsError = useSelector(selectAnnouncementsError);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -697,23 +723,33 @@ const MDashboard = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchAnnouncements());
+    dispatch(fetchTodayAnnouncements());
   }, [dispatch]);
 
   const handleCreateAnnouncement = async (announcementData) => {
     try {
-      await dispatch(createAnnouncement(announcementData)).unwrap();
-      setShowAnnouncementBox(false);
+      // Dispatch the createAnnouncement action
+      const result = await dispatch(createAnnouncement(announcementData)).unwrap();
+      
+      // Show success message
       setSnackbar({
         open: true,
         message: "Announcement created successfully",
-        severity: "success",
+        severity: "success"
       });
+  
+      // Close modal and reset form
+      handleModalClose();
+  
+      // Refresh today's announcements
+      dispatch(fetchTodayAnnouncements());
+  
     } catch (error) {
+      // Show error message
       setSnackbar({
         open: true,
-        message: error || "Failed to create announcement",
-        severity: "error",
+        message: error.message || "Failed to create announcement",
+        severity: "error"
       });
     }
   };
@@ -736,21 +772,26 @@ const MDashboard = () => {
       return;
     }
 
+    setDeleteLoading(true);
     try {
       await dispatch(deleteAnnouncement(selectedAnnouncement.id)).unwrap();
+      setShowConfirmDialog(false);
       handleViewClose();
       setSnackbar({
         open: true,
         message: "Announcement deleted successfully",
         severity: "success",
       });
+      // Refetch announcements
+      dispatch(fetchTodayAnnouncements());
     } catch (error) {
-      console.error("Delete error:", error);
       setSnackbar({
         open: true,
         message: error?.message || "Failed to delete announcement",
         severity: "error",
       });
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -774,6 +815,12 @@ const MDashboard = () => {
     return `${day}\n${monthDay}`;
   };
 
+  const extractDepartment = (assignedString) => {
+    // Format: "email@example.com (Staff) (Department) (Shift)"
+    const match = assignedString.match(/\(([^)]+)\)/g);
+    return match && match[1] ? match[1].replace(/[()]/g, '') : '';
+  };
+
   // Add state for deadline time
   const [selectedHour, setSelectedHour] = useState("09");
   const [selectedMinute, setSelectedMinute] = useState("00");
@@ -785,6 +832,86 @@ const MDashboard = () => {
   const minutes = Array.from({length: 60}, (_, i) =>
     i.toString().padStart(2, "0")
   );
+
+  // Add these states at the top of MDashboard component
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const announcementContainerRef = useRef(null);
+
+  // Add this function to handle scroll
+  const handleAnnouncementScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollHeight - scrollTop <= clientHeight * 1.5 && !announcementsLoading && hasMore) {
+      loadMoreAnnouncements();
+    }
+  };
+
+  // Add function to load more announcements
+  const loadMoreAnnouncements = async () => {
+    try {
+      const response = await dispatch(fetchAnnouncements(`?page=${page + 1}`)).unwrap();
+      if (response.results?.length > 0) {
+        setPage(prev => prev + 1);
+        setHasMore(!!response.next);
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Error loading more announcements:', error);
+    }
+  };
+
+  const renderAnnouncements = () => {
+    if (announcementsLoading) {
+      return (
+        <div className="space-y-4">
+          <Skeleton variant="text" width="60%" height={24} {...skeletonProps} />
+          <Skeleton variant="rectangular" width="100%" height={60} {...skeletonProps} />
+          <Skeleton variant="rectangular" width="100%" height={60} {...skeletonProps} />
+        </div>
+      );
+    }
+
+    if (announcementsError) {
+      return (
+        <div className="text-red-500 text-center mt-4">
+          {announcementsError}
+        </div>
+      );
+    }
+
+    if (!announcements?.length) {
+      return (
+        <div className="flex justify-center mt-20 h-full text-gray-500">
+          No announcements available for today
+        </div>
+      );
+    }
+
+    return announcements.map((announcement) => (
+      <div
+        key={announcement.id}
+        className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
+        onClick={() => handleViewAnnouncement(announcement)}
+      >
+        <div className="flex justify-between items-start mb-2">
+          <div>
+            <h3 className="font-semibold text-lg">{announcement.title}</h3>
+            <span className="text-sm text-gray-500">
+              {announcement.department} • {announcement.urgency}
+            </span>
+          </div>
+          <span className="text-sm text-gray-500">
+            {new Date(announcement.created_at).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </span>
+        </div>
+        <p className="text-gray-600 line-clamp-2">{announcement.description}</p>
+      </div>
+    ));
+  };
 
   return (
     <section className=" h-screen p-2 mr-2 sm:mr-4 font-Montserrat">
@@ -1156,12 +1283,6 @@ const MDashboard = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Deadline
                   </label>
-                  <Tooltip
-                    open={fieldErrors.deadline}
-                    title="Deadline is required"
-                    arrow
-                    placement="top"
-                  >
                     <div className="flex space-x-2">
                       <select
                         value={selectedHour}
@@ -1198,7 +1319,6 @@ const MDashboard = () => {
                         ))}
                       </select>
                     </div>
-                  </Tooltip>
                 </div>
 
                 <Tooltip
@@ -1216,23 +1336,6 @@ const MDashboard = () => {
                     placeholder="Task Description"
                     maxLength={350}
                     className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
-                  />
-                </Tooltip>
-
-                <Tooltip
-                  open={fieldErrors.date}
-                  title="Please enter a valid date"
-                  arrow
-                  placement="top"
-                >
-                  <input
-                    type="date"
-                    value={formatDate(taskDescription)}
-                    onChange={(e) => {
-                      setTaskDescription(e.target.value);
-                      setFieldErrors((prev) => ({...prev, date: false}));
-                    }}
-                    className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 focus:border-gray-300 focus:outline-none"
                   />
                 </Tooltip>
 
@@ -1266,68 +1369,26 @@ const MDashboard = () => {
            <AdminTaskAssignment onClose={() => setShowTaskAssignment(false)} />
           </Dialog>
           <div className="bg-white rounded-lg flex flex-col shadow xl:min-h-[515px] w-full p-4">
-            <h2 className="text-lg font-semibold">Announcements</h2>
-            <div className="flex-1 overflow-y-auto mb-4">
-              {announcementsLoading ? (
-                <div className="space-y-4">
-                  <Skeleton
-                    variant="text"
-                    width="60%"
-                    height={24}
-                    {...skeletonProps}
-                  />
-                  <Skeleton
-                    variant="rectangular"
-                    width="100%"
-                    height={60}
-                    {...skeletonProps}
-                  />
-                  <Skeleton
-                    variant="rectangular"
-                    width="100%"
-                    height={60}
-                    {...skeletonProps}
-                  />
-                </div>
-              ) : announcementsError ? (
-                <div className="text-red-500 text-center mt-4">
-                  {announcementsError}
-                </div>
-              ) : (
-                <div className="overflow-auto h-[400px]">
-                  {announcements.length > 0 ? (
-                    announcements.map((announcement) => (
-                      <div
-                        key={announcement._id}
-                        className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
-                        onClick={() => handleViewAnnouncement(announcement)}
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-semibold text-lg">
-                            {announcement.title}
-                          </h3>
-                          <span className="text-sm text-gray-500">
-                            {new Date(
-                              announcement.created_at
-                            ).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
-                        </div>
-                        <p className="text-gray-600">{announcement.content}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex justify-center mt-20 h-full text-gray-500">
-                      No announcements available
-                    </div>
-                  )}
-                </div>
-              )}
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Announcements</h2>
+              <IconButton
+                onClick={handleShowAllAnnouncements}
+                size="small"
+              >
+                <MoreVertical className="h-5 w-5 text-gray-600"  />
+              </IconButton >
+            </div>
+
+            <AllAnnouncementsDialog
+              open={showAllAnnouncements}
+              onClose={() => setShowAllAnnouncements(false)}
+            />
+            <div 
+              ref={announcementContainerRef}
+              className="overflow-auto h-[400px]"
+              onScroll={handleAnnouncementScroll}
+            >
+              {renderAnnouncements()}
             </div>
 
             <div className="mt-auto ">
@@ -1364,93 +1425,91 @@ const MDashboard = () => {
               </div>
             )}
 
-            <Dialog
-              open={!!selectedAnnouncement}
-              onClose={handleViewClose}
-              maxWidth="sm"
-              fullWidth
-            >
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">
-                  View Announcement
-                </h2>
-                <div className="space-y-4">
-                  <TextField
-                    label="Title"
-                    fullWidth
-                    value={selectedAnnouncement?.title || ""}
-                    InputProps={{readOnly: true}}
-                  />
-                  <TextField
-                    label="Description"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    value={selectedAnnouncement?.description || ""}
-                    InputProps={{readOnly: true}}
-                  />
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium">Department:</span>{" "}
-                      {selectedAnnouncement?.department}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium">Urgency:</span>{" "}
-                      {selectedAnnouncement?.urgency}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium">Created By:</span>{" "}
-                      {selectedAnnouncement?.assigned_by}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium">Created At:</span>{" "}
-                      {selectedAnnouncement?.created_at &&
-                        new Date(
-                          selectedAnnouncement.created_at
-                        ).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                    </p>
-                    <div className="text-sm text-gray-500">
-                      <span className="font-medium">Assigned To:</span>
-                      <ul className="list-disc pl-5 mt-1">
-                        {selectedAnnouncement?.assigned_to.map(
-                          (person, index) => (
-                            <li key={index}>{person}</li>
-                          )
-                        )}
-                      </ul>
+<Dialog
+                  open={!!selectedAnnouncement}
+                  onClose={handleViewClose}
+                  maxWidth="sm"
+                  fullWidth
+                  sx={{zIndex: 1300}}
+                >
+                  <div className="p-6">
+                    <h2 className="text-xl font-semibold mb-4">
+                      View Announcement
+                    </h2>
+                    <div className="space-y-4">
+                      <TextField
+                        label="Title"
+                        fullWidth
+                        value={selectedAnnouncement?.title || ""}
+                        InputProps={{readOnly: true}}
+                      />
+                      <TextField
+                        label="Description"
+                        fullWidth
+                        multiline
+                        rows={4}
+                        value={selectedAnnouncement?.description || ""}
+                        InputProps={{readOnly: true}}
+                      />
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-500">
+                          <span className="font-medium">Department:</span>{" "}
+                          {selectedAnnouncement?.department}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          <span className="font-medium">Urgency:</span>{" "}
+                          {selectedAnnouncement?.urgency}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          <span className="font-medium">Created By:</span>{" "}
+                          {selectedAnnouncement?.assigned_by}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          <span className="font-medium">Created At:</span>{" "}
+                          {selectedAnnouncement?.created_at &&
+                            new Date(
+                              selectedAnnouncement.created_at
+                            ).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                        </p>
+                        <div className="text-sm text-gray-500">
+  <span className="font-medium">Assigned To:</span>
+  <ul className="list-disc pl-5 mt-1">
+    {Array.from(new Set( // Remove duplicates
+      selectedAnnouncement?.assigned_to?.map(person => extractDepartment(person))
+    )).map((department, index) => (
+      <li key={index}>{department}</li>
+    )) || []}
+  </ul>
+</div>
+                      </div>
+                      <div className="flex justify-end gap-2 mt-4">
+                        <Button
+                          onClick={() => setShowConfirmDialog(true)}
+                          variant="contained"
+                          color="error"
+                        >
+                          Delete
+                        </Button>
+                        <Button
+                          onClick={handleViewClose}
+                          variant="contained"
+                          sx={{
+                            backgroundColor: "#3A426F",
+                            "&:hover": {backgroundColor: "#3A426F"},
+                          }}
+                        >
+                          Close
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex justify-end gap-2 mt-4">
-                    <Button
-                      onClick={handleDelete}
-                      variant="contained"
-                      sx={{
-                        backgroundColor: "#dc2626",
-                        "&:hover": {backgroundColor: "#b91c1c"},
-                      }}
-                    >
-                      Delete
-                    </Button>
-                    <Button
-                      onClick={handleViewClose}
-                      variant="contained"
-                      sx={{
-                        backgroundColor: "#3A426F",
-                        "&:hover": {backgroundColor: "#3A426F"},
-                      }}
-                    >
-                      Close
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Dialog>
+                </Dialog>
           </div>
           <div className="bg-white rounded-lg shadow h-auto w-full p-4">
             <h2 className="text-lg  font-semibold mb-1">Leave Management</h2>
@@ -1483,8 +1542,53 @@ const MDashboard = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+      <DeleteConfirmationDialog
+        open={showConfirmDialog}
+        onClose={() => setShowConfirmDialog(false)}
+        onConfirm={handleDelete}
+        loading={deleteLoading}
+      />
     </section>
   );
 };
+
+// Add DeleteConfirmationDialog component at the top of the file
+const DeleteConfirmationDialog = ({ open, onClose, onConfirm, loading }) => (
+  <Dialog
+    open={open}
+    onClose={onClose}
+    sx={{
+      "& .MuiDialog-paper": {
+        margin: "16px",
+        maxWidth: "400px",
+      },
+      zIndex: 1400,
+    }}
+  >
+    <div className="p-6">
+      <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
+      <p className="text-gray-600 mb-6">
+        Are you sure you want to delete this announcement? This action cannot be undone.
+      </p>
+      <div className="flex justify-end gap-3">
+        <Button 
+          variant="outlined" 
+          onClick={onClose}
+          disabled={loading}
+        >
+          Cancel
+        </Button>
+        <Button 
+          variant="contained" 
+          color="error"
+          onClick={onConfirm}
+          disabled={loading}
+        >
+          {loading ? "Deleting..." : "Delete"}
+        </Button>
+      </div>
+    </div>
+  </Dialog>
+);
 
 export default MDashboard;
