@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import * as React from "react";
 import {FaChevronDown, FaChevronUp} from "react-icons/fa";
 import {PieChart} from "@mui/x-charts/PieChart";
@@ -11,8 +11,7 @@ import {
   fetchStaffData,
   selectStaffPerDepartment,
   selectStaffLoading,
-  selectDepartments,
-} from "../../redux/slices/AdminStaffSlice";
+} from "../../redux/slices/StaffSlice";
 import {
   fetchAttendanceStats,
   selectError,
@@ -28,15 +27,17 @@ import {
   IconButton,
   Select,
   MenuItem,
+  Menu,
 } from "@mui/material";
 import {CreateAnnouncementBox} from "../common/CreateAnnouncementBox";
 import {
   createAnnouncement,
-  fetchAnnouncements,
+  fetchTodayAnnouncements, // Add this
   selectAllAnnouncements,
   selectAnnouncementsLoading,
   selectAnnouncementsError,
   deleteAnnouncement,
+  selectTodayAnnouncements, // Add this
 } from "../../redux/slices/AnnouncementSlice";
 // import { createTask, selectTasksLoading, selectTasksError } from '../../redux/slices/TaskSlice';
 import Slider from "@mui/material/Slider";
@@ -84,6 +85,13 @@ import {
 import {MoreVertical} from "lucide-react";
 import {AllAnnouncementsDialog} from "../common/AllAnnouncementsDialog";
 import RevenueDashboard from "../common/RevenueDashboard";
+import {
+  selectHotelDetails,
+  fetchHotelDetails,
+  selectDepartmentNames,
+} from "../../redux/slices/HotelDetailsSlice";
+import AdminTaskAssignment from "../admin/components/AdminTaskAssignment";
+import {Tooltip} from "@mui/material";
 
 const MDashboard = () => {
   const dispatch = useDispatch();
@@ -150,34 +158,36 @@ const MDashboard = () => {
   // const departments = useSelector(selectDepartments);
   const availableRooms = useSelector(selectAvailableRooms);
   const occupiedRooms = useSelector(selectOccupiedRooms);
-  const dailyRevenues = useSelector(state => {
-    console.log('Redux State:', state.revenue);
+  const dailyRevenues = useSelector((state) => {
+    console.log("Redux State:", state.revenue);
     return state.revenue.dailyRevenues;
   });
-  const dates = useSelector(state => state.revenue.dates);
+  const dates = useSelector((state) => state.revenue.dates);
   const latestRevenue = useSelector(selectLatestRevenue);
-  const revenueLoading = useSelector(state => state.revenue.loading);
+  const revenueLoading = useSelector((state) => state.revenue.loading);
 
   // Log the selected values
-  console.log('Selected Revenue Data:', {
+  console.log("Selected Revenue Data:", {
     dailyRevenues,
     dates,
     latestRevenue,
-    revenueLoading
+    revenueLoading,
   });
+
+  const hotelDetails = useSelector(selectHotelDetails);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const result = await dispatch(fetchRevenueStats()).unwrap();
-        console.log('Revenue API Response:', result);
+        console.log("Revenue API Response:", result);
       } catch (error) {
-        console.error('Revenue API Error:', error);
+        console.error("Revenue API Error:", error);
       }
     };
 
     fetchData();
-    
+
     const interval = setInterval(fetchData, 3600000);
     return () => clearInterval(interval);
   }, [dispatch]);
@@ -196,30 +206,30 @@ const MDashboard = () => {
     return () => clearInterval(interval);
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       await Promise.all([
-  //         dispatch(fetchGuestData()),
-  //         dispatch(fetchRoomStats()),
-  //         dispatch(fetchRevenueStats()),
-  //         dispatch(fetchStaffData()),
-  //         dispatch(fetchRevenueStats())
-  //       ]);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-  
-  //   fetchData();
-  
-  //   const interval = setInterval(() => {
-  //     dispatch(fetchRoomStats());
-  //   }, 30 * 60 * 1000); // 30 minutes
-  
-  //   return () => clearInterval(interval);
-  // }, [dispatch]);
-  
+  const [fieldErrors, setFieldErrors] = useState({
+    title: false,
+    department: false,
+    priority: false,
+    description: false,
+  });
+
+  useEffect(() => {
+    if (hotelDetails?.department_names) {
+      const deptArray = hotelDetails.department_names
+        .split(",")
+        .map((dept) => dept.trim())
+        .map((dept) => ({
+          value: dept.toLowerCase(),
+          label: dept.charAt(0).toUpperCase() + dept.slice(1),
+        }));
+      setDepartments(deptArray);
+    }
+  }, [hotelDetails]);
+
+  useEffect(() => {
+    dispatch(fetchHotelDetails());
+    // ... your other dispatch calls
+  }, [dispatch]);
 
   const [cumulativeRevenue, setCumulativeRevenue] = useState(0);
 
@@ -316,13 +326,13 @@ const MDashboard = () => {
     {
       id: 0,
       value: occupiedRooms,
-      label: "Occupied",
+      label: `Occupied (${occupiedRooms})`,
       color: "#252941",
     },
     {
       id: 1,
       value: availableRooms,
-      label: "Vacant",
+      label: `Available (${availableRooms})`,
       color: "#8094D4",
     },
   ];
@@ -370,7 +380,7 @@ const MDashboard = () => {
   };
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    const intervalId = setInterval((  ) => {
       const currentDate = new Date().toISOString().slice(0, 10); // Get today's date in YYYY-MM-DD format
       const currentIndex = dates.findIndex((date) => date === currentDate);
       if (currentIndex !== -1) {
@@ -408,16 +418,12 @@ const MDashboard = () => {
     },
   };
 
- const occupancyloading=useSelector(selectOccupancyLoading);
- const occupancyError=useSelector(selectOccupancyError);
-  // const departments = [
-  //   // { value: '', label: 'Select Department', disabled: true },
-  //   { value: 'security', label: 'Security' },
-  //   { value: 'housekeeping', label: 'HouseKeeping' },
-  //   { value: 'maintainence', label: 'Maintainence' },
-  //   { value: 'kitchen', label: 'Kitchen' },
-  //   { value: 'reception', label: 'Reception' },
-  // ];
+  const departments = useSelector(selectStaffPerDepartment);
+  const staffLoading = useSelector(selectStaffLoading);
+
+  useEffect(() => {
+    dispatch(fetchStaffData());
+  }, [dispatch]);
 
   const [selected, setSelected] = useState({label: "Department", value: ""});
 
@@ -432,6 +438,25 @@ const MDashboard = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [showTaskAssignment, setShowTaskAssignment] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const hotelDepartments = useSelector(selectDepartmentNames);
+  const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Add these handlers
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleShowAllAnnouncements = () => {
+    setShowAllAnnouncements(true);
+    handleMenuClose();
+  };
 
   const handleDotsClose = () => {
     setAnchorEl(null);
@@ -445,13 +470,13 @@ const MDashboard = () => {
     {
       id: 0,
       value: stats.total_present,
-      label: "Present",
+      label: `Present (${stats.total_present})`,
       color: "#252941",
     },
     {
       id: 1,
       value: stats.total_crew - stats.total_present,
-      label: "Absent",
+      label: `Absent (${stats.total_crew - stats.total_present})`,
       color: "#8094D4",
     },
   ];
@@ -481,8 +506,18 @@ const MDashboard = () => {
   const vacantStaffCount = Math.max(0, totalStaff - busyStaffCount);
 
   const staffStatus = [
-    {id: 0, value: busyStaffCount, label: "Busy", color: "#252941"},
-    {id: 1, value: vacantStaffCount, label: "Vacant", color: "#8094D4"},
+    {
+      id: 0,
+      value: busyStaffCount,
+      label: `Busy (${busyStaffCount})`,
+      color: "#252941",
+    },
+    {
+      id: 1,
+      value: vacantStaffCount,
+      label: `Vacant (${vacantStaffCount})`,
+      color: "#8094D4",
+    },
   ];
 
   const rotateWeeklyData = (data, todayIndex) => {
@@ -553,12 +588,7 @@ const MDashboard = () => {
   }, [currentHour]);
 
   const handleSelect = (dept) => {
-    //  (taskData);
     setSelected(dept);
-    setTaskData((prevData) => ({
-      ...prevData,
-      department: dept.value,
-    }));
     setIsDropdownOpen(false);
   };
   // useEffect(() => {
@@ -586,68 +616,105 @@ const MDashboard = () => {
   //     alert('An error occurred: ' + error.message);
   //   }
   // };
+    // Add this helper function at the top of component
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+  
+  // Modified handleAssign with capitalized department
   const handleAssign = async (e) => {
     e.preventDefault();
-
-    if (!taskTitle.trim()) {
-      setSnackbar({
-        open: true,
-        message: "Please enter a task title",
-        severity: "error",
-      });
+  
+    const errors = {
+      title: !taskTitle,
+      department: !selected.value,
+      deadline: !selectedHour || !selectedMinute,
+      description: !taskDescription,
+    };
+  
+    setFieldErrors(errors);
+  
+    if (Object.values(errors).some((error) => error)) {
       return;
     }
-
-    if (!taskDescription.trim()) {
-      setSnackbar({
-        open: true,
-        message: "Please enter a task description",
-        severity: "error",
-      });
-      return;
-    }
-
-    if (!selected.value) {
-      setSnackbar({
-        open: true,
-        message: "Please select a department",
-        severity: "error",
-      });
-      return;
-    }
-
+  
+    // Create deadline timestamp
+    const today = new Date();
+    today.setHours(parseInt(selectedHour, 10));
+    today.setMinutes(parseInt(selectedMinute, 10));
+    today.setSeconds(0);
+  
+    const formattedDeadline = today.toISOString();
+  
+    const taskData = {
+      title: taskTitle,
+      description: taskDescription,
+      department: capitalizeFirstLetter(selected.value), // Capitalize department
+      deadline: formattedDeadline,
+    };
+  
     try {
-      await dispatch(
-        createTask({
-          title: taskTitle.trim(),
-          description: taskDescription.trim(),
-          department: selected.value,
-          priority: selectedPriority,
-        })
-      ).unwrap();
-
-      setTaskTitle("");
-      setTaskDescription("");
-      setSelected({label: "Select Department", value: ""});
-
+      await dispatch(createTask(taskData)).unwrap();
       setSnackbar({
         open: true,
-        message: "Task assigned successfully",
+        message: "Task created successfully",
         severity: "success",
       });
+      // Reset form
+      setTaskTitle("");
+      setTaskDescription("");
+      setSelected({label: "Department", value: ""});
+      setSelectedHour("09");
+      setSelectedMinute("00");
+      setFieldErrors({
+        title: false,
+        department: false,
+        deadline: false,
+        description: false,
+      });
     } catch (err) {
+      let errorMessage;
+  
+      if (err?.non_field_errors?.[0]?.includes("No staff in the specified department")) {
+        const deptName = selected?.label || "selected department";
+        errorMessage = `No staff members available in ${deptName} department`;
+      } else {
+        errorMessage =
+          err?.errors?.detail ||
+          err?.message ||
+          (typeof err === "object" ? Object.values(err)[0] : err) ||
+          "Failed to assign task";
+      }
+  
       setSnackbar({
         open: true,
-        message: err.message || "Failed to assign task",
+        message: errorMessage,
         severity: "error",
       });
+      console.error("Task assignment error:", err);
+      
+      const timeout = setTimeout(() => {
+        setFormSubmitted(false);
+      }, 3000);
+  
+      const handleClick = () => {
+        setFormSubmitted(false);
+        document.removeEventListener('click', handleClick);
+        clearTimeout(timeout);
+      };
+  
+      document.addEventListener('click', handleClick);
     }
   };
-  const handleSnackbarClose = () => {
-    setSnackbar({...snackbar, open: false});
+
+  // Add Snackbar close handler
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") return;
+    setSnackbar((prev) => ({...prev, open: false}));
   };
 
-  const announcements = useSelector(selectAllAnnouncements);
+  const announcements = useSelector(selectTodayAnnouncements);
   const announcementsLoading = useSelector(selectAnnouncementsLoading);
   const announcementsError = useSelector(selectAnnouncementsError);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -663,23 +730,33 @@ const MDashboard = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchAnnouncements());
+    dispatch(fetchTodayAnnouncements());
   }, [dispatch]);
 
   const handleCreateAnnouncement = async (announcementData) => {
     try {
-      await dispatch(createAnnouncement(announcementData)).unwrap();
-      setShowAnnouncementBox(false);
+      // Dispatch the createAnnouncement action
+      const result = await dispatch(createAnnouncement(announcementData)).unwrap();
+      
+      // Show success message
       setSnackbar({
         open: true,
         message: "Announcement created successfully",
-        severity: "success",
+        severity: "success"
       });
+  
+      // Close modal and reset form
+      handleModalClose();
+  
+      // Refresh today's announcements
+      dispatch(fetchTodayAnnouncements());
+  
     } catch (error) {
+      // Show error message
       setSnackbar({
         open: true,
-        message: error || "Failed to create announcement",
-        severity: "error",
+        message: error.message || "Failed to create announcement",
+        severity: "error"
       });
     }
   };
@@ -702,21 +779,26 @@ const MDashboard = () => {
       return;
     }
 
+    setDeleteLoading(true);
     try {
       await dispatch(deleteAnnouncement(selectedAnnouncement.id)).unwrap();
+      setShowConfirmDialog(false);
       handleViewClose();
       setSnackbar({
         open: true,
         message: "Announcement deleted successfully",
         severity: "success",
       });
+      // Refetch announcements
+      dispatch(fetchTodayAnnouncements());
     } catch (error) {
-      console.error("Delete error:", error);
       setSnackbar({
         open: true,
         message: error?.message || "Failed to delete announcement",
         severity: "error",
       });
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -724,20 +806,118 @@ const MDashboard = () => {
     (leave) => leave.status === "Pending"
   ).length;
 
-  const [selectedDataType, setSelectedDataType] = useState('checkins');
-  const daily_checkins = useSelector(state => state.revenue.daily_checkins);
-  const daily_checkouts = useSelector(state => state.revenue.daily_checkouts);
-  const weekRange = useSelector(state => state.revenue.weekRange);
+  const [selectedDataType, setSelectedDataType] = useState("checkins");
+  const daily_checkins = useSelector((state) => state.revenue.daily_checkins);
+  const daily_checkouts = useSelector((state) => state.revenue.daily_checkouts);
+  const weekRange = useSelector((state) => state.revenue.weekRange);
 
   // Format dates helper function
   const formatDates = (date) => {
     const d = new Date(date);
-    const day = d.toLocaleDateString("en-US", { weekday: "short" });
+    const day = d.toLocaleDateString("en-US", {weekday: "short"});
     const monthDay = d.toLocaleDateString("en-US", {
       month: "numeric",
       day: "numeric",
     });
     return `${day}\n${monthDay}`;
+  };
+
+  const extractDepartment = (assignedString) => {
+    // Format: "email@example.com (Staff) (Department) (Shift)"
+    const match = assignedString.match(/\(([^)]+)\)/g);
+    return match && match[1] ? match[1].replace(/[()]/g, '') : '';
+  };
+
+  // Add state for deadline time
+  const [selectedHour, setSelectedHour] = useState("09");
+  const [selectedMinute, setSelectedMinute] = useState("00");
+
+  // Generate hours and minutes arrays
+  const hours = Array.from({length: 24}, (_, i) =>
+    i.toString().padStart(2, "0")
+  );
+  const minutes = Array.from({length: 60}, (_, i) =>
+    i.toString().padStart(2, "0")
+  );
+
+  // Add these states at the top of MDashboard component
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const announcementContainerRef = useRef(null);
+
+  // Add this function to handle scroll
+  const handleAnnouncementScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollHeight - scrollTop <= clientHeight * 1.5 && !announcementsLoading && hasMore) {
+      loadMoreAnnouncements();
+    }
+  };
+
+  // Add function to load more announcements
+  const loadMoreAnnouncements = async () => {
+    try {
+      const response = await dispatch(fetchAnnouncements(`?page=${page + 1}`)).unwrap();
+      if (response.results?.length > 0) {
+        setPage(prev => prev + 1);
+        setHasMore(!!response.next);
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Error loading more announcements:', error);
+    }
+  };
+
+  const renderAnnouncements = () => {
+    if (announcementsLoading) {
+      return (
+        <div className="space-y-4">
+          <Skeleton variant="text" width="60%" height={24} {...skeletonProps} />
+          <Skeleton variant="rectangular" width="100%" height={60} {...skeletonProps} />
+          <Skeleton variant="rectangular" width="100%" height={60} {...skeletonProps} />
+        </div>
+      );
+    }
+
+    if (announcementsError) {
+      return (
+        <div className="text-red-500 text-center mt-4">
+          {announcementsError}
+        </div>
+      );
+    }
+
+    if (!announcements?.length) {
+      return (
+        <div className="flex justify-center mt-20 h-full text-gray-500">
+          No announcements available for today
+        </div>
+      );
+    }
+
+    return announcements.map((announcement) => (
+      <div
+        key={announcement.id}
+        className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
+        onClick={() => handleViewAnnouncement(announcement)}
+      >
+        <div className="flex justify-between items-start mb-2">
+          <div>
+            <h3 className="font-semibold text-lg">{announcement.title}</h3>
+            <span className="text-sm text-gray-500">
+              {announcement.department} • {announcement.urgency}
+            </span>
+          </div>
+          <span className="text-sm text-gray-500">
+            {new Date(announcement.created_at).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </span>
+        </div>
+        <p className="text-gray-600 line-clamp-2">{announcement.description}</p>
+      </div>
+    ));
   };
 
   return (
@@ -785,30 +965,45 @@ const MDashboard = () => {
                       <h3 className="font-medium mb-2 text-center">
                         Occupancy Rate
                       </h3>
-                      {occupancyError ? (
+                      {!occupancyData.some((item) => item.value > 0) ? (
                         <div className="flex items-center justify-center h-[180px] text-gray-500">
-                          {occupancyError}
-                          {/* No Room Data Available */}
+                          No Data Available
                         </div>
                       ) : (
-                      <PieChart
-                        series={[
-                          {
-                            data: occupancyData,
-                            highlightScope: {fade: "global", highlight: "item"},
-                            innerRadius: 45,
-                            paddingAngle: 1,
-                            cornerRadius: 1,
-                          },
-                        ]}
-                        height={220}
-                        margin={{top: 0, bottom: 40, left: 0, right: 0}}
-                        slotProps={{
-                          legend: {
-                            hidden: true,
-                          },
-                        }}
-                      />
+                        <div>
+                          <PieChart
+                            series={[
+                              {
+                                data: occupancyData,
+                                highlightScope: {
+                                  fade: "global",
+                                  highlight: "item",
+                                },
+                                innerRadius: 45,
+                                paddingAngle: 1,
+                                cornerRadius: 1,
+                              },
+                            ]}
+                            height={220}
+                            margin={{top: 0, bottom: 40, left: 0, right: 0}}
+                            slotProps={{
+                              legend: {
+                                direction: "row",
+                                position: {
+                                  vertical: "bottom",
+                                  horizontal: "center",
+                                },
+                                padding: 0,
+                                markSize: 10,
+                                itemGap: 15,
+                                labelStyle: {
+                                  fontSize: 12,
+                                  fontWeight: 500,
+                                },
+                              },
+                            }}
+                          />
+                        </div>
                       )}
                     </div>
 
@@ -816,24 +1011,46 @@ const MDashboard = () => {
                       <h3 className="font-medium mb-2 text-center">
                         Staff Status
                       </h3>
-                      <PieChart
-                        series={[
-                          {
-                            data: staffStatus,
-                            highlightScope: {fade: "global", highlight: "item"},
-                            innerRadius: 45,
-                            paddingAngle: 1,
-                            cornerRadius: 1,
-                          },
-                        ]}
-                        height={220}
-                        margin={{top: 0, bottom: 40, left: 0, right: 0}}
-                        slotProps={{
-                          legend: {
-                            hidden: true,
-                          },
-                        }}
-                      />
+                      {!staffStatus.some((item) => item.value > 0) ? (
+                        <div className="flex items-center justify-center h-[180px] text-gray-500">
+                          No Data Available
+                        </div>
+                      ) : (
+                        <div>
+                          <PieChart
+                            series={[
+                              {
+                                data: staffStatus,
+                                highlightScope: {
+                                  fade: "global",
+                                  highlight: "item",
+                                },
+                                innerRadius: 45,
+                                paddingAngle: 1,
+                                cornerRadius: 1,
+                              },
+                            ]}
+                            height={220}
+                            margin={{top: 0, bottom: 40, left: 0, right: 0}}
+                            slotProps={{
+                              legend: {
+                                direction: "row",
+                                position: {
+                                  vertical: "bottom",
+                                  horizontal: "center",
+                                },
+                                padding: 0,
+                                markSize: 10,
+                                itemGap: 15,
+                                labelStyle: {
+                                  fontSize: 12,
+                                  fontWeight: 500,
+                                },
+                              },
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex-1 min-w-[250px]">
@@ -841,36 +1058,53 @@ const MDashboard = () => {
                         Staff Attendance
                       </h3>
 
-                      {/* {staffAttendanceData.total_present === 0 ? (
-                        <div className="flex items-center justify-center h-[180px] text-gray-500">
-                          No Data Available
-                        </div> */}
                       {statLoading ? (
                         <></>
                       ) : statError ? (
-                        <p className="flex items-center justify-center text-gray-500">No Data Available</p>
+                        <p className="text-red-500 text-center">
+                          No Data Available
+                        </p>
+                      ) : !staffAttendanceData.some(
+                          (item) => item.value > 0
+                        ) ? (
+                        <div className="flex items-center justify-center h-[180px] text-gray-500">
+                          No Data Available
+                        </div>
                       ) : (
-                        <PieChart
-                          series={[
-                            {
-                              data: staffAttendanceData,
-                              highlightScope: {
-                                fade: "global",
-                                highlight: "item",
+                        <div>
+                          <PieChart
+                            series={[
+                              {
+                                data: staffAttendanceData,
+                                highlightScope: {
+                                  fade: "global",
+                                  highlight: "item",
+                                },
+                                innerRadius: 45,
+                                paddingAngle: 1,
+                                cornerRadius: 1,
                               },
-                              innerRadius: 45,
-                              paddingAngle: 1,
-                              cornerRadius: 1,
-                            },
-                          ]}
-                          height={220}
-                          margin={{top: 0, bottom: 40, left: 0, right: 0}}
-                          slotProps={{
-                            legend: {
-                              hidden: true,
-                            },
-                          }}
-                        />
+                            ]}
+                            height={220}
+                            margin={{top: 0, bottom: 40, left: 0, right: 0}}
+                            slotProps={{
+                              legend: {
+                                direction: "row",
+                                position: {
+                                  vertical: "bottom",
+                                  horizontal: "center",
+                                },
+                                padding: 0,
+                                markSize: 10,
+                                itemGap: 15,
+                                labelStyle: {
+                                  fontSize: 12,
+                                  fontWeight: 500,
+                                },
+                              },
+                            }}
+                          />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -892,7 +1126,7 @@ const MDashboard = () => {
                 value={selectedDataType}
                 onChange={(e) => setSelectedDataType(e.target.value)}
                 size="small"
-                sx={{ minWidth: 120 }}
+                sx={{minWidth: 120}}
                 disabled={revenueLoading}
               >
                 <MenuItem value="checkins">Check-ins</MenuItem>
@@ -900,7 +1134,7 @@ const MDashboard = () => {
               </Select>
             </div>
 
-            <Box sx={{ width: "100%" }}>
+            <Box sx={{width: "100%"}}>
               {revenueLoading ? (
                 <Skeleton
                   variant="rectangular"
@@ -911,35 +1145,43 @@ const MDashboard = () => {
               ) : (
                 <LineChart
                   height={300}
-                  margin={{ top: 5, right: 20, bottom: 40, left: 40 }}
-                  series={[{
-                    data: selectedDataType === 'checkins' ? daily_checkins : daily_checkouts,
-                    color: selectedDataType === 'checkins' ? "#3331D1" : "#0B8FD9",
-                    area: true,
-                    curve: "linear"
-                  }]}
-                  xAxis={[{
-                    data: dates.map(date => formatDates(date)),
-                    scaleType: "band",
-                    tickLabelStyle: {
-                      angle: 0, 
-                      textAnchor: "middle"
-                    }
-                  }]}
+                  margin={{top: 5, right: 20, bottom: 40, left: 40}}
+                  series={[
+                    {
+                      data:
+                        selectedDataType === "checkins"
+                          ? daily_checkins
+                          : daily_checkouts,
+                      color:
+                        selectedDataType === "checkins" ? "#3331D1" : "#0B8FD9",
+                      area: true,
+                      curve: "linear",
+                    },
+                  ]}
+                  xAxis={[
+                    {
+                      data: dates.map((date) => formatDates(date)),
+                      scaleType: "band",
+                      tickLabelStyle: {
+                        angle: 0,
+                        textAnchor: "middle",
+                      },
+                    },
+                  ]}
                   sx={{
                     ".MuiLineElement-root": {
                       strokeWidth: 2,
                     },
                     ".MuiAreaElement-root": {
                       fillOpacity: 0.1,
-                    }
+                    },
                   }}
                 />
               )}
             </Box>
           </div>
 
-                    <RevenueDashboard 
+          <RevenueDashboard
             revenueLoading={revenueLoading}
             dailyRevenues={dailyRevenues} // Make sure this is not undefined
             dates={dates}
@@ -950,200 +1192,213 @@ const MDashboard = () => {
         {/* Second Column */}
         <div className="space-y-5">
           <div className="w-full ">
-            <div className="bg-white  h-[50%] p-4 pr-6 pl-6 shadow rounded-lg">
-              <form className="flex flex-col gap-4" onSubmit={handleAssign}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold">Task Assignment</h2>
-
+              <form
+                className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg"
+                onSubmit={handleAssign}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <h2 className="text-lg sm:text-xl font-semibold">
+                    Task Assignment
+                  </h2>
                   <IconButton
                     onClick={handleShowTaskAssignment}
                     size="small"
                     className="text-gray-600"
                   >
-                    <BsThreeDots />
+                    <MoreVertical />
                   </IconButton>
                 </div>
 
-                <input
-                  type="text"
-                  placeholder="Task Title"
-                  value={taskTitle}
-                  onChange={(e) => setTaskTitle(e.target.value)}
-                  className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
-                />
-                <div className="flex lg:justify-between gap-2">
-                  <div className="relative lg:w-48 w-full">
-                    <button
-                      type="button"
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
-                        selected.value ? "text-black" : "text-gray-400"
-                      } focus:outline-none flex justify-between items-center`}
-                    >
-                      {selected.label}
-                      {isDropdownOpen ? (
-                        <FaChevronUp className="text-gray-600" />
-                      ) : (
-                        <FaChevronDown className="text-gray-600" />
-                      )}
-                    </button>
+                <Tooltip
+                  open={fieldErrors.title}
+                  title="Task title is required"
+                  arrow
+                  placement="top"
+                >
+                  <input
+                    type="text"
+                    placeholder="Task Title"
+                    value={taskTitle}
+                    onChange={(e) => {
+                      setTaskTitle(e.target.value);
+                      setFieldErrors((prev) => ({...prev, title: false}));
+                    }}
+                    className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
+                  />
+                </Tooltip>
 
-                    {isDropdownOpen && (
-                      <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                        {departments.map((dept, index) => (
-                          <button
-                            key={index}
-                            type="button"
-                            onClick={() => handleSelect(dept)}
-                            disabled={dept.disabled}
-                            className={`w-full text-left px-4 py-2 ${
-                              dept.disabled
-                                ? "text-gray-400 cursor-default"
-                                : "text-black hover:bg-gray-100"
-                            }`}
-                          >
-                            {dept.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div className="relative w-full lg:w-40">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setPriorityDropdownOpen(!isPriorityDropdownOpen)
-                      }
-                      className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
-                        selectedPriority ? "text-black" : "text-gray-400"
-                      } focus:outline-none flex justify-between items-center`}
-                    >
-                      {selectedPriority || " Priority"}
-                      {isPriorityDropdownOpen ? (
-                        <FaChevronUp className="text-gray-600" />
-                      ) : (
-                        <FaChevronDown className="text-gray-600" />
-                      )}
-                    </button>
+                <div className="flex justify-between gap-4">
+                  <Tooltip
+                    open={fieldErrors.department}
+                    title="Department is required"
+                    arrow
+                    placement="top"
+                  >
+                    <div className="relative w-full">
+                      <button
+                        type="button"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                          selected.value ? "text-black" : "text-gray-400"
+                        } focus:outline-none flex justify-between items-center`}
+                      >
+                        {selected.label || "Department"}
+                        {isDropdownOpen ? (
+                          <FaChevronUp className="text-gray-600" />
+                        ) : (
+                          <FaChevronDown className="text-gray-600" />
+                        )}
+                      </button>
 
-                    {isPriorityDropdownOpen && (
-                      <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                        {["High", "Medium", "Low"].map((priority) => (
-                          <button
-                            key={priority}
-                            type="button"
-                            onClick={() => {
-                              setSelectedPriority(priority);
-                              setPriorityDropdownOpen(false);
-                            }}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                          >
-                            <span
-                              className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                                priority === "High"
-                                  ? "bg-red-500"
-                                  : priority === "Medium"
-                                  ? "bg-yellow-500"
-                                  : "bg-green-500"
-                              }`}
-                            ></span>
-                            {priority}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                      {isDropdownOpen && (
+                        <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+                          {staffLoading ? (
+                            <div className="px-4 py-2 text-gray-500">
+                              Loading departments...
+                            </div>
+                          ) : departments ? (
+                            Object.entries(departments).map(
+                              ([dept, count], index) => (
+                                <button
+                                  key={index}
+                                  type="button"
+                                  onClick={() => {
+                                    handleSelect({
+                                      label: dept,
+                                      value: dept.toLowerCase(),
+                                    });
+                                    setFieldErrors((prev) => ({
+                                      ...prev,
+                                      department: false,
+                                    }));
+                                  }}
+                                  className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                                >
+                                  {`${dept} (${count})`}
+                                </button>
+                              )
+                            )
+                          ) : (
+                            <div className="px-4 py-2 text-gray-500">
+                              No departments available
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Tooltip>
                 </div>
-                <textarea
-                  value={taskDescription}
-                  onChange={(e) => setTaskDescription(e.target.value)}
-                  placeholder="Task Description"
-                  maxLength={350}
-                  className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 h-[120px] resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
-                />
+
+                <div className="relative w-full mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Deadline
+                  </label>
+                    <div className="flex space-x-2">
+                      <select
+                        value={selectedHour}
+                        onChange={(e) => {
+                          setSelectedHour(e.target.value);
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            deadline: false,
+                          }));
+                        }}
+                        className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                      >
+                        {hours.map((hour) => (
+                          <option key={hour} value={hour}>
+                            {hour}:00
+                          </option>
+                        ))}
+                      </select>
+                      <select
+                        value={selectedMinute}
+                        onChange={(e) => {
+                          setSelectedMinute(e.target.value);
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            deadline: false,
+                          }));
+                        }}
+                        className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                      >
+                        {minutes.map((minute) => (
+                          <option key={minute} value={minute}>
+                            {minute}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                </div>
+
+                <Tooltip
+                  open={fieldErrors.description}
+                  title="Description is required"
+                  arrow
+                  placement="top"
+                >
+                  <textarea
+                    value={taskDescription}
+                    onChange={(e) => {
+                      setTaskDescription(e.target.value);
+                      setFieldErrors((prev) => ({...prev, description: false}));
+                    }}
+                    placeholder="Task Description"
+                    maxLength={350}
+                    className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+                  />
+                </Tooltip>
+
                 <div className="flex justify-end">
                   <button
                     type="submit"
                     disabled={Taskloading}
-                    className="h-9  w-full  bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white  shadow-xl"
+                    className="h-9 w-full bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50 shadow-xl flex items-center justify-center"
                   >
-                    {Taskloading ? "Assigning..." : "Assign"}
+                    {Taskloading ? (
+                      <LoadingAnimation size={24} color="#FFFFFF" />
+                    ) : (
+                      "Assign"
+                    )}
                   </button>
                 </div>
               </form>
-            </div>
           </div>
           <Dialog
             open={showTaskAssignment}
             onClose={() => setShowTaskAssignment(false)}
             maxWidth="lg"
             fullWidth
+            BackdropProps={{
+              sx: {
+                backgroundColor: "rgba(0, 0, 0, 0.4)",
+                backdropFilter: "blur(5px)",
+              },
+            }}
           >
-            <MTaskAssignment onClose={() => setShowTaskAssignment(false)} />
+           <AdminTaskAssignment onClose={() => setShowTaskAssignment(false)} />
           </Dialog>
           <div className="bg-white rounded-lg flex flex-col shadow xl:min-h-[515px] w-full p-4">
-            <h2 className="text-lg font-semibold">Announcements</h2>
-            <div className="flex-1 overflow-y-auto mb-4">
-              {announcementsLoading ? (
-                <div className="space-y-4">
-                  <Skeleton
-                    variant="text"
-                    width="100%"
-                    height={100}
-                    {...skeletonProps}
-                  />
-                  <Skeleton
-                    variant="rectangular"
-                    width="100%"
-                    height={150}
-                    {...skeletonProps}
-                  />
-                  <Skeleton
-                    variant="rectangular"
-                    width="100%"
-                    height={100}
-                    {...skeletonProps}
-                  />
-                </div>
-              ) : announcementsError ? (
-                <div className="text-gray-500 text-center mt-4 min-h-full">
-                  {announcementsError}
-                </div>
-              ) : (
-                <div className="overflow-auto h-[400px]">
-                  {announcements.length > 0 ? (
-                    announcements.map((announcement) => (
-                      <div
-                        key={announcement._id}
-                        className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
-                        onClick={() => handleViewAnnouncement(announcement)}
-                      >
-                        <div className="flex sm:justify-between sm:flex-row flex-col items-start mb-2">
-                          <h3 className="font-semibold text-lg">
-                            {announcement.title}
-                          </h3>
-                          <span className="text-sm text-gray-500">
-                            {new Date(
-                              announcement.created_at
-                            ).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
-                        </div>
-                        <p className="text-gray-600">{announcement.content}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex justify-center mt-20 h-full text-gray-500">
-                      No announcements available
-                    </div>
-                  )}
-                </div>
-              )}
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Announcements</h2>
+              <IconButton
+                onClick={handleShowAllAnnouncements}
+                size="small"
+              >
+                <MoreVertical className="h-5 w-5 text-gray-600"  />
+              </IconButton >
+            </div>
+
+            <AllAnnouncementsDialog
+              open={showAllAnnouncements}
+              onClose={() => setShowAllAnnouncements(false)}
+            />
+            <div 
+              ref={announcementContainerRef}
+              className="overflow-auto h-[400px]"
+              onScroll={handleAnnouncementScroll}
+            >
+              {renderAnnouncements()}
             </div>
 
             <div className="mt-auto ">
@@ -1164,106 +1419,107 @@ const MDashboard = () => {
                 Create Announcement
               </Button>
             </div>
-
+            
             {showAnnouncementBox && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-xl w-full max-w-2xl mx-4">
                   <CreateAnnouncementBox
                     onClose={() => setShowAnnouncementBox(false)}
                     onSubmit={handleCreateAnnouncement}
-                    departments={departments}
+                    departments={Object.entries(departments || {}).map(([dept]) => ({
+                      label: dept,
+                      value: dept.toLowerCase()
+                    }))}
                   />
                 </div>
               </div>
             )}
 
-            <Dialog
-              open={!!selectedAnnouncement}
-              onClose={handleViewClose}
-              maxWidth="sm"
-              fullWidth
-            >
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">
-                  View Announcement
-                </h2>
-                <div className="space-y-4">
-                  <TextField
-                    label="Title"
-                    fullWidth
-                    value={selectedAnnouncement?.title || ""}
-                    InputProps={{readOnly: true}}
-                  />
-                  <TextField
-                    label="Description"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    value={selectedAnnouncement?.description || ""}
-                    InputProps={{readOnly: true}}
-                  />
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium">Department:</span>{" "}
-                      {selectedAnnouncement?.department}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium">Urgency:</span>{" "}
-                      {selectedAnnouncement?.urgency}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium">Created By:</span>{" "}
-                      {selectedAnnouncement?.assigned_by}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium">Created At:</span>{" "}
-                      {selectedAnnouncement?.created_at &&
-                        new Date(
-                          selectedAnnouncement.created_at
-                        ).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                    </p>
-                    <div className="text-sm text-gray-500">
-                      <span className="font-medium">Assigned To:</span>
-                      <ul className="list-disc pl-5 mt-1">
-                        {selectedAnnouncement?.assigned_to.map(
-                          (person, index) => (
-                            <li key={index}>{person}</li>
-                          )
-                        )}
-                      </ul>
+<Dialog
+                  open={!!selectedAnnouncement}
+                  onClose={handleViewClose}
+                  maxWidth="sm"
+                  fullWidth
+                  sx={{zIndex: 1300}}
+                >
+                  <div className="p-6">
+                    <h2 className="text-xl font-semibold mb-4">
+                      View Announcement
+                    </h2>
+                    <div className="space-y-4">
+                      <TextField
+                        label="Title"
+                        fullWidth
+                        value={selectedAnnouncement?.title || ""}
+                        InputProps={{readOnly: true}}
+                      />
+                      <TextField
+                        label="Description"
+                        fullWidth
+                        multiline
+                        rows={4}
+                        value={selectedAnnouncement?.description || ""}
+                        InputProps={{readOnly: true}}
+                      />
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-500">
+                          <span className="font-medium">Department:</span>{" "}
+                          {selectedAnnouncement?.department}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          <span className="font-medium">Urgency:</span>{" "}
+                          {selectedAnnouncement?.urgency}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          <span className="font-medium">Created By:</span>{" "}
+                          {selectedAnnouncement?.assigned_by}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          <span className="font-medium">Created At:</span>{" "}
+                          {selectedAnnouncement?.created_at &&
+                            new Date(
+                              selectedAnnouncement.created_at
+                            ).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                        </p>
+                        <div className="text-sm text-gray-500">
+  <span className="font-medium">Assigned To:</span>
+  <ul className="list-disc pl-5 mt-1">
+    {Array.from(new Set( // Remove duplicates
+      selectedAnnouncement?.assigned_to?.map(person => extractDepartment(person))
+    )).map((department, index) => (
+      <li key={index}>{department}</li>
+    )) || []}
+  </ul>
+</div>
+                      </div>
+                      <div className="flex justify-end gap-2 mt-4">
+                        <Button
+                          onClick={() => setShowConfirmDialog(true)}
+                          variant="contained"
+                          color="error"
+                        >
+                          Delete
+                        </Button>
+                        <Button
+                          onClick={handleViewClose}
+                          variant="contained"
+                          sx={{
+                            backgroundColor: "#3A426F",
+                            "&:hover": {backgroundColor: "#3A426F"},
+                          }}
+                        >
+                          Close
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex justify-end gap-2 mt-4">
-                    <Button
-                      onClick={handleDelete}
-                      variant="contained"
-                      sx={{
-                        backgroundColor: "#dc2626",
-                        "&:hover": {backgroundColor: "#b91c1c"},
-                      }}
-                    >
-                      Delete
-                    </Button>
-                    <Button
-                      onClick={handleViewClose}
-                      variant="contained"
-                      sx={{
-                        backgroundColor: "#3A426F",
-                        "&:hover": {backgroundColor: "#3A426F"},
-                      }}
-                    >
-                      Close
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Dialog>
+                </Dialog>
           </div>
           <div className="bg-white rounded-lg shadow h-auto w-full p-4">
             <h2 className="text-lg  font-semibold mb-1">Leave Management</h2>
@@ -1281,8 +1537,68 @@ const MDashboard = () => {
           </div>
         </div>
       </div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{vertical: "top", horizontal: "right"}}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{width: "100%"}}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+      <DeleteConfirmationDialog
+        open={showConfirmDialog}
+        onClose={() => setShowConfirmDialog(false)}
+        onConfirm={handleDelete}
+        loading={deleteLoading}
+      />
     </section>
   );
 };
+
+// Add DeleteConfirmationDialog component at the top of the file
+const DeleteConfirmationDialog = ({ open, onClose, onConfirm, loading }) => (
+  <Dialog
+    open={open}
+    onClose={onClose}
+    sx={{
+      "& .MuiDialog-paper": {
+        margin: "16px",
+        maxWidth: "400px",
+      },
+      zIndex: 1400,
+    }}
+  >
+    <div className="p-6">
+      <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
+      <p className="text-gray-600 mb-6">
+        Are you sure you want to delete this announcement? This action cannot be undone.
+      </p>
+      <div className="flex justify-end gap-3">
+        <Button 
+          variant="outlined" 
+          onClick={onClose}
+          disabled={loading}
+        >
+          Cancel
+        </Button>
+        <Button 
+          variant="contained" 
+          color="error"
+          onClick={onConfirm}
+          disabled={loading}
+        >
+          {loading ? "Deleting..." : "Delete"}
+        </Button>
+      </div>
+    </div>
+  </Dialog>
+);
 
 export default MDashboard;

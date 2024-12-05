@@ -5,7 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { 
   deleteAnnouncement, 
   fetchAnnouncements, 
-  selectAllAnnouncements 
+  selectAllAnnouncements,
+  clearAnnouncements,
+  selectPagination
 } from '../../redux/slices/AnnouncementSlice';
 import LoadingAnimation from './LoadingAnimation';
 
@@ -57,26 +59,35 @@ export const AllAnnouncementsDialog = ({ open, onClose }) => {
   const [error, setError] = useState(null);
   const containerRef = useRef(null);
   const announcements = useSelector(selectAllAnnouncements);
+  const { nextPage } = useSelector(selectPagination);
 
   useEffect(() => {
     if (open) {
+      // Reset all pagination-related state
+      dispatch(clearAnnouncements());
+      setPage(1);
+      setHasMore(true);
+      setError(null);
+      setLoading(false);
+      // Load first page
       loadAnnouncements(1);
     }
   }, [open]);
 
   const loadAnnouncements = async (pageNum) => {
-    if (!hasMore || loading) return;
-    
+    if (loading || (!hasMore && pageNum > 1)) return;
+
     try {
       setLoading(true);
       const response = await dispatch(
         fetchAnnouncements(`?page=${pageNum}`)
       ).unwrap();
       
-      setHasMore(response.next !== null);
+      setHasMore(!!response.next);
       setPage(pageNum);
     } catch (error) {
       console.error('Error loading announcements:', error);
+      setError('Failed to load announcements');
     } finally {
       setLoading(false);
     }
@@ -154,7 +165,12 @@ export const AllAnnouncementsDialog = ({ open, onClose }) => {
             className="max-h-[60vh] overflow-y-auto space-y-4"
             onScroll={handleScroll}
           >
-            {announcements.length === 0 ? (
+            {loading && announcements.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <LoadingAnimation size={48} color="#3A426F" />
+                <p className="text-gray-500 mt-4">Loading announcements...</p>
+              </div>
+            ) : announcements.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12">
                 <svg 
                   className="w-16 h-16 text-gray-300 mb-4"
