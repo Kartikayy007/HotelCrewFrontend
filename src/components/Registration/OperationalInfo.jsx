@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import HotelIcon from '/operational.svg';
 import lineIcon from '/Line.svg';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
   const [checkInTime, setCheckInTime] = useState(initialData.check_in_time || '');
   const [checkOutTime, setCheckOutTime] = useState(initialData.check_out_time || '');
   const [paymentMethods, setPaymentMethods] = useState(initialData.payment_methods || '');
   const [error, setError] = useState('');
-
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "error",
+  });
   useEffect(() => {
     if (initialData) {
       setCheckInTime(initialData.check_in_time || '');
@@ -29,7 +35,11 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
 
     // Validate fields
     if (!checkInTime || !checkOutTime || !paymentMethods.trim()) {
-      setError('Please fill out all required fields.');
+      setSnackbar({
+        open: true,
+        message: "Please fill out all required fields.",
+        severity: "error",
+      });
       return;
     }
 
@@ -92,23 +102,14 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
     }
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-6">
-        {[1, 2, 3, 4, 5].map((num) => (
-          <div
-            key={num}
-            className={`w-8 h-8 flex items-center justify-center rounded-full border-solid border-[3.5px] ${
-              num === 5 ? "border-[#5C69F8] text-black" : "text-black bg-white border-none"
-            }`}
-          >
-            {num}
-          </div>
-        ))}
-      </div>
-
-      <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
-        <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-6">
+      <div className="flex flex-col xl:flex-row justify-center items-center gap-8 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
+        <div className="flex xl:hidden font-medium gap-3 mb-4 relative top-0">
           {[1, 2, 3, 4, 5].map((num) => (
             <div
               key={num}
@@ -121,16 +122,16 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
           ))}
         </div>
 
-        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-20">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 my-4">
           <img
             src={HotelIcon}
             alt="Hotel Icon"
             className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] font-medium font-Montserrat">
+          <h2 className="text-3xl text-center font-medium text-neutral-950 font-Montserrat">
             Operational Information
           </h2>
-          <p className="font-sans font-normal text-center">
+          <p className="font-sans text-lg font-medium text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -141,13 +142,13 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
 
         <form className="space-y-2 xl:w-full max-w-[330px]">
           <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-semibold hidden xl:block xl:text-left">Operational Information</h1>
+            <h1 className="text-[32px] font-semibold hidden xl:block xl:whitespace-nowrap xl:text-left">Operational Information</h1>
           </div>
 
           <div>
             <label
               htmlFor="check-in-time"
-              className="block text-sm font-sans font-[600] text-neutral-950 mb-1"
+              className="block text-lg font-sans font-[600] text-neutral-950 mb-1"
             >
               Check-in Time
             </label>
@@ -156,7 +157,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-in-time"
               value={checkInTime}
               onChange={(e) => setCheckInTime(e.target.value)}
-              className={`placeholder:text-base h-8 w-[182px] xl:w-[299px] mr-6 py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
+              className={`placeholder:text-base h-8 w-[182px] xl:w-[299px] mr-6 py-1 px-4 border rounded-[4px] text-lg focus:outline-none ${
                 !checkInTime && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
@@ -165,7 +166,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
           <div>
             <label
               htmlFor="check-out-time"
-              className="block text-sm font-sans font-[450] text-gray-700 mb-1"
+              className="block text-lg font-sans font-[600] text-neutral-950 mb-1"
             >
               Check-out Time
             </label>
@@ -174,7 +175,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="check-out-time"
               value={checkOutTime}
               onChange={(e) => setCheckOutTime(e.target.value)}
-              className={`h-8 w-[182px] xl:w-[299px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
+              className={`h-8 placeholder:text-base w-[182px] xl:w-[299px] py-1 px-4 border rounded-[4px] text-xl focus:outline-none ${
                 !checkOutTime && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder='Check-out timings'
@@ -184,7 +185,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
           <div>
             <label
               htmlFor="payment-methods"
-              className="block text-sm font-sans font-[600] mb-1"
+              className="block text-lg font-sans font-[600] mb-1"
             >
               Payment Methods*
             </label>
@@ -193,7 +194,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
               id="payment-methods"
               value={paymentMethods}
               onChange={(e) => setPaymentMethods(e.target.value)}
-              className={`h-8 w-[330px] xl:w-[623px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
+              className={`h-8 w-[330px]placeholder:text-base  xl:w-[623px] py-2 px-4 border rounded-[4px] text-xl focus:outline-none ${
                 !paymentMethods && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder='e.g., Cash, Credit Card, UPI'
@@ -209,7 +210,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
                 <span>Back </span>
               </button>
               <button onClick={handleNextClick} className="h-9 w-28 bg-[#5663AC] font-Montserrat font-bold rounded-lg text-white xl:fixed xl:left-[41.2vw]">
-                <span>Next </span>
+                <span>Submit </span>
                 <span>➔</span>
               </button>
             </div>
@@ -218,7 +219,7 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
 
         <div>
           <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
-            <div className="flex gap-5 text-[32px]">
+            <div className="flex gap-7 text-[32px]">
               {[1, 2, 3, 4, 5].map((num) => (
                 <div
                   key={num}
@@ -241,17 +242,32 @@ function OperationalInfo({ onNext, onBack, updateFormData, initialData }) {
                 className=" h-[96] mb-4 text-[#5663AC]"
               />
               <h2 className="text-[24px] font-[500] font-Montserrat">Operational Information</h2>
-              <p className="font-sans font-[400] text-[16px] text-center">
+              <p className="font-sans font-normal text-center">
                 Fill out the form on the left.
                 <br />
-                <span > You can always edit the data in the </span>
+                <span className='font-sans font-normal text-center' > You can always edit the data in the </span>
                 <br />
-                <span> setting menu.</span>
+                <span className='font-sans font-normal text-center'> setting menu.</span>
               </p>
             </div>
           </div>
         </div>
       </div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+        </Snackbar>
     </section>
   );
 }

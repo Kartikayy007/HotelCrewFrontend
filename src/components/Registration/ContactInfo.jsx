@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import contactIcon from "/contact.svg";
 import lineIcon from '/Line.svg';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
   const [completeAddress, setCompleteAddress] = useState("");
@@ -9,6 +11,12 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
   const [emergencyPhoneNumber, setEmergencyPhoneNumber] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [error, setError] = useState("");
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "error",
+  });
 
   useEffect(() => {
     if (initialData) {
@@ -22,19 +30,31 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
   const handleNextClick = (e) => {
     e.preventDefault();
     if (!completeAddress || !mainPhoneNumber || !emergencyPhoneNumber || !emailAddress) {
-      setError('Please fill out all required fields.');
+      setSnackbar({
+        open: true,
+        message: "Please fill out all required fields.",
+        severity: "error",
+      });
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailAddress)) {
-      setError('Please enter a valid email address.');
+      setSnackbar({
+        open: true,
+        message: "Please enter a valid email address.",
+        severity: "error",
+      });
       return;
     }
 
     const phoneNumberRegex = /^\d{10}$/;
     if(!phoneNumberRegex.test(mainPhoneNumber) || !phoneNumberRegex.test(emergencyPhoneNumber)) {
-      setError('Please enter a valid phone number.');
+      setSnackbar({
+        open: true,
+        message: "Please enter a valid phone number.",
+        severity: "error",
+      });
       return;
     }
 
@@ -55,11 +75,14 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
       setter(value);
     }
   };
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
 
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
-      <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
-        <div className="flex xl:hidden font-medium gap-3 mb-4 fixed xl:top-9 top-6">
+      <div className="flex flex-col xl:flex-row justify-center items-center gap-1 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
+        <div className="flex xl:hidden bg-white font-medium gap-3 mb-4 relative  top-0">
           {[1, 2, 3, 4, 5].map((num) => (
             <div
               key={num}
@@ -78,10 +101,10 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
             alt="Contact Icon"
             className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] font-medium font-Montserrat">
+          <h2 className="text-3xl text-center font-medium font-Montserrat">
             Contact & Location
           </h2>
-          <p className="font-sans font-normal text-center">
+          <p className="font-sans text-lg font-normal text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -90,15 +113,15 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
           </p>
         </div>
 
-        <form className="space-y-7 w-full xl:w-40-">
-          <div className="flex justify-between items-center">
-            <h1 className="text-[32px] font-semibold hidden xl:block xl:text-left">Contact & Location</h1>
-          </div>
+        <form className="space-y-7 w-[90vw] xl:w-40 px-4">
+          {/* <div className="flex justify-between items-center"> */}
+            <h1 className="text-3xl font-semibold xl:whitespace-nowrap hidden xl:block xl:text-left">Contact & Location</h1>
+          {/* </div> */}
 
           <div>
             <label
               htmlFor="complete-address"
-              className="block text-sm font-sans font-semibold"
+              className="text-lg w-full font-sans font-semibold whitespace-nowrap"
             >
               Complete Address*
             </label>
@@ -107,7 +130,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="complete-address"
               value={completeAddress}
               onChange={(e) => setCompleteAddress(e.target.value)}
-              className={`h-8 w-full xl:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
+              className={`h-8 w-full xl:w-[623px] py-2 px-4 text-xl whitespace-nowrap border rounded-[4px] focus:outline-none ${
                 !completeAddress && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
               placeholder="Enter full address"
@@ -118,7 +141,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
             <div>
               <label
                 htmlFor="phone-number"
-                className="block text-sm font-sans font-semibold mb-1"
+                className="block text-lg font-sans font-semibold mb-1"
               >
                 Phone Numbers*
               </label>
@@ -141,7 +164,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
               id="emergency-phone"
               value={emergencyPhoneNumber}
               onChange={(e) => handleNumberInput(e, setEmergencyPhoneNumber)}
-              className={`h-8 w-1/2 xl:w-[299px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
+              className={`h-8 w-full  xl:w-[299px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
                 !emergencyPhoneNumber && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500 xl:ml-4`}
               placeholder="Emergency number"
@@ -152,7 +175,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
           <div>
             <label
               htmlFor="hotel-email"
-              className="block text-sm font-sans font-semibold mb-1"
+              className="block text-lg font-sans font-semibold mb-1"
             >
               Hotel Email*
             </label>
@@ -203,7 +226,7 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
 
         <div>
           <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
-            <div className="flex gap-5 text-[32px]">
+            <div className="flex gap-7 text-[32px]">
               {[1, 2, 3, 4, 5].map((num) => (
                 <div
                   key={num}
@@ -219,24 +242,39 @@ function ContactInfo({ onNext, onBack, updateFormData, initialData }) {
             <img className="relative top-36 left-[43.7%]" src={lineIcon} alt="" />
             <img className="relative top-[80%] left-[43.7%]" src={lineIcon} alt="" />
 
-            <div className="flex flex-col items-center justify-center h-full space-y4">
+            <div className="flex flex-col items-center justify-center h-full space-y-4">
               <img 
                 src={contactIcon} 
                 alt="Contact Icon" 
                 className="h-[96] mb-4 text-[#5663AC]"
               />
-              <h2 className="text-[24px] font-[500] font-Montserrat">Contact & Location</h2>
-              <p className="font-sans font-[400] text-center">
+              <h2 className="text-2xl font-[500] font-Montserrat">Contact & Location</h2>
+              <p className="font-sans font-normal text-center">
                 Fill out the form on the left.
                 <br />
-                <span className="font-sans font-[300]">You can always edit the data in the </span>
+                <span className="font-sans font-normal text-center">You can always edit the data in the </span>
                 <br />
-                <span className="font-sans font-[300]">setting menu.</span>
+                <span className="font-sans font-normal text-center">setting menu.</span>
               </p>
             </div>
           </div>
         </div>
       </div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+        </Snackbar>
     </section>
   );
 }
