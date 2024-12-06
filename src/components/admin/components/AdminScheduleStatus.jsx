@@ -211,7 +211,7 @@ useEffect(() => {
     <div className="h-auto sm:h-80">
       <div className="px-2 xs:px-4 sm:px-8">
         <div 
-          className={`bg-white ${shiftType !== "morning" ? "mt-6 sm:mt-11" : ""}`}
+          className={`bg-white ${shiftType !== "Morning" ? "mt-6 sm:mt-11" : ""}`}
           onDragOver={handleDragOver}
           onDrop={(e) => handleDrop(e, shiftType)}
         >
@@ -226,7 +226,7 @@ useEffect(() => {
               </div>
             )}
           </div>
-          <div className="h-[180px] xs:h-[200px] sm:h-[280px] overflow-y-auto">
+          <div className="h-[180px] xs:h-[200px] sm:h-[260px] overflow-y-auto">
             <div className="flex flex-wrap gap-2 xs:gap-3 sm:gap-4 pt-2">
               {staff.map((staff) => (
                 <div
@@ -253,13 +253,13 @@ useEffect(() => {
   );
   const [department, setDepartment] = useState([]);
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-auto scrollbar-thin p-1 xs:p-2 sm:p-4">
-      <h1 className="text-[#252941] text-3xl my-4 pl-12 font-semibold">
+    <section className="bg-[#E6EEF9] h-full w-[100%] overflow-y-auto p-1 xs:p-2 sm:p-4">
+      <h1 className="text-[#252941] text-3xl mb-3 mt-5 pl-12 ml-4 font-semibold">
         Schedule status
       </h1>
 
       <div>
-        <div className="bg-white w-full rounded-lg shadow-lg mx-6 min-h-[calc(118vh-120px)] lg:h-[80rem]">
+        <div className="bg-white w-auto rounded-lg shadow-lg sm:mx-6 mx-3 min-h-[calc(100vh-120px)] lg:h-[80rem]">
           <div className="z-10 pb-2 xs:pb-4 sm:pb-6">
             <div className="flex justify-between items-start sm:items-center p-2 xs:p-4 sm:p-6">
               <h1 className="font-semibold text-lg xs:text-xl sm:text-2xl mb-2 xs:mb-4 sm:mb-0">
@@ -277,7 +277,7 @@ useEffect(() => {
             </div>
 
             <div className="flex flex-col lg:justify-between lg:flex-row px-2 xs:px-4 sm:px-6 space-y-2 xs:space-y-4 lg:space-y-0">
-              <div className="flex gap-2 xs:gap-3 sm:gap-5 text-black font-medium w-full lg:w-2/3 overflow-x-auto scrollbar-none scrollbar-thumb-[#E6EEF9] scrollbar-track-transparent pb-2">
+              <div className="flex gap-2 xs:gap-3 sm:gap-5 text-black font-medium sm:w-auto lg:w-2/3 overflow-x-auto pb-2">
               <button
               key="all"
               onClick={() => setActiveFilter("All")}
@@ -285,13 +285,13 @@ useEffect(() => {
                 }`}
             >
               All
-            </button>
+              </button>
                 {department.map((department) => (
                   <button
                     key={department}
                     onClick={() => setActiveFilter(department)}
-                    className={`p-1.5 xs:p-2 sm:p-2
-                      min-w-24 text-[14px] xs:text-lg sm:text-sm md:text-base lg:text-lg 
+                    className={`p-1.5 xs:p-2 sm:p-2 w-auto lg:min-w-40 min-w-32
+                      text-[14px] xs:text-lg sm:text-sm md:text-base lg:text-lg 
                       rounded-3xl capitalize
                       whitespace-nowrap 
                       transition-colors 
@@ -308,7 +308,7 @@ useEffect(() => {
 
               <div className="relative flex items-center w-full lg:w-auto lg:m-9">
                 <input
-                  className="p-1.5 xs:p-2 sm:p-3 pl-10 xs:pl-12 sm:pl-14 bg-[#E6EEF9] rounded-3xl w-full lg:w- text-xs xs:text-sm sm:text-base"
+                  className="p-1.5 xs:p-2 sm:p-3 pl-10 xs:pl-12 sm:pl-14 bg-[#E6EEF9] rounded-3xl text-xs xs:text-sm w-[98%] sm:text-base"
                   placeholder="Search staff"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -321,9 +321,9 @@ useEffect(() => {
             </div>
           </div>
 
-          <ShiftSection title="Morning Shift" staff={dayShiftStaff} shiftType="morning" />
-          <ShiftSection title="Evening Shift" staff={EveningShiftStaff} shiftType="evening" />
-          <ShiftSection title="Night Shift" staff={nightShiftStaff} shiftType="night" />
+          <ShiftSection title="Morning Shift" staff={dayShiftStaff} shiftType="Morning" />
+          <ShiftSection title="Evening Shift" staff={EveningShiftStaff} shiftType="Evening" />
+          <ShiftSection title="Night Shift" staff={nightShiftStaff} shiftType="Night" />
         </div>
       </div>
 

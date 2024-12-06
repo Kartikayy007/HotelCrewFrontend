@@ -92,8 +92,8 @@ const AdminAttendanceList = ({ onBack }) => {
 
     switch (timeFilter) {
       case 'daily':
-        const presentList = todayList.filter(item => item.current_attendance === "Present");
-        const absentList = todayList.filter(item => item.current_attendance === "Absent");
+        const presentList = todayList?.filter(item => item.current_attendance === "Present");
+        const absentList = todayList?.filter(item => item.current_attendance === "Absent");
         
         return {
           'Today': {

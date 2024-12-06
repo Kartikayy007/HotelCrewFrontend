@@ -286,7 +286,7 @@ function AdminPayRoll() {
                 <select
                   value={departmentFilter}
                   onChange={(e) => setDepartmentFilter(e.target.value)}
-                  className="min-w-[140px] bg-[#F1F6FC] hover:bg-gray-200 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+                  className="min-w-[140px] bg-white hover:bg-slate-50 text-[#5663AC] font-medium py-2 px-4 rounded-full"
                 >
                   <option value="All">Department</option>
                   {departments.map((dept) => (
@@ -299,7 +299,7 @@ function AdminPayRoll() {
                 <select
                   value={shiftFilter}
                   onChange={(e) => setShiftFilter(e.target.value)}
-                  className="min-w-[140px] bg-[#F1F6FC] hover:bg-gray-200 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+                  className="min-w-[140px] bg-white hover:bg-slate-50 text-[#5663AC] font-medium py-2 px-4 rounded-full"
                 >
                   <option value="All">All Shifts</option>
                   {SHIFT_OPTIONS.map((shift) => (
@@ -318,7 +318,7 @@ function AdminPayRoll() {
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#F1F6FC] hover:bg-gray-200 text-[#5663AC] font-medium py-2 px-4 rounded-2xl border-2 border-[#B7CBEA] pl-10"
+                  className="w-full bg-white hover:bg-slate-50 text-[#5663AC] font-medium py-2 px-4 rounded-2xl border-2 border-[#B7CBEA] pl-10"
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5663AC] w-5 h-5" />
               </div>

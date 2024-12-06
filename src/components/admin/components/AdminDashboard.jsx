@@ -1480,7 +1480,7 @@ function AdminDashboard() {
                       <select
                         value={selectedHour}
                         onChange={(e) => setSelectedHour(e.target.value)}
-                        className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                        className="border border-gray-200 rounded-xl bg-[#e6eef9] focus:bg-white p-2 w-1/2  font-Montserrat focus:outline-none"
                       >
                         {hours.map((hour) => (
                           <option key={hour} value={hour}>
@@ -1491,7 +1491,7 @@ function AdminDashboard() {
                       <select
                         value={selectedMinute}
                         onChange={(e) => setSelectedMinute(e.target.value)}
-                        className="border border- gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                        className="border border- gray-200 rounded-xl bg-[#e6eef9] font-Montserrat focus:bg-white p-2 w-1/2 focus:outline-none"
                       >
                         {minutes.map((minute) => (
                           <option key={minute} value={minute}>

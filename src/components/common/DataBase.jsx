@@ -1,14 +1,14 @@
-import React, {useState, useRef, useEffect} from "react";
-import {useSelector, useDispatch} from "react-redux";
+import React, { useState, useRef, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   selectStaffPerDepartment,
   createStaff,
   fetchStaffData, // Add this import
 } from "../../redux/slices/StaffSlice";
-import {selectCustomers} from "../../redux/slices/customerSlice"; // Adjust path as needed
+import { selectCustomers } from "../../redux/slices/customerSlice"; // Adjust path as needed
 import StaffDB from "./DB/StaffDB";
 import CustomerDB from "./DB/CustomerDB";
-import {Search, ChevronLeft, ChevronRight} from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Button,
   Dialog,
@@ -92,7 +92,7 @@ function DataBase() {
         ...newStaffData,
         role: capitalizeFirstLetter(newStaffData.role), // Capitalize before API call
       };
-      
+
       await dispatch(createStaff(staffDataForApi));
       setCreateDialogOpen(false);
       dispatch(fetchStaffData()); // Refresh staff list
@@ -106,7 +106,7 @@ function DataBase() {
   // Update handleInputChange
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    
+
     if (name === 'role') {
       setIsManager(value === 'manager');
       // Clear department if manager is selected
@@ -119,7 +119,7 @@ function DataBase() {
         return;
       }
     }
-    
+
     setNewStaffData(prev => ({
       ...prev,
       [name]: value
@@ -134,7 +134,7 @@ function DataBase() {
     }
     if (name === 'upi_id') {
       setErrors(prev => ({
-        ...prev, 
+        ...prev,
         upi_id: value ? !isValidUPI(value) : false
       }));
     }
@@ -142,7 +142,7 @@ function DataBase() {
 
   const checkScroll = () => {
     if (scrollContainerRef.current) {
-      const {scrollLeft, scrollWidth, clientWidth} = scrollContainerRef.current;
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
       setShowLeftArrow(scrollLeft > 0);
       setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
     }
@@ -182,7 +182,7 @@ function DataBase() {
 
   // Update isAllFieldsFilled
   const isAllFieldsFilled = () => {
-    const baseValidation = 
+    const baseValidation =
       newStaffData.user_name &&
       newStaffData.email &&
       isValidEmail(newStaffData.email) &&
@@ -191,12 +191,12 @@ function DataBase() {
       newStaffData.salary &&
       newStaffData.upi_id &&
       isValidUPI(newStaffData.upi_id);
-      
+
     // Skip department check for managers
     if (isManager) {
       return baseValidation;
     }
-    
+
     return baseValidation && newStaffData.department;
   };
 
@@ -226,16 +226,16 @@ function DataBase() {
 
               <div
                 ref={scrollContainerRef}
-                className="scroll-container flex gap-2 overflow-x-auto hide-scrollbar w-full"
-              >
+                className="scroll-container flex gap-2 overflow-x-auto hide-scrollbar w-full">
+
                 {activeComponent === "StaffDB" && (
                   <>
                     <select
                       value={filters.department}
                       onChange={(e) =>
-                        setFilters({...filters, department: e.target.value})
+                        setFilters({ ...filters, department: e.target.value })
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+                      className="filter1 bg-white hover:bg-slate-50 text-[#5663AC] font-Montserrat font-medium py-2 px-4 rounded-full focus:bg-white"
                     >
                       <option value="All">All Departments</option>
                       {departments.map((dept) => (
@@ -247,9 +247,9 @@ function DataBase() {
                     <select
                       value={filters.role}
                       onChange={(e) =>
-                        setFilters({...filters, role: e.target.value})
+                        setFilters({ ...filters, role: e.target.value })
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
+                      className="filter1 bg-white hover:bg-slate-50 font-Montserrat text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2 focus:bg-white"
                     >
                       <option value="All">Role</option>
                       <option value="Manager">Manager</option>
@@ -259,9 +259,9 @@ function DataBase() {
                     <select
                       value={filters.shift}
                       onChange={(e) =>
-                        setFilters({...filters, shift: e.target.value})
+                        setFilters({ ...filters, shift: e.target.value })
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
+                      className="filter1 bg-white hover:bg-slate-50 font-Montserrat text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2 focus:bg-white"
                     >
                       <option value="All">Shift</option>
                       <option value="Morning">Morning Shift</option>
@@ -275,9 +275,9 @@ function DataBase() {
                     <select
                       value={filters.customerType}
                       onChange={(e) =>
-                        setFilters({...filters, customerType: e.target.value})
+                        setFilters({ ...filters, customerType: e.target.value })
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+                      className="filter1 bg-white font-Montserrat hover:bg-slate-50 text-[#5663AC] font-medium py-2 px-4 rounded-full"
                     >
                       <option value="All">Customer Type</option>
                       <option value="Regular">Regular</option>
@@ -286,9 +286,9 @@ function DataBase() {
                     <select
                       value={filters.roomType}
                       onChange={(e) =>
-                        setFilters({...filters, roomType: e.target.value})
+                        setFilters({ ...filters, roomType: e.target.value })
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full border-2 mr-2"
+                      className="filter1 bg-white hover:bg-slate-50 font-Montserrat text-[#5663AC] font-medium py-2 px-4 rounded-full border-2 mr-2"
                     >
                       <option value="All">Room Type</option>
                       {customers &&
@@ -330,21 +330,19 @@ function DataBase() {
         <div className="flex flex-col">
           <div>
             <button
-              className={`${
-                activeComponent === "StaffDB"
+              className={`${activeComponent === "StaffDB"
                   ? "bg-[#252941] text-[#F1F6FC]"
                   : "bg-[#B7CBEA] text-[#252941]"
-              } font-medium py-2 px-4 rounded-t-lg`}
+                } font-medium py-2 px-4 rounded-t-lg`}
               onClick={() => setActiveComponent("StaffDB")}
             >
               Staff
             </button>
             <button
-              className={`${
-                activeComponent === "CustomerDB"
+              className={`${activeComponent === "CustomerDB"
                   ? "bg-[#252941] text-[#F1F6FC]"
                   : "bg-[#B7CBEA] text-[#252941]"
-              } font-medium py-2 px-4 rounded-t-lg`}
+                } font-medium py-2 px-4 rounded-t-lg`}
               onClick={() => setActiveComponent("CustomerDB")}
             >
               Customer
@@ -368,7 +366,7 @@ function DataBase() {
             bottom: 32,
             right: 32,
             bgcolor: "#252941",
-            "&:hover": {bgcolor: "#1a1f36"},
+            "&:hover": { bgcolor: "#1a1f36" },
             borderRadius: "500px",
             padding: "12px 24px",
             boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
@@ -393,10 +391,10 @@ function DataBase() {
           },
         }}
       >
-        <DialogTitle sx={{bgcolor: "#252941", color: "white"}}>
+        <DialogTitle sx={{ bgcolor: "#252941", color: "white" }}>
           Create New Staff
         </DialogTitle>
-        <DialogContent sx={{mt: 2, minHeight: "400px"}}>
+        <DialogContent sx={{ mt: 2, minHeight: "400px" }}>
           {isCreating ? (
             <div className="flex flex-col mt-36 items-center justify-center h-full">
               <LoadingAnimation size={60} />
@@ -413,9 +411,9 @@ function DataBase() {
                 fullWidth
                 value={newStaffData.user_name}
                 onChange={handleInputChange}
-                sx={{mb: 2}}
+                sx={{ mb: 2 }}
               />
-              <Tooltip 
+              <Tooltip
                 open={newStaffData.email && !isValidEmail(newStaffData.email)}
                 title="Please enter a valid email address"
                 placement="top"
@@ -430,10 +428,10 @@ function DataBase() {
                   fullWidth
                   value={newStaffData.email}
                   onChange={handleInputChange}
-                  sx={{mb: 2}}
+                  sx={{ mb: 2 }}
                 />
               </Tooltip>
-              <FormControl fullWidth sx={{mb: 2}}>
+              <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel
                   id="department-label"
                   sx={{
@@ -470,7 +468,7 @@ function DataBase() {
                 </Select>
               </FormControl>
               <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel 
+                <InputLabel
                   id="role-label"
                   sx={{
                     backgroundColor: 'white',
@@ -500,7 +498,7 @@ function DataBase() {
                 </Select>
               </FormControl>
               <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel 
+                <InputLabel
                   id="shift-label"
                   sx={{
                     backgroundColor: 'white',
@@ -531,7 +529,7 @@ function DataBase() {
                 fullWidth
                 value={newStaffData.salary}
                 onChange={handleInputChange}
-                sx={{mb: 2}}
+                sx={{ mb: 2 }}
               />
               <Tooltip
                 open={newStaffData.upi_id && !isValidUPI(newStaffData.upi_id)}
@@ -547,13 +545,13 @@ function DataBase() {
                   fullWidth
                   value={newStaffData.upi_id}
                   onChange={handleInputChange}
-                  sx={{mb: 2}}
+                  sx={{ mb: 2 }}
                 />
               </Tooltip>
             </>
           )}
         </DialogContent>
-        <DialogActions sx={{p: 2}}>
+        <DialogActions sx={{ p: 2 }}>
           <Button
             onClick={() => setCreateDialogOpen(false)}
             color="inherit"
@@ -573,7 +571,7 @@ function DataBase() {
                 disabled={isCreating || !isAllFieldsFilled()}
                 sx={{
                   bgcolor: "#252941",
-                  "&:hover": {bgcolor: "#1a1f36"},
+                  "&:hover": { bgcolor: "#1a1f36" },
                 }}
               >
                 {isCreating ? "Creating..." : "Create"}
