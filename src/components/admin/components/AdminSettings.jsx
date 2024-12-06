@@ -62,7 +62,7 @@ const useConfirmationDialog = () => {
         <DialogContentText>{dialogConfig.message}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={closeDialog} color="primary">
+        <Button onClick={closeDialog} color="#252941">
           Cancel
         </Button>
         <Button
@@ -70,7 +70,15 @@ const useConfirmationDialog = () => {
             dialogConfig.onConfirm();
             closeDialog();
           }}
-          color="primary"
+          sx={{
+            backgroundColor: "#252941", // Background color
+            color: "#ffffff", // Text color
+            '&:hover': {
+              backgroundColor: "#1e2135", // Hover effect
+            },
+          }}
+          // color="#252941"
+          
           variant="contained"
         >
           Confirm
@@ -185,7 +193,7 @@ const BasicInfo = () => {
 
   return (
     <>
-      <section className="bg-white rounded-3xl p-8 lg:h-[75vh] mx-5 h-full shadow-sm lg:w-2/3">
+      <section className="bg-white rounded-3xl p-8 lg:h-[75vh] mx-5 h-full  lg:w-2/3">
         <h2 className="text-2xl font-semibold mb-6">Basic Information</h2>
 
         <div className="space-y-6">
@@ -196,9 +204,10 @@ const BasicInfo = () => {
             <input
               type="text"
               name="hotel_name"
+              maxLength={120}
               value={formData.hotel_name}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-400 focus:border-blue-400"
             />
           </div>
 
@@ -209,9 +218,10 @@ const BasicInfo = () => {
             <input
               type="text"
               name="legal_business_name"
+              maxLength={150}
               value={formData.legal_business_name}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-400 focus:border-blue-400"
             />
           </div>
 
@@ -222,9 +232,12 @@ const BasicInfo = () => {
             <input
               type="number"
               name="year_established"
+              min={1000}
+              max={2024}
+              minLength={3}
               value={formData.year_established}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-400 focus:border-blue-400"
             />
           </div>
 
@@ -234,10 +247,11 @@ const BasicInfo = () => {
             </label>
             <input
               type="text"
+              maxLength={100}
               name="license_registration_numbers"
               value={formData.license_registration_numbers}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-400 focus:border-blue-400"
             />
           </div>
         </div>
@@ -410,7 +424,7 @@ const ContactInfo = () => {
   };
 
   return (
-    <section className="bg-white rounded-3xl mx-5 lg:h-[75vh] h-full p-8 shadow-sm lg:w-2/3">
+    <section className="bg-white rounded-3xl mx-5 lg:h-[75vh] h-full p-8  lg:w-2/3">
       <h2 className="text-xl font-bold mb-8">Contact Information</h2>
 
       <div className="space-y-6">
@@ -424,9 +438,10 @@ const ContactInfo = () => {
           <input
             type="text"
             id="complete_address"
+            maxLength={150}
             value={formData.complete_address}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           />
         </div>
 
@@ -438,18 +453,20 @@ const ContactInfo = () => {
             <input
               type="tel"
               id="main_phone_number"
+              maxLength={10}
               placeholder="Main number"
               value={formData.main_phone_number}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
             />
             <input
               type="tel"
               id="emergency_phone_number"
+              maxLength={10}
               placeholder="Emergency number"
               value={formData.emergency_phone_number}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
             />
           </div>
         </div>
@@ -463,10 +480,11 @@ const ContactInfo = () => {
           </label>
           <input
             type="email"
+            maxLength={150}
             id="email_address"
             value={formData.email_address}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           />
         </div>
 
@@ -474,7 +492,7 @@ const ContactInfo = () => {
           <button
             onClick={handleSubmit}
             disabled={!isDirty || isSubmitting || !hasChanges()}
-            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
+            className={`bg-[#252941] text-white px-6 py-2 rounded-full hover:bg-[#374160] 
               transition-colors flex items-center gap-2
               ${
                 !isDirty || isSubmitting || !hasChanges()
@@ -605,7 +623,7 @@ const PropertyDetails = () => {
   };
 
   return (
-    <section className="bg-white rounded-3xl p-8 lg:h-[75vh] mx-5 h-full shadow-sm lg:w-2/3">
+    <section className="bg-white rounded-3xl h-full  sm:p-8 lg:h-[75vh] sm:mx-5 mx-[16px] py-8 px-3   lg:w-2/3">
       <h2 className="text-xl font-bold mb-4 sm:mb-8">Property Details</h2>
       {updateError && (
         <div className="text-red-500 mb-4">
@@ -614,7 +632,7 @@ const PropertyDetails = () => {
       )}
 
       <div className="space-y-4 sm:space-y-1 w-full">
-        <div className="h-80 w-full overflow-scroll">
+        <div className="h-80 w-full overflow-auto">
           <div className="flex justify-between items-center mb-4">
             <label className="text-sm font-medium">Room Types</label>
             <button
@@ -632,12 +650,13 @@ const PropertyDetails = () => {
                 <label className="block text-xs mb-2">Room Type</label>
                 <input
                   type="text"
+                  maxLength={70}
                   value={room.room_type}
                   onChange={(e) =>
                     updateRoomType(index, "room_type", e.target.value)
                   }
                   placeholder="e.g. Single, Double"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                 />
               </div>
 
@@ -646,6 +665,7 @@ const PropertyDetails = () => {
                 <input
                   type="number"
                   value={room.count}
+                  min={1}
                   onChange={(e) =>
                     updateRoomType(
                       index,
@@ -653,7 +673,7 @@ const PropertyDetails = () => {
                       parseInt(e.target.value) || 0
                     )
                   }
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                 />
               </div>
 
@@ -662,6 +682,7 @@ const PropertyDetails = () => {
                 <input
                   type="number"
                   value={room.price}
+                  min={0}
                   onChange={(e) =>
                     updateRoomType(
                       index,
@@ -671,7 +692,7 @@ const PropertyDetails = () => {
                   }
                   placeholder="0.00"
                   step="0.01"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                 />
               </div>
 
@@ -695,11 +716,12 @@ const PropertyDetails = () => {
             </label>
             <input
               type="number"
+              min={1}
               value={formData.number_of_floors}
               onChange={(e) =>
                 handleInputChange("number_of_floors", parseInt(e.target.value) || 0)
               }
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
             />
           </div>
 
@@ -709,11 +731,12 @@ const PropertyDetails = () => {
             </label>
             <input
               type="number"
+              min={0}
               value={formData.valet_parking_capacity}
               onChange={(e) =>
                 handleInputChange("valet_parking_capacity", parseInt(e.target.value) || 0)
               }
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
             />
           </div>
         </div>
@@ -726,7 +749,7 @@ const PropertyDetails = () => {
               onChange={(e) =>
                 handleInputChange("valet_parking_available", e.target.checked)
               }
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-400"
             />
             <span className="text-sm font-medium">Valet Parking Available</span>
           </label>
@@ -736,7 +759,7 @@ const PropertyDetails = () => {
           <button
             onClick={handleSaveClick}
             disabled={!isDirty || updateLoading}
-            className={`bg-[#424C6B] text-white px-6 py-2 rounded-full hover:bg-[#374160] transition-colors ${
+            className={`bg-[#252941] text-white px-6 py-2 rounded-full hover:bg-[#374160] transition-colors ${
               !isDirty || updateLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
@@ -758,7 +781,7 @@ const PropertyDetails = () => {
           },
         }}
       >
-        <DialogTitle sx={{ bgcolor: "#252941", color: "white" }}>
+        <DialogTitle sx={{ bgcolor: "white", color: "252941" }}>
           Confirm Changes
         </DialogTitle>
         <DialogContent sx={{ mt: 2 }}>
@@ -776,7 +799,7 @@ const PropertyDetails = () => {
             variant="contained"
             sx={{
               bgcolor: "#252941",
-              "&:hover": { bgcolor: "#1a1f36" },
+              "&:hover": { bgcolor: "#252941" },
             }}
           >
             Save Changes
@@ -912,12 +935,12 @@ const StaffManagement = () => {
   };
 
   return (
-    <section className="bg-white mx-4 lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm lg:w-2/3">
+    <section className="bg-white mx-4 lg:h-[75vh] h-full rounded-3xl p-8  lg:w-2/3">
       <h2 className="text-xl font-bold mb-8">Staff Management</h2>
 
-      <div className="space-y-6">
+      <div className="space-y-6 h-96 overflow-y-auto">
         <div>
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between  items-center mb-2">
             <label className="block text-sm font-medium">Departments</label>
             <button
               onClick={addDepartment}
@@ -927,13 +950,14 @@ const StaffManagement = () => {
             </button>
           </div>
           {departments.map((department, index) => (
-            <div key={index} className="flex gap-4 mb-4 items-center">
+            <div key={index} className="flex gap-4 mb-4 items-center ">
               <input
                 type="text"
                 value={department}
+                maxLength={50}
                 onChange={(e) => handleDepartmentChange(index, e.target.value)}
                 placeholder="Department name"
-                className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
               />
               <button
                 onClick={() => removeDepartment(index)}
@@ -943,6 +967,7 @@ const StaffManagement = () => {
               </button>
             </div>
           ))}
+        </div>
         </div>
         <div className="flex justify-end mt-8">
           <button
@@ -966,7 +991,7 @@ const StaffManagement = () => {
             )}
           </button>
         </div>
-      </div>
+      
 
       <ConfirmationDialog />
 
@@ -1105,7 +1130,7 @@ const OperationalInfo = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm w-2/3 mx-4"
+      className="bg-white lg:h-[75vh] h-full rounded-3xl p-8  w-2/3 mx-4"
     >
       <h2 className="text-xl font-bold mb-8">Operational Information</h2>
       <div className="space-y-6">
@@ -1120,7 +1145,7 @@ const OperationalInfo = () => {
               onChange={(e) =>
                 handleInputChange("check_in_time", e.target.value)
               }
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
               required
             />
             <Clock
@@ -1141,7 +1166,7 @@ const OperationalInfo = () => {
               onChange={(e) =>
                 handleInputChange("check_out_time", e.target.value)
               }
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
               required
             />
             <Clock
@@ -1162,7 +1187,7 @@ const OperationalInfo = () => {
               handleInputChange("payment_methods", e.target.value.split(", "))
             }
             placeholder="Enter payment methods (comma separated)"
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           />
         </div>
 
@@ -1281,7 +1306,7 @@ const StaffData = () => {
   };
 
   return (
-    <section className="bg-white lg:h-[75vh] h-full rounded-3xl p-8 shadow-sm lg:w-2/3 mx-4">
+    <section className="bg-white lg:h-[75vh] h-full rounded-3xl p-8  lg:w-2/3 mx-4">
       <h2 className="text-xl font-bold mb-8">Staff Data</h2>
       {/* {file && (
         <div className="mb-4 p-2 bg-gray-100 rounded">
@@ -1293,13 +1318,13 @@ const StaffData = () => {
       <div
         onDragOver={(e) => {
           e.preventDefault();
-          e.currentTarget.classList.add("border-blue-500");
+          e.currentTarget.classList.add("border-blue-400");
         }}
         onDragLeave={(e) => {
-          e.currentTarget.classList.remove("border-blue-500");
+          e.currentTarget.classList.remove("border-blue-400");
         }}
         onDrop={(e) => {
-          e.currentTarget.classList.remove("border-blue-500");
+          e.currentTarget.classList.remove("border-blue-400");
           handleDrop(e);
         }}
         className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors bg-[#EFEFEF] h-1/2 flex flex-col justify-center items-center"
@@ -1532,7 +1557,7 @@ const Profile = () => {
                   value={formData.user_name}
                   onChange={handleInputChange}
                   required
-                  className="border border-gray-400 rounded-[4px] px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="border border-gray-400 rounded-[4px] px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
 
@@ -1605,14 +1630,14 @@ const AdminSettings = () => {
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] min-h-screen w-full overflow-y-auto p-2 sm:p-4">
       <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
         Settings
       </h1>
 
       <div className="mb-6 mt-6">
         <div>
-          <nav className="flex flex-wrap">
+          <nav className="flex overflow-x-auto w-screen   md:w-full">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -1630,7 +1655,7 @@ const AdminSettings = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-tr-lg rounded-b-lg shadow lg:w-[75vw] -mt-7">
+      <div className="bg-white rounded-tr-lg rounded-b-lg shadow xl:w-[75vw] -mt-7">
         {renderContent()}
       </div>
     </section>

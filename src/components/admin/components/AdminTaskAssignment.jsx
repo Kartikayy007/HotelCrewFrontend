@@ -63,7 +63,7 @@ const EmptyTaskState = ({ status }) => (
 
 // Update the TaskColumn component's div className
 const TaskColumn = ({ title, status, tasks }) => (
-  <div className="bg-gray-50 rounded-lg p-4 h-[65vh] overflow-scroll">
+  <div className="bg-gray-50 rounded-lg p-4 h-[65vh] overflow-auto">
     <h2 className="text-lg font-semibold mb-4 flex items-center">
       <div className={`w-3 h-3 rounded-full ${
         status === 'pending' ? 'bg-yellow-400' :

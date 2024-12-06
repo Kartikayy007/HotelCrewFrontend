@@ -189,12 +189,12 @@ const AdminLeaveManagement = () => {
         message: result.message || 'Leave request rejected',
         severity: 'error',
       });
-      
+
       handleCloseModal();
     } catch (err) {
       // Revert optimistic update on error
       dispatch(fetchLeaveRequests());
-      
+
       setSnackbar({
         open: true,
         message: err.message || 'Failed to reject leave request',
@@ -227,22 +227,21 @@ const AdminLeaveManagement = () => {
 
   if (status === 'loading') {
     return (
-      <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+      <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
         <h1 className="lg:text-3xl text-2xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
           Staff Leave Management
         </h1>
-        <div className={`bg-white mx-6 ${
-          isMobile ? 'rounded-lg shadow-md' : 'h-[83vh] overflow-scroll rounded-lg shadow-lg'
-        } p-4 sm:p-6`}>
-          <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'} mt-3 mb-6`}>
+        <div className={`bg-white mx-6 ${isMobile ? 'rounded-lg shadow-md' : 'h-[83vh] overflow-auto rounded-lg shadow-lg'
+          } p-4 sm:p-6`}>
+          <div className={`flex w-screen overflow-x-auto ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'} mt-3 mb-6`}>
             <div className={`flex ${isMobile ? 'justify-center' : 'space-x-2'} ${!isMobile && 'items-center'}`}>
               {['All', 'Pending', 'Approved', 'Rejected'].map((status) => (
-                <Skeleton 
-                  key={status} 
-                  variant="rectangular" 
-                  width={100} 
-                  height={40} 
-                  className={`rounded-full ${isMobile ? 'mr-2 mb-2' : ''}`} 
+                <Skeleton
+                  key={status}
+                  variant="rectangular"
+                  width={100}
+                  height={40}
+                  className={`rounded-full ${isMobile ? 'mr-2 mb-2' : ''}`}
                 />
               ))}
             </div>
@@ -378,22 +377,23 @@ const AdminLeaveManagement = () => {
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
       <h1 className="lg:text-3xl text-2xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
         Staff Leave Management
       </h1>
-      <div className={`bg-white mx-6 ${
-        isMobile ? 'rounded-lg shadow-md' : 'h-[83vh] overflow-scroll rounded-lg shadow-lg'
-      } p-4 sm:p-6`}>
-        <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'} mt-3 mb-6`}>
-          <div className={`flex ${isMobile ? 'justify-center' : 'space-x-2'} ${!isMobile && 'items-center'}`}>
+      <div className={`bg-white mx-6 ${isMobile ? 'rounded-lg shadow-md' : 'h-[83vh] overflow-auto rounded-lg shadow-lg'
+        } p-4 sm:p-6 overflow-x-auto`}>
+        <div  className={`flex ${isMobile ? 'flex-col space-y-4 w-full' : 'justify-between items-center'} mt-3 mb-6`}>
+        <div
+    className={`flex ${isMobile ? 'w-full overflow-x-auto justify-start' : 'space-x-2'} items-center`}
+    style={{ scrollSnapType: 'x mandatory' }} 
+  >
             {['All', 'Pending', 'Approved', 'Rejected'].map((status) => (
               <button
                 key={status}
                 onClick={() => setFilter(status)}
-                className={`px-4 py-2 rounded-full ${
-                  filter === status ? 'bg-[#6675C5] text-white' : 'bg-[#F1F6FC] text-black'
-                } ${isMobile ? 'mr-2 mb-2' : ''}`}
+                className={`px-4 py-2 rounded-full ${filter === status ? 'bg-[#6675C5] text-white' : 'bg-[#F1F6FC] text-black'
+                  } ${isMobile ? 'mr-2 mb-2' : ''}`}
               >
                 {status}
               </button>
