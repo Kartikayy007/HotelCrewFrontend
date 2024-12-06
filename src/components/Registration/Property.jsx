@@ -3,6 +3,8 @@ import { Trash2 } from "lucide-react";
 import plus from '/tabler_plus.svg';
 import hotelIcon from '/property.svg';
 import line from '/Line.svg';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 const Property = ({ onNext, onBack, updateFormData, initialData }) => {
   const [roomTypes, setRoomTypes] = useState([
@@ -14,7 +16,11 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
   const [parkingCapacity, setParkingCapacity] = useState("");
   const [error, setError] = useState("");
   const roomRefs = useRef([]);
-
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "error",
+  });
   useEffect(() => {
     if (initialData) {
       const initialRoomTypes =
@@ -52,10 +58,27 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
     setRoomTypes(newRoomTypes);
   };
 
-  const handleNumberInput = (e, setter) => {
+  // const handleNumberInput = (e, setter) => {
+  //   const value = e.target.value;
+  //   if (/^\d*$/.test(value)) {
+  //     setter(value);
+  //   }
+  // };
+  const handleNumberInput = (e, setValue) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) {
-      setter(value);
+    
+    // Ensure the input is a valid number and not zero or just zeros
+    const number = parseInt(value, 10);
+    
+    if (value === '' || (number > 0 && number.toString() === value)) {
+      setValue(value);
+    } else {
+      // If the value is invalid (e.g., 0 or leading zeros), prevent it from being entered
+      setSnackbar({
+        open: true,
+        message: "Please enter a valid number greater than 0.",
+        severity: "error",
+      });
     }
   };
 
@@ -63,7 +86,11 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
     e.preventDefault();
   
     if (!numberOfRooms || !numberOfFloors || roomTypes.some(room => !room.type || !room.count || !room.price)) {
-      setError("Please fill out all required fields.");
+      setSnackbar({
+        open: true,
+        message: "Please fill out all required fields.",
+        severity: "error",
+      });
       const emptyRoomIndex = roomTypes.findIndex(room => !room.type || !room.count || !room.price);
       if (emptyRoomIndex !== -1 && roomRefs.current[emptyRoomIndex]) {
         roomRefs.current[emptyRoomIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -108,10 +135,14 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
     onBack();
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
   return (
     <section className="min-h-screen bg-white flex items-center overflow-hidden">
       <div className="flex flex-col xl:flex-row justify-center items-center gap-0 xl:ml-[5.1rem] m-auto p-0 xl:p-0 xl:gap-52">
-        <div className="flex xl:hidden gap-3 mb-4 fixed xl:top-9 top-6">
+        <div className="flex xl:hidden gap-3 mb-4 bg-white relative font-medium top-3">
           {[1, 2, 3, 4, 5].map((num) => (
             <div
               key={num}
@@ -124,16 +155,16 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
           ))}
         </div>
 
-        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-20">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-4">
           <img
             src={hotelIcon}
             alt="Hotel Icon"
             className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] font-medium font-Montserrat">
+          <h2 className="text-3xl text-center font-medium font-Montserrat">
             Property Details
           </h2>
-          <p className="font-sans font-normal text-center">
+          <p className="font-sans text-lg font-medium text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -150,7 +181,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="number-of-rooms"
-              className="block text-sm font-sans font-semibold"
+              className="block text-lg font-sans font-semibold"
             >
               Number of Rooms
             </label>
@@ -170,21 +201,21 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
             <div className="flex justify-between mb-2">
               <label
                 htmlFor="types-of-rooms"
-                className="block text-sm font-sans font-semibold"
+                className="block text-lg font-sans font-semibold"
               >
                 Types of Rooms
               </label>
               <button
                 type="button"
-                className="xl:relative xl:left-[232px] relative right-12 "
+                className="xl:relative xl:left-[232px] relative right-4` "
                 onClick={handleAddRoomType}
               >
                 <img src={plus} alt="Add room type" />
               </button>
             </div>
 
-            <div className="h-32 xl:w-[630px] w-full overflow-y-auto overflow-x-hidden pr-3 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100">
-              <div className="space-y-2 overflow-x-scroll">
+            <div className="h-32 xl:w-[630px] w-full overflow-y-auto  pr-3 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100">
+              <div className="space-y-2  overflow-x-auto scrollbar-hidden">
                 {roomTypes.map((room, index) => (
                   <div 
                   key={index} 
@@ -192,10 +223,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                   className="flex items-center gap-2 xl:gap-4">
                     <input
                       type="text"
-                      className={`placeholder:text-base h-8 w-[100px] xl:w-[200px] py-2 xl:px-4 px-2 text-xl border rounded-[4px] focus:outline-none ${
+                      className={`placeholder:text-base h-8 w-[110px] xl:w-[220px] py-2 xl:px-4 px-2 text-xl border rounded-[4px] focus:outline-none ${
                         !room.type && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
-                      placeholder="Typ of Rooms"
+                      placeholder="Room Type"
                       value={room.type}
                       onChange={(e) =>
                         handleRoomTypeChange(index, "type", e.target.value)
@@ -203,10 +234,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                     />
                     <input
                       type="text"
-                      className={`placeholder:text-base h-8 w-[100px] xl:w-[180px] py-2 px-2 xl:px-4 text-xl border rounded-[4px] focus:outline-none ${
+                      className={`placeholder:text-base h-8 w-[70px] xl:w-[140px] py-2 px-2 xl:px-4 text-xl border rounded-[4px] focus:outline-none ${
                         !room.count && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
-                      placeholder="No. Rooms"
+                      placeholder="Count"
                       value={room.count}
                       onChange={(e) =>
                         handleNumberInput(e, (value) =>
@@ -216,10 +247,10 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                     />
                     <input
                       type="text"
-                      className={`placeholder:text-base h-8 w-[100px] xl:w-[160px] py-2 px-2 xl:px-4 text-xl border rounded-[4px] focus:outline-none ${
+                      className={`placeholder:text-base h-8 w-[70px] xl:w-[140px] py-2 px-2 xl:px-4 text-xl border rounded-[4px] focus:outline-none ${
                         !room.price && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                       } focus:border-purple-500`}
-                      placeholder="Price of Room"
+                      placeholder="Price"
                       value={room.price}
                       onChange={(e) =>
                         handleNumberInput(e, (value) =>
@@ -244,7 +275,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="number-of-floors"
-              className="block text-sm font-sans font-semibold mb-1"
+              className="block text-lg font-sans font-semibold mb-1"
             >
               Number of Floors
             </label>
@@ -254,7 +285,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               placeholder="Total Floors "
               value={numberOfFloors}
               onChange={(e) => handleNumberInput(e, setNumberOfFloors)}
-              className={`h-8 w-full xl:w-[623px] py-2 text-xl px-4 border rounded-[4px] focus:outline-none ${
+              className={`h-8 placeholder:text-base w-full xl:w-[623px] py-2 text-xl px-4 border rounded-[4px] focus:outline-none ${
                 !numberOfFloors && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
               } focus:border-purple-500`}
             />
@@ -276,7 +307,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               />
               <label
                 htmlFor="valetParking"
-                className="text-sm font-sans font-semibold"
+                className="text-lg font-sans font-semibold"
               >
                 Valet Parking Available
               </label>
@@ -286,7 +317,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
               <div>
                 <label
                   htmlFor="parking-capacity"
-                  className="block text-sm font-sans font-semibold mb-1"
+                  className="block text-lg font-sans font-semibold mb-1"
                 >
                   Parking Capacity
                 </label>
@@ -295,7 +326,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                   id="parking-capacity"
                   value={parkingCapacity}
                   onChange={(e) => handleNumberInput(e, setParkingCapacity)}
-                  className={`h-8 w-full xl:w-[623px] py-2 px-4 border rounded-lg focus:outline-none ${
+                  className={`h-8 w-full xl:w-[623px] py-2 px-4 border rounded-[4px] focus:outline-none ${
                     !parkingCapacity && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
                   } focus:border-purple-500`}
                   disabled={!valetParking}
@@ -328,7 +359,7 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
 
         <div>
           <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
-            <div className="flex gap-5 text-[32px]">
+            <div className="flex gap-7 text-[32px]">
               {[1, 2, 3, 4, 5].map((num) => (
                 <div
                   key={num}
@@ -351,22 +382,37 @@ const Property = ({ onNext, onBack, updateFormData, initialData }) => {
                 alt="Hotel Icon"
                 className="h-24 mb-4 text-[#5663AC]"
               />
-              <h2 className="text-[24px] font-[450] font-Montserrat">
+              <h2 className="text-2xl font-medium font-Montserrat">
                 Property Details
               </h2>
-              <p className="text-gray-600 font-sans font-[300] text-center">
+              <p className="font-sans font-normal text-center">
                 Fill out the form on the left.
                 <br />
-                <span className="font-sans font-[300]">
+                <span className="font-sans font-normal text-center">
                   You can always edit the data in the
                 </span>
                 <br />
-                <span>setting menu.</span>
+                <span className="font-sans font-normal text-center">setting menu.</span>
               </p>
             </div>
           </div>
         </div>
       </div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+        </Snackbar>
     </section>
   );
 };

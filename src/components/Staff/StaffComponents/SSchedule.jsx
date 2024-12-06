@@ -305,29 +305,12 @@ const SSchedule = () => {
     } else if (shift === "Night" || shift==="night") {
       return "09:00 PM to 05:00 AM";
     } else {
-      return "Invalid shift"; // Handle invalid inputs
+      return "Invalid shift";
     }
   };
-  // const attendance = [
-  //   { date: "24/11/24", current_attendance: "Absent" },
-  //   { date: "23/11/24", current_attendance: "Present" },
-  //   { date: "22/11/24", current_attendance: "Present" },
-  //   { date: "21/11/24", current_attendance: "Present" },
-  //   { date: "20/11/24", current_attendance: "Present" },
-  //   { date: "19/11/24", current_attendance: "Present" },
-  //   { date: "18/11/24", current_attendance: "Absent" },
-  //   { date: "17/11/24", current_attendance: "Present" },
-  //   { date: "16/11/24", current_attendance: "Present" },
-  //   { date: "15/11/24", current_attendance: "Present" },
-  //   { date: "14/11/24", current_attendance: "Present" },
-  //   { date: "13/11/24", current_attendance: "Present" },
-  //   { date: "12/11/24", current_attendance: "Present" },
-  //   { date: "11/11/24", current_attendance: "Present" },
-  // ]
   return (
-    <section className=" h-screen  font-Montserrat  overflow-y-auto ">
+    <section className=" h-screen bg-[]  font-Montserrat  overflow-y-auto ">
       <h2 className="text-[#252941] text-3xl mt-5 lg:text-center  my-3 pl-11 ml-5 font-semibold">Schedule Status</h2>
-      {/* <div className="grid grid-cols-1  xl:grid-cols-[40%,35%,25%] gap-5 p-3 "> */}
       <div className="flex flex-col justify-center xl:flex-row xl:gap-5 gap-14 p-3 ">
         <div className="space-y-5 xl:w-[40%] ">
           <div className="bg-white w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
@@ -361,7 +344,7 @@ const SSchedule = () => {
                 </div>
               ) : (
                 <table className="w-[96%]  px-1 mx-auto border border-[#dcdcdc] rounded-2xl shadow  ">
-                  {/* Table Headers */}
+                  
                   <thead>
                     <tr className="bg-[#3F4870] text-[#E6EEF9] rounded-xl">
 

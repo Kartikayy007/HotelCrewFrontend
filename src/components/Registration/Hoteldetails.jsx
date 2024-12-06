@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import hotelIcon from '/hotel.svg';
 import lineIcon from '/Line.svg';
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
   const [hotelName, setHotelName] = useState('');
@@ -8,6 +10,12 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
   const [yearEstablished, setYearEstablished] = useState('');
   const [licenseRegistrationNumbers, setLicenseRegistrationNumbers] = useState('');
   const [error, setError] = useState('');
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "error",
+  });
 
   useEffect(() => {
     if (initialData) {
@@ -21,7 +29,20 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
   const handleNextClick = (e) => {
     e.preventDefault();
     if (!hotelName || !yearEstablished || !licenseRegistrationNumbers || !legalBusinessName) {
-      setError('Please fill out all required fields.');
+      // setError('Please fill out all required fields.');
+      setSnackbar({
+        open: true,
+        message: "Please fill out all required fields.",
+        severity: "error",
+      });
+      return;
+    }
+    if(yearEstablished.length<4 || parseInt(yearEstablished) < 1000 || parseInt(yearEstablished) > 2024){
+      setSnackbar({
+        open: true,
+        message: "Enter a valid year.",
+        severity: "error",
+      });
       return;
     }
 
@@ -43,15 +64,21 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
     }
   };
 
+  
+
+  const handleSnackbarClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
   const inputClass = (value) =>
     `h-8 w-full xl:w-[623px] py-2 px-4 text-xl border rounded-[4px] focus:outline-none ${
       !value && error ? 'border-[#99182C]' : 'border-[#BDBDBD]'
     } focus:border-purple-500`;
 
+
   return (
     <section className="min-h-screen bg-[#FFFFFF] flex items-center overflow-hidden">
       <div className="flex flex-col xl:flex-row justify-center items-center gap-4 xl:ml-[5.1rem] m-auto p-4 xl:p-0 xl:gap-52">
-        <div className="flex xl:hidden gap-3 mb-4 fixed xl:top-9 top-6">
+        <div className="flex xl:hidden bg-white gap-3 mb-4 relative font-medium top-2">
           {[1, 2, 3, 4, 5].map((num) => (
             <div
               key={num}
@@ -64,16 +91,16 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           ))}
         </div>
 
-        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-8 mt-8">
+        <div className="xl:hidden w-full flex flex-col items-center space-y-4 mb-4 mt-2">
           <img
             src={hotelIcon}
             alt="Hotel Icon"
             className="h-24 mb-4 text-[#5663AC]"
           />
-          <h2 className="text-[32px] font-medium font-Montserrat">
+          <h2 className="text-3xl font-medium text-center font-Montserrat">
             Hotel Information
           </h2>
-          <p className="font-sans font-normal text-center">
+          <p className="font-sans font-normal  text-lg text-center">
             Fill out the form below.
             <br />
             You can always edit the data in the
@@ -90,12 +117,13 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="hotel-name"
-              className="block text-sm font-sans font-semibold"
+              className="block text-lg font-sans font-semibold"
             >
               Hotel Name*
             </label>
             <input
               type="text"
+              maxLength={120}
               id="hotel-name"
               value={hotelName}
               onChange={(e) => setHotelName(e.target.value)}
@@ -106,12 +134,13 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="legal-business-name"
-              className="block text-sm font-sans font-semibold mb-1"
+              className="block text-lg font-sans font-semibold mb-1"
             >
               Legal Business Name 
             </label>
             <input
               type="text"
+              maxLength={150}
               id="legal-business-name"
               value={legalBusinessName}
               onChange={(e) => setLegalBusinessName(e.target.value)}
@@ -122,7 +151,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="year-established"
-              className="block text-sm font-sans font-semibold mb-1"
+              className="block text-lg font-sans font-semibold mb-1"
             >
               Year Established*
             </label>
@@ -132,7 +161,8 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
               value={yearEstablished}
               onChange={handleYearInput}
               placeholder="YYYY"
-              maxLength={4}
+              min={1000}
+              max={2024}
               className={inputClass(yearEstablished)}
             />
           </div>
@@ -140,12 +170,13 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
           <div>
             <label
               htmlFor="license-registration-numbers"
-              className="block text-sm font-sans font-semibold mb-1"
+              className="block text-lg font-sans font-semibold mb-1"
             >
               License/Registration Numbers*
             </label>
             <input
               type="text"
+              maxLength={100}
               id="license-registration-numbers"
               value={licenseRegistrationNumbers}
               onChange={(e) => setLicenseRegistrationNumbers(e.target.value)}
@@ -168,7 +199,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
 
         <div>
           <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
-            <div className="flex gap-5 text-[32px]">
+            <div className="flex gap-7 text-[32px]">
               {[1, 2, 3, 4, 5].map((num) => (
                 <div
                   key={num}
@@ -190,22 +221,37 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
                 alt="Hotel Icon"
                 className="h-[96] mb-4 text-[#5663AC]"
               />
-              <h2 className="text-[24px] font-[450] font-Montserrat">
+              <h2 className="text-2xl font-[500] font-Montserrat">
                 Hotel Information
               </h2>
-              <p className="text-gray-600 font-sans font-[300] text-center">
+              <p className="font-sans font-normal text-center">
                 Fill out the form on the left.
                 <br />
-                <span className="font-sans font-[300]">
+                <span className="font-sans font-normal text-center">
                   You can always edit the data in the
                 </span>
                 <br />
-                <span>setting menu.</span>
+                <span className='font-sans font-normal text-center'>setting menu.</span>
               </p>
             </div>
           </div>
         </div>
       </div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+        </Snackbar>
     </section>
   );
 };
