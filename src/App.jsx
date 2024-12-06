@@ -6,7 +6,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import Admin from './components/admin/Admin';
 import MainLayout from './components/Manager/MainLayout';
 import Reception from './components/receptionist/Reception';
-// import SLayout from './components/Staff/SLayout';
+import SLayout from './components/Staff/SLayout';
 import Login from './components/Login/Login';
 import SignUp from './components/signup/SignUp';
 import MultiStepForm from './components/Registration/MultiStepForm';
@@ -150,7 +150,7 @@ const App = () => {
           
           <Route path="/staff/dashboard/*" element={
             <RoleBasedRoute allowedRoles={['Staff']}>
-              {/* <SLayout /> */}
+              <SLayout />
             </RoleBasedRoute>
           } />
 

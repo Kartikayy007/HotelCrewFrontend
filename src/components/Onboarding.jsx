@@ -7,8 +7,7 @@ import Preloading from "./common/Preloading";
 import {gsap} from "gsap";
 import {ScrollTrigger} from "gsap/ScrollTrigger";
 import FloatingPhone from "./common/FloatingPhone";
-import { Helmet } from 'react-helmet-async';
-
+import { Helmet } from "react-helmet-async";
 gsap.registerPlugin(ScrollTrigger);
 
 const Onboarding = () => {
@@ -50,7 +49,7 @@ const Onboarding = () => {
           trigger: ".animate-on-scroll",
           start: "top 130%",
           end: "top 90%",
-          scrub: 2,
+          scrub: 1,
         },
       }
     );
@@ -66,7 +65,7 @@ const Onboarding = () => {
           trigger: ".animate-on-scroll1",
           start: "top 130%",
           end: "top 90%",
-          scrub: 2,
+          scrub: 1,
         },
       }
     );
@@ -101,7 +100,7 @@ const Onboarding = () => {
 
   return (
     <>
-      <Helmet>
+          <Helmet>
         <title>Hotel Registration | HotelCrew</title>
         <meta name="description" content="Complete your hotel registration process. Register your hotel details, set up your account, and get started with HotelCrew's hotel management system." />
         <meta name="keywords" content="hotel registration, hotel management system, hotelcrew, hotel setup, hotel onboarding" />
@@ -113,6 +112,7 @@ const Onboarding = () => {
         <link rel="canonical" href={window.location.href} />
         <meta name="robots" content="index, follow" />
       </Helmet>
+
 
       <Preloading />
       <div className="font-Montserrat backdrop-blur-xl bg-white bg-opacity-75">
@@ -232,7 +232,7 @@ const Onboarding = () => {
         </nav>
 
         <section>
-          <div className="relative min-h-screen overflow-hidden">
+          <div className="relative min-h-screen overflow-hidden md:min-h-96">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               <div className="text-center w-full sm:w-4/5 lg:w-2/3 mx-auto mt-8 sm:mt-10 lg:mt-12 space-y-6 sm:space-y-8 lg:space-y-12 max-w-4xl">
                 <div className="space-y-2 sm:space-y-4">
@@ -272,17 +272,19 @@ const Onboarding = () => {
             </div>
 
             <div className="relative parallax">
-              <img
-                src="/Mask group.svg"
-                alt="Hotel Staff Illustration"
-                class="w-full md:w-4/5 lg:w-[90%] mt-10"
-              />
-            </div>
+  <div className="flex justify-center items-center">
+    <img
+      src="/Mask group.svg"
+      alt="Hotel Staff Illustration"
+      className="w-full md:w-3/4 lg:w-[90%] mt-14 md:mt-28 mx-auto"
+    />
+  </div>
+</div>
           </div>
 
-          <div className="bg-[#5C69F8] m-4 md:m-12 lg:m-24 rounded-2xl min-h-[80vh] flex items-center animate-on-scroll">
-            <div className="flex flex-col lg:flex-row justify-center items-center w-full gap-8 lg:gap-16 py-8 lg:py-0">
-              <div className="w-full lg:w-1/2 px-6 lg:px-8 xl:px-16 flex flex-col justify-center ">
+          <div className="bg-[#5C69F8] m-4 md:m-8 lg:m-20 rounded-2xl min-h-[80vh] flex items-center animate-on-scroll">
+            <div className="flex flex-col lg:flex-row justify-center items-center w-full gap-8 lg:gap-10 py-6 lg:py-0 md:gap-10 ">
+              <div className="w-full lg:w-1/2 px-6 lg:px-8 xl:px-16 flex flex-col justify-center p-10">
                 <div>
                   <h1 className="text-white text-3xl md:text-4xl lg:text-[44.9px] font-bold lg:w-full">
                     Transform your Hotel regardless of your{" "}
@@ -371,7 +373,7 @@ const Onboarding = () => {
                     <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-[#252941]">
                       Perfect
                     </h1>
-                    <p className="text-lg md:text-xl font-semibold mt-5 text-white">
+                    <p className="text-lg md:text-xl font-semibold mt-5 text-white ">
                       Management for your growth.
                     </p>
                   </div>
@@ -435,19 +437,30 @@ const Onboarding = () => {
               </div>
             </div>
           </div>
-          <div className="bg-[#252941] mx-4 md:mx-12 lg:m-24 rounded-2xl min-h-[450px] lg:h-[650px] animate-on-scroll1">
+
+          <div>
+  <div className="bg-[#252941] mx-4 md:mx-12 lg:m-24 rounded-2xl min-h-[450px] lg:h-[650px] animate-on-scroll1 mt-8">
+    <div className="relative w-full h-full">
+      <div className="absolute inset-0 p-0 sm:p-2 md:p-4">
+      <div className="relative w-full h-full mt-20 md:mt-10 lg:mt-0"> {/* Added margin-top for mobile, removed for larger screens */}
   <iframe
-    width="100%"
-    height="100%"
     src="https://www.youtube.com/embed/ldk7CG7oMRU"
     title="YouTube video player"
     frameBorder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-    className="rounded-2xl"
-  ></iframe>
+    className="w-full h-full rounded-2xl"
+    style={{
+      minHeight: '300px',
+      height: '100%',
+      width: '100%'
+    }}
+  />
 </div>
-
+      </div>
+    </div>
+  </div>
+</div>
           <div className="p-1">
             <div className="bg-[#E2E3FF] mx-4 md:mx-12 lg:m-24 rounded-2xl min-h-[300px] lg:h-[403px] mt-8 lg:mt-32">
               <div className="flex flex-col lg:flex-row justify-around items-center h-full py-8 lg:py-0 px-6 lg:px-0">
@@ -470,7 +483,7 @@ const Onboarding = () => {
                     </div>
                   </div>
                 </div>
-                <div className="w-full lg:w-96 flex justify-center lg:justify-end lg:mr-40 animation3">
+                <div className="w-full lg:w-96 flex justify-center lg:justify-end lg:mr-40 ">
         <FloatingPhone />
       </div>
               </div>

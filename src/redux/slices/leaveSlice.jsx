@@ -11,21 +11,18 @@ const getAuthHeaders = () => {
     }
   
     return {
-      Authorization: `Bearer ${token}`, // Return the headers with the token
+      Authorization: `Bearer ${token}`, 
     };
   };
-// **Async Thunks**
-
-// Fetch all leave requests
 export const fetchLeaveRequests = createAsyncThunk(
   "leave/fetchLeaveRequests",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`https://hotelcrew-1.onrender.com/api/attendance/leave_list/`, {
-        headers: getAuthHeaders(), // Correctly invoke the function and pass as headers
+        headers: getAuthHeaders(),
       });
       console.log(response.data.data)
-      return response.data.data; // Assuming "data" contains the leave requests
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching leave requests");
     }
@@ -42,7 +39,7 @@ export const fetchLeaveCount = createAsyncThunk(
         headers: getAuthHeaders(),
       });
       console.log("leave",response.data.data)
-      return response.data.data; // Assuming "data" contains the leave count
+      return response.data.data; 
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching leave count");
     }

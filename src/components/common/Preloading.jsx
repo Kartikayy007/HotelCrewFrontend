@@ -1,36 +1,57 @@
 import React, { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
+import { motion, useAnimation } from 'framer-motion';
 
 function Preloading() {
   const preloadingRef = useRef(null);
-  const spansRef = useRef([]);
-  const spansRef1 = useRef([]); 
+  const controls = useAnimation();
 
   useEffect(() => {
-    gsap.fromTo(preloadingRef.current, { top: '0' }, { top: '100vh', duration: 2, delay: 2.3, ease: 'power3.inOut' })
-    const timeline = gsap.timeline();
-    timeline
-      .fromTo(spansRef.current, { opacity: 1, y: 145 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, delay: 0.1 })
-      .fromTo(spansRef1.current, { opacity: 1, y: 190 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1}); 
-  }, []);
+    controls.start({
+      top: '100vh',
+      transition: { duration: 2, delay: 2.3, ease: 'easeInOut' }
+    });
+
+    controls.start(i => ({
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5, delay: i * 0.1 }
+    }));
+  }, [controls]);
 
   return (
-    <div ref={preloadingRef} className='bg-[#5D69F8] z-50 fixed h-screen w-screen flex flex-col justify-end'>
+    <motion.div
+      ref={preloadingRef}
+      className='bg-[#5D69F8] z-50 fixed h-screen w-screen flex flex-col justify-end'
+      initial={{ top: '0' }}
+      animate={controls}
+    >
       <div className='flex overflow-hidden h-28 md:h-56'>
         {['H', 'O', 'T', 'E', 'L'].map((letter, index) => (
-          <span key={index} ref={el => spansRef.current[index] = el} className='text-[#252941] text-[100px] md:text-[200px] font-semibold'>
+          <motion.span
+            key={index}
+            custom={index}
+            initial={{ y: 145, opacity: 1 }}
+            animate={controls}
+            className='text-[#252941] text-[100px] md:text-[200px] font-semibold'
+          >
             {letter}
-          </span>
+          </motion.span>
         ))}
       </div>
       <div className='relative flex h-36 md:h-72 -top-10 md:-top-20 overflow-hidden'>
         {['C', 'R', 'E', 'W'].map((letter, index) => (
-          <span key={index + 5} ref={el => spansRef1.current[index] = el} className='text-white text-[125px] md:text-[250px] font-semibold'>
+          <motion.span
+            key={index + 5}
+            custom={index + 5}
+            initial={{ y: 190, opacity: 1 }}
+            animate={controls}
+            className='text-white text-[125px] md:text-[250px] font-semibold'
+          >
             {letter}
-          </span>
+          </motion.span>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 

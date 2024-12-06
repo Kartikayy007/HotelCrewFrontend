@@ -295,8 +295,8 @@ useEffect(() => {
     }
   };
   return (
-    <section className=" h-screen bg-[]  font-Montserrat  overflow-y-auto ">
-      <h2 className="text-[#252941] text-3xl mt-5 lg:text-center  my-3 pl-11 ml-5 font-semibold">Schedule Status</h2>
+    <section className=" h-screen bg-[#E6EEF9]  font-Montserrat  overflow-y-auto ">
+      <h2 className="text-[#252941] text-3xl mt-5  my-3 pl-11 ml-5 font-semibold">Schedule Status</h2>
       <div className="flex flex-col justify-center xl:flex-row xl:gap-5 gap-14 p-3 ">
         <div className="space-y-5 xl:w-[40%] ">
           <div className="bg-white w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">

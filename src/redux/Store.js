@@ -24,6 +24,10 @@ import payrollReducer from './slices/PayrollSlice'
 import shiftsReducer from './slices/ShiftSlice'
 import staffProfileReducer from './slices/StaffProfileSlice'
 import roomDetailsReducer from './slices/RoomDetailsSlice';
+import staffDashboardReducer from './slices/StaffDashboardSlice';
+import staffPerformanceReducer from './slices/StaffPerformanceSlice';
+import leaveStaffReducer from './slices/StaffLeaveSlice';
+import staffTasksReducer from './slices/StaffTaskSlice';
 
 const store = configureStore({
   reducer: {
@@ -50,7 +54,11 @@ const store = configureStore({
     payroll: payrollReducer,
     shifts: shiftsReducer,
     staffProfile: staffProfileReducer,
-    roomDetails: roomDetailsReducer
+    roomDetails: roomDetailsReducer,
+    staffDashboard: staffDashboardReducer,
+    performance: staffPerformanceReducer,
+    leavestaff: leaveStaffReducer,
+    stafftasks: staffTasksReducer
   },
 })
 

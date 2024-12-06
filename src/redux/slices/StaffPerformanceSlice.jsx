@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const getAuthHeaders = () => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1Mzc5MDI1LCJpYXQiOjE3MzI3ODcwMjUsImp0aSI6IjYzYmVjY2UxNjAxNzQzY2I5ZjM4Zjc1YTcwMzJkMjdhIiwidXNlcl9pZCI6MTczfQ.U3Qx2NpNSwHMa8vEFtwpaaz8CKLzkAi0pO7YAnlarPc'; // Replace with your token retrieval logic
+    const token = localStorage.getItem('accessToken') // Replace with your token retrieval logic
   
     if (!token) {
       throw new Error('No authentication token found');
@@ -17,7 +17,7 @@ export const fetchStaffPerformance = createAsyncThunk(
   'performance/fetchStaffPerformance',
   async (_, { rejectWithValue }) => {
       try {
-        const url = "https://hotelcrew-1.onrender.com/api/statics/performance/staff/week/";  // Define the URL
+        const url = "https://hotelcrew-1.onrender.com/api/statics/performance/staff/currentweek/";  // Define the URL
         const headers = getAuthHeaders();
       const response = await axios.get(url ,{ headers });
        (response.data);
