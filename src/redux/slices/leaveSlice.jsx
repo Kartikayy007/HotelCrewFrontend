@@ -4,7 +4,8 @@ import axios from "axios";
 const API_BASE_URL = "https://hotelcrew-1.onrender.com/api/attendance"; // Replace with your actual API base URL
 
 const getAuthHeaders = () => {
-    const token = localStorage.getItem("accessToken") || sessionStorage.getItem("token");
+    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NDU5MzUwLCJpYXQiOjE3MzI4NjczNTAsImp0aSI6ImYyZWIyMWIzZGVlZjQ0MWQ5YThlNzY2OWFmMWIxNGQ1IiwidXNlcl9pZCI6MTg1fQ.YkgvzmHmNKwR3bvQ9KiZvc1lZd_xf0ZgKmLg1KujQ4Y'
+
 
     if (!token) {
       throw new Error("Authentication token not found");
