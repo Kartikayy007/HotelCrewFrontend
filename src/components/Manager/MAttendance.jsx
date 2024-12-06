@@ -1,10 +1,8 @@
 import React from 'react'
-import { useState, useEffect, useMemo } from 'react';
-import { Maximize2, X } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { Ban, CircleCheck, CircleX, ClockAlert, Maximize2, X } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAttendance, updateAttendance, checkAttendance, selectStaff, selectLoading, selectError } from '../../redux/slices/AttendanceSlice';
+import { fetchAttendance, updateAttendance, selectStaff, selectLoading, selectError, selectUpdateLoading } from '../../redux/slices/AttendanceSlice';
 import {
   fetchLeaveRequests,
   updateLeaveStatus,
@@ -14,7 +12,7 @@ import {
   selectLeaveLoading,
   selectLeaveError,
   selectUpdateStatus,
-} from "../../redux/slices/leaveSlice";
+} from "../../redux/slices/LeaveSlice";
 import { useMediaQuery } from "@mui/material";
 import Skeleton from '@mui/material/Skeleton';
 import {
@@ -27,12 +25,14 @@ import {
 } from "@mui/material";
 import { Calendar, Check, Clock,CircleAlert,BadgeCheck,BadgeX } from "lucide-react";
 import LoadingAnimation from '../common/LoadingAnimation';
-import { Calendar, Check, Clock } from "lucide-react";
-import { selectStaffLoading } from "../../redux/slices/StaffSlice";
-
-
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
+
+// Add this helper function at the top of your component
+const capitalizeFirstLetter = (string) => {
+  if (!string) return '';
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
 
 const MAttendance = () => {
   const [department, setDepartment] = useState([]);
@@ -73,8 +73,6 @@ const MAttendance = () => {
     setOpenModal(false);
     setSelectedStaff(null);
   };
-  const staff = useSelector(selectStaff) || [];
-  const staffLoading = useSelector(selectStaffLoading);
 
   const modalStyle =() => {
     const isSmallScreen = useMediaQuery("(max-width: 430px)");
@@ -93,37 +91,32 @@ const MAttendance = () => {
   }};
   const [approvedLeaves, setApprovedLeaves] = useState([]);
   const [rejectedLeaves, setRejectedLeaves] = useState([]);
-  // const { staff, loading, error } = useSelector((state) => state.attendance);
-// const staff = useSelector((state) => state.attendance.staff || []);
-const loading=useSelector(selectLoading);
-const error=useSelector(selectError);
-  const demoStaff = [
-    { id: 1, user_name: "John Doe", email: "john.doe@example.com", department: "Kitchen", current_attendance: "Present", description: "Annual leave request for vacation planning.", },
-    { id: 2, user_name: "Jane Smith", email: "jane.smith@example.com", department: "House", current_attendance: "Absent" },
-    { id: 3, user_name: "Alice Johnson", email: "alice.j@example.com", department: "Finance", current_attendance: "Present" },
-  ];
+  const staff = useSelector(selectStaff);
+  console.log('staff:', staff);
 
 
+  const loading = useSelector(selectLoading);
+  const error = useSelector(selectError);
+  const updateLoading = useSelector(selectUpdateLoading);
   useEffect(() => {
-    console.log('Staff:', staff); 
+    // console.log('Staff:', staff); 
   }, [staff]);
 
-  const [demoMode, setDemoMode] = useState(false);
-
-
-  const dataToUse = demoMode ? demoStaff : staff;
 
   useEffect(() => {
-    const fetchData = () => {
-      dispatch(fetchAttendance());
-
+    const fetchData = async () => {
+      try {
+        const result = await dispatch(fetchAttendance()).unwrap();
+        console.log('Fetched data:', result);
+      } catch (error) {
+        console.error('Failed to fetch staff:', error);
+      }
     };
+
     fetchData();
     const intervalId = setInterval(fetchData, 900000);
     return () => clearInterval(intervalId);
   }, [dispatch]);
-
-
 
   useEffect(() => {
     if (staff && staff.length > 0) {
@@ -140,17 +133,16 @@ const error=useSelector(selectError);
   }, [staff]);
 
   const [localloading,setLocalLoading]=useState(null);
-  const handleToggleAttendance = (id) => {
-    setLocalLoading(id);
-    dispatch(updateAttendance(id));
-    setTimeout(() => {
-      setLocalLoading(null); // Reset loading
-    }, 900);
+  const handleToggleAttendance = async (id) => {
+    try {
+      await dispatch(updateAttendance(id)).unwrap();
+    } catch (error) {
+      console.error('Failed to update attendance:', error);
+    }
   };
 
 
   useEffect(() => {
-    // Fetch leave requests on component mount
      ("Fetching leave requests on mount");
     dispatch(fetchLeaveRequests());
 
@@ -163,56 +155,6 @@ const error=useSelector(selectError);
     return () => clearInterval(interval);
   }, [dispatch]);
 
-  // if (loading) {
-
-  //   return <p>Loading attendance...</p>;
-  // }
-
-  // if (error) {
-  //   <div className="flex justify-center text-2xl items-center h-full">
-  //     return <p>Error loading attendance: {error}</p>;
-  //   </div>
-  // }
-
-  // if (error) {
-  //   return (
-  //      ({error}),
-  //     <div className="flex justify-center text-2xl items-center h-full">    
-  //       <p >No data Available</p>
-  //     </div>
-  //   );
-  // }
-  // 
-
-
-  // Handle approve/reject
-  // const handleLeaveAction = (id, action) => {
-  //   setLeaveRequests((prevRequests) =>
-  //     prevRequests.map((request) =>
-  //       request.id === id ? { ...request, status: action } : request
-  //     )
-  //   );
-
-  //   if (action === "approved") {
-  //     const approvedLeave = leaveRequests.find((request) => request.id === id);
-  //     setApprovedLeaves((prevApprovedLeaves) => [...prevApprovedLeaves, approvedLeave]);
-
-  //     setSnackbar({
-  //       open: true,
-  //       message: "Leave request approved successfully",
-  //       severity: "success",
-  //     });
-  //   }
-  //   if (action === "rejected") {
-  //     const rejectedLeave = leaveRequests.find((request) => request.id === id);
-  //     setRejectedLeaves((prevRejectedLeaves) => [...prevRejectedLeaves, rejectedLeave]);
-  //     setSnackbar({
-  //       open: true,
-  //       message: "Leave request rejected",
-  //       severity: "error",
-  //     });
-  //   }
-  // };
   const handleLeaveAction = (id, action) => {
    
     dispatch(updateLeaveStatus({ leaveId: id, status: action }))
@@ -257,19 +199,22 @@ const error=useSelector(selectError);
     }));
   };
 
-  const filteredStaff = staff.filter((member) => {
-    const normalizedDepartments = selectedDepartments.map((dept) => dept.toLowerCase());
-    const departmentMatch =
-      normalizedDepartments.includes('all') ||
-      normalizedDepartments.includes(member.department.toLowerCase());
-
-    const shiftMatch =
-      selectedShift.toLowerCase() === 'all' ||
-      member.shift.toLowerCase() === selectedShift.toLowerCase();
-
-    return departmentMatch && shiftMatch;
-  });
-
+  const filteredStaff = React.useMemo(() => {
+    if (!staff || !Array.isArray(staff)) return [];
+  
+    return staff.filter((member) => {
+      const departmentMatch = 
+        selectedDepartments.includes('All') || 
+        selectedDepartments.includes(capitalizeFirstLetter(member?.department));
+  
+      const shiftMatch = 
+        selectedShift === 'All' || 
+        member?.shift === selectedShift;
+  
+      return departmentMatch && shiftMatch;
+    });
+  }, [staff, selectedDepartments, selectedShift]);
+  
   const toggleDepartmentSelection = (department) => {
     setSelectedDepartments([department]);
 
@@ -279,40 +224,21 @@ const error=useSelector(selectError);
     const start = new Date(fromDate);
     const end = new Date(toDate);
 
-    // Calculate the difference in milliseconds
     const differenceInMilliseconds = end - start;
 
-    // Convert milliseconds to days
     const durationInDays = differenceInMilliseconds / (1000 * 60 * 60 * 24);
 
-    return durationInDays + 1; // Include the start day in the count
+    return durationInDays + 1;
   };
-
-  if (staffLoading) {
-    return (
-      <div className="p-4">
-        <Skeleton variant="rectangular" height={200} />
-        <div className="mt-4 space-y-2">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} variant="rectangular" height={60} />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <section className=" h-screen p-2 mr-1 font-Montserrat">
       <h1 className="text-[#252941] text-3xl mt-6 mb-4 pl-16 font-semibold">
         Staff Attendance & Leave
       </h1>
-      {/* <div> */}
       <div className='flex justify-center mb-1 mt-6 pb-5 px-3'>
-        {/* <div className="bg-white w-full h-[392px] pb-7  py-2  rounded-lg shadow"> */}
         <div className={`bg-white w-full rounded-xl shadow ${isTableExpanded ? "h-screen" : "h-[460px]"}`}>
           <div className="flex justify-between items-center p-4 pb-2">
             <h2 className="text-[#252941] text-lg sm:text-xl pl-1 mt-2  mb-2 font-semibold ml-3">Select Shift:</h2>
-            {/* Expand/Collapse Icons */}
             {isTableExpanded ? (
               <X
                 size={24}
@@ -327,30 +253,12 @@ const error=useSelector(selectError);
               />
             )}
           </div>
-          {/* <div className="md:hidden p-4 flex items-center justify-center">
-            <select
-              className="py-2 px-4 w-full  border border-gray-300 rounded-3xl"
-              onChange={(e) => toggleDepartmentSelection(e.target.value)}
-              value={selectedDepartments[0]} // Show the first selected option
-            >
-              <option value="All">All</option>
-
-
-              {department.map((dept) => (
-                <option key={dept} value={dept} className='bg-[#efefef] rounded-xl'>
-                  {dept}
-                </option>
-              ))}
-
-            </select>
-            </div> */}
 
           <div className="flex mb-2 pl-2 mx-4 gap-4 rounded-xl pr-9 overflow-x-auto scrollbar-none scrollbar-track-transparent scrollbar-thumb-neutral-50">
-            {/* Shift Buttons */}
             {['All', 'Morning', 'Evening', 'Night'].map((shift) => (
               <button
                 key={shift}
-                onClick={() => setSelectedShift(shift)}
+                // onClick={() => setSelectedShift(shift)}
                 className={`px-4 py-2 w-auto rounded-3xl border-none font-semibold ${selectedShift === shift
                     ? 'bg-[#6675C5] text-white'
                     : 'bg-[#E6EEF9] text-[#252941]'
@@ -362,16 +270,15 @@ const error=useSelector(selectError);
           </div>
           <h2 className="text-[#252941] text-lg sm:text-xl  pl-8 my-2 md:mt-4 mb-2 font-semibold">Select Department:</h2>
           <div className=" flex mb-2 pl-4 mx-3 pb-4 mt-4  gap-4 rounded-3xl pr-9 overflow-x-auto scrollbar-none scrollbar-track-transparent scrollbar-thumb-neutral-50">
-            {/* "All" Button */}
 
-            <button
+            {/* <button
               key="all"
               onClick={() => toggleDepartmentSelection('All')}
               className={`px-4 py-2 w-auto rounded-3xl font-semibold  border-none ${selectedDepartments.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
                 }`}
             >
               All
-            </button>
+            </button> */}
 
 
             {department.map((dept) => (
@@ -393,9 +300,9 @@ const error=useSelector(selectError);
               } md:ml-2 mr-5 ml-5 overflow-y-auto rounded-xl scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-50`}
           >
             {loading ? (
-              <div className="flex justify-center items-center h-[500px]">
-                <Skeleton variant="rectangular" width="96%" height={400} sx={{ backgroundColor: '#E6EEF9' }} />
-              </div>
+              <LoadingAnimation />
+            ) : !staff?.length ? (
+              <div className="text-center p-4">No staff data available</div>
             ) : (
               <table className="w-[96%] px-3 ml-4 mx-auto border border-[#dcdcdc] rounded-2xl shadow-xl ">
                 {/* Table Headers */}
@@ -411,7 +318,7 @@ const error=useSelector(selectError);
 
 
                 <tbody>
-                  {filteredStaff.map((member, index) => (
+                  {staff.map((member, index) => (
                     <tr
                       key={member.id}
                       className={`px-4 py-2 ${index % 2 === 0 ? 'bg-[#F1F6FC]' : 'bg-[#DEE8FF]'
@@ -437,8 +344,9 @@ const error=useSelector(selectError);
                   : 'bg-red-500 text-white'
                 }`}
                 onClick={() => handleToggleAttendance(member.id)}
+                disabled={updateLoading}
               >
-                {localloading === member.id ? (
+                {updateLoading ? (
               <LoadingAnimation size={24} color="#ffffff" className='px-4 py-1 bg-white' />
             ) : (
                 member.current_attendance

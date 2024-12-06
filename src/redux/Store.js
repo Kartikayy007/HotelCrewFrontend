@@ -13,7 +13,7 @@ import staffReducer from "./slices/DashboardStaffSlice.jsx"
 import hotelCheckInReducer from './slices/hotelCheckInSlice'
 import revenueReducer from './slices/revenueSlice' 
 import scheduleReducer from './slices/scheduleSlice'
-import leaveReducer from './slices/leaveSlice'
+import leaveReducer from './slices/LeaveSlice.jsx'
 import customerReducer from './slices/customerSlice'
 import hotelDetailsReducer from './slices/HotelDetailsSlice'
 import checkInReducer from './slices/CheckInSlice'
@@ -23,8 +23,8 @@ import staffAttendanceReducer from './slices/StaffAttendanceSlice'
 import checkoutReducer from './slices/checkoutSlice'
 import payrollReducer from './slices/PayrollSlice'
 import shiftsReducer from './slices/ShiftSlice'
-import staffPofileReducer from './slices/StaffProfileSlice.jsx'
-import guestReducer from './slices/GuestSlice.jsx'
+import staffProfileReducer from './slices/StaffProfileSlice'
+
 const store = configureStore({
   reducer: {
     user: UserReducer,
@@ -50,9 +50,7 @@ const store = configureStore({
     checkout: checkoutReducer,
     payroll: payrollReducer,
     shifts: shiftsReducer,
-    staffProfile:staffPofileReducer,
-    guest:guestReducer,
-    
+    staffProfile: staffProfileReducer,
   },
 })
 

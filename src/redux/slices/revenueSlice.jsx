@@ -53,7 +53,7 @@ export const fetchRevenueStats = createAsyncThunk(
           'Content-Type': 'application/json'
         }
       });
-      console.log(response.data);
+       (response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch revenue stats');
@@ -106,7 +106,7 @@ const revenueSlice = createSlice({
         
         state.lastFetched = Date.now();
         state.error = null;
-        console.log('API Response:', action.payload); // Add this log
+         ('API Response:', action.payload); // Add this log
       })
       .addCase(fetchRevenueStats.rejected, (state, action) => {
         state.loading = false;

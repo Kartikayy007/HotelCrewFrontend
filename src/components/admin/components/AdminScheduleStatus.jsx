@@ -78,7 +78,7 @@ if(!scheduleList) return <div>no data in scgedulelist</div>;
   const [isChangingShift, setIsChangingShift] = useState(false);
   
   const handleDragStart = (e, staff) => {
-    console.log('Drag Start Data:', staff); // Debug log
+     ('Drag Start Data:', staff); // Debug log
     e.dataTransfer.setData('text/plain', JSON.stringify({
       id: staff.id || staff.user_id || staff._id,
       name: staff.user_name,
