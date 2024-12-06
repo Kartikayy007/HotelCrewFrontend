@@ -118,7 +118,7 @@ export const fetchTodayAnnouncements = createAsyncThunk(
         'https://hotelcrew-1.onrender.com/api/taskassignment/announcements/day/',
         config
       );
-      console.log(response.data);
+       (response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch today\'s announcements');

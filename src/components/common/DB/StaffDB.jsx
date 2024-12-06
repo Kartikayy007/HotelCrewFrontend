@@ -29,6 +29,7 @@ import {
   editStaff,
   deleteStaff
 } from "../../../redux/slices/StaffSlice";
+import {selectHotelDetails} from "../../../redux/slices/HotelDetailsSlice";
 
 const ROLES = {
   STAFF: 'staff',

@@ -1,94 +1,80 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+const BASE_URL = 'https://hotelcrew-1.onrender.com/api';
 
-const FETCH_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/list/';
-const UPDATE_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/change';
-const FETCH_ATTENDANCE_STATS_URL = 'https://hotelcrew-1.onrender.com/api/attendance/stats/'; 
-const CHECK_ATTENDANCE_URL = 'https://hotelcrew-1.onrender.com/api/attendance/check/'; 
-
-// const api = axios.create({
-//   baseURL: 'https://hotelcrew-1.onrender.com',
-// });
-// localStorage.setItem('accessToken','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0MjY4MTQ3LCJpYXQiOjE3MzE2NzYxNDcsImp0aSI6IjUyZTJkNDc4NTYxYzRhMmM4ZGIxNDRmMjVkZWYxMjJmIiwidXNlcl9pZCI6NDV9.p4LuZecKhv6K5dVs-9f1lNFxprEdi-_j7wcoR4Zbscs')
-
-
-const getAuthToken = () => {
-  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
-
-  if (!token) {
-    throw new Error('Authentication token not found');
-  }
-  return token;
-};
-
-
-
-
+// Async thunks
 export const fetchAttendance = createAsyncThunk(
   'attendance/fetchAttendance',
-  async () => {
-    const response = await axios.get(FETCH_ATTENDANCE_URL, {
-      headers: getAuthHeaders(),
-    });
-     console.log("response",response.data);
-     
-    return response.data;
-    
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
+      const response = await axios.get(`${BASE_URL}/attendance/list/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to fetch attendance');
+    }
   }
 );
 
 export const updateAttendance = createAsyncThunk(
   'attendance/updateAttendance',
-  async (id) => {
-    const response = await axios.post(
-      `${UPDATE_ATTENDANCE_URL}/${id}/`,
-      {},
-      { headers: getAuthHeaders() }
-    );
-     (response.data);
-     ("updated")
-    return { id, ...response.data };
+  async (staffId, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
+      const response = await axios.post(
+        `${BASE_URL}/attendance/change/${staffId}/`, 
+        {},
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      return { staffId, result: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to update attendance');
+    }
   }
 );
+
+// Add this new thunk
 export const fetchAttendanceStats = createAsyncThunk(
   'attendance/fetchAttendanceStats',
-  async () => {
-    const response = await axios.get(FETCH_ATTENDANCE_STATS_URL, {
-      headers: getAuthHeaders(),
-    });
-     ("Astats",response.data)
-    return response.data;
-  }
-);
-export const checkAttendance = createAsyncThunk(
-  'attendance/checkAttendance',
-  async (date) => {
-    const response = await axios.get(`${CHECK_ATTENDANCE_URL}?date=${date}`, {
-      headers: getAuthHeaders(),
-    });
-    return response.data;
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
+      const response = await axios.get(`${BASE_URL}/attendance/stats/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to fetch attendance stats');
+    }
   }
 );
 
-
+// Slice
 const attendanceSlice = createSlice({
   name: 'attendance',
   initialState: {
     staff: [],
-    stats: {
-      totalCrew: 0,
-      totalPresent: 0,
-      daysWithRecordsThisMonth: 0,
-      totalPresentMonth: 0,
-    },
-    attendanceCheck: null,
+    stats: null, // Add this
     loading: false,
     error: null,
+    updateLoading: false,
+    updateError: null,
+    statsLoading: false, // Add this
+    statsError: null    // Add this
   },
-  reducers: {},
+  reducers: {
+    clearErrors: (state) => {
+      state.error = null;
+      state.updateError = null;
+      state.statsError = null;  
+    }
+  },
   extraReducers: (builder) => {
     builder
+      // Fetch attendance
       .addCase(fetchAttendance.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -99,54 +85,54 @@ const attendanceSlice = createSlice({
       })
       .addCase(fetchAttendance.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
+      })
+      // Update attendance
+      .addCase(updateAttendance.pending, (state) => {
+        state.updateLoading = true;
+        state.updateError = null;
       })
       .addCase(updateAttendance.fulfilled, (state, action) => {
-        const updatedStaff = state.staff.map((member) =>
-          member.id === action.payload.id
-            ? { ...member, current_attendance: action.payload.attendance ? 'Present' : 'Absent' }
-            : member
+        state.updateLoading = false;
+        const { staffId, result } = action.payload;
+        state.staff = state.staff.map(member => 
+          member.id === staffId ? 
+          { ...member, current_attendance: result.attendance ? 'Present' : 'Absent' } 
+          : member
         );
-        state.staff = updatedStaff;
       })
+      .addCase(updateAttendance.rejected, (state, action) => {
+        state.updateLoading = false;
+        state.updateError = action.payload;
+      })
+      // Add these new cases
       .addCase(fetchAttendanceStats.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.statsLoading = true;
+        state.statsError = null;
       })
       .addCase(fetchAttendanceStats.fulfilled, (state, action) => {
-        state.loading = false;
-        state.stats = {
-          totalCrew: action.payload.total_crew,
-          totalPresent: action.payload.total_present,
-          daysWithRecordsThisMonth: action.payload.days_with_records_this_month,
-          totalPresentMonth: action.payload.total_present_month,
-        };
+        state.statsLoading = false;
+        state.stats = action.payload;
       })
       .addCase(fetchAttendanceStats.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
-  
-  .addCase(checkAttendance.pending, (state) => {
-    state.loading = true;
-    state.attendanceCheck = null; // Reset attendance check state
-    state.error = null;
-  })
-  .addCase(checkAttendance.fulfilled, (state, action) => {
-    state.loading = false;
-    state.attendanceCheck = action.payload; // Store the attendance check result
-  })
-  .addCase(checkAttendance.rejected, (state, action) => {
-    state.loading = false;
-    state.error = action.error.message;
-  });
-},
+        state.statsLoading = false;
+        state.statsError = action.payload;
+      });
+  }
 });
 
+// Selectors
 export const selectStaff = (state) => state.attendance.staff;
-export const selectStats = (state) => state.attendance.stats;
-export const selectAttendanceCheck = (state) => state.attendance.attendanceCheck;
 export const selectLoading = (state) => state.attendance.loading;
 export const selectError = (state) => state.attendance.error;
+export const selectUpdateLoading = (state) => state.attendance.updateLoading;
+export const selectUpdateError = (state) => state.attendance.updateError;
+
+// Add these new selectors
+export const selectStats = (state) => state.attendance.stats;
+export const selectStatsLoading = (state) => state.attendance.statsLoading;
+export const selectStatsError = (state) => state.attendance.statsError;
+
+export const { clearErrors } = attendanceSlice.actions;
 
 export default attendanceSlice.reducer;

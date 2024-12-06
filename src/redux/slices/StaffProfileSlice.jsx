@@ -25,7 +25,7 @@ export const getStaffProfile = createAsyncThunk(
           },
         }
       );
-      console.log('Staff Profile:', response.data); // For debugging, log the response
+       ('Staff Profile:', response.data); // For debugging, log the response
       return response.data.user; // Return only the 'user' data from the response
     } catch (error) {
         if (error.response) {
@@ -58,7 +58,7 @@ export const updateStaffProfile = createAsyncThunk(
           },
         }
       );
-      console.log('Profile Updated:', response.data); // For debugging, log the response
+       ('Profile Updated:', response.data); // For debugging, log the response
       return response.data.user; // Return updated user details
     } catch (error) {
       if (error.response) {

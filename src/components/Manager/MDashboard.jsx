@@ -158,7 +158,7 @@ const MDashboard = () => {
   const availableRooms = useSelector(selectAvailableRooms);
   const occupiedRooms = useSelector(selectOccupiedRooms);
   const dailyRevenues = useSelector((state) => {
-    console.log("Redux State:", state.revenue);
+     ("Redux State:", state.revenue);
     return state.revenue.dailyRevenues;
   });
   const dates = useSelector((state) => state.revenue.dates);
@@ -166,7 +166,7 @@ const MDashboard = () => {
   const revenueLoading = useSelector((state) => state.revenue.loading);
 
   // Log the selected values
-  console.log("Selected Revenue Data:", {
+   ("Selected Revenue Data:", {
     dailyRevenues,
     dates,
     latestRevenue,
@@ -174,12 +174,13 @@ const MDashboard = () => {
   });
 
   const hotelDetails = useSelector(selectHotelDetails);
+  const hotelDepartments = useSelector(selectDepartmentNames);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const result = await dispatch(fetchRevenueStats()).unwrap();
-        console.log("Revenue API Response:", result);
+         ("Revenue API Response:", result);
       } catch (error) {
         console.error("Revenue API Error:", error);
       }
@@ -211,18 +212,14 @@ const MDashboard = () => {
     description: false,
   });
 
+  const [departments, setDepartments] = useState([]);
+
+  // Replace the existing useEffect with this:
   useEffect(() => {
-    if (hotelDetails?.department_names) {
-      const deptArray = hotelDetails.department_names
-        .split(",")
-        .map((dept) => dept.trim())
-        .map((dept) => ({
-          value: dept.toLowerCase(),
-          label: dept.charAt(0).toUpperCase() + dept.slice(1),
-        }));
-      setDepartments(deptArray);
+    if (hotelDepartments?.length > 0) {
+      setDepartments(hotelDepartments);
     }
-  }, [hotelDetails]);
+  }, [hotelDepartments]);
 
   useEffect(() => {
     dispatch(fetchHotelDetails());
@@ -416,7 +413,7 @@ const MDashboard = () => {
     },
   };
 
-  const departments = useSelector(selectStaffPerDepartment);
+  // const departments = useSelector(selectStaffPerDepartment);
   const staffLoading = useSelector(selectStaffLoading);
 
   useEffect(() => {
@@ -437,7 +434,6 @@ const MDashboard = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [showTaskAssignment, setShowTaskAssignment] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const hotelDepartments = useSelector(selectDepartmentNames);
   const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -1256,28 +1252,23 @@ const MDashboard = () => {
                           <div className="px-4 py-2 text-gray-500">
                             Loading departments...
                           </div>
-                        ) : departments ? (
-                          Object.entries(departments).map(
-                            ([dept, count], index) => (
-                              <button
-                                key={index}
-                                type="button"
-                                onClick={() => {
-                                  handleSelect({
-                                    label: dept,
-                                    value: dept.toLowerCase(),
-                                  });
-                                  setFieldErrors((prev) => ({
-                                    ...prev,
-                                    department: false,
-                                  }));
-                                }}
-                                className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                              >
-                                {`${dept} (${count})`}
-                              </button>
-                            )
-                          )
+                        ) : departments.length > 0 ? (
+                          departments.map((dept, index) => (
+                            <button
+                              key={index}
+                              type="button"
+                              onClick={() => {
+                                handleSelect(dept);
+                                setFieldErrors((prev) => ({
+                                  ...prev,
+                                  department: false,
+                                }));
+                              }}
+                              className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                            >
+                              {`${dept.label}`}
+                            </button>
+                          ))
                         ) : (
                           <div className="px-4 py-2 text-gray-500">
                             No departments available
@@ -1379,7 +1370,7 @@ const MDashboard = () => {
             }}
           >
             <AdminTaskAssignment onClose={() => setShowTaskAssignment(false)} />
-          </Dialog>
+          </Dialog >
           <div className="bg-white rounded-lg flex flex-col shadow xl:h-[26rem] w-full p-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold">Announcements</h2>
@@ -1391,6 +1382,12 @@ const MDashboard = () => {
             <AllAnnouncementsDialog
               open={showAllAnnouncements}
               onClose={() => setShowAllAnnouncements(false)}
+              BackdropProps={{
+                sx: {
+                  backgroundColor: "rgba(0, 0, 0, 0.4)",
+                  backdropFilter: "blur(5px)",
+                },
+              }}
             />
             <div
               ref={announcementContainerRef}
@@ -1425,12 +1422,7 @@ const MDashboard = () => {
                   <CreateAnnouncementBox
                     onClose={() => setShowAnnouncementBox(false)}
                     onSubmit={handleCreateAnnouncement}
-                    departments={Object.entries(departments || {}).map(
-                      ([dept]) => ({
-                        label: dept,
-                        value: dept.toLowerCase(),
-                      })
-                    )}
+                    departments={departments} // Changed from hotelDepartments to departments
                   />
                 </div>
               </div>

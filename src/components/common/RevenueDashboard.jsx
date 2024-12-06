@@ -11,7 +11,7 @@ const RevenueDashboard = ({
   skeletonProps = {}
 }) => {
   // Enhanced console logs
-  console.log('Raw Revenue Props:', {
+   ('Raw Revenue Props:', {
     revenueLoading,
     dailyRevenues: dailyRevenues || [],
     dates: dates || [],
@@ -30,7 +30,7 @@ const RevenueDashboard = ({
   const validDates = (dates || [])
     .filter(date => date && typeof date === 'string');
 
-  console.log('Processed Data:', {
+   ('Processed Data:', {
     validDailyRevenues,
     validDates,
     hasPositiveRevenue: validDailyRevenues.some(v => v > 0)

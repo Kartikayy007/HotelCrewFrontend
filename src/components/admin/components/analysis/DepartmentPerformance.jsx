@@ -120,9 +120,12 @@ const DepartmentPerformance = () => {
             boxShadow: 24,
           }
         }}
-        BackdropProps={
-          { sx: { backdropFilter: 'blur(5px)' } }
-        }
+        BackdropProps={{
+          sx: {
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            backdropFilter: "blur(5px)",
+          },
+        }}
       >
         <DialogTitle>
           <div className="flex justify-between items-center">

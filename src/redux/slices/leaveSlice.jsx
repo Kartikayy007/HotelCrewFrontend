@@ -4,7 +4,7 @@ import axios from "axios";
 const API_BASE_URL = "https://hotelcrew-1.onrender.com/api/attendance"; // Replace with your actual API base URL
 
 const getAuthHeaders = () => {
-    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NDU5MzUwLCJpYXQiOjE3MzI4NjczNTAsImp0aSI6ImYyZWIyMWIzZGVlZjQ0MWQ5YThlNzY2OWFmMWIxNGQ1IiwidXNlcl9pZCI6MTg1fQ.YkgvzmHmNKwR3bvQ9KiZvc1lZd_xf0ZgKmLg1KujQ4Y'
+    const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
 
 
     if (!token) {
@@ -12,7 +12,7 @@ const getAuthHeaders = () => {
     }
   
     return {
-      Authorization: `Bearer ${token}`, // Return the headers with the token
+      Authorization: `Bearer ${token}`, 
     };
   };
 // **Async Thunks**
@@ -25,7 +25,7 @@ export const fetchLeaveRequests = createAsyncThunk(
       const response = await axios.get(`https://hotelcrew-1.onrender.com/api/attendance/leave_list/`, {
         headers: getAuthHeaders(), // Correctly invoke the function and pass as headers
       });
-      console.log(response.data.data)
+       (response.data.data)
       return response.data.data; // Assuming "data" contains the leave requests
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching leave requests");
@@ -42,7 +42,7 @@ export const fetchLeaveCount = createAsyncThunk(
         params: { date },
         headers: getAuthHeaders(),
       });
-      console.log("leave",response.data.data)
+       ("leave",response.data.data)
       return response.data.data; // Assuming "data" contains the leave count
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching leave count");
@@ -55,7 +55,7 @@ export const updateLeaveStatus = createAsyncThunk(
   "leave/updateLeaveStatus",
   async ({ leaveId, status }, { rejectWithValue }) => {
     try {
-      const response = await axios.patch(`${API_BASE_URL}/leave_approve/${leaveId}`,
+      const response = await axios.patch(`${API_BASE_URL}/leave_approve/${leaveId}/`,
          { status },
          {
           headers: getAuthHeaders(), // Correctly invoke and pass headers
@@ -97,7 +97,7 @@ const leaveSlice = createSlice({
         })
         .addCase(fetchLeaveRequests.fulfilled, (state, action) => {
           state.leaveLoading = false;
-          console.log(action.payload);
+           (action.payload);
           state.leaveRequests = action.payload;
         })
         .addCase(fetchLeaveRequests.rejected, (state, action) => {
@@ -113,7 +113,7 @@ const leaveSlice = createSlice({
         })
         .addCase(fetchLeaveCount.fulfilled, (state, action) => {
           state.leaveLoading = false;
-          console.log("P",action.payload.leave_count);
+           ("P",action.payload.leave_count);
           state.leaveCount = action.payload.leave_count;
         })
         .addCase(fetchLeaveCount.rejected, (state, action) => {
@@ -121,7 +121,6 @@ const leaveSlice = createSlice({
           state.leaveError = action.payload;
         });
   
-      // Update Leave Status
       builder
         .addCase(updateLeaveStatus.pending, (state) => {
           state.leaveLoading = true;
@@ -129,7 +128,7 @@ const leaveSlice = createSlice({
         })
         .addCase(updateLeaveStatus.fulfilled, (state, action) => {
           state.leaveLoading = false;
-          console.log(action.payload.message);
+           (action.payload.message);
           state.updateStatus = action.payload.message;
         })
         .addCase(updateLeaveStatus.rejected, (state, action) => {
