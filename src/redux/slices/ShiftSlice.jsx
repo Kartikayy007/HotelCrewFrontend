@@ -3,9 +3,7 @@ import axios from 'axios';
 
 // URL for fetching and updating shifts
 const FETCH_SHIFTS_URL = 'https://hotelcrew-1.onrender.com/api/edit/schedule_list/';
-const UPDATE_SHIFT_URL = 'https://hotelcrew-1.onrender.com/api/edit/schedule_change'; // Assuming this is the update shift API
-
-// Utility to get auth headers
+const UPDATE_SHIFT_URL = 'https://hotelcrew-1.onrender.com/api/edit/schedule_change';
 const getAuthHeaders = () => {
   const token = localStorage.getItem('accessToken') || sessionStorage.getItem('token');
 
@@ -18,7 +16,6 @@ const getAuthHeaders = () => {
   };
 };
 
-// Async thunk to fetch shifts
 export const fetchShifts = createAsyncThunk(
   'shifts/fetchShifts',
   async (_, { rejectWithValue }) => {

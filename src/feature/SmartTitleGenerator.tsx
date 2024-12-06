@@ -1,4 +1,3 @@
-// SmartTitleGenerator.tsx
 import React, { useState, useEffect } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Tooltip, IconButton } from '@mui/material';

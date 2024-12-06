@@ -15,7 +15,6 @@ const SLayout = () => {
         SSchedule: <SSchedule />,
         SProfile: <SProfile />,
         STask: <STask />,
-        
     };
     const currentComponent = useSelector((state) => state.staff.currentComponent);
 

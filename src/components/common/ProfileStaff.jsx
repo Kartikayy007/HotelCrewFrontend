@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
-import {Skeleton, Snackbar, Alert, Slide} from "@mui/material";
+import {Skeleton, Snackbar, Alert, Slide, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
+import {useNavigate} from 'react-router-dom';
+import {LogOut} from 'lucide-react';
 // import InfoIcon from "@mui/icons-material/Info";
 import {
   getStaffProfile,
@@ -72,6 +74,8 @@ const SProfile = () => {
   const [tempImage, setTempImage] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageLoading, setImageLoading] = useState(false); // Add new state
+  const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (error) {
@@ -267,6 +271,24 @@ const SProfile = () => {
       setSnackbarOpen(true);
     }
   }, [error]);
+
+  // Add logout handler
+  const handleLogout = () => {
+    // Clear all storage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('isHotelRegistered');
+    localStorage.removeItem('role');
+    localStorage.removeItem('userData');
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('userData');
+
+    // Close dialog and navigate
+    setOpenLogoutDialog(false);
+    navigate('/login');
+  };
 
   return (
     <>
@@ -474,6 +496,47 @@ const SProfile = () => {
                 </div>
             )}
         </div>
+        <div className="absolute bottom-6 right-6">
+          <button
+            onClick={() => setOpenLogoutDialog(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+          >
+            <LogOut size={20} />
+            Logout
+          </button>
+        </div>
+
+        {/* Logout Confirmation Dialog */}
+        <Dialog
+          open={openLogoutDialog}
+          onClose={() => setOpenLogoutDialog(false)}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Confirm Logout"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Are you sure you want to logout? This will end your current session.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button 
+              onClick={() => setOpenLogoutDialog(false)}
+              className="text-gray-600"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleLogout}
+              className="text-red-500"
+              autoFocus
+            >
+              Logout
+            </Button>
+          </DialogActions>
+        </Dialog>
     </section>
 
       <Snackbar 

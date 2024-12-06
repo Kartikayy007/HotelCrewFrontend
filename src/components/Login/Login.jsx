@@ -99,7 +99,7 @@ const Login = () => {
         const roleRoutes = {
           'Admin': '/admin/dashboard',
           'Manager': '/manager/dashboard',
-          'Reception': '/reception/dashboard',
+          'Receptionist': '/reception/dashboard',
           'Staff': '/staff/dashboard'
         };
 

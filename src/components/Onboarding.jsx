@@ -7,6 +7,7 @@ import Preloading from "./common/Preloading";
 import {gsap} from "gsap";
 import {ScrollTrigger} from "gsap/ScrollTrigger";
 import FloatingPhone from "./common/FloatingPhone";
+import { Helmet } from 'react-helmet-async';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -100,6 +101,19 @@ const Onboarding = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Hotel Registration | HotelCrew</title>
+        <meta name="description" content="Complete your hotel registration process. Register your hotel details, set up your account, and get started with HotelCrew's hotel management system." />
+        <meta name="keywords" content="hotel registration, hotel management system, hotelcrew, hotel setup, hotel onboarding" />
+        
+        <meta property="og:title" content="Hotel Registration | HotelCrew" />
+        <meta property="og:description" content="Complete your hotel registration process and get started with HotelCrew's hotel management system." />
+        <meta property="og:type" content="website" />
+        
+        <link rel="canonical" href={window.location.href} />
+        <meta name="robots" content="index, follow" />
+      </Helmet>
+
       <Preloading />
       <div className="font-Montserrat backdrop-blur-xl bg-white bg-opacity-75">
         <nav className="font-bold text-xl backdrop-blur-xl bg-white bg-opacity-75 sticky top-0 z-50">

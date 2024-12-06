@@ -319,16 +319,16 @@ const AdminAnalytics = () => {
     const date = new Date(dateString);
     const day = date.toLocaleDateString("en-US", { weekday: "short" });
     const monthDay = date.toLocaleDateString("en-US", {
-      month: "numeric",
-      day: "numeric",
-    });
-    return `${day}\n${monthDay}`;
-  };
+      month: "numeric", 
+      day: "numeric", 
+    }); 
+    return `${day}\n${monthDay}`; 
+  }; 
 
   const hasAttendanceData =
-    weeklyStats.dates.length > 0 &&
-    weeklyStats.total_crew_present.length > 0 &&
-    weeklyStats.total_staff_absent.length > 0;
+    weeklyStats?.dates.length > 0 &&
+    weeklyStats?.total_crew_present.length > 0 &&
+    weeklyStats?.total_staff_absent.length > 0;
 
   const handlePerformanceRangeChange = (event, newValue) => {
     setPerformanceRange(newValue);
