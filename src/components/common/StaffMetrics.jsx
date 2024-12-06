@@ -35,7 +35,7 @@ const StaffMetrics = () => {
 
   const fetchWeeklyData = async () => {
     try {
-      const response = await axios.get('https://hotelcrew-1.onrender.com/api/statics/performance/hotel/week/', {
+      const response = await axios.get('https://hotelcrew-1.onrender.com/api/statics/performance/hotel/past7/', {
         headers: getAuthHeaders(),
       });
       
@@ -69,7 +69,7 @@ const StaffMetrics = () => {
     }],
     series: [{
       data: weeklyData.map(d => d.performance),
-      curve: "linear",
+      curve: "catmullRom",
       color: "#2A2AA9",
     }],
   };
@@ -101,7 +101,7 @@ const StaffMetrics = () => {
             xAxis={performanceData.xAxis}
             series={[{
               data: weeklyData.map(d => d.performance),
-              curve: "linear",
+              curve: "catmullRom",
               color: "#4C51BF",
               area: true
             }]}

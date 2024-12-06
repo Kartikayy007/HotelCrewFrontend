@@ -117,7 +117,7 @@ export const fetchStaffStatus = createAsyncThunk(
         }
       };
       const response = await axios.get(STAFF_STATUS_URL, config);
-      console.log('Staff status response:', response.data); // Debug log
+       ('Staff status response:', response.data); // Debug log
       return response.data;
     } catch (error) {
       console.error('Failed to fetch staff status:', error);

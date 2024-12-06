@@ -64,6 +64,8 @@ import {
 } from "../../../redux/slices/OcupancyRateSlice";
 import {fetchWeeklyAttendance} from "../../../redux/slices/AdminAttendanceSlice";
 import {selectDepartmentNames} from "../../../redux/slices/HotelDetailsSlice";
+import PredictiveTextArea from "../../../feature/PredictiveTextArea";
+import SmartTitleGenerator from "../../../feature/SmartTitleGenerator";
 
 const DeleteConfirmationDialog = ({open, onClose, onConfirm, loading}) => (
   <Dialog
@@ -1091,7 +1093,7 @@ function AdminDashboard() {
                         data: dailyRevenues?.length ? dailyRevenues : [0],
                         color: "#4C51BF",
                         area: true,
-                        curve: "linear",
+                        curve: "catmullRom",
                       },
                     ]}
                     xAxis={[
@@ -1153,7 +1155,7 @@ function AdminDashboard() {
                 </Box>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg w-full p-4 flex flex-col h-[40rem] xl:h-[calc(40vh)] ">
+              <div className="bg-white rounded-xl shadow-lg w-full p-4 flex flex-col h-[40rem] xl:h-[16rem] ">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold">
                     Today's Announcements
@@ -1395,7 +1397,7 @@ function AdminDashboard() {
 
               <form
                 onSubmit={handleAssign}
-                className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg lg:flex-1"
+                className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg lg:flex-1"
               >
                 <div className="flex justify-between items-center mb-2">
                   <h2 className="text-lg sm:text-xl font-semibold">
@@ -1410,20 +1412,30 @@ function AdminDashboard() {
                   </IconButton>
                 </div>
 
-                <Tooltip
-                  open={formSubmitted && taskTitle === ""}
-                  title="Task title is required"
-                  arrow
-                  placement="top"
-                >
-                  <input
-                    type="text"
-                    placeholder="Task Title"
-                    value={taskTitle}
-                    onChange={(e) => setTaskTitle(e.target.value)}
-                    className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
+                <div className="relative">
+                  <Tooltip
+                    open={formSubmitted && taskTitle === ""}
+                    title="Task title is required"
+                    arrow
+                    placement="top"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Task Title"
+                      value={taskTitle}
+                      maxLength={100}
+                      onChange={(e) => setTaskTitle(e.target.value)}
+                      className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full pr-10 focus:border-gray-300 focus:outline-none -z-0"
+                    />
+                  </Tooltip>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+                  <SmartTitleGenerator
+                    description={taskDescription}
+                    onTitleGenerated={setTaskTitle}
+                    disabled={!taskDescription.trim()}
                   />
-                </Tooltip>
+                </div>
+                </div>
 
                 <div className="flex justify-between gap-4">
                   <Tooltip
@@ -1509,12 +1521,12 @@ function AdminDashboard() {
                   arrow
                   placement="top"
                 >
-                  <textarea
+                  <PredictiveTextArea
                     value={taskDescription}
                     onChange={(e) => setTaskDescription(e.target.value)}
-                    placeholder="Task Description"
+                    placeholder="Type task description..."
                     maxLength={350}
-                    className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+                    className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 min-h-32"
                   />
                 </Tooltip>
 

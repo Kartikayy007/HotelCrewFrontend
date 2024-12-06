@@ -10,6 +10,8 @@ import {
   Fade,
 } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
+import SmartTitleGenerator from '../../feature/SmartTitleGenerator';
+import PredictiveTextArea from '../../feature/PredictiveTextArea';
 
 export const CreateAnnouncementBox = ({ onClose, onSubmit, departments }) => {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -83,6 +85,7 @@ export const CreateAnnouncementBox = ({ onClose, onSubmit, departments }) => {
           exit: 200
         }
       }}
+      fullWidth
       BackdropProps={{
         sx: {
           backgroundColor: "rgba(0, 0, 0, 0.4)",
@@ -115,22 +118,33 @@ export const CreateAnnouncementBox = ({ onClose, onSubmit, departments }) => {
         </div>
 
         <div className="space-y-4">
-          <Tooltip
-            open={formSubmitted && !announcement.title.trim()}
-            title="Title is required"
-            arrow
-            placement="top"
-            sx={tooltipStyle}
-          >
-            <TextField
-              label="Announcement Title"
-              fullWidth
-              variant="outlined"
-              value={announcement.title}
-              onChange={(e) => setAnnouncement({...announcement, title: e.target.value})}
-              placeholder="Enter announcement title"
-            />
-          </Tooltip>
+          <div className="relative">
+            <Tooltip
+              open={formSubmitted && !announcement.title.trim()}
+              title="Title is required"
+              arrow
+              placement="top"
+              sx={tooltipStyle}
+            >
+              <div className="w-full">
+                <input 
+                  type="text"
+                  onChange={(e) => setAnnouncement({...announcement, title: e.target.value})}
+                  value={announcement.title}
+                  className="w-full p-3 border rounded-md focus:outline-none focus:border-blue-500"
+                  placeholder="Enter Title"
+                
+                />
+              </div>
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+              <SmartTitleGenerator
+                description={announcement.description}
+                onTitleGenerated={(title) => setAnnouncement(prev => ({...prev, title}))}
+                disabled={!announcement.description.trim()}
+              />
+              </div>
+            </Tooltip>
+          </div>
 
           <Tooltip
             open={formSubmitted && !announcement.department}
@@ -190,15 +204,23 @@ export const CreateAnnouncementBox = ({ onClose, onSubmit, departments }) => {
             placement="top"
             sx={tooltipStyle}
           >
-            <TextField
-              label="Announcement Message"
-              fullWidth
-              multiline
-              rows={6}
-              value={announcement.description}
-              onChange={(e) => setAnnouncement({...announcement, description: e.target.value})}
-              placeholder="Write your announcement message here..."
-            />
+            <div className="w-full relative">
+              <PredictiveTextArea
+                placeholder="Write your announcement message here..."
+                value={announcement.description}
+                onChange={(e) => {
+                  const newDescription = e.target.value;
+                  setAnnouncement(prev => ({
+                    ...prev, 
+                    description: newDescription
+                  }));
+                }}
+                className="min-w-full min-h-[250px] p-3 border rounded-md focus:outline-none focus:border-blue-500 resize-none"
+              />
+
+              
+              
+            </div>
           </Tooltip>
 
           <div className="flex justify-end space-x-2 pt-4 border-t mt-4">
