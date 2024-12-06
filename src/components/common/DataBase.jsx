@@ -265,8 +265,8 @@ function DataBase() {
                     >
                       <option value="All">Shift</option>
                       <option value="Morning">Morning Shift</option>
+                      <option value="Evening">Evening Shift</option>
                       <option value="Night">Night Shift</option>
-                      <option value="Evening">Evening</option>
                     </select>
                   </>
                 )}

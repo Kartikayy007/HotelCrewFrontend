@@ -326,9 +326,9 @@ const AdminAnalytics = () => {
   };
 
   const hasAttendanceData =
-    weeklyStats?.dates?.length > 0 &&
-    weeklyStats?.total_crew_present?.length > 0 &&
-    weeklyStats?.total_staff_absent?.length > 0;
+    weeklyStats.dates.length > 0 &&
+    weeklyStats.total_crew_present.length > 0 &&
+    weeklyStats.total_staff_absent.length > 0;
 
   const handlePerformanceRangeChange = (event, newValue) => {
     setPerformanceRange(newValue);
