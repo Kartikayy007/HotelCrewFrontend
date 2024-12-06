@@ -56,6 +56,11 @@ const SSchedule = () => {
 
   }, []);
 
+  // Add useEffect to fetch profile data
+  useEffect(() => {
+    dispatch(getStaffProfile());
+  }, [dispatch]);
+
   const skeletonProps = {
     animation: "wave",
     sx: {
@@ -103,46 +108,24 @@ const SSchedule = () => {
     }
     }, [applyLeaveError])
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const { from_date, to_date,leave_type, reason} = leaveDetails;
-    if (!from_date) {
-      setSnackbar({
-        open: true,
-        message: "From Date is required.",
-        severity: "error"
-      });
-      return;
-    }
-    if (!to_date) {
-      setSnackbar({
-        open: true,
-        message: "End Date is required.",
-        severity: "error"
-      });
-      return;
-    }
-    if (!leave_type) {
-      setSnackbar({
-        open: true,
-        message: "Leave Type is required.",
-        severity: "error"
-      });
-      
-      return;
-    }
-    if (!reason) {
-      setSnackbar({
-        open: true,
-        message: "Description is required.",
-        severity: "error"
-      });
-      
-      return;
-    }
-    dispatch(staffLeaveApply(leaveDetails));
-     (appliedLeave);
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const { from_date, to_date, leave_type, reason } = leaveDetails;
+
+  // Validation checks
+  if (!from_date || !to_date || !leave_type || !reason) {
+    setSnackbar({
+      open: true,
+      message: `Please fill in all required fields`,
+      severity: "error"
+    });
+    return;
+  }
+
+  // Dispatch the leave application
+  await dispatch(staffLeaveApply(leaveDetails));
+};
+
   const monthlyAttendance = useSelector((state) => state.staffAttendance.monthlyAttendance);
   const {
 
@@ -263,71 +246,57 @@ const SSchedule = () => {
 
  
 
-  useEffect(() => {
-    if (appliedLeave) {
-      setSnackbar({
-        open: true,
-        message: 'Leave Request Submitted Successfully!',
-        severity: 'success',
-      });
-      setLeaveDetails({
-        from_date: '',
-        to_date: '',
-        leave_type: '',
-        reason:'' // Reset any other form fields as needed
-      });
-      setStartDate(null);
-      setEndDate(null);
-      dispatch(resetLeaveStatus()); 
-    }
+useEffect(() => {
+  if (appliedLeave) {
+    setSnackbar({
+      open: true,
+      message: appliedLeave,
+      severity: 'success'
+    });
+    // Reset form
+    setLeaveDetails({
+      from_date: '',
+      to_date: '',
+      leave_type: '',
+      reason: ''
+    });
+    setStartDate(null);
+    setEndDate(null);
+    dispatch(resetLeaveStatus());
+  }
 
-    if (applyLeaveError) {
-       (applyLeaveError);
-      setSnackbar({
-        open: true,
-        message: 'Error submitting leave request. Please try again.',
-        severity: 'error',
-      });
-      dispatch(resetApplyLeaveError());
-    }
-  }, [appliedLeave, applyLeaveError]);
-
+  if (applyLeaveError) {
+    setSnackbar({
+      open: true,
+      message: applyLeaveError || 'Failed to submit leave request',
+      severity: 'error'
+    });
+    dispatch(resetApplyLeaveError());
+  }
+}, [appliedLeave, applyLeaveError, dispatch]);
 
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
-  const shifts = ["morning", "day", "night"];
+  // Update shiftTime function for correct shift mapping
   const shiftTime = (shift) => {
-    if (shift === "Morning"|| shift==="morning") {
-      return "05:00 AM to 01:00 PM";
-    } else if (shift === "Evening"|| shift==="Evening") {
-      return "01:00 PM to 09:00 PM";
-    } else if (shift === "Night" || shift==="night") {
-      return "09:00 PM to 05:00 AM";
-    } else {
-      return "Invalid shift"; // Handle invalid inputs
+    const shiftLower = shift?.toLowerCase();
+    
+    switch(shiftLower) {
+      case "morning":
+        return "06:00 AM to 02:00 PM";
+      case "evening":
+      case "day": // Handle both "evening" and "day" cases
+        return "02:00 PM to 10:00 PM"; 
+      case "night":
+        return "10:00 PM to 06:00 AM";
+      default:
+        return "Invalid shift";
     }
   };
-  // const attendance = [
-  //   { date: "24/11/24", current_attendance: "Absent" },
-  //   { date: "23/11/24", current_attendance: "Present" },
-  //   { date: "22/11/24", current_attendance: "Present" },
-  //   { date: "21/11/24", current_attendance: "Present" },
-  //   { date: "20/11/24", current_attendance: "Present" },
-  //   { date: "19/11/24", current_attendance: "Present" },
-  //   { date: "18/11/24", current_attendance: "Absent" },
-  //   { date: "17/11/24", current_attendance: "Present" },
-  //   { date: "16/11/24", current_attendance: "Present" },
-  //   { date: "15/11/24", current_attendance: "Present" },
-  //   { date: "14/11/24", current_attendance: "Present" },
-  //   { date: "13/11/24", current_attendance: "Present" },
-  //   { date: "12/11/24", current_attendance: "Present" },
-  //   { date: "11/11/24", current_attendance: "Present" },
-  // ]
   return (
-    <section className=" h-screen  font-Montserrat  overflow-y-auto ">
-      <h2 className="text-[#252941] text-3xl mt-5 lg:text-center  my-3 pl-11 ml-5 font-semibold">Schedule Status</h2>
-      {/* <div className="grid grid-cols-1  xl:grid-cols-[40%,35%,25%] gap-5 p-3 "> */}
+    <section className=" h-screen bg-[#E6EEF9]  font-Montserrat  overflow-y-auto ">
+      <h2 className="text-[#252941] text-3xl mt-5  my-3 pl-11 ml-5 font-semibold">Schedule Status</h2>
       <div className="flex flex-col justify-center xl:flex-row xl:gap-5 gap-14 p-3 ">
         <div className="space-y-5 xl:w-[40%] ">
           <div className="bg-white w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
@@ -341,9 +310,22 @@ const SSchedule = () => {
                 />
               </div>
             ) : (
+              // Update shift display section
               <div className='text-lg text-[#47518C] font-semibold mb-2'>
-                <p className='capitalize'>{profile?.shift||"Invalid"} Shift</p>
-                <p className=''>Time: {shiftTime(profile?.shift||'shifts[0]')}</p>
+                {profileLoading ? (
+                  <Skeleton variant="text" width="60%" height={30} />
+                ) : profileError ? (
+                  <p>Error loading shift details</p>
+                ) : (
+                  <>
+                    <p className='capitalize'>
+                      {profile?.shift ? `${profile.shift} Shift` : "No shift assigned"}
+                    </p>
+                    <p className=''>
+                      Time: {profile?.shift ? shiftTime(profile.shift) : "Not available"}
+                    </p>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -361,7 +343,7 @@ const SSchedule = () => {
                 </div>
               ) : (
                 <table className="w-[96%]  px-1 mx-auto border border-[#dcdcdc] rounded-2xl shadow  ">
-                  {/* Table Headers */}
+                  
                   <thead>
                     <tr className="bg-[#3F4870] text-[#E6EEF9] rounded-xl">
 
@@ -602,12 +584,17 @@ const SSchedule = () => {
                     <button
                       type="submit"
                       disabled={leaveLoading}
-                      //onclick()=>{handleRequestSubmit}
-                      className="h-9  w-full  bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white  shadow-xl"
+                      className={`h-9 w-full font-Montserrat font-bold rounded-xl text-white shadow-xl
+    ${leaveLoading ? 'bg-gray-400' : 'bg-[#3A426F]'}`}
                     >
-                      {/* Request */}
-                      {leaveLoading ? "Submiting..." : "Submit"}
-                    </button>
+  {leaveLoading ? 
+    <div className="flex items-center justify-center gap-2">
+      <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"/>
+      Submitting...
+    </div> : 
+    'Submit'
+  }
+</button>
                   </div>
                 </form>
               </div>
@@ -621,29 +608,21 @@ const SSchedule = () => {
           <button onClick={handleCloseSnackbar} className="absolute top-1 right-2 text-xl">×</button>
         </div>
       )} */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity="success"
-          variant="filled"
-          sx={{ 
-            width: '100%',
-            '& .MuiAlert-filledSuccess': {
-              backgroundColor: '#4CAF50'
-            }
-          }}
-        >{snackbar.message}
-          {/* {draggedStaff && targetShift ? 
-            `Shift updated successfully` : 
-            'Shift updated successfully'
-          } */}
-        </Alert>
-      </Snackbar>
+<Snackbar
+  open={snackbar.open}
+  autoHideDuration={4000}
+  onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+  anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+>
+  <MuiAlert 
+    elevation={6}
+    variant="filled"
+    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+    severity={snackbar.severity}
+  >
+    {snackbar.message}
+  </MuiAlert>
+</Snackbar>
        
 
         </div>

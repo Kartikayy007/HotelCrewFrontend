@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Function to retrieve the authentication token
 const getAuthToken = () => {
-   const token  =localStorage.getItem('accessToken'); // Retrieve token from local storage
+   const token  = localStorage.getItem('accessToken'); 
     if (!token) {
       throw new Error('Authentication token not found');
     }
@@ -25,7 +24,7 @@ export const getStaffProfile = createAsyncThunk(
           },
         }
       );
-      console.log('Staff Profile:', response.data); // For debugging, log the response
+       ('Staff Profile:', response.data); // For debugging, log the response
       return response.data.user; // Return only the 'user' data from the response
     } catch (error) {
         if (error.response) {
@@ -46,19 +45,20 @@ export const getStaffProfile = createAsyncThunk(
 
 export const updateStaffProfile = createAsyncThunk(
   'staffProfile/updateStaffProfile', // Slice name
-  async (updatedDetails, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
       const token = getAuthToken(); // Retrieve auth token
       const response = await axios.put(
         'https://hotelcrew-1.onrender.com/api/edit/user_profile/', // API endpoint for updating staff profile
-        updatedDetails, // The updated user details
+        formData, // The updated user details
         {
           headers: {
             Authorization: `Bearer ${token}`, // Attach token in headers
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
-      console.log('Profile Updated:', response.data); // For debugging, log the response
+       ('Profile Updated:', response.data); // For debugging, log the response
       return response.data.user; // Return updated user details
     } catch (error) {
       if (error.response) {
@@ -77,10 +77,9 @@ export const updateStaffProfile = createAsyncThunk(
 );
 
 
-// First fix initial state structure
 const initialState = {
     profile: null,
-    user: null, // Add user field
+    user: null, 
     loading: false,
     error: null,
     successMessage: null

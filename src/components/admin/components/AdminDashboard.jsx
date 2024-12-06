@@ -11,10 +11,7 @@ import {
   Snackbar,
   Alert,
   IconButton,
-  Slider,
   Skeleton,
-  Grid,
-  Card,
 } from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {
@@ -32,8 +29,8 @@ import AdminTaskAssignment from "./AdminTaskAssignment";
 import {CreateAnnouncementBox} from "../../common/CreateAnnouncementBox";
 import {
   createAnnouncement,
-  fetchAnnouncements,
-  selectAllAnnouncements,
+  fetchTodayAnnouncements,
+  selectTodayAnnouncements,
   selectAnnouncementsLoading,
   selectAnnouncementsError,
   deleteAnnouncement,
@@ -67,6 +64,8 @@ import {
 } from "../../../redux/slices/OcupancyRateSlice";
 import {fetchWeeklyAttendance} from "../../../redux/slices/AdminAttendanceSlice";
 import {selectDepartmentNames} from "../../../redux/slices/HotelDetailsSlice";
+import PredictiveTextArea from "../../../feature/PredictiveTextArea";
+import SmartTitleGenerator from "../../../feature/SmartTitleGenerator";
 
 const DeleteConfirmationDialog = ({open, onClose, onConfirm, loading}) => (
   <Dialog
@@ -106,23 +105,40 @@ const DeleteConfirmationDialog = ({open, onClose, onConfirm, loading}) => (
 const DashboardLoadingState = () => {
   const currentHour = new Date().getHours();
   const greeting =
-  currentHour < 12
-    ? "Good Morning"
-    : currentHour < 18
-    ? "Good Afternoon"
-    : "Good Evening";
+    currentHour < 12
+      ? "Good Morning"
+      : currentHour < 18
+      ? "Good Afternoon"
+      : "Good Evening";
   return (
-      <><h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
-      {greeting}
-    </h1><div className="flex flex-col xl:flex-row justify-around">
+    <>
+      <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">
+        {greeting}
+      </h1>
+      <div className="flex flex-col xl:flex-row justify-around">
         <div className="flex flex-col space-y-6 w-full xl:w-4/6">
           <div className="bg-white rounded-xl shadow-lg min-h-[320px] w-full p-4">
-            <Skeleton variant="text" width="200px" height={32} className="mb-4" />
+            <Skeleton
+              variant="text"
+              width="200px"
+              height={32}
+              className="mb-4"
+            />
             <div className="flex flex-col sm:flex-row justify-between gap-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="flex-1 min-w-[250px]">
-                  <Skeleton variant="text" width="150px" height={24} className="mx-auto mb-2" />
-                  <Skeleton variant="circular" width={220} height={220} className="mx-auto" />
+                  <Skeleton
+                    variant="text"
+                    width="150px"
+                    height={24}
+                    className="mx-auto mb-2"
+                  />
+                  <Skeleton
+                    variant="circular"
+                    width={220}
+                    height={220}
+                    className="mx-auto"
+                  />
                 </div>
               ))}
             </div>
@@ -136,7 +152,12 @@ const DashboardLoadingState = () => {
                 <Skeleton variant="text" width="80px" height={32} />
               </div>
             </div>
-            <Skeleton variant="rectangular" width="100%" height={300} className="mb-4" />
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={300}
+              className="mb-4"
+            />
             <Skeleton variant="rectangular" width="100%" height={40} />
           </div>
 
@@ -145,14 +166,24 @@ const DashboardLoadingState = () => {
               <Skeleton variant="text" width="200px" height={32} />
               <Skeleton variant="text" width="100px" height={32} />
             </div>
-            <Skeleton variant="rectangular" width="100%" height={300} className="mb-4" />
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={300}
+              className="mb-4"
+            />
             <Skeleton variant="rectangular" width="100%" height={40} />
           </div>
         </div>
 
         <div className="flex flex-col space-y-6 w-full xl:w-[30%] mt-5 xl:mt-0">
           <div className="bg-white rounded-xl shadow-lg min-h-[416px] w-full p-4">
-            <Skeleton variant="text" width="180px" height={32} className="mb-4" />
+            <Skeleton
+              variant="text"
+              width="180px"
+              height={32}
+              className="mb-4"
+            />
             <Skeleton variant="rectangular" width="100%" height={340} />
           </div>
 
@@ -163,14 +194,27 @@ const DashboardLoadingState = () => {
             </div>
             <div className="flex-1 overflow-y-auto mb-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="border-b border-gray-200 py-4 last:border-0">
-                  <Skeleton variant="text" width="60%" height={24} className="mb-2" />
+                <div
+                  key={i}
+                  className="border-b border-gray-200 py-4 last:border-0"
+                >
+                  <Skeleton
+                    variant="text"
+                    width="60%"
+                    height={24}
+                    className="mb-2"
+                  />
                   <Skeleton variant="text" width="100%" height={20} />
                   <Skeleton variant="text" width="80%" height={20} />
                 </div>
               ))}
             </div>
-            <Skeleton variant="rectangular" width="100%" height={40} className="mt-auto" />
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={40}
+              className="mt-auto"
+            />
           </div>
 
           <div className="bg-white rounded-xl shadow-lg p-6">
@@ -187,7 +231,8 @@ const DashboardLoadingState = () => {
             </div>
           </div>
         </div>
-      </div></>
+      </div>
+    </>
   );
 };
 
@@ -217,8 +262,8 @@ function AdminDashboard() {
 
   const latestRevenue = useSelector(selectLatestRevenue);
   const revenueLoading = useSelector((state) => state.revenue.loading);
-  const dailyRevenues = useSelector(state => state.revenue.dailyRevenues);
-  const dates = useSelector(state => state.revenue.dates);
+  const dailyRevenues = useSelector((state) => state.revenue.dailyRevenues);
+  const dates = useSelector((state) => state.revenue.dates);
 
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
@@ -242,7 +287,7 @@ function AdminDashboard() {
           dispatch(fetchRoomStats()),
           dispatch(fetchStaffStatus()),
           dispatch(fetchWeeklyAttendance()),
-          dispatch(fetchAnnouncements()), 
+          dispatch(fetchTodayAnnouncements()),
         ]);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -319,7 +364,7 @@ function AdminDashboard() {
     if (latestRevenue) {
       const currentHour = new Date().getHours();
       const currentTotalRevenue = parseFloat(latestRevenue);
-      
+
       setHourlyRevenues((prev) => {
         const updated = [...prev];
         if (currentTotalRevenue > previousTotalRevenue) {
@@ -330,10 +375,10 @@ function AdminDashboard() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
         return updated;
       });
-      
+
       setPreviousTotalRevenue(currentTotalRevenue);
     }
-}, [latestRevenue]);
+  }, [latestRevenue]);
 
   useEffect(() => {
     const midnightClear = setInterval(() => {
@@ -418,13 +463,13 @@ function AdminDashboard() {
     {
       id: 0,
       value: occupiedRooms,
-      label: "Occupied",
+      label: `Occupied (${occupiedRooms})`,
       color: "#252941",
     },
     {
       id: 1,
       value: availableRooms,
-      label: "Vacant",
+      label: `Available (${availableRooms})`,
       color: "#8094D4",
     },
   ];
@@ -476,9 +521,9 @@ function AdminDashboard() {
 
   const getTodayStats = () => {
     if (
-      !weeklyStats.dates ||
-      !weeklyStats.total_crew_present ||
-      !weeklyStats.total_staff_absent
+      !weeklyStats?.dates ||
+      !weeklyStats?.total_crew_present ||
+      !weeklyStats?.total_staff_absent
     ) {
       return {present: 0, absent: 0};
     }
@@ -501,13 +546,13 @@ function AdminDashboard() {
     {
       id: 0,
       value: todayStats.present,
-      label: "Present",
+      label: `Present (${todayStats.present})`,
       color: "#8094D4",
     },
     {
       id: 1,
       value: todayStats.absent,
-      label: "Absent",
+      label: `Absent (${todayStats.absent})`,
       color: "#252941",
     },
   ];
@@ -553,7 +598,6 @@ function AdminDashboard() {
       ? "Good Afternoon"
       : "Good Evening";
 
-  const announcements = useSelector(selectAllAnnouncements);
   const announcementsLoading = useSelector(selectAnnouncementsLoading);
   const announcementsError = useSelector(selectAnnouncementsError);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -573,50 +617,50 @@ function AdminDashboard() {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-    const handleCreateAnnouncement = async (announcementData) => {
-      try {
-        setLoading(true);
-    
-        const enrichedData = {
-          ...announcementData,
-          department: capitalizeFirstLetter(announcementData.department),
-          created_at: new Date().toISOString(),
-        };
-    
-        await dispatch(createAnnouncement(enrichedData)).unwrap();
-        setShowAnnouncementBox(false);
-        await dispatch(fetchAnnouncements());
-    
-        setSnackbar({
-          open: true,
-          message: "Announcement created successfully",
-          severity: "success",
-        });
-      } catch (error) {
-        console.error("Create announcement error:", error);
-        
-        // Extract the specific error message and customize it with department name
-        let errorMessage;
-        if (error?.department) {
-          const departmentName = enrichedData.department || "selected department";
-          errorMessage = `No staff found in ${departmentName} department`;
-        } else {
-          // Fallback error message
-          errorMessage = 
-            typeof error === 'string' ? error : 
-            error?.message || 
-            "Failed to create announcement";
-        }
-    
-        setSnackbar({
-          open: true,
-          message: errorMessage,
-          severity: "error",
-        });
-      } finally {
-        setLoading(false);
+  const handleCreateAnnouncement = async (announcementData) => {
+    try {
+      setLoading(true);
+
+      const enrichedData = {
+        ...announcementData,
+        department: capitalizeFirstLetter(announcementData.department),
+        created_at: new Date().toISOString(),
+      };
+
+      await dispatch(createAnnouncement(enrichedData)).unwrap();
+      setShowAnnouncementBox(false);
+      await dispatch(fetchTodayAnnouncements());
+
+      setSnackbar({
+        open: true,
+        message: "Announcement created successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error("Create announcement error:", error);
+
+      // Extract the specific error message and customize it with department name
+      let errorMessage;
+      if (error?.department) {
+        const departmentName = enrichedData.department || "selected department";
+        errorMessage = `No staff found in ${departmentName} department`;
+      } else {
+        // Fallback error message
+        errorMessage =
+          typeof error === "string"
+            ? error
+            : error?.message || "Failed to create announcement";
       }
-    };
+
+      setSnackbar({
+        open: true,
+        message: errorMessage,
+        severity: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleViewAnnouncement = (announcement) => {
     setSelectedAnnouncement(announcement);
@@ -633,7 +677,7 @@ function AdminDashboard() {
       setDeleteLoading(true);
       await dispatch(deleteAnnouncement(selectedAnnouncement.id)).unwrap();
 
-      // Close both dialogs and reset states
+      dispatch(fetchTodayAnnouncements());
       setShowConfirmDialog(false);
       setSelectedAnnouncement(null);
 
@@ -655,34 +699,40 @@ function AdminDashboard() {
   };
 
   // In handleAssign function
-    const handleAssign = async (e) => {
+  const handleAssign = async (e) => {
     e.preventDefault();
     setFormSubmitted(true);
-  
+
     // Validation check
-    if (!taskTitle || !selected.value || !taskDescription || !selectedHour || !selectedMinute) {
+    if (
+      !taskTitle ||
+      !selected.value ||
+      !taskDescription ||
+      !selectedHour ||
+      !selectedMinute
+    ) {
       const timeout = setTimeout(() => {
         setFormSubmitted(false);
       }, 3000);
-  
+
       const handleClick = () => {
         setFormSubmitted(false);
-        document.removeEventListener('click', handleClick);
+        document.removeEventListener("click", handleClick);
         clearTimeout(timeout);
       };
-  
-      document.addEventListener('click', handleClick);
+
+      document.addEventListener("click", handleClick);
       return;
     }
-  
+
     try {
       const today = new Date();
       today.setHours(parseInt(selectedHour, 10));
       today.setMinutes(parseInt(selectedMinute, 10));
       today.setSeconds(0);
-  
+
       const formattedDeadline = today.toISOString();
-  
+
       await dispatch(
         createTask({
           title: taskTitle.trim(),
@@ -691,9 +741,9 @@ function AdminDashboard() {
           deadline: formattedDeadline,
         })
       ).unwrap();
-  
+
       await Promise.all([dispatch(fetchTasks()), dispatch(fetchStaffStatus())]);
-  
+
       // Reset form
       setTaskTitle("");
       setTaskDescription("");
@@ -701,7 +751,7 @@ function AdminDashboard() {
       setSelectedHour("09");
       setSelectedMinute("00");
       setFormSubmitted(false); // Reset tooltip state
-  
+
       setSnackbar({
         open: true,
         message: "Task assigned successfully",
@@ -709,8 +759,12 @@ function AdminDashboard() {
       });
     } catch (err) {
       let errorMessage;
-  
-      if (err?.non_field_errors?.[0]?.includes("No staff in the specified department")) {
+
+      if (
+        err?.non_field_errors?.[0]?.includes(
+          "No staff in the specified department"
+        )
+      ) {
         const deptName = selected?.label || "selected department";
         errorMessage = `No staff members available in ${deptName} department`;
       } else {
@@ -720,26 +774,26 @@ function AdminDashboard() {
           (typeof err === "object" ? Object.values(err)[0] : err) ||
           "Failed to assign task";
       }
-  
+
       setSnackbar({
         open: true,
         message: errorMessage,
         severity: "error",
       });
       console.error("Task assignment error:", err);
-      
+
       // Auto-hide error tooltips after 3 seconds
       const timeout = setTimeout(() => {
         setFormSubmitted(false);
       }, 3000);
-  
+
       const handleClick = () => {
         setFormSubmitted(false);
-        document.removeEventListener('click', handleClick);
+        document.removeEventListener("click", handleClick);
         clearTimeout(timeout);
       };
-  
-      document.addEventListener('click', handleClick);
+
+      document.addEventListener("click", handleClick);
     }
   };
 
@@ -772,20 +826,17 @@ function AdminDashboard() {
 
   const [showAnnouncementBox, setShowAnnouncementBox] = useState(false);
   const [showAllAnnouncements, setShowAllAnnouncements] = useState(false);
+  const todayAnnouncements = useSelector(selectTodayAnnouncements);
 
   const sortedAnnouncements = useMemo(() => {
-    if (!announcements?.length) return [];
+    if (!todayAnnouncements?.length) return [];
 
-    return [...announcements].sort((a, b) => {
-      const dateA = a.created_at ? new Date(a.created_at) : null;
-      const dateB = b.created_at ? new Date(a.created_at) : null;
-
-      if (!dateA || isNaN(dateA.getTime())) return 1;
-      if (!dateB || isNaN(dateB.getTime())) return -1;
-
+    return [...todayAnnouncements].sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
       return dateB - dateA;
     });
-  }, [announcements]);
+  }, [todayAnnouncements]);
 
   const formatDataForGraph = () => {
     return revenueData.map((point) => ({
@@ -821,8 +872,13 @@ function AdminDashboard() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  const extractDepartment = (assignedString) => {
+    const match = assignedString.match(/\(([^)]+)\)/g);
+    return match && match[1] ? match[1].replace(/[()]/g, "") : "";
+  };
+
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
       {isInitialLoading ? (
         <DashboardLoadingState />
       ) : (
@@ -963,7 +1019,7 @@ function AdminDashboard() {
                             Staff Attendance
                           </h3>
 
-                          {attendanceStats.total_present === 0 ? (
+                          {attendanceStats?.total_present === 0 ? (
                             <div className="flex items-center justify-center h-[180px] text-gray-500">
                               No Data Available
                             </div>
@@ -1013,11 +1069,9 @@ function AdminDashboard() {
                   <h2 className="text-lg sm:text-xl font-semibold">
                     Weekly Revenue Overview
                   </h2>
-    
+
                   <div className="text-right">
-                    <p className="text-sm text-gray-500">
-                      Latest Revenue
-                    </p>
+                    <p className="text-sm text-gray-500">Latest Revenue</p>
                     <p className="text-xl font-bold">
                       ₹{latestRevenue || "0.00"}
                     </p>
@@ -1039,20 +1093,20 @@ function AdminDashboard() {
                         data: dailyRevenues?.length ? dailyRevenues : [0],
                         color: "#4C51BF",
                         area: true,
-                        curve: "linear",
+                        curve: "catmullRom",
                       },
                     ]}
                     xAxis={[
                       {
-                        data: dates?.length ? dates : ['No data'],
+                        data: dates?.length ? dates : ["No data"],
                         scaleType: "band",
                         tickLabelStyle: {
                           angle: 0,
-                          fontSize: 12
-                        }
+                          fontSize: 12,
+                        },
                       },
                     ]}
-                    sx={{ 
+                    sx={{
                       ".MuiLineElement-root": {
                         strokeWidth: 2,
                       },
@@ -1101,7 +1155,7 @@ function AdminDashboard() {
                 </Box>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg w-full p-4 flex flex-col h-[40rem] xl:h-[calc(40vh)] ">
+              <div className="bg-white rounded-xl shadow-lg w-full p-4 flex flex-col h-[40rem] xl:h-[16rem] ">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-lg font-semibold">
                     Today's Announcements
@@ -1165,7 +1219,7 @@ function AdminDashboard() {
                       ))}
                     </div>
                   ) : (
-                    <div className="overflow-scroll">
+                    <div className="overflow-auto">
                       {sortedAnnouncements.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-8 px-4">
                           <svg
@@ -1191,31 +1245,31 @@ function AdminDashboard() {
                       ) : (
                         sortedAnnouncements.map((announcement) => (
                           <div
-                            key={announcement._id}
+                            key={announcement.id}
                             className="border-b border-gray-200 py-4 last:border-0 cursor-pointer hover:bg-gray-50"
                             onClick={() => handleViewAnnouncement(announcement)}
                           >
                             <div className="flex justify-between items-start mb-2">
-                              <h3 className="font-semibold text-lg truncate max-w-[150px]">
-                                {announcement.title}
-                              </h3>
+                              <div>
+                                <h3 className="font-semibold text-lg">
+                                  {announcement.title}
+                                </h3>
+                                <span className="text-sm text-gray-500">
+                                  {announcement.department} •{" "}
+                                  {announcement.urgency}
+                                </span>
+                              </div>
                               <span className="text-sm text-gray-500">
-                                {announcement.created_at &&
-                                !isNaN(new Date(announcement.created_at))
-                                  ? new Date(
-                                      announcement.created_at
-                                    ).toLocaleDateString("en-US", {
-                                      year: "numeric",
-                                      month: "short",
-                                      day: "numeric",
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })
-                                  : "Date not available"}
+                                {new Date(
+                                  announcement.created_at
+                                ).toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
                               </span>
                             </div>
-                            <p className="text-gray-600">
-                              {announcement.content}
+                            <p className="text-gray-600 line-clamp-2">
+                              {announcement.description}
                             </p>
                           </div>
                         ))
@@ -1244,7 +1298,7 @@ function AdminDashboard() {
                       <CreateAnnouncementBox
                         onClose={() => setShowAnnouncementBox(false)}
                         onSubmit={handleCreateAnnouncement}
-                        departments={hotelDepartments} 
+                        departments={hotelDepartments}
                       />
                     </div>
                   </div>
@@ -1305,9 +1359,15 @@ function AdminDashboard() {
                         <div className="text-sm text-gray-500">
                           <span className="font-medium">Assigned To:</span>
                           <ul className="list-disc pl-5 mt-1">
-                            {selectedAnnouncement?.assigned_to?.map(
-                              (person, index) => <li key={index}>{person}</li>
-                            ) || []}
+                            {Array.from(
+                              new Set( // Remove duplicates
+                                selectedAnnouncement?.assigned_to?.map(
+                                  (person) => extractDepartment(person)
+                                )
+                              )
+                            ).map((department, index) => (
+                              <li key={index}>{department}</li>
+                            )) || []}
                           </ul>
                         </div>
                       </div>
@@ -1337,7 +1397,7 @@ function AdminDashboard() {
 
               <form
                 onSubmit={handleAssign}
-                className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg lg:flex-1"
+                className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg lg:flex-1"
               >
                 <div className="flex justify-between items-center mb-2">
                   <h2 className="text-lg sm:text-xl font-semibold">
@@ -1352,20 +1412,30 @@ function AdminDashboard() {
                   </IconButton>
                 </div>
 
-                <Tooltip
-                  open={formSubmitted && taskTitle === ""}
-                  title="Task title is required"
-                  arrow
-                  placement="top"
-                >
-                  <input
-                    type="text"
-                    placeholder="Task Title"
-                    value={taskTitle}
-                    onChange={(e) => setTaskTitle(e.target.value)}
-                    className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
+                <div className="relative">
+                  <Tooltip
+                    open={formSubmitted && taskTitle === ""}
+                    title="Task title is required"
+                    arrow
+                    placement="top"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Task Title"
+                      value={taskTitle}
+                      maxLength={100}
+                      onChange={(e) => setTaskTitle(e.target.value)}
+                      className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full pr-10 focus:border-gray-300 focus:outline-none -z-0"
+                    />
+                  </Tooltip>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+                  <SmartTitleGenerator
+                    description={taskDescription}
+                    onTitleGenerated={setTaskTitle}
+                    disabled={!taskDescription.trim()}
                   />
-                </Tooltip>
+                </div>
+                </div>
 
                 <div className="flex justify-between gap-4">
                   <Tooltip
@@ -1433,7 +1503,7 @@ function AdminDashboard() {
                       <select
                         value={selectedMinute}
                         onChange={(e) => setSelectedMinute(e.target.value)}
-                        className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                        className="border border- gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
                       >
                         {minutes.map((minute) => (
                           <option key={minute} value={minute}>
@@ -1451,12 +1521,12 @@ function AdminDashboard() {
                   arrow
                   placement="top"
                 >
-                  <textarea
+                  <PredictiveTextArea
                     value={taskDescription}
                     onChange={(e) => setTaskDescription(e.target.value)}
-                    placeholder="Task Description"
+                    placeholder="Type task description..."
                     maxLength={350}
-                    className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+                    className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 min-h-32"
                   />
                 </Tooltip>
 

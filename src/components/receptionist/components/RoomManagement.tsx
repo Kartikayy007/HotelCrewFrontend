@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Search } from 'lucide-react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Grid, Divider, Skeleton } from '@mui/material';
 import { fetchCustomers, selectCustomers } from '../../../redux/slices/customerSlice';
-import { selectHotelDetails } from '../../../redux/slices/HotelDetailsSlice';
+import { fetchRoomDetails, selectRoomDetails } from '../../../redux/slices/RoomDetailsSlice';
 import { checkoutGuest } from '../../../redux/slices/checkoutSlice';
 
 interface Guest {
@@ -42,7 +42,7 @@ const SkeletonRow = () => (
 const RoomManagement = () => {
   const dispatch = useDispatch();
   const customers = useSelector(selectCustomers);
-  const hotelDetails = useSelector(selectHotelDetails);
+  const roomDetails = useSelector(selectRoomDetails);
   const [loading, setLoading] = useState(true);
   
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null);
@@ -58,18 +58,25 @@ const RoomManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [roomTypeOptions, setRoomTypeOptions] = useState(['All']);
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    dispatch(fetchCustomers()).finally(() => {
+    // Fetch both customers and room details
+    Promise.all([
+      dispatch(fetchCustomers()),
+      dispatch(fetchRoomDetails())
+    ]).finally(() => {
       setLoading(false);
     });
   }, [dispatch]);
 
   useEffect(() => {
-    if (hotelDetails?.room_types) {
-      const types = ['All', ...hotelDetails.room_types.map(rt => rt.room_type)];
+    // Update room type options based on room details
+    if (roomDetails && roomDetails.length > 0) {
+      const types = ['All', ...roomDetails.map(rt => rt.room_type)];
       setRoomTypeOptions(types);
     }
-  }, [hotelDetails]);
+  }, [roomDetails]);
 
   const filterCustomers = (data: Guest[]) => {
     if (!data || !Array.isArray(data)) {
@@ -77,14 +84,13 @@ const RoomManagement = () => {
     }
     
     return data.filter(guest => {
-      const profile = (guest.profile || guest.name || '').toLowerCase();
-      const email = (guest.email || '').toLowerCase();
+      const guestName = (guest.profile || guest.name || '').toLowerCase();
       const searchLower = searchQuery.toLowerCase();
 
-      const matchesSearch = searchQuery === '' || 
-        profile.includes(searchLower) || 
-        email.includes(searchLower);
+      // Simplified search to focus on name only
+      const matchesSearch = searchQuery === '' || guestName.includes(searchLower);
 
+      // Keep existing filter logic
       const vipStatus = guest.vipStatus || guest.status || 'REGULAR';
       const matchesCustomerType = customerType === 'All' ? true :
         customerType === 'VIP' ? vipStatus === 'VIP' : vipStatus === 'REGULAR';
@@ -150,15 +156,19 @@ const RoomManagement = () => {
           </div>
         </div>
 
-        <div className="relative lg:w-2/6 w-full">
+                <div className="relative lg:w-2/6 w-full">
           <input
-            type="text"
-            placeholder="Search..."
+            ref={searchInputRef}
+            type="text" 
+            placeholder="Search by guest name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-[#F1F6FC] hover:bg-gray-300 w-full text-[#5663AC] font-medium py-2 px-4 rounded-2xl border-2 border-[#B7CBEA] pl-10"
+            className="bg-[#F1F6FC] hover:bg-gray-300 w-full text-[#5663AC] font-medium py-2 px-4 rounded-2xl border-2 border-[#B7CBEA] pl-10 focus:outline-none focus:ring-2 focus:ring-[#5663AC] focus:border-transparent"
           />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5663AC]" />
+          <Search 
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5663AC]"
+            onClick={() => searchInputRef.current?.focus()}
+          />
         </div>
       </div>
     </div>
@@ -191,7 +201,7 @@ const RoomManagement = () => {
   };
 
   const confirmCheckout = () => {
-     ('Checking out guest:', selectedGuest);
+    console.log('Checking out guest:', selectedGuest);
     setCheckoutConfirm(false);
     setOpenDialog(false);
   };
@@ -260,7 +270,7 @@ const RoomManagement = () => {
                   <th className="p-4 text-left font-semibold">Profile</th>
                   <th className="p-4 text-center font-semibold">Contact</th>
                   <th className="p-4 text-center font-semibold">Email</th>
-                  <th className="p-4 text-center font-semibold">Rooms</th>
+                  <th className="p-4 text-center font-semibold">Room</th>
                   <th className="p-4 text-center font-semibold">Room Type</th>
                   <th className="p-4 text-center font-semibold">Check In</th>
                   <th className="p-4 text-center font-semibold">Check Out</th>
@@ -320,7 +330,6 @@ const RoomManagement = () => {
         </section>
       </div>
 
-      {/* Rest of the dialogs remain the same */}
       <RoomDialog
         rooms={selectedRooms}
         open={openRoomDialog}
@@ -330,8 +339,7 @@ const RoomManagement = () => {
       {/* Guest Details Dialog */}
       <Dialog
         open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        maxWidth="md"
+        onClose={() => setOpenDialog(false)}maxWidth="md"
         fullWidth
         PaperProps={{
           style: {

@@ -1,9 +1,10 @@
-import React, {useState, useRef, useEffect} from "react";
+import React, {useState, useRef, useEffect, useMemo} from "react";
 import {useSelector, useDispatch} from "react-redux";
 import {
   selectStaffPerDepartment,
   createStaff,
-  fetchStaffData, // Add this import
+  fetchStaffData, 
+  selectStaffList,
 } from "../../redux/slices/StaffSlice";
 import {selectCustomers} from "../../redux/slices/customerSlice"; // Adjust path as needed
 import StaffDB from "./DB/StaffDB";
@@ -28,6 +29,7 @@ import AddIcon from "@mui/icons-material/Add"; // Add this import
 import {
   fetchHotelDetails,
   selectDepartmentNames,
+  selectHotelDetails
 } from "../../redux/slices/HotelDetailsSlice";
 
 // Add these validation functions
@@ -46,6 +48,19 @@ const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
+// In Database.jsx, add these selectors at the top:
+const getUniqueValues = (staffList, field) => {
+  return [...new Set(staffList
+    .map(staff => staff[field])
+    .filter(Boolean))]
+    .sort();
+};
+
+// In Database.jsx, add this helper function at the top
+const normalizeString = (str) => {
+  return str ? str.toLowerCase().trim() : '';
+};
+
 function DataBase() {
   const [activeComponent, setActiveComponent] = React.useState("StaffDB");
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -56,7 +71,7 @@ function DataBase() {
     department: "All",
     role: "All",
     shift: "All",
-    customerType: "All",
+    customerType: "All", 
     roomType: "All",
   });
 
@@ -73,16 +88,47 @@ function DataBase() {
   const [isCreating, setIsCreating] = useState(false);
   const [isDepartmentsLoading, setIsDepartmentsLoading] = useState(true);
   const dispatch = useDispatch();
-  const departments = useSelector(selectDepartmentNames);
 
-  // Add error states
   const [errors, setErrors] = useState({
     email: false,
     upi_id: false
   });
 
-  // Add this to existing state declarations
   const [isManager, setIsManager] = useState(false);
+
+  const staffList = useSelector(selectStaffList);
+  const hotelDetails = useSelector(selectHotelDetails);
+  
+  // Get unique departments
+  const departments = useMemo(() => {
+    if (!hotelDetails?.department_names) return [];
+    
+    return hotelDetails.department_names
+      .split(',')
+      .map(dept => dept.trim())
+      .map(dept => ({
+        value: dept.toLowerCase(),
+        label: capitalizeFirstLetter(dept)
+      }));
+  }, [hotelDetails]);
+
+  // Get unique roles 
+  const roles = useMemo(() => {
+    return getUniqueValues(staffList, 'role')
+      .map(role => ({
+        value: role.toLowerCase(),
+        label: capitalizeFirstLetter(role)
+      }));
+  }, [staffList]);
+
+  // Get unique shifts
+  const shifts = useMemo(() => {
+    return getUniqueValues(staffList, 'shift')
+      .map(shift => ({
+        value: shift.toLowerCase(), 
+        label: `${capitalizeFirstLetter(shift)} Shift`
+      }));
+  }, [staffList]);
 
   // Update handleCreateStaff function
   const handleCreateStaff = async () => {
@@ -201,7 +247,7 @@ function DataBase() {
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
       <div className="w-[95vw] sm:w-[95vw] md:w-[95vw] lg:w-[95vw] xl:w-[95vw] 2xl:w-[80vw]">
         <div>
           <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12 text-[#252941] mb-2">
@@ -235,12 +281,12 @@ function DataBase() {
                       onChange={(e) =>
                         setFilters({...filters, department: e.target.value})
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+                      className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full"
                     >
                       <option value="All">All Departments</option>
                       {departments.map((dept) => (
-                        <option key={dept.value} value={dept.value}>
-                          {dept.label}
+                        <option key={dept.value} value={dept.value.toLowerCase()}>
+                          {capitalizeFirstLetter(dept.label)}
                         </option>
                       ))}
                     </select>
@@ -249,24 +295,28 @@ function DataBase() {
                       onChange={(e) =>
                         setFilters({...filters, role: e.target.value})
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
+                      className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
                     >
                       <option value="All">Role</option>
-                      <option value="Manager">Manager</option>
-                      <option value="Receptionist">Receptionist</option>
-                      <option value="Staff">Staff</option>
+                      {roles.map((role) => (
+                        <option key={role.value} value={role.value.toLowerCase()}>
+                          {capitalizeFirstLetter(role.label)}
+                        </option>
+                      ))}
                     </select>
                     <select
                       value={filters.shift}
                       onChange={(e) =>
                         setFilters({...filters, shift: e.target.value})
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
+                      className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
                     >
                       <option value="All">Shift</option>
-                      <option value="Morning">Morning Shift</option>
-                      <option value="Night">Night Shift</option>
-                      <option value="Evening">Evening</option>
+                      {shifts.map((shift) => (
+                        <option key={shift.value} value={shift.value.toLowerCase()}>
+                          {capitalizeFirstLetter(shift.label)}
+                        </option>
+                      ))}
                     </select>
                   </>
                 )}
@@ -277,7 +327,7 @@ function DataBase() {
                       onChange={(e) =>
                         setFilters({...filters, customerType: e.target.value})
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+                      className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full"
                     >
                       <option value="All">Customer Type</option>
                       <option value="Regular">Regular</option>
@@ -288,7 +338,7 @@ function DataBase() {
                       onChange={(e) =>
                         setFilters({...filters, roomType: e.target.value})
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full border-2 mr-2"
+                      className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full border-2 mr-2"
                     >
                       <option value="All">Room Type</option>
                       {customers &&
@@ -320,7 +370,7 @@ function DataBase() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search..."
-                className="bg-[#F1F6FC] hover:bg-gray-300 w-full text-[#5663AC] font-medium py-2 px-4 rounded-2xl border-2 border-[#B7CBEA] pl-10"
+                className="bg-white hover:bg-gray-50 w-full text-[#5663AC] font-medium py-2 px-4 rounded-2xl border-2 border-[#B7CBEA] pl-10"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5663AC]" />
             </div>
@@ -488,7 +538,7 @@ function DataBase() {
                     handleInputChange({
                       target: {
                         name: 'role',
-                        value: role // Keep lowercase in state
+                        value: role  
                       }
                     });
                   }}

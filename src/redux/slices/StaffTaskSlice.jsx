@@ -5,14 +5,14 @@ import axios from 'axios';
 // Define a function to get the authorization headers
 const getAuthHeaders = () => {
     // Ideally, you fetch the token from localStorage or Redux store
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1Mzc5MDI1LCJpYXQiOjE3MzI3ODcwMjUsImp0aSI6IjYzYmVjY2UxNjAxNzQzY2I5ZjM4Zjc1YTcwMzJkMjdhIiwidXNlcl9pZCI6MTczfQ.U3Qx2NpNSwHMa8vEFtwpaaz8CKLzkAi0pO7YAnlarPc';
+    const token = localStorage.getItem('accessToken');
     return {
         Authorization: `Bearer ${token}`
     }
 };
 
 // Define the initial state
-const initialState = {
+const initialState = { 
     tasks: [],
     count: 0,
     loading: false,

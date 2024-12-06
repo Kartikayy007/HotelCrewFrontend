@@ -2,7 +2,14 @@ import { useState, useEffect, React } from 'react'
 import { FaClock, FaCheckCircle } from 'react-icons/fa';
 import { Snackbar, Skeleton,Alert } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
-import { selectStaffTasks, selectStaffTaskCount, selectStaffTaskLoading, selectStaffTaskError, fetchStaffTasks } from '../../../redux/slices/StaffTaskSlice';
+import { 
+  selectStaffTasks, 
+  selectStaffTaskCount, 
+  selectStaffTaskLoading, 
+  selectStaffTaskError, 
+  fetchStaffTasks, 
+  updateStaffTaskStatus 
+} from '../../../redux/slices/StaffTaskSlice';
 const STask = () => {
   const dispatch = useDispatch();
   const tasks = useSelector(selectStaffTasks);
@@ -134,34 +141,24 @@ const STask = () => {
   // };
   const handleStatusUpdate = (newStatus) => {
     if (!selectedTask) return;
-  
-    // Create the updated task object
-    const updatedTask = { ...selectedTask, status: newStatus };
-  
-    // Dispatch the thunk to update the status on the backend
-    dispatch(patchUpdateStaffTaskStatus({ id: selectedTask.id, status: newStatus }))
+    
+    dispatch(updateStaffTaskStatus({ 
+      id: selectedTask.id, 
+      status: newStatus 
+    }))
       .unwrap()
-      .then((response) => {
-        // Response from the backend
-         ("Task status updated:", response);
-  
-        // Update the tasks arrays locally
-        const updatedTasks = tasks.map((task) =>
-          task.id === selectedTask.id ? { ...task, status: response.status } : task
-        );
-  
-        // Sort and set the tasks into their respective categories
-        setPendingTasks(sortTasksByPriority(updatedTasks.filter((t) => t.status === "pending")));
-        setCompletedTasks(sortTasksByPriority(updatedTasks.filter((t) => t.status === "completed")));
-        setInProgressTasks(sortTasksByPriority(updatedTasks.filter((t) => t.status === "in-progress")));
-  
-        // Clear the selected task and close the menu
+      .then(() => {
+        setSnackbarMessage("Task status updated successfully");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
         setIsStatusMenuVisible(false);
         setSelectedTask(null);
+        // Refresh task list
+        dispatch(fetchStaffTasks());
       })
       .catch((error) => {
-        console.error("Failed to update task status:", error);
-        setSnackbarMessage("Failed to update task status. Please try again.");
+        setSnackbarMessage("Failed to update task status");
+        setSnackbarSeverity("error");
         setSnackbarOpen(true);
       });
   };

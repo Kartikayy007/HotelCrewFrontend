@@ -203,7 +203,7 @@ function Profile() {
         <Alert
           onClose={() => setAlert(prev => ({ ...prev, open: false }))}
           severity={alert.severity}
-          variant="contained"
+          variant="filled"
         >
           {alert.message}
         </Alert>

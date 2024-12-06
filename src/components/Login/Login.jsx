@@ -28,12 +28,18 @@ const Login = () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(String(email).toLowerCase());
   }, []);
+  // const validateEmail = (email) => {
+  //   return email && email.includes('@');
+  // };
 
-  const validatePassword = useCallback((password) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
-    const isValid = passwordRegex.test(password);
-    return isValid;
-  }, []);
+  // const validatePassword = useCallback((password) => {
+  //   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
+  //   const isValid = passwordRegex.test(password);
+  //   return isValid;
+  // }, []);
+  const validatePassword = (password) => {
+    return password && !password.includes(' ');
+  };
 
   const handleInputChange = useCallback(
     (set) => (e) => {
@@ -58,13 +64,17 @@ const Login = () => {
         return;
       }
 
+      // if (!validateEmail(email)) {
+      //   setErrorMsg("Please enter a valid email address");
+      //   return;
+      // }
       if (!validateEmail(email)) {
         setErrorMsg("Please enter a valid email address");
         return;
       }
 
       if (!validatePassword(password)) {
-        setErrorMsg("Invalid Password Format");
+        setErrorMsg("Password cannot contain spaces");
         return;
       }
 
@@ -94,12 +104,11 @@ const Login = () => {
           JSON.stringify({ count: 0, timestamp: Date.now() })
         );
 
-        // Use role from the response data
         const { role } = result.payload;
         const roleRoutes = {
           'Admin': '/admin/dashboard',
           'Manager': '/manager/dashboard',
-          'Reception': '/reception/dashboard',
+          'Receptionist': '/reception/dashboard',
           'Staff': '/staff/dashboard'
         };
 
@@ -121,7 +130,7 @@ const Login = () => {
       if (error.response) {
         switch (error.response.status) {
           case 401:
-            setErrorMsg("Invalid email or password");
+            setErrorMsg("Invalid credentials");
             break;
           case 429:
             setErrorMsg("Too many login attempts. Please try again later");
@@ -135,7 +144,7 @@ const Login = () => {
       } else if (error.message === "Network Error") {
         setErrorMsg("Network error. Please check your connection and try again.");
       } else if (error.message === "Invalid credentials") {
-        setErrorMsg("Invalid email or password");
+        setErrorMsg("Invalid credentials");
       } else {
         setErrorMsg("An error occurred during login. Please try again");
       }
@@ -162,9 +171,9 @@ const Login = () => {
 
       if (
         resetAttempts.count >= 3 &&
-        now - resetAttempts.timestamp < 60 * 60 * 1000
+        now - resetAttempts.timestamp < 15 * 60 * 1000
       ) {
-        setErrorMsg("Too many reset attempts. Please try again in 1 hour.");
+        setErrorMsg("Too many reset attempts. Please try again in 15 minutes.");
         return;
       }
 
@@ -224,8 +233,8 @@ const Login = () => {
   };
 
   return (
-    <div className="font-Montserrat lg:min-h-screen lg:w-full lg:flex lg:justify-center ">
-      <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] lg:hidden">
+    <div className="font-Montserrat lg:min-h-screen xl:w-full xl:flex xl:justify-center ">
+      <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] xl:hidden">
         <img
           className="w-full h-full object-fill"
           src="/web2 1.svg"
@@ -233,7 +242,7 @@ const Login = () => {
         />
       </div>
       {showForgotPassword ? (
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-2">
+        <div className="w-full xl:w-1/2 flex items-center justify-center p-2">
           <div className="space-y-9">
             <form
               className="lg:w-96 w-80 lg:space-y-7 space-y-4"
@@ -244,15 +253,15 @@ const Login = () => {
                 }
               }}
             >
-              <h1 className="text-[45px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
+              <h1 className="text-4xl font-bold xl:mt-0 mt-5 text-center xl:text-left">
                 Forgot Password
               </h1>
-              <div className="lg:space-y-4 space-y-2">
+              <div className="xl:space-y-4 space-y-2">
                 <input
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={handleInputChange(setEmail)}
-                  className={`w-full p-2 text-xl placeholder:text-base pl-4 border-b
+                  className={`w-full p-2 text-base lg:text-lg placeholder:text-base pl-4 border-b
                         focus:outline-none focus:ring-0  pr-4 ${
                           errorMsg
                             ? "border-[#99182C] placeholder-[#99182C]"
@@ -264,7 +273,7 @@ const Login = () => {
               </div>
               {errorMsg && (
                 <div
-                  className="text-[#99182C] text-base text-center lg:text-left  lg:w-40"
+                  className="text-[#99182C] text-base text-center lg:text-left  lg:w-full"
                   role="alert"
                 >
                   {errorMsg}
@@ -278,7 +287,7 @@ const Login = () => {
                     setShowForgotPassword(false);
                     setErrorMsg("");
                   }}
-                  className=" text-base text-gray-500"
+                  className=" text-sm lg:text-base text-gray-500"
                 >
                   Back to Login
                 </button>
@@ -300,21 +309,21 @@ const Login = () => {
           </div>
         </div>
       ) : (
-        <div className="w-full lg:w-1/2 flex justify-center items-center p-2">
+        <div className="w-full xl:w-1/2 flex justify-center items-center p-2">
           <div className="space-y-9">
             <form
-              className="w-full lg:w-96 lg:space-y-7 space-y-4"
+              className="w-80 lg:w-96 lg:space-y-7 space-y-5"
               onSubmit={handleSubmit}
             >
-              <h1 className="text-[40px] font-bold mt-5 text-center lg:text-left">
+              <h1 className="text-4xl font-bold mt-5 text-center xl:text-left">
                 LogIn
               </h1>
               <div className="space-y-4">
                 <input
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={handleInputChange(setEmail)}
-                  className={`w-full p-2 text-xl placeholder:text-base pl-4 border-b ${
+                  className={`w-full p-2 text-base lg:text-lg placeholder:text-base pl-4 border-b ${
                     errorMsg
                       ? "border-[#99182C] placeholder-[#99182C]"
                       : "border-gray-500 placeholder-gray-500"
@@ -327,7 +336,7 @@ const Login = () => {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={handleInputChange(setPassword)}
-                    className={`w-full p-2 pl-4 text-xl placeholder:text-base border-b ${
+                    className={`w-full p-2 pl-4 text-base lg:text-lg placeholder:text-base border-b ${
                       errorMsg
                         ? "border-[#99182C] placeholder-[#99182C]"
                         : "border-gray-500 placeholder-gray-500"
@@ -349,17 +358,18 @@ const Login = () => {
                   </button>
                 </div>
               </div>
-
+                <div className="h-2">
               {errorMsg && (
                 <div
-                  className="text-[#99182C] text-sm text-center lg:text-left lg:w-40"
+                  className="text-[#99182C] leading-[0.8rem] lg:text-base text-sm text-center lg:text-left lg:w-full"
                   role="alert"
                 >
                   {errorMsg}
                 </div>
               )}
+              </div>
 
-              <div className="flex justify-between items-center text-base">
+              <div className="flex justify-between flex-row  items-center lg:text-base text-sm">
                 <button
                   type="button"
                   onClick={() => {
@@ -397,12 +407,12 @@ const Login = () => {
                 </button>
               </div>
 
-              <div className="text-center mt-4">
-                <span className="text-sm text-gray-500">Need an account? </span>
+              <div className="text-center mt-4 ">
+                <span className=" text-gray-500 lg:text-base text-sm">Need an account? </span>
                 <button
                   type="button"
                   onClick={() => navigate("/signup", { replace: true })}
-                  className="text-sm text-[#5663AC] hover:text-[#6773AC] font-medium"
+                  className="lg:text-base text-sm text-[#5663AC] hover:text-[#6773AC] font-medium"
                 >
                   Register
                 </button>
@@ -411,7 +421,7 @@ const Login = () => {
           </div>
         </div>
       )}
-      <div className="w-full lg:flex justify-center items-center bg-[#8094D4] hidden ">
+      <div className="w-full xl:flex justify-center items-center bg-[#8094D4] hidden ">
         <img className="w-[90%]" src="/web2 1.svg" alt="Login Hero" />
       </div>
     </div>

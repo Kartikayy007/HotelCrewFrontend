@@ -1,11 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { HelmetProvider } from 'react-helmet-async';
 
 import Admin from './components/admin/Admin';
 import MainLayout from './components/Manager/MainLayout';
-import Reception from './components/receptionist/Reception'
-// import StaffDashboard from './components/Dashboard/StaffDashboard';
+import Reception from './components/receptionist/Reception';
+import SLayout from './components/Staff/SLayout';
 import Login from './components/Login/Login';
 import SignUp from './components/signup/SignUp';
 import MultiStepForm from './components/Registration/MultiStepForm';
@@ -87,7 +88,7 @@ const PublicRoute = ({ children, allowAccess = false }) => {
     const roleRoutes = {
       'Admin': '/admin/dashboard',
       'Manager': '/manager/dashboard',
-      'Reception': '/reception/dashboard',
+      'Receptionist': '/reception/dashboard', 
       'Staff': '/staff/dashboard'
     };
     
@@ -100,63 +101,65 @@ const PublicRoute = ({ children, allowAccess = false }) => {
 
 const App = () => {
   return (
-    <Router> 
-      <Routes>
-        {/* Landing/Public Routes */}
-        <Route path="/" element={
-          <PublicRoute allowAccess={true}>
-            <Onboarding />
-          </PublicRoute>
-        } />
-        
-        <Route path="/login" element={
-          <PublicRoute allowAccess={true} >
-            <Login />
-          </PublicRoute>
-        } />
-        
-        <Route path="/signup" element={
-          <PublicRoute allowAccess={true}>
-            <SignUp />
-          </PublicRoute>
-        } />
-        
-        <Route path="/signup/hoteldetails" element={
-          <RegistrationFlowGuard>
-            <MultiStepForm />
-          </RegistrationFlowGuard>
-        } />
+    <HelmetProvider>
+      <Router> 
+        <Routes>
+          {/* Landing/Public Routes */}
+          <Route path="/" element={
+            <PublicRoute allowAccess={true}>
+              <Onboarding />
+            </PublicRoute>
+          } />
+          
+          <Route path="/login" element={
+            <PublicRoute allowAccess={true} >
+              <Login />
+            </PublicRoute>
+          } />
+          
+          <Route path="/signup" element={
+            <PublicRoute allowAccess={true}>
+              <SignUp />
+            </PublicRoute>
+          } />
+          
+          <Route path="/signup/hoteldetails" element={
+            <RegistrationFlowGuard>
+              <MultiStepForm />
+            </RegistrationFlowGuard>
+          } />
 
-        {/* Protected Routes */}
-        <Route path="/admin/dashboard/*" element={
-          <RoleBasedRoute allowedRoles={['Admin']}>
-            <Admin />
-          </RoleBasedRoute>
-        } />
-        
-        <Route path="/manager/dashboard/*" element={
-          <RoleBasedRoute allowedRoles={['Manager']}>
-            <MainLayout />
-          </RoleBasedRoute>
-        } />
-        
-        <Route path="/reception/dashboard/*" element={
-          <RoleBasedRoute allowedRoles={['Reception']}>
-            <Reception />
-          </RoleBasedRoute>
-        } />
-        
-        <Route path="/staff/dashboard/*" element={
-          <RoleBasedRoute allowedRoles={['Staff']}>
-            {/* <StaffDashboard /> */}
-          </RoleBasedRoute>
-        } />
+          {/* Protected Routes */}
+          <Route path="/admin/dashboard/*" element={
+            <RoleBasedRoute allowedRoles={['Admin']}>
+              <Admin />
+            </RoleBasedRoute>
+          } />
+          
+          <Route path="/manager/dashboard/*" element={
+            <RoleBasedRoute allowedRoles={['Manager']}>
+              <MainLayout />
+            </RoleBasedRoute>
+          } />
+          
+          <Route path="/reception/dashboard/*" element={
+            <RoleBasedRoute allowedRoles={['Receptionist']}> 
+              <Reception />
+            </RoleBasedRoute>
+          } />
+          
+          <Route path="/staff/dashboard/*" element={
+            <RoleBasedRoute allowedRoles={['Staff']}>
+              <SLayout />
+            </RoleBasedRoute>
+          } />
 
-        {/* Error Routes */}
-        <Route path="/unauthorized" element={<Page404 />} />
-        <Route path="*" element={<Page404 />} />
-      </Routes>
-    </Router>
+          {/* Error Routes */}
+          <Route path="/unauthorized" element={<Page404 />} />
+          <Route path="*" element={<Page404 />} />
+        </Routes>
+      </Router>
+    </HelmetProvider>
   );
 };
 

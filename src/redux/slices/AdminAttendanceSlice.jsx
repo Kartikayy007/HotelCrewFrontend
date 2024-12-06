@@ -26,6 +26,7 @@ export const fetchAttendanceStats = createAsyncThunk(
           }
         }
       );
+      console.log('Attendance stats:', response.data);
       return response.data;
     } catch (error) {
       if (error.message === 'Authentication token not found') {
@@ -147,6 +148,8 @@ const initialState = {
   error: null,
   lastFetched: null
 };
+
+console.log
 
 const adminAttendanceSlice = createSlice({
   name: 'attendance',

@@ -22,7 +22,6 @@ export const loginUser = createAsyncThunk(
       );
       
       const response = await request.data;
-       ('Login response:', response);
 
       // Store auth data
       localStorage.setItem('accessToken', response.access_token);

@@ -12,7 +12,7 @@ import staffReducer from "./slices/DashboardStaffSlice.jsx"
 import hotelCheckInReducer from './slices/hotelCheckInSlice'
 import revenueReducer from './slices/revenueSlice' 
 import scheduleReducer from './slices/scheduleSlice'
-import leaveReducer from './slices/leaveSlice'
+import leaveReducer from './slices/LeaveSlice.jsx'
 import customerReducer from './slices/customerSlice'
 import hotelDetailsReducer from './slices/HotelDetailsSlice'
 import checkInReducer from './slices/CheckInSlice'
@@ -22,6 +22,12 @@ import staffAttendanceReducer from './slices/StaffAttendanceSlice'
 import checkoutReducer from './slices/checkoutSlice'
 import payrollReducer from './slices/PayrollSlice'
 import shiftsReducer from './slices/ShiftSlice'
+import staffProfileReducer from './slices/StaffProfileSlice'
+import roomDetailsReducer from './slices/RoomDetailsSlice';
+import staffDashboardReducer from './slices/StaffDashboardSlice';
+import staffPerformanceReducer from './slices/StaffPerformanceSlice';
+import leaveStaffReducer from './slices/StaffLeaveSlice';
+import staffTasksReducer from './slices/StaffTaskSlice';
 
 const store = configureStore({
   reducer: {
@@ -46,7 +52,13 @@ const store = configureStore({
     userProfile: userProfileReducer,
     checkout: checkoutReducer,
     payroll: payrollReducer,
-    shifts: shiftsReducer
+    shifts: shiftsReducer,
+    staffProfile: staffProfileReducer,
+    roomDetails: roomDetailsReducer,
+    staffDashboard: staffDashboardReducer,
+    performance: staffPerformanceReducer,
+    leavestaff: leaveStaffReducer,
+    stafftasks: staffTasksReducer
   },
 })
 

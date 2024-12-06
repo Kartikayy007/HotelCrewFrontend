@@ -64,11 +64,11 @@ const useCountAnimation = (end, duration = 500) => {
 
 const StatsCard = ({ title, value, Icon, trend, previousValue, suffix = '', showTrend = true }) => {
   const getGradient = () => {
-    if (title === "Total Staff") return "from-green-400 to-emerald-600";
-    if (!showTrend) return "from-rose-500 to-pink-600";
+    if (title === "Total Staff") return "from-blue-400 to-blue-600";
+    if (!showTrend) return "from-blue-400 to-blue-600";
     return trend > (previousValue || 0) 
     ? "from-green-400 to-emerald-600" 
-    : "from-rose-500 to-pink-600";
+    : "from-blue-400 to-blue-600";
 };
 
   const getTrendIconColor = () => {
@@ -319,16 +319,16 @@ const AdminAnalytics = () => {
     const date = new Date(dateString);
     const day = date.toLocaleDateString("en-US", { weekday: "short" });
     const monthDay = date.toLocaleDateString("en-US", {
-      month: "numeric",
-      day: "numeric",
-    });
-    return `${day}\n${monthDay}`;
-  };
+      month: "numeric", 
+      day: "numeric", 
+    }); 
+    return `${day}\n${monthDay}`; 
+  }; 
 
   const hasAttendanceData =
-    weeklyStats.dates.length > 0 &&
-    weeklyStats.total_crew_present.length > 0 &&
-    weeklyStats.total_staff_absent.length > 0;
+    weeklyStats?.dates.length > 0 &&
+    weeklyStats?.total_crew_present.length > 0 &&
+    weeklyStats?.total_staff_absent.length > 0;
 
   const handlePerformanceRangeChange = (event, newValue) => {
     setPerformanceRange(newValue);
@@ -353,12 +353,12 @@ const AdminAnalytics = () => {
   //  (animatedRevenue, animatedCheckIns, animatedCheckOuts, animatedStaff);
 
   return (
-    <div className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <div className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
       {isLoading ? (
         <LoadingState />
       ) : (
-        <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
-          <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12</div>">
+        <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
+          <h1 className="text-3xl font-semibold px-3 pt-0 sm:px-4 lg:ml-8 ml-14 ">
             Analytics
           </h1>
 
@@ -507,7 +507,7 @@ const AdminAnalytics = () => {
                     onDoubleClick={handleSectionDoubleClick}
                   >
                     <StaffMetrics />
-                    <section className="bg-white rounded-lg shadow-lg p-4 h-[40.5vh]">
+                    <section className="bg-white rounded-lg shadow-lg p-4 h-[49.5vh]">
                       <div className="h-96">
                         <div className="flex justify-between items-center mb-4">
                           <div>
@@ -529,7 +529,7 @@ const AdminAnalytics = () => {
                         </div>
                         <div className="h-64 w-full flex justify-center items-center">
                           {!isAllDataLoaded ? (
-                            <Skeleton variant="rectangular" width="100%" height={220} animation="wave" />
+                            <Skeleton variant="rectangular" width="100%" height={300} animation="wave" />
                           ) : (
                             <Box sx={{ width: "100%", mb: 0, mt: 0 }}>  
                             <LineChart
@@ -541,7 +541,7 @@ const AdminAnalytics = () => {
                                   : checkoutsData.data,
                                 color: selectedDataType === 'checkins' ? "#3331D1" : "#0B8FD9",
                                 area: true,
-                                curve: "linear",
+                                curve: "catmullRom",
                               }]}
                               xAxis={[{
                                 data: dates.map(formatDates),
@@ -594,7 +594,7 @@ const AdminAnalytics = () => {
                               data: dailyRevenues,
                               color: "#0B8FD9",
                               area: true,
-                              curve: "linear",
+                              curve: "catmullRom",
                             },
                           ]}
                           xAxis={[
@@ -623,7 +623,7 @@ const AdminAnalytics = () => {
                     </div>
                   </section>
 
-                  <section className="bg-white min-h-[54.5rem] rounded-lg shadow-lg p-4">
+                  <section className="bg-white min-h-[30.5rem] rounded-lg shadow-lg p-4">
                     <h3 className="text-lg font-semibold">
                       Department Performance
                     </h3>

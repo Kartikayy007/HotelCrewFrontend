@@ -29,21 +29,23 @@ import {
   editStaff,
   deleteStaff
 } from "../../../redux/slices/StaffSlice";
+import {selectHotelDetails} from "../../../redux/slices/HotelDetailsSlice";
 
-// Add role values constant at the top of the file
 const ROLES = {
   STAFF: 'staff',
   RECEPTIONIST: 'receptionist',
   MANAGER: 'manager'
 };
-
-// Add at the top of StaffDB.jsx
 const capitalizeShift = (shift) => {
   if (!shift) return '';
   return shift.charAt(0).toUpperCase() + shift.slice(1).toLowerCase();
 };
 
-// Add validation functions at the top
+const capitalizeFirstLetter = (string) => {
+  if (!string) return '';
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
+
 const isValidEmail = (email) => {
   const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return emailPattern.test(email);
@@ -80,26 +82,28 @@ const NoResults = () => (
   </tr>
 );
 
-// Update EditDialog component
 const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
-  // Initialize formData with default role as 'staff' if no role is provided
+  const hotelDetails = useSelector(selectHotelDetails);  
+  
   const [formData, setFormData] = useState(() => ({
     ...staff,
-    role: staff?.role || 'staff' // Set default role to 'staff'
+    role: staff?.role || 'staff' 
   }));
   
   const staffList = useSelector(selectStaffList);
   
   const departments = useMemo(() => {
-    return [...new Set(staffList.map(s => s.department))]
-      .filter(Boolean)
+    if (!hotelDetails?.department_names) return [];
+    
+    return hotelDetails.department_names
+      .split(',')
+      .map(dept => dept.trim())
       .map(dept => ({
-        value: dept,
-        label: dept.charAt(0).toUpperCase() + dept.slice(1)
+        value: dept.toLowerCase(),
+        label: capitalizeFirstLetter(dept)
       }));
-  }, [staffList]);
+  }, [hotelDetails]);
 
-  // Update the shifts memo in EditDialog
   const shifts = useMemo(() => {
     return [...new Set(staffList.map(s => s.shift))]
       .filter(Boolean)
@@ -109,7 +113,6 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
       }));
   }, [staffList]);
 
-  // Roles array with staff as first option
   const roles = [
     { value: 'staff', label: 'Staff' },
     { value: 'receptionist', label: 'Receptionist' },
@@ -120,7 +123,7 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
     if (open) {
       setFormData({ 
         ...staff,
-        role: staff?.role || 'staff' // Maintain default role even when dialog reopens
+        role: staff?.role || 'staff' 
       });
     }
   }, [open, staff]);
@@ -133,7 +136,6 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
     }));
   }, []);
 
-  // Update handleSave in EditDialog to capitalize shift before saving
   const handleSave = React.useCallback(async () => {
     const updatedData = {
       ...formData,
@@ -188,6 +190,7 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
             value={formData.department || ''}
             onChange={handleChange}
             label="Department"
+            disabled={formData.role === 'manager'}  
           >
             {departments.map(dept => (
               <MenuItem key={dept.value} value={dept.value}>
@@ -203,6 +206,14 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
             value={formData.role || ''}
             onChange={handleChange}
             label="Role"
+            displayEmpty
+            defaultValue=""
+            renderValue={(selected) => {
+              if (!selected) {
+                return <em>Select Role</em>;
+              }
+              return capitalizeFirstLetter(selected);
+            }}
           >
             {roles.map(role => (
               <MenuItem 
@@ -221,6 +232,14 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
             value={formData.shift || ''}
             onChange={handleChange}
             label="Shift"
+            displayEmpty
+            defaultValue=""
+            renderValue={(selected) => {
+              if (!selected) {
+                return <em>Select Shift</em>;
+              }
+              return capitalizeFirstLetter(selected);
+            }}
           >
             {shifts.map(shift => (
               <MenuItem 
@@ -258,7 +277,11 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
         </Tooltip>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose} sx={
+          {
+            color: '#252941',
+          }
+        }>Cancel</Button>
         <Tooltip
           open={
             (formData.email && !isValidEmail(formData.email)) ||
@@ -276,6 +299,17 @@ const EditDialog = React.memo(({ open, onClose, staff, onSave }) => {
                 !formData.upi_id ||
                 !isValidUPI(formData.upi_id)
               }
+              sx={{
+                backgroundColor: '#252941',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#353b5c'
+                },
+                '&.Mui-disabled': {
+                  backgroundColor: '#808080',
+                  color: '#ffffff70'
+                }
+              }}
             >
               Save
             </Button>
@@ -370,7 +404,7 @@ function StaffDB({ searchTerm, filters }) {
           severity: 'success'
         });
         setDeleteConfirmation(null);
-        dispatch(fetchStaffData()); // Refresh the list
+        dispatch(fetchStaffData());  
       } catch (error) {
         setSnackbar({
           open: true,
@@ -428,37 +462,32 @@ function StaffDB({ searchTerm, filters }) {
       [name]: value
     }));
   };
+  const filteredEmployees = useMemo(() => {
+    return employees.filter(employee => {
+      const searchMatches = !searchTerm || [
+        employee.user_name,
+        employee.email,
+        employee.department,
+        employee.role
+      ].some(field => 
+        field?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
-  // Updated filtering logic
-  const filteredEmployees = employees.filter(employee => {
-    const matchesSearch = 
-      employee.user_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.role?.toLowerCase().includes(searchTerm.toLowerCase());
+      const departmentMatches = 
+        filters.department === "All" || 
+        employee.department?.toLowerCase() === filters.department?.toLowerCase();
 
-    const matchesDepartment = 
-      filters.department === "All" || 
-      employee.department?.toLowerCase() === filters.department?.toLowerCase();
+      const roleMatches = 
+        filters.role === "All" || 
+        employee.role?.toLowerCase() === filters.role?.toLowerCase();
 
-    const matchesRole = 
-      filters.role === "All" || 
-      employee.role?.toLowerCase() === filters.role?.toLowerCase();
+      const shiftMatches = 
+        filters.shift === "All" || 
+        employee.shift?.toLowerCase() === filters.shift?.toLowerCase();
 
-    const matchesShift = 
-      filters.shift === "All" || 
-      employee.shift?.toLowerCase() === filters.shift?.toLowerCase();
-
-    // Debug logs
-    console.log('Employee:', {
-      name: employee.user_name,
-      role: employee.role,
-      filterRole: filters.role,
-      matchesRole
+      return searchMatches && departmentMatches && roleMatches && shiftMatches;
     });
-
-    return matchesSearch && matchesDepartment && matchesRole && matchesShift;
-  });
+  }, [employees, searchTerm, filters]);
 
   const EmployeeDetailsDialog = () => (
     <Dialog 
@@ -608,11 +637,11 @@ function StaffDB({ searchTerm, filters }) {
             ) : filteredEmployees.length === 0 ? (
               <NoResults />
             ) : (
-              filteredEmployees.map((employee) => (
+              filteredEmployees.map((employee, index) => (
                 <tr
                   key={employee.id}
-                  className={`border-b hover:bg-gray-50 transition-colors ${
-                    employee.id % 2 === 0 ? "bg-[#DEE8FF]" : "bg-[#E6EEF9]"
+                  className={`border-b transition-colors ${
+                    index % 2 === 0 ? "bg-[#DEE8FF]" : "bg-[#F1F6FC]"
                   }`}
                 >
                   <td className="p-6">
@@ -702,7 +731,7 @@ function StaffDB({ searchTerm, filters }) {
       </div>
 
       {deleteConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900">

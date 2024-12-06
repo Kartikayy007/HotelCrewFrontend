@@ -8,6 +8,8 @@ import { createTask, selectTasksLoading, selectTasksError, selectTaskMetrics, fe
 import TaskAssignment from './TaskAssignment';
 import LoadingAnimation from '../../common/LoadingAnimation';
 import { selectDepartments, fetchStaffData } from '../../../redux/slices/StaffSlice'
+import SmartTitleGenerator from '../../../feature/SmartTitleGenerator';
+import PredictiveTextArea from '../../../feature/PredictiveTextArea';
 
 interface SnackbarState {
   open: boolean;
@@ -153,17 +155,27 @@ const GuestRequest: React.FC = () => {
               onSubmit={handleAssign}
               className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg md:flex-1 lg:flex-1 xl:w-full"
             >
-              <div className="flex justify-between items-center mb-2 ">
+              <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg sm:text-xl font-semibold">Assign Task</h2>
               </div>
 
-              <input
-                type="text"
-                placeholder="Task Title"
-                value={taskTitle}
-                onChange={(e) => setTaskTitle(e.target.value)}
-                className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Task Title"
+                  value={taskTitle}
+                  onChange={(e) => setTaskTitle(e.target.value)}
+                  className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none pr-16"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+                <SmartTitleGenerator
+                  description={taskDescription}
+                  onTitleGenerated={setTaskTitle}
+                  disabled={!taskDescription}
+                />
+                </div>
+              </div>
+
               <div className="flex justify-between gap-4">
                 <div className="relative w-full">
                   <button
@@ -225,7 +237,7 @@ const GuestRequest: React.FC = () => {
                   </select>
                 </div>
               </div>
-              <textarea
+              <PredictiveTextArea
                 value={taskDescription}
                 onChange={(e) => setTaskDescription(e.target.value)}
                 placeholder="Task Description"

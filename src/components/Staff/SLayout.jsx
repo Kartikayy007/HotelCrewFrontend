@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import React from 'react';
-import { setCurrentComponent } from "../../redux/slices/DashboardStaffSlice";
+import { setCurrentComponent } from "../../redux/slices/StaffDashboardSlice";
 import SSidebar from './StaffComponents/SSidebar'
 import SDashboard from './StaffComponents/SDashboard'
 import STask from './StaffComponents/STask';
@@ -15,9 +15,8 @@ const SLayout = () => {
         SSchedule: <SSchedule />,
         SProfile: <SProfile />,
         STask: <STask />,
-        
     };
-    const currentComponent = useSelector((state) => state.staff.currentComponent);
+    const currentComponent = useSelector((state) => state.staffDashboard.currentComponent);
 
     const handleMenuItemClick = (component) => {
         dispatch(setCurrentComponent(component)); 

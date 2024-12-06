@@ -32,6 +32,7 @@ const MSideBar = ({ onMenuItemClick }) => {
     { icon: <Database size={20} />, label: 'Database', component: MDatabae },
     { icon: <Settings size={20} />, label: 'Profile', component: MProfile },
   ];
+  
 
   const handleMenuClick = (component) => {
     onMenuItemClick(component);

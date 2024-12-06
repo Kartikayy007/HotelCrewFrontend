@@ -63,7 +63,7 @@ const EmptyTaskState = ({ status }) => (
 
 // Update the TaskColumn component's div className
 const TaskColumn = ({ title, status, tasks }) => (
-  <div className="bg-gray-50 rounded-lg p-4 h-[65vh] overflow-scroll">
+  <div className="bg-gray-50 rounded-lg p-4 h-[65vh] overflow-auto">
     <h2 className="text-lg font-semibold mb-4 flex items-center">
       <div className={`w-3 h-3 rounded-full ${
         status === 'pending' ? 'bg-yellow-400' :
@@ -352,7 +352,15 @@ const AdminTaskAssignment = ({ onClose }) => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Monitor Active Tasks</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Monitor Active Tasks</h1>
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-500" />
+        </button>
+      </div>
       
       <div className="mb-4 grid grid-cols-3 gap-4">
         <div className="bg-blue-50 p-4 rounded-lg">
