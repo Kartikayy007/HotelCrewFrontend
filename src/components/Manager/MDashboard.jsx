@@ -467,14 +467,14 @@ const MDashboard = () => {
   const staffAttendanceData = [
     {
       id: 0,
-      value: stats.total_present,
-      label: `Present (${stats.total_present})`,
+      value: stats?.total_present,
+      label: `Present (${stats?.total_present})`,
       color: "#252941",
     },
     {
       id: 1,
-      value: stats.total_crew - stats.total_present,
-      label: `Absent (${stats.total_crew - stats.total_present})`,
+      value: stats?.total_crew - stats?.total_present,
+      label: `Absent (${stats?.total_crew - stats?.total_present})`,
       color: "#8094D4",
     },
   ];

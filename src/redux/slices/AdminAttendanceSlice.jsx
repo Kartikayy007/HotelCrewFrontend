@@ -126,33 +126,12 @@ export const fetchWeeklyAttendance = createAsyncThunk(
   }
 );
 
-// const initialState = {
-//   stats: {
-//     total_crew: 0,
-//     total_present: 0,
-//     days_with_records_this_month: 0,
-//     total_present_month: 0
-//   },
-//   todayList: [],
-//   weeklyStats: {
-//     dates: [],
-//     total_crew_present: [],
-//     total_staff_absent: [],
-//     loading: false,
-//     error: null,
-//     lastFetched: null
-//   },
-//   lastWeeklyFetch: null,
-//   loading: false,
-//   error: null,
-//   lastFetched: null
-// };
 const initialState = {
   stats: {
     total_crew: 0,
     total_present: 0,
     days_with_records_this_month: 0,
-    total_present_month: 0,
+    total_present_month: 0
   },
   todayList: [],
   weeklyStats: {
@@ -161,13 +140,14 @@ const initialState = {
     total_staff_absent: [],
     loading: false,
     error: null,
-    lastFetched: null,
+    lastFetched: null
   },
   lastWeeklyFetch: null,
   loading: false,
   error: null,
-  lastFetched: null,
+  lastFetched: null
 };
+
 const adminAttendanceSlice = createSlice({
   name: 'attendance',
   initialState,
@@ -227,7 +207,7 @@ const adminAttendanceSlice = createSlice({
 });
 
 // Selectors
-export const selectWeeklyStats = (state) => state.attendance.weeklyStats || initialState.weeklyStats;
+export const selectWeeklyStats = (state) => state.attendance.weeklyStats;
 export const selectWeeklyStatsLoading = (state) => state.attendance.weeklyStats.loading;
 export const selectWeeklyStatsError = (state) => state.attendance.weeklyStats.error;
 

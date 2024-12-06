@@ -521,9 +521,9 @@ function AdminDashboard() {
 
   const getTodayStats = () => {
     if (
-      !weeklyStats.dates ||
-      !weeklyStats.total_crew_present ||
-      !weeklyStats.total_staff_absent
+      !weeklyStats?.dates ||
+      !weeklyStats?.total_crew_present ||
+      !weeklyStats?.total_staff_absent
     ) {
       return {present: 0, absent: 0};
     }
@@ -878,7 +878,7 @@ function AdminDashboard() {
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
       {isInitialLoading ? (
         <DashboardLoadingState />
       ) : (
@@ -1019,7 +1019,7 @@ function AdminDashboard() {
                             Staff Attendance
                           </h3>
 
-                          {attendanceStats.total_present === 0 ? (
+                          {attendanceStats?.total_present === 0 ? (
                             <div className="flex items-center justify-center h-[180px] text-gray-500">
                               No Data Available
                             </div>
@@ -1219,7 +1219,7 @@ function AdminDashboard() {
                       ))}
                     </div>
                   ) : (
-                    <div className="overflow-y-auto">
+                    <div className="overflow-scroll">
                       {sortedAnnouncements.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-8 px-4">
                           <svg
@@ -1492,7 +1492,7 @@ function AdminDashboard() {
                       <select
                         value={selectedHour}
                         onChange={(e) => setSelectedHour(e.target.value)}
-                        className="border border-gray-200 rounded-xl bg-[#e6eef9] focus:bg-white p-2 w-1/2  font-Montserrat focus:outline-none"
+                        className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
                       >
                         {hours.map((hour) => (
                           <option key={hour} value={hour}>
@@ -1503,7 +1503,7 @@ function AdminDashboard() {
                       <select
                         value={selectedMinute}
                         onChange={(e) => setSelectedMinute(e.target.value)}
-                        className="border border- gray-200 rounded-xl bg-[#e6eef9] font-Montserrat focus:bg-white p-2 w-1/2 focus:outline-none"
+                        className="border border- gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
                       >
                         {minutes.map((minute) => (
                           <option key={minute} value={minute}>

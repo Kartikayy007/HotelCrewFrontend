@@ -14,4 +14,4 @@ const adminSlice = createSlice({
 });
 
 export const { setActiveComponent } = adminSlice.actions;
-export const adminReducer = adminSlice.reducer; 
+export const adminReducer = adminSlice.reducer;

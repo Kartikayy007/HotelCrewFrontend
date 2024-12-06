@@ -63,10 +63,10 @@ const Login = () => {
         return;
       }
 
-      if (!validatePassword(password)) {
-        setErrorMsg("Invalid credentials");
-        return;
-      }
+      // if (!validatePassword(password)) {
+      //   setErrorMsg("Invalid credentials");
+      //   return;
+      // }
 
       const loginAttempts = JSON.parse(
         localStorage.getItem("loginAttempts") || '{"count": 0, "timestamp": 0}'

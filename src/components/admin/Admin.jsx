@@ -141,7 +141,6 @@ const Admin = () => {
         <div className="flex h-screen">
           <AdminSidebar onMenuItemClick={handleMenuItemClick} />
           <div className='h-screen w-screen'>
-          <div className='flex h-screen w-screen'>
             {activeComponent && React.createElement(activeComponent)}
           </div>
           <Snackbar
