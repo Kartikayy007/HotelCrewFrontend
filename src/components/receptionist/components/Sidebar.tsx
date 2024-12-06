@@ -11,6 +11,9 @@ import {
   selectUserProfileLoading,
   fetchUserProfile 
 } from '../../../redux/slices/userProfileSlice';
+// import { BubbleText } from '../../common/BubbleText';
+import styles from './bubble.module.css';
+
 
 interface SidebarProps {
   onMenuItemClick: (component: React.ComponentType) => void;
@@ -43,6 +46,18 @@ const ProfilePreviewModal = ({ imageUrl, isOpen, onClose }) => {
         />
       </div>
     </div>
+  );
+};
+
+const BubbleText = ({ text }) => {
+  return (
+    <h2 className="text-xl font-semibold">
+      {text.split("").map((child, idx) => (
+        <span className={styles.hoverText} key={idx}>
+          {child}
+        </span>
+      ))}
+    </h2>
   );
 };
 
@@ -110,9 +125,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onMenuItemClick }) => {
                 className="w-full h-full object-cover"
               />
             </div>
-            <h2 className="text-xl font-semibold">
-              {profile?.user_name || "User Name"}
-            </h2>
+            <BubbleText text={profile?.user_name || "User Name"} />
+            {/* <h2 className="text-xl font-semibold">
+              
+            </h2> */}
           </div>
         )}
 

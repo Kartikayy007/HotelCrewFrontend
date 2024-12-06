@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Function to retrieve the authentication token
 const getAuthToken = () => {
-   const token  =localStorage.getItem('accessToken'); // Retrieve token from local storage
+   const token  = localStorage.getItem('accessToken'); 
     if (!token) {
       throw new Error('Authentication token not found');
     }

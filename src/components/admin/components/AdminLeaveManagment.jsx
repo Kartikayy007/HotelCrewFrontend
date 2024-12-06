@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Calendar, Check, X, Clock } from 'lucide-react';
-import { fetchLeaveRequests, selectLeaveError, selectLeaveRequests, selectUpdateStatus, updateLeaveStatus } from '../../../redux/slices/LeaveSlice';
+import { fetchLeaveRequests, selectLeaveError, selectLeaveRequests, selectUpdateStatus, updateLeaveStatus } from '../../../redux/slices/leaveSlice';
 import {
   Alert,
   Box,
