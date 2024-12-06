@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import React from 'react';
-import { setCurrentComponent } from "../../redux/slices/StaffSlice";
+import { setCurrentComponent } from "../../redux/slices/DashboardStaffSlice";
 import SSidebar from './StaffComponents/SSidebar'
 import SDashboard from './StaffComponents/SDashboard'
 import STask from './StaffComponents/STask';
