@@ -92,6 +92,8 @@ import {
 } from "../../redux/slices/HotelDetailsSlice";
 import AdminTaskAssignment from "../admin/components/AdminTaskAssignment";
 import {Tooltip} from "@mui/material";
+import PredictiveTextArea from "../../feature/PredictiveTextArea";
+import SmartTitleGenerator from "../../feature/SmartTitleGenerator";
 
 const MDashboard = () => {
   const dispatch = useDispatch();
@@ -380,7 +382,7 @@ const MDashboard = () => {
   };
 
   useEffect(() => {
-    const intervalId = setInterval((  ) => {
+    const intervalId = setInterval(() => {
       const currentDate = new Date().toISOString().slice(0, 10); // Get today's date in YYYY-MM-DD format
       const currentIndex = dates.findIndex((date) => date === currentDate);
       if (currentIndex !== -1) {
@@ -541,7 +543,7 @@ const MDashboard = () => {
   };
 
   const getCurrentDayIndex = () => {
-    const currentDay = new Date().getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const currentDay = new Date().getDay();
     return currentDay;
   };
 
@@ -591,69 +593,44 @@ const MDashboard = () => {
     setSelected(dept);
     setIsDropdownOpen(false);
   };
-  // useEffect(() => {
-  //    ("Updated taskData:", taskData);
-  // }, [taskData]);
 
-  // localStorage.setItem('accessToken',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9. tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NTc4MzMzLCJpYXQiOjE3MzE5ODYzMzMsImp0aSI6IjMxNjk0NTQzNWIzYTQ0MDBhM2MxOGE5M2UzZTk5NTQ0IiwidXNlcl9pZCI6NzF9.Dyl7m7KmXCrMvqbPo31t9q7wWcYgLHCNi9SNO6SPfrY")
-
-  // const dataToSend = {
-  //   title,
-  //   description,
-  //   department,
-  //   // priority,
-  // };
-
-  //   try {
-  //     const response = await dispatch(createTask(taskData));
-  //     //  (response.data);
-  //     if (response.data.status === 'success') {
-  //       alert('Task created successfully');
-  //     } else {
-  //       alert('Failed to create task: ' + response.data.message);
-  //     }
-  //   } catch (error) {
-  //     alert('An error occurred: ' + error.message);
-  //   }
-  // };
-    // Add this helper function at the top of component
   const capitalizeFirstLetter = (str) => {
-    if (!str) return '';
+    if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
-  
+
   // Modified handleAssign with capitalized department
   const handleAssign = async (e) => {
     e.preventDefault();
-  
+
     const errors = {
       title: !taskTitle,
       department: !selected.value,
       deadline: !selectedHour || !selectedMinute,
       description: !taskDescription,
     };
-  
+
     setFieldErrors(errors);
-  
+
     if (Object.values(errors).some((error) => error)) {
       return;
     }
-  
+
     // Create deadline timestamp
     const today = new Date();
     today.setHours(parseInt(selectedHour, 10));
     today.setMinutes(parseInt(selectedMinute, 10));
     today.setSeconds(0);
-  
+
     const formattedDeadline = today.toISOString();
-  
+
     const taskData = {
       title: taskTitle,
       description: taskDescription,
       department: capitalizeFirstLetter(selected.value), // Capitalize department
       deadline: formattedDeadline,
     };
-  
+
     try {
       await dispatch(createTask(taskData)).unwrap();
       setSnackbar({
@@ -673,10 +650,16 @@ const MDashboard = () => {
         deadline: false,
         description: false,
       });
+
+      await Promise.all([dispatch(fetchTasks()), dispatch(fetchStaffData())]);
     } catch (err) {
       let errorMessage;
-  
-      if (err?.non_field_errors?.[0]?.includes("No staff in the specified department")) {
+
+      if (
+        err?.non_field_errors?.[0]?.includes(
+          "No staff in the specified department"
+        )
+      ) {
         const deptName = selected?.label || "selected department";
         errorMessage = `No staff members available in ${deptName} department`;
       } else {
@@ -686,25 +669,25 @@ const MDashboard = () => {
           (typeof err === "object" ? Object.values(err)[0] : err) ||
           "Failed to assign task";
       }
-  
+
       setSnackbar({
         open: true,
         message: errorMessage,
         severity: "error",
       });
       console.error("Task assignment error:", err);
-      
+
       const timeout = setTimeout(() => {
         setFormSubmitted(false);
       }, 3000);
-  
+
       const handleClick = () => {
         setFormSubmitted(false);
-        document.removeEventListener('click', handleClick);
+        document.removeEventListener("click", handleClick);
         clearTimeout(timeout);
       };
-  
-      document.addEventListener('click', handleClick);
+
+      document.addEventListener("click", handleClick);
     }
   };
 
@@ -736,27 +719,28 @@ const MDashboard = () => {
   const handleCreateAnnouncement = async (announcementData) => {
     try {
       // Dispatch the createAnnouncement action
-      const result = await dispatch(createAnnouncement(announcementData)).unwrap();
-      
+      const result = await dispatch(
+        createAnnouncement(announcementData)
+      ).unwrap();
+
       // Show success message
       setSnackbar({
         open: true,
         message: "Announcement created successfully",
-        severity: "success"
+        severity: "success",
       });
-  
+
       // Close modal and reset form
       handleModalClose();
-  
+
       // Refresh today's announcements
       dispatch(fetchTodayAnnouncements());
-  
     } catch (error) {
       // Show error message
       setSnackbar({
         open: true,
         message: error.message || "Failed to create announcement",
-        severity: "error"
+        severity: "error",
       });
     }
   };
@@ -825,7 +809,7 @@ const MDashboard = () => {
   const extractDepartment = (assignedString) => {
     // Format: "email@example.com (Staff) (Department) (Shift)"
     const match = assignedString.match(/\(([^)]+)\)/g);
-    return match && match[1] ? match[1].replace(/[()]/g, '') : '';
+    return match && match[1] ? match[1].replace(/[()]/g, "") : "";
   };
 
   // Add state for deadline time
@@ -847,8 +831,12 @@ const MDashboard = () => {
 
   // Add this function to handle scroll
   const handleAnnouncementScroll = (e) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.target;
-    if (scrollHeight - scrollTop <= clientHeight * 1.5 && !announcementsLoading && hasMore) {
+    const {scrollTop, scrollHeight, clientHeight} = e.target;
+    if (
+      scrollHeight - scrollTop <= clientHeight * 1.5 &&
+      !announcementsLoading &&
+      hasMore
+    ) {
       loadMoreAnnouncements();
     }
   };
@@ -856,15 +844,17 @@ const MDashboard = () => {
   // Add function to load more announcements
   const loadMoreAnnouncements = async () => {
     try {
-      const response = await dispatch(fetchAnnouncements(`?page=${page + 1}`)).unwrap();
+      const response = await dispatch(
+        fetchAnnouncements(`?page=${page + 1}`)
+      ).unwrap();
       if (response.results?.length > 0) {
-        setPage(prev => prev + 1);
+        setPage((prev) => prev + 1);
         setHasMore(!!response.next);
       } else {
         setHasMore(false);
       }
     } catch (error) {
-      console.error('Error loading more announcements:', error);
+      console.error("Error loading more announcements:", error);
     }
   };
 
@@ -873,8 +863,18 @@ const MDashboard = () => {
       return (
         <div className="space-y-4">
           <Skeleton variant="text" width="60%" height={24} {...skeletonProps} />
-          <Skeleton variant="rectangular" width="100%" height={60} {...skeletonProps} />
-          <Skeleton variant="rectangular" width="100%" height={60} {...skeletonProps} />
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={60}
+            {...skeletonProps}
+          />
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={60}
+            {...skeletonProps}
+          />
         </div>
       );
     }
@@ -1155,7 +1155,7 @@ const MDashboard = () => {
                       color:
                         selectedDataType === "checkins" ? "#3331D1" : "#0B8FD9",
                       area: true,
-                      curve: "linear",
+                      curve: "catmullRom",
                     },
                   ]}
                   xAxis={[
@@ -1192,23 +1192,24 @@ const MDashboard = () => {
         {/* Second Column */}
         <div className="space-y-5">
           <div className="w-full ">
-              <form
-                className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg"
-                onSubmit={handleAssign}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h2 className="text-lg sm:text-xl font-semibold">
-                    Task Assignment
-                  </h2>
-                  <IconButton
-                    onClick={handleShowTaskAssignment}
-                    size="small"
-                    className="text-gray-600"
-                  >
-                    <MoreVertical />
-                  </IconButton>
-                </div>
+            <form
+              className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg"
+              onSubmit={handleAssign}
+            >
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-lg sm:text-xl font-semibold">
+                  Task Assignment
+                </h2>
+                <IconButton
+                  onClick={handleShowTaskAssignment}
+                  size="small"
+                  className="text-gray-600"
+                >
+                  <MoreVertical />
+                </IconButton>
+              </div>
 
+              <div className="relative ">
                 <Tooltip
                   open={fieldErrors.title}
                   title="Task title is required"
@@ -1219,150 +1220,161 @@ const MDashboard = () => {
                     type="text"
                     placeholder="Task Title"
                     value={taskTitle}
+                    maxLength={100}
                     onChange={(e) => {
                       setTaskTitle(e.target.value);
                       setFieldErrors((prev) => ({...prev, title: false}));
                     }}
-                    className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
+                    className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full pr-10 focus:border-gray-300 focus:outline-none truncate"
                   />
                 </Tooltip>
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
+                  <SmartTitleGenerator
+                    description={taskDescription}
+                    onTitleGenerated={setTaskTitle}
+                    disabled={!taskDescription.trim()}
+                  />
+                </div>
+              </div>
 
-                <div className="flex justify-between gap-4">
-                  <Tooltip
-                    open={fieldErrors.department}
-                    title="Department is required"
-                    arrow
-                    placement="top"
-                  >
-                    <div className="relative w-full">
-                      <button
-                        type="button"
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
-                          selected.value ? "text-black" : "text-gray-400"
-                        } focus:outline-none flex justify-between items-center`}
-                      >
-                        {selected.label || "Department"}
-                        {isDropdownOpen ? (
-                          <FaChevronUp className="text-gray-600" />
-                        ) : (
-                          <FaChevronDown className="text-gray-600" />
-                        )}
-                      </button>
-
-                      {isDropdownOpen && (
-                        <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
-                          {staffLoading ? (
-                            <div className="px-4 py-2 text-gray-500">
-                              Loading departments...
-                            </div>
-                          ) : departments ? (
-                            Object.entries(departments).map(
-                              ([dept, count], index) => (
-                                <button
-                                  key={index}
-                                  type="button"
-                                  onClick={() => {
-                                    handleSelect({
-                                      label: dept,
-                                      value: dept.toLowerCase(),
-                                    });
-                                    setFieldErrors((prev) => ({
-                                      ...prev,
-                                      department: false,
-                                    }));
-                                  }}
-                                  className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                                >
-                                  {`${dept} (${count})`}
-                                </button>
-                              )
-                            )
-                          ) : (
-                            <div className="px-4 py-2 text-gray-500">
-                              No departments available
-                            </div>
-                          )}
-                        </div>
+              <div className="flex justify-between gap-4">
+                <Tooltip
+                  open={fieldErrors.department}
+                  title="Department is required"
+                  arrow
+                  placement="top"
+                >
+                  <div className="relative w-full">
+                    <button
+                      type="button"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      className={`border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full text-left ${
+                        selected.value ? "text-black" : "text-gray-400"
+                      } focus:outline-none flex justify-between items-center`}
+                    >
+                      {selected.label || "Department"}
+                      {isDropdownOpen ? (
+                        <FaChevronUp className="text-gray-600" />
+                      ) : (
+                        <FaChevronDown className="text-gray-600" />
                       )}
-                    </div>
-                  </Tooltip>
-                </div>
+                    </button>
 
-                <div className="relative w-full mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Deadline
-                  </label>
-                    <div className="flex space-x-2">
-                      <select
-                        value={selectedHour}
-                        onChange={(e) => {
-                          setSelectedHour(e.target.value);
-                          setFieldErrors((prev) => ({
-                            ...prev,
-                            deadline: false,
-                          }));
-                        }}
-                        className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
-                      >
-                        {hours.map((hour) => (
-                          <option key={hour} value={hour}>
-                            {hour}:00
-                          </option>
-                        ))}
-                      </select>
-                      <select
-                        value={selectedMinute}
-                        onChange={(e) => {
-                          setSelectedMinute(e.target.value);
-                          setFieldErrors((prev) => ({
-                            ...prev,
-                            deadline: false,
-                          }));
-                        }}
-                        className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
-                      >
-                        {minutes.map((minute) => (
-                          <option key={minute} value={minute}>
-                            {minute}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                </div>
+                    {isDropdownOpen && (
+                      <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-xl shadow-lg z-10">
+                        {staffLoading ? (
+                          <div className="px-4 py-2 text-gray-500">
+                            Loading departments...
+                          </div>
+                        ) : departments ? (
+                          Object.entries(departments).map(
+                            ([dept, count], index) => (
+                              <button
+                                key={index}
+                                type="button"
+                                onClick={() => {
+                                  handleSelect({
+                                    label: dept,
+                                    value: dept.toLowerCase(),
+                                  });
+                                  setFieldErrors((prev) => ({
+                                    ...prev,
+                                    department: false,
+                                  }));
+                                }}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                              >
+                                {`${dept} (${count})`}
+                              </button>
+                            )
+                          )
+                        ) : (
+                          <div className="px-4 py-2 text-gray-500">
+                            No departments available
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Tooltip>
+              </div>
 
+              <div className="relative w-full mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Deadline
+                </label>
+                <div className="flex space-x-2">
+                  <select
+                    value={selectedHour}
+                    onChange={(e) => {
+                      setSelectedHour(e.target.value);
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        deadline: false,
+                      }));
+                    }}
+                    className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                  >
+                    {hours.map((hour) => (
+                      <option key={hour} value={hour}>
+                        {hour}:00
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={selectedMinute}
+                    onChange={(e) => {
+                      setSelectedMinute(e.target.value);
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        deadline: false,
+                      }));
+                    }}
+                    className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-1/2 focus:outline-none"
+                  >
+                    {minutes.map((minute) => (
+                      <option key={minute} value={minute}>
+                        {minute}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="relative">
                 <Tooltip
                   open={fieldErrors.description}
                   title="Description is required"
                   arrow
                   placement="top"
                 >
-                  <textarea
+                  <PredictiveTextArea
                     value={taskDescription}
                     onChange={(e) => {
                       setTaskDescription(e.target.value);
                       setFieldErrors((prev) => ({...prev, description: false}));
                     }}
-                    placeholder="Task Description"
+                    placeholder="Type task description..."
                     maxLength={350}
-                    className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+                    className="border border-gray-200 w-full rounded-xl bg-[#e6eef9] p-2 xl:h-full h-72 resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100  min-h-32"
                   />
                 </Tooltip>
+              </div>
 
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={Taskloading}
-                    className="h-9 w-full bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50 shadow-xl flex items-center justify-center"
-                  >
-                    {Taskloading ? (
-                      <LoadingAnimation size={24} color="#FFFFFF" />
-                    ) : (
-                      "Assign"
-                    )}
-                  </button>
-                </div>
-              </form>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={Taskloading}
+                  className="h-9 w-full bg-[#3A426F] font-Montserrat font-bold rounded-xl text-white disabled:opacity-50 shadow-xl flex items-center justify-center"
+                >
+                  {Taskloading ? (
+                    <LoadingAnimation size={24} color="#FFFFFF" />
+                  ) : (
+                    "Assign"
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
           <Dialog
             open={showTaskAssignment}
@@ -1376,24 +1388,21 @@ const MDashboard = () => {
               },
             }}
           >
-           <AdminTaskAssignment onClose={() => setShowTaskAssignment(false)} />
+            <AdminTaskAssignment onClose={() => setShowTaskAssignment(false)} />
           </Dialog>
-          <div className="bg-white rounded-lg flex flex-col shadow xl:min-h-[515px] w-full p-4">
+          <div className="bg-white rounded-lg flex flex-col shadow xl:h-[26rem] w-full p-4">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold">Announcements</h2>
-              <IconButton
-                onClick={handleShowAllAnnouncements}
-                size="small"
-              >
-                <MoreVertical className="h-5 w-5 text-gray-600"  />
-              </IconButton >
+              <IconButton onClick={handleShowAllAnnouncements} size="small">
+                <MoreVertical className="h-5 w-5 text-gray-600" />
+              </IconButton>
             </div>
 
             <AllAnnouncementsDialog
               open={showAllAnnouncements}
               onClose={() => setShowAllAnnouncements(false)}
             />
-            <div 
+            <div
               ref={announcementContainerRef}
               className="overflow-auto h-[400px]"
               onScroll={handleAnnouncementScroll}
@@ -1419,107 +1428,113 @@ const MDashboard = () => {
                 Create Announcement
               </Button>
             </div>
-            
+
             {showAnnouncementBox && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-xl w-full max-w-2xl mx-4">
                   <CreateAnnouncementBox
                     onClose={() => setShowAnnouncementBox(false)}
                     onSubmit={handleCreateAnnouncement}
-                    departments={Object.entries(departments || {}).map(([dept]) => ({
-                      label: dept,
-                      value: dept.toLowerCase()
-                    }))}
+                    departments={Object.entries(departments || {}).map(
+                      ([dept]) => ({
+                        label: dept,
+                        value: dept.toLowerCase(),
+                      })
+                    )}
                   />
                 </div>
               </div>
             )}
 
-<Dialog
-                  open={!!selectedAnnouncement}
-                  onClose={handleViewClose}
-                  maxWidth="sm"
-                  fullWidth
-                  sx={{zIndex: 1300}}
-                >
-                  <div className="p-6">
-                    <h2 className="text-xl font-semibold mb-4">
-                      View Announcement
-                    </h2>
-                    <div className="space-y-4">
-                      <TextField
-                        label="Title"
-                        fullWidth
-                        value={selectedAnnouncement?.title || ""}
-                        InputProps={{readOnly: true}}
-                      />
-                      <TextField
-                        label="Description"
-                        fullWidth
-                        multiline
-                        rows={4}
-                        value={selectedAnnouncement?.description || ""}
-                        InputProps={{readOnly: true}}
-                      />
-                      <div className="space-y-2">
-                        <p className="text-sm text-gray-500">
-                          <span className="font-medium">Department:</span>{" "}
-                          {selectedAnnouncement?.department}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          <span className="font-medium">Urgency:</span>{" "}
-                          {selectedAnnouncement?.urgency}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          <span className="font-medium">Created By:</span>{" "}
-                          {selectedAnnouncement?.assigned_by}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          <span className="font-medium">Created At:</span>{" "}
-                          {selectedAnnouncement?.created_at &&
-                            new Date(
-                              selectedAnnouncement.created_at
-                            ).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                        </p>
-                        <div className="text-sm text-gray-500">
-  <span className="font-medium">Assigned To:</span>
-  <ul className="list-disc pl-5 mt-1">
-    {Array.from(new Set( // Remove duplicates
-      selectedAnnouncement?.assigned_to?.map(person => extractDepartment(person))
-    )).map((department, index) => (
-      <li key={index}>{department}</li>
-    )) || []}
-  </ul>
-</div>
-                      </div>
-                      <div className="flex justify-end gap-2 mt-4">
-                        <Button
-                          onClick={() => setShowConfirmDialog(true)}
-                          variant="contained"
-                          color="error"
-                        >
-                          Delete
-                        </Button>
-                        <Button
-                          onClick={handleViewClose}
-                          variant="contained"
-                          sx={{
-                            backgroundColor: "#3A426F",
-                            "&:hover": {backgroundColor: "#3A426F"},
-                          }}
-                        >
-                          Close
-                        </Button>
-                      </div>
+            <Dialog
+              open={!!selectedAnnouncement}
+              onClose={handleViewClose}
+              maxWidth="sm"
+              fullWidth
+              sx={{zIndex: 1300}}
+            >
+              <div className="p-6">
+                <h2 className="text-xl font-semibold mb-4">
+                  View Announcement
+                </h2>
+                <div className="space-y-4">
+                  <TextField
+                    label="Title"
+                    fullWidth
+                    value={selectedAnnouncement?.title || ""}
+                    InputProps={{readOnly: true}}
+                  />
+                  <TextField
+                    label="Description"
+                    fullWidth
+                    multiline
+                    rows={4}
+                    value={selectedAnnouncement?.description || ""}
+                    InputProps={{readOnly: true}}
+                  />
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Department:</span>{" "}
+                      {selectedAnnouncement?.department}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Urgency:</span>{" "}
+                      {selectedAnnouncement?.urgency}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Created By:</span>{" "}
+                      {selectedAnnouncement?.assigned_by}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium">Created At:</span>{" "}
+                      {selectedAnnouncement?.created_at &&
+                        new Date(
+                          selectedAnnouncement.created_at
+                        ).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                    </p>
+                    <div className="text-sm text-gray-500">
+                      <span className="font-medium">Assigned To:</span>
+                      <ul className="list-disc pl-5 mt-1">
+                        {Array.from(
+                          new Set( // Remove duplicates
+                            selectedAnnouncement?.assigned_to?.map((person) =>
+                              extractDepartment(person)
+                            )
+                          )
+                        ).map((department, index) => (
+                          <li key={index}>{department}</li>
+                        )) || []}
+                      </ul>
                     </div>
                   </div>
-                </Dialog>
+                  <div className="flex justify-end gap-2 mt-4">
+                    <Button
+                      onClick={() => setShowConfirmDialog(true)}
+                      variant="contained"
+                      color="error"
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      onClick={handleViewClose}
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "#3A426F",
+                        "&:hover": {backgroundColor: "#3A426F"},
+                      }}
+                    >
+                      Close
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Dialog>
           </div>
           <div className="bg-white rounded-lg shadow h-auto w-full p-4">
             <h2 className="text-lg  font-semibold mb-1">Leave Management</h2>
@@ -1563,7 +1578,7 @@ const MDashboard = () => {
 };
 
 // Add DeleteConfirmationDialog component at the top of the file
-const DeleteConfirmationDialog = ({ open, onClose, onConfirm, loading }) => (
+const DeleteConfirmationDialog = ({open, onClose, onConfirm, loading}) => (
   <Dialog
     open={open}
     onClose={onClose}
@@ -1578,18 +1593,15 @@ const DeleteConfirmationDialog = ({ open, onClose, onConfirm, loading }) => (
     <div className="p-6">
       <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
       <p className="text-gray-600 mb-6">
-        Are you sure you want to delete this announcement? This action cannot be undone.
+        Are you sure you want to delete this announcement? This action cannot be
+        undone.
       </p>
       <div className="flex justify-end gap-3">
-        <Button 
-          variant="outlined" 
-          onClick={onClose}
-          disabled={loading}
-        >
+        <Button variant="outlined" onClick={onClose} disabled={loading}>
           Cancel
         </Button>
-        <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           color="error"
           onClick={onConfirm}
           disabled={loading}

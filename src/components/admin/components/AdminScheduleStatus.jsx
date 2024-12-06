@@ -1,12 +1,37 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, Move } from "lucide-react";
-import { Snackbar, Alert } from '@mui/material';
+import { Snackbar, Alert, Skeleton, Button } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchShifts, updateShift } from '../../../redux/slices/ShiftSlice';
+import { Info as InfoIcon } from 'lucide-react';
+
 
 
 function AdminScheduleStatus() {
   const dispatch = useDispatch();
+  const [showHelpSnackbar, setShowHelpSnackbar] = useState(false);
+
+  // Check localStorage on mount
+  useEffect(() => {
+    const shouldShow = localStorage.getItem('showDragDropHelp') !== 'false';
+    if (shouldShow) {
+      // Show message after random delay (3-10 seconds)
+      const timeout = setTimeout(() => {
+        setShowHelpSnackbar(true);
+      }, Math.random() * 7000 + 3000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, []);
+
+  const handleDontShowAgain = () => {
+    localStorage.setItem('showDragDropHelp', 'false');
+    setShowHelpSnackbar(false);
+  };
+
+  const handleCloseHelp = () => {
+    setShowHelpSnackbar(false);
+  };
 
   useEffect(() => {
     dispatch(fetchShifts());
@@ -17,7 +42,21 @@ function AdminScheduleStatus() {
   const scheduleList = useSelector((state) => state.shifts.scheduleList);
 
 
-  if (loading) return <div>Loading shifts...</div>;
+  if (loading) {
+    return (
+      <div className="bg-[#E6EEF9] h-full w-full p-4">
+        <h1 className="text-[#252941] text-3xl my-4 pl-12 font-semibold">
+          Schedule status
+        </h1>
+        <div className="bg-white rounded-lg shadow-lg mx-6 min-h-[calc(118vh-120px)] lg:h-[80rem] p-6">
+          <ShiftSectionSkeleton />
+          <ShiftSectionSkeleton />
+          <ShiftSectionSkeleton />
+        </div>
+      </div>
+    );
+  }
+
   if (error) return <div>Error: {error}</div>;
 if(!scheduleList) return <div>no data in scgedulelist</div>;
 //   if (!scheduleList || !Array.isArray(scheduleList) || scheduleList.length === 0) {
@@ -27,32 +66,6 @@ if(!scheduleList) return <div>no data in scgedulelist</div>;
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedShift, setSelectedShift] = useState("All Shifts");
   const [isShiftChangeMode, setIsShiftChangeMode] = useState(false);
-  // const [staffData, setStaffData] = useState(scheduleList);
-
-//   const [staffData, setStaffData] = useState([
-//     {name: "Ben Smith", department: "Kitchen", shift: "Day Shift"},
-//   {name: "Sarah Johnson", department: "Housekeeping", shift: "Evening Shift"},
-//   {name: "Mike Chen", department: "Kitchen", shift: "Night Shift"},
-//   {name: "Maria Garcia", department: "Reception", shift: "Day Shift"},
-//   {name: "Alex Wong", department: "Security", shift: "Evening Shift"},
-//   {name: "Lisa Parker", department: "Housekeeping", shift: "Day Shift"},
-//   {name: "James Wilson", department: "Reception", shift: "Night Shift"},
-//   {name: "Thomas Anderson", department: "Maintenance", shift: "Day Shift"},
-//   {name: "Nina Patel", department: "F&B", shift: "Evening Shift"},
-//   {name: "Carlos Rodriguez", department: "Front Office", shift: "Night Shift"},
-//   {name: "Sophie Zhang", department: "Kitchen", shift: "Day Shift"},
-//   {name: "Omar Hassan", department: "Security", shift: "Evening Shift"},
-//   {name: "Emily Brown", department: "Housekeeping", shift: "Night Shift"},
-//   {name: "Daniel Lee", department: "Maintenance", shift: "Day Shift"},
-//   {name: "Isabella Silva", department: "F&B", shift: "Evening Shift"},
-//   {name: "Ryan Murphy", department: "Front Office", shift: "Night Shift"},
-//   {name: "Aisha Khan", department: "Kitchen", shift: "Day Shift"},
-//   {name: "Marcus Thompson", department: "Security", shift: "Evening Shift"},
-//   {name: "Julia Kim", department: "Housekeeping", shift: "Night Shift"},
-//   {name: "Mohammed Al-Said", department: "Maintenance", shift: "Day Shift"},
-//   {name: "Lucy Chen", department: "F&B", shift: "Evening Shift"},
-//   {name: "Samuel Jackson", department: "Front Office", shift: "Night Shift"}
-// ]);
   
   const [draggedStaff, setDraggedStaff] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -77,22 +90,29 @@ if(!scheduleList) return <div>no data in scgedulelist</div>;
     e.preventDefault(); 
   };
   
+  const capitalizeShift = (shift) => {
+    const shiftMap = {
+      'morning': 'Morning',
+      'evening': 'Evening',
+      'night': 'Night'
+    };
+    return shiftMap[shift.toLowerCase()] || shift;
+  };
+
   const handleDrop = async (e, targetShift) => {
     e.preventDefault();
     const staffData = JSON.parse(e.dataTransfer.getData('text/plain'));
     
-    // Convert both shifts to lowercase for consistent comparison
     const currentShift = staffData.currentShift.toLowerCase();
     const newShift = targetShift.toLowerCase();
     
-    // Check if same shift
     if (currentShift === newShift) {
       setSnackbar({
         open: true,
         message: 'Staff is already in this shift',
         severity: 'info'
       });
-      return; // Exit early - no API call needed
+      return;
     }
   
     try {
@@ -111,16 +131,16 @@ if(!scheduleList) return <div>no data in scgedulelist</div>;
   
       await dispatch(updateShift({
         userId,
-        shift: targetShift
+        shift: capitalizeShift(targetShift) // Capitalize shift name
       }));
   
       setSnackbar({
         open: true,
-        message: `Successfully moved ${staffData.name} to ${targetShift} shift`,
+        message: `Successfully moved ${staffData.name} to ${capitalizeShift(targetShift)} shift`,
         severity: 'success'
       });
       
-      dispatch(fetchShifts()); // Refresh data
+      dispatch(fetchShifts());
       
     } catch (error) {
       setSnackbar({
@@ -207,7 +227,40 @@ useEffect(() => {
   }
 }, [scheduleList]);
 
-  const ShiftSection = ({ title, staff, shiftType }) => (
+const ShiftSectionSkeleton = () => (
+  <div className="px-2 xs:px-4 sm:px-8">
+    <div className="bg-white mt-6 sm:mt-11">
+      <Skeleton variant="text" width={200} height={40} />
+      <div className="flex flex-wrap gap-2 xs:gap-3 sm:gap-4 pt-2">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <Skeleton
+            key={i}
+            variant="rounded"
+            width={120}
+            height={60}
+            className="rounded-3xl"
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const EmptyShiftMessage = ({ shiftName }) => (
+  <div className="flex flex-col items-center justify-center h-[180px] xs:h-[200px] sm:h-[280px] text-gray-500">
+    <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+    </svg>
+    <p className="text-center">No staff assigned to {shiftName} shift</p>
+  </div>
+);
+
+const ShiftSection = ({ title, staff, shiftType }) => {
+  if (loading) {
+    return <ShiftSectionSkeleton />;
+  }
+
+  return (
     <div className="h-auto sm:h-80">
       <div className="px-2 xs:px-4 sm:px-8">
         <div 
@@ -226,31 +279,37 @@ useEffect(() => {
               </div>
             )}
           </div>
-          <div className="h-[180px] xs:h-[200px] sm:h-[260px] overflow-y-auto">
-            <div className="flex flex-wrap gap-2 xs:gap-3 sm:gap-4 pt-2">
-              {staff.map((staff) => (
-                <div
-                  // key={`${shift}-${index}`}
-                  key={staff.id}
-                  draggable={isShiftChangeMode}
-                  onDragStart={(e) => handleDragStart(e, staff)}
-                  className={`rounded-3xl text-sm xs:text-base sm:text-xl 
-                    ${isShiftChangeMode 
-                      ? 'cursor-move hover:bg-blue-100 transition-colors' 
-                      : ''} 
-                    bg-[#E6EEF9] min-w-[100px] xs:min-w-[120px] sm:min-w-32 
-                    text-center p-1.5 xs:p-2 sm:p-3`}
-                >
-                  <p>{staff.user_name}</p>
-                  <p className="text-xs text-gray-500">{staff.department}</p>
-                </div>
-              ))}
-            </div>
+
+          <div className="h-[180px] xs:h-[200px] sm:h-[280px] overflow-y-auto">
+            {staff.length === 0 ? (
+              <EmptyShiftMessage shiftName={title.split(" ")[0]} />
+            ) : (
+              <div className="flex flex-wrap gap-2 xs:gap-3 sm:gap-4 pt-2">
+                {staff.map((staff) => (
+                  <div
+                    key={staff.id}
+                    draggable={isShiftChangeMode}
+                    onDragStart={(e) => handleDragStart(e, staff)}
+                    className={`rounded-3xl text-sm xs:text-base sm:text-xl 
+                      ${isShiftChangeMode 
+                        ? 'cursor-move hover:bg-blue-100 transition-colors' 
+                        : ''} 
+                      bg-[#E6EEF9] min-w-[100px] xs:min-w-[120px] sm:min-w-32 
+                      text-center p-1.5 xs:p-2 sm:p-3`}
+                  >
+                    <p>{staff.user_name}</p>
+                    <p className="text-xs text-gray-500">{staff.department}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
+};
+
   const [department, setDepartment] = useState([]);
   return (
     <section className="bg-[#E6EEF9] h-full w-[100%] overflow-y-auto p-1 xs:p-2 sm:p-4">
@@ -365,6 +424,68 @@ useEffect(() => {
           {isChangingShift ? 'Changing shift...' : snackbar.message}
         </Alert>
       </Snackbar>
+      
+      <Snackbar
+        open={showHelpSnackbar}
+        autoHideDuration={8000}
+        onClose={handleCloseHelp}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        sx={{
+          mt: 0, // Add top margin to avoid collision with app bar
+          '& .MuiSnackbarContent-root': {
+            backgroundColor: '#3A426F',
+            padding: '12px 24px',
+            minWidth: '400px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+          },
+          '& .MuiSnackbarContent-message': {
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            fontSize: '0.95rem'
+          }
+        }}
+        message={
+          <>
+            <InfoIcon size={20} />
+            Tip: You can drag and drop staff members between shifts to reassign them
+          </>
+        }
+        action={
+          <>
+            <Button 
+              color="inherit"
+              size="small" 
+              onClick={handleDontShowAgain}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 500,
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.12)'
+                }
+              }}
+            >
+              Don't show again
+            </Button>
+            <Button 
+              color="inherit"
+              size="small" 
+              onClick={handleCloseHelp}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 500,
+                ml: 1,
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.12)'
+                }
+              }}
+            >
+              Got it
+            </Button>
+          </>
+        }
+      />
     </section>
   );
 }

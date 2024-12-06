@@ -62,7 +62,7 @@ function RevenueChart() {
     }],
     series: [{
       data: getFilteredData().map(d => d.revenue),
-      curve: "linear",
+      curve: "catmullRom",
       color: "#6B46C1",
       highlightScope: {
         highlighted: "none",
