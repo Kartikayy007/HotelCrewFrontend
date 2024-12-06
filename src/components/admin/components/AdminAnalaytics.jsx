@@ -353,12 +353,12 @@ const AdminAnalytics = () => {
   //  (animatedRevenue, animatedCheckIns, animatedCheckOuts, animatedStaff);
 
   return (
-    <div className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <div className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
       {isLoading ? (
         <LoadingState />
       ) : (
-        <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
-          <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12</div>">
+        <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
+          <h1 className="text-3xl font-semibold px-3 pt-0 sm:px-4 lg:ml-8 ml-14 ">
             Analytics
           </h1>
 
@@ -507,7 +507,7 @@ const AdminAnalytics = () => {
                     onDoubleClick={handleSectionDoubleClick}
                   >
                     <StaffMetrics />
-                    <section className="bg-white rounded-lg shadow-lg p-4 h-[40.5vh]">
+                    <section className="bg-white rounded-lg shadow-lg p-4 h-[49.5vh]">
                       <div className="h-96">
                         <div className="flex justify-between items-center mb-4">
                           <div>
@@ -529,7 +529,7 @@ const AdminAnalytics = () => {
                         </div>
                         <div className="h-64 w-full flex justify-center items-center">
                           {!isAllDataLoaded ? (
-                            <Skeleton variant="rectangular" width="100%" height={220} animation="wave" />
+                            <Skeleton variant="rectangular" width="100%" height={300} animation="wave" />
                           ) : (
                             <Box sx={{ width: "100%", mb: 0, mt: 0 }}>  
                             <LineChart
@@ -623,7 +623,7 @@ const AdminAnalytics = () => {
                     </div>
                   </section>
 
-                  <section className="bg-white min-h-[54.5rem] rounded-lg shadow-lg p-4">
+                  <section className="bg-white min-h-[30.5rem] rounded-lg shadow-lg p-4">
                     <h3 className="text-lg font-semibold">
                       Department Performance
                     </h3>

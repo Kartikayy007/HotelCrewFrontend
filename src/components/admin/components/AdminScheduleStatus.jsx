@@ -45,7 +45,7 @@ function AdminScheduleStatus() {
   if (loading) {
     return (
       <div className="bg-[#E6EEF9] h-full w-full p-4">
-        <h1 className="text-[#252941] text-3xl my-4 pl-12 font-semibold">
+        <h1 className="text-[#252941] text-3xl my-4 pl-14 font-semibold">
           Schedule status
         </h1>
         <div className="bg-white rounded-lg shadow-lg mx-6 min-h-[calc(118vh-120px)] lg:h-[80rem] p-6">
@@ -336,7 +336,7 @@ const ShiftSection = ({ title, staff, shiftType }) => {
             </div>
 
             <div className="flex flex-col lg:justify-between lg:flex-row px-2 xs:px-4 sm:px-6 space-y-2 xs:space-y-4 lg:space-y-0">
-              <div className="flex gap-2 xs:gap-3 sm:gap-5 text-black font-medium w-full lg:w-2/3 overflow-x-auto scrollbar-none scrollbar-thumb-[#E6EEF9] scrollbar-track-transparent pb-2">
+              <div className="flex gap-2 xs:gap-3 sm:gap-5 text-black font-medium w-full lg:w-2/3 overflow-x-auto scrollbar-hidden pb-2">
               <button
               key="all"
               onClick={() => setActiveFilter("All")}
@@ -349,8 +349,8 @@ const ShiftSection = ({ title, staff, shiftType }) => {
                   <button
                     key={department}
                     onClick={() => setActiveFilter(department)}
-                    className={`p-1.5 xs:p-2 sm:p-2
-                      min-w-24 text-[14px] xs:text-lg sm:text-sm md:text-base lg:text-lg 
+                    className={`p-1.5 xs:p-2 sm:p-2 w-auto lg:min-w-40 min-w-32
+                      text-[14px] xs:text-lg sm:text-sm md:text-base lg:text-lg 
                       rounded-3xl capitalize
                       whitespace-nowrap 
                       transition-colors 

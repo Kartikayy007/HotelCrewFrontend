@@ -247,7 +247,7 @@ function DataBase() {
   };
 
   return (
-    <section className="bg-[#E6EEF9] h-full w-full overflow-scroll p-2 sm:p-4">
+    <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
       <div className="w-[95vw] sm:w-[95vw] md:w-[95vw] lg:w-[95vw] xl:w-[95vw] 2xl:w-[80vw]">
         <div>
           <h1 className="text-3xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12 text-[#252941] mb-2">
@@ -281,7 +281,7 @@ function DataBase() {
                       onChange={(e) =>
                         setFilters({...filters, department: e.target.value})
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+                      className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full"
                     >
                       <option value="All">All Departments</option>
                       {departments.map((dept) => (
@@ -295,7 +295,7 @@ function DataBase() {
                       onChange={(e) =>
                         setFilters({...filters, role: e.target.value})
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
+                      className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
                     >
                       <option value="All">Role</option>
                       {roles.map((role) => (
@@ -309,7 +309,7 @@ function DataBase() {
                       onChange={(e) =>
                         setFilters({...filters, shift: e.target.value})
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
+                      className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full mr-2"
                     >
                       <option value="All">Shift</option>
                       {shifts.map((shift) => (
@@ -327,7 +327,7 @@ function DataBase() {
                       onChange={(e) =>
                         setFilters({...filters, customerType: e.target.value})
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+                      className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full"
                     >
                       <option value="All">Customer Type</option>
                       <option value="Regular">Regular</option>
@@ -338,7 +338,7 @@ function DataBase() {
                       onChange={(e) =>
                         setFilters({...filters, roomType: e.target.value})
                       }
-                      className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full border-2 mr-2"
+                      className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full border-2 mr-2"
                     >
                       <option value="All">Room Type</option>
                       {customers &&
@@ -370,7 +370,7 @@ function DataBase() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search..."
-                className="bg-[#F1F6FC] hover:bg-gray-300 w-full text-[#5663AC] font-medium py-2 px-4 rounded-2xl border-2 border-[#B7CBEA] pl-10"
+                className="bg-white hover:bg-gray-50 w-full text-[#5663AC] font-medium py-2 px-4 rounded-2xl border-2 border-[#B7CBEA] pl-10"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#5663AC]" />
             </div>
