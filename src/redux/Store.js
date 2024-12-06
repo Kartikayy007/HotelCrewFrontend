@@ -23,6 +23,7 @@ import checkoutReducer from './slices/checkoutSlice'
 import payrollReducer from './slices/PayrollSlice'
 import shiftsReducer from './slices/ShiftSlice'
 import staffProfileReducer from './slices/StaffProfileSlice'
+import roomDetailsReducer from './slices/RoomDetailsSlice';
 
 const store = configureStore({
   reducer: {
@@ -49,6 +50,7 @@ const store = configureStore({
     payroll: payrollReducer,
     shifts: shiftsReducer,
     staffProfile: staffProfileReducer,
+    roomDetails: roomDetailsReducer
   },
 })
 

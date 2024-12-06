@@ -4,14 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { 
   fetchAnnouncements,
   selectAllAnnouncements,
-  selectAnnouncementsLoading
+  selectAnnouncementsLoading,
+  selectPagination,
+  clearAnnouncements
 } from '../../../redux/slices/AnnouncementSlice';
 import { Dialog, DialogContent, DialogTitle, Skeleton } from '@mui/material';
 import LoadingAnimation from '../../common/LoadingAnimation';
-import { onMessage } from 'firebase/messaging';
-import { messaging } from '../../../firebase-config';
-import { registerDeviceToken } from '../../../services/notificationService';
-import { toast } from 'react-toastify';
+
 
 interface Announcement {
   id: number;
@@ -26,18 +25,21 @@ const AnnouncementSection: React.FC = () => {
   const dispatch = useDispatch();
   const announcements = useSelector(selectAllAnnouncements);
   const loading = useSelector(selectAnnouncementsLoading);
+  const { nextPage, totalCount } = useSelector(selectPagination);
   
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
-  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+
+  // Calculate hasMore based on API response
+  const hasMore = Boolean(nextPage);
+
   const observer = useRef<IntersectionObserver | null>(null);
   const lastAnnouncementRef = useCallback((node: HTMLDivElement | null) => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
 
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
+      if (entries[0].isIntersecting && hasMore && !loading) {
         setPage(prevPage => prevPage + 1);
       }
     });
@@ -45,70 +47,19 @@ const AnnouncementSection: React.FC = () => {
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
 
+  // Clear announcements on component unmount
   useEffect(() => {
-    dispatch(fetchAnnouncements(`?page=${page}`));
+    return () => {
+      dispatch(clearAnnouncements());
+    };
+  }, [dispatch]);
+
+  // Fetch announcements only when page changes
+  useEffect(() => {
+    if (page === 1 || hasMore) {
+      dispatch(fetchAnnouncements(`?page=${page}`));
+    }
   }, [dispatch, page]);
-
-  // useEffect(() => {
-  //   const initNotifications = async () => {
-  //     try {
-  //       // Check current permission
-  //       const currentPermission = Notification.permission;
-  //       setNotificationPermission(currentPermission);
-
-  //       if (currentPermission === 'denied') {
-  //         toast.warning('Please enable notifications in your browser settings', {
-  //           position: "top-right",
-  //           autoClose: false,
-  //         });
-  //         return;
-  //       }
-
-  //       if (currentPermission === 'default') {
-  //         // Show explanation before requesting
-  //         toast.info('We need your permission to send notifications', {
-  //           position: "top-right",
-  //           autoClose: 5000,
-  //         });
-  //       }
-
-  //       // Register device
-  //       await registerDeviceToken();
-        
-  //       toast.success('Notifications enabled successfully!', {
-  //         position: "top-right",
-  //         autoClose: 3000,
-  //       });
-
-  //       return onMessage(messaging, (payload) => {
-  //          ('Received message:', payload);
-  //         toast.info(payload.notification?.body, {
-  //           title: payload.notification?.title,
-  //           position: "top-right",
-  //           autoClose: 5000
-  //         });
-  //       });
-  //     } catch (error) {
-  //       console.error('Error initializing notifications:', error);
-  //       if (error.message.includes('permission denied')) {
-  //         toast.error('Please allow notifications to receive updates', {
-  //           position: "top-right",
-  //           autoClose: false,
-  //         });
-  //       } else {
-  //         toast.error('Failed to initialize notifications', {
-  //           position: "top-right",
-  //           autoClose: 5000,
-  //         });
-  //       }
-  //     }
-  //   };
-
-  //   const unsubscribe = initNotifications();
-  //   return () => {
-  //     unsubscribe?.();
-  //   };
-  // }, []);
 
   const handleAnnouncementClick = (announcement: Announcement) => {
     setSelectedAnnouncement(announcement);
@@ -116,17 +67,21 @@ const AnnouncementSection: React.FC = () => {
 
   return (
     <div className="bg-white h-96 rounded-lg shadow-lg flex flex-col">
-    <div className="sticky top-0 z-20 bg-white rounded-lg ">
-      <h2 className="text-xl font-semibold p-4">
-        Announcement Channel
-      </h2>
-    </div>
+      <div className="sticky top-0 z-20 bg-white rounded-lg">
+        <h2 className="text-xl font-semibold p-4">
+          Announcement Channel {totalCount > 0 && `(${totalCount})`}
+        </h2>
+      </div>
       
       {loading && page === 1 ? (
         <div className="flex-1 overflow-y-auto space-y-4 p-6 pt-2">
           {[...Array(3)].map((_, index) => (
             <Skeleton key={index} variant="rectangular" height={100} className="rounded-lg" />
           ))}
+        </div>
+      ) : announcements.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center text-gray-500">
+          No announcements available
         </div>
       ) : (
         <>

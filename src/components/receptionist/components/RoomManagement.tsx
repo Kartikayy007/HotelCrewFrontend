@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Search } from 'lucide-react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Grid, Divider, Skeleton } from '@mui/material';
 import { fetchCustomers, selectCustomers } from '../../../redux/slices/customerSlice';
-import { selectHotelDetails } from '../../../redux/slices/HotelDetailsSlice';
+import { fetchRoomDetails, selectRoomDetails } from '../../../redux/slices/RoomDetailsSlice';
 import { checkoutGuest } from '../../../redux/slices/checkoutSlice';
 
 interface Guest {
@@ -42,7 +42,7 @@ const SkeletonRow = () => (
 const RoomManagement = () => {
   const dispatch = useDispatch();
   const customers = useSelector(selectCustomers);
-  const hotelDetails = useSelector(selectHotelDetails);
+  const roomDetails = useSelector(selectRoomDetails);
   const [loading, setLoading] = useState(true);
   
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null);
@@ -59,17 +59,22 @@ const RoomManagement = () => {
   const [roomTypeOptions, setRoomTypeOptions] = useState(['All']);
 
   useEffect(() => {
-    dispatch(fetchCustomers()).finally(() => {
+    // Fetch both customers and room details
+    Promise.all([
+      dispatch(fetchCustomers()),
+      dispatch(fetchRoomDetails())
+    ]).finally(() => {
       setLoading(false);
     });
   }, [dispatch]);
 
   useEffect(() => {
-    if (hotelDetails?.room_types) {
-      const types = ['All', ...hotelDetails.room_types.map(rt => rt.room_type)];
+    // Update room type options based on room details
+    if (roomDetails && roomDetails.length > 0) {
+      const types = ['All', ...roomDetails.map(rt => rt.room_type)];
       setRoomTypeOptions(types);
     }
-  }, [hotelDetails]);
+  }, [roomDetails]);
 
   const filterCustomers = (data: Guest[]) => {
     if (!data || !Array.isArray(data)) {
@@ -191,7 +196,7 @@ const RoomManagement = () => {
   };
 
   const confirmCheckout = () => {
-     ('Checking out guest:', selectedGuest);
+    console.log('Checking out guest:', selectedGuest);
     setCheckoutConfirm(false);
     setOpenDialog(false);
   };
@@ -320,7 +325,6 @@ const RoomManagement = () => {
         </section>
       </div>
 
-      {/* Rest of the dialogs remain the same */}
       <RoomDialog
         rooms={selectedRooms}
         open={openRoomDialog}
@@ -330,8 +334,7 @@ const RoomManagement = () => {
       {/* Guest Details Dialog */}
       <Dialog
         open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        maxWidth="md"
+        onClose={() => setOpenDialog(false)}maxWidth="md"
         fullWidth
         PaperProps={{
           style: {

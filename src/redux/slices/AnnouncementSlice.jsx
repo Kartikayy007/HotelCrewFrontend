@@ -183,11 +183,21 @@ const announcementSlice = createSlice({
       .addCase(fetchAnnouncements.fulfilled, (state, action) => {
         state.loading = false;
         if (action.payload.results) {
-          // Append results for pagination
-          state.announcements = [...state.announcements, ...action.payload.results];
-          // Store pagination info
+          // If it's first page, replace announcements
+          // Otherwise append new results
+          if (action.meta.arg === '?page=1') {
+            state.announcements = action.payload.results;
+          } else {
+            // Filter out duplicates based on id before appending
+            const newAnnouncements = action.payload.results.filter(
+              newAnn => !state.announcements.some(
+                existingAnn => existingAnn.id === newAnn.id
+              )
+            );
+            state.announcements = [...state.announcements, ...newAnnouncements];
+          }
           state.nextPage = action.payload.next;
-          state.previousPage = action.payload.previous; 
+          state.previousPage = action.payload.previous;
           state.totalCount = action.payload.count;
         }
       })

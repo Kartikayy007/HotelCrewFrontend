@@ -37,14 +37,12 @@ const Dashboard = () => {
     dispatch(fetchStaffAttendance());
   }, [dispatch]);
 
-  // Refresh customers when new check-in occurs
   useEffect(() => {
     if (checkInsFromRedux?.length > 0) {
       dispatch(fetchCustomers());
     }
   }, [checkInsFromRedux, dispatch]);
 
-  // Get recent 20 customers sorted by check-in time
   const getRecentCustomers = () => {
     return [...allCustomers]
       .sort((a, b) => new Date(b.check_in_time) - new Date(a.check_in_time))
@@ -70,7 +68,7 @@ const Dashboard = () => {
     ];
 
     const completed = taskMetrics.completed;
-    const remaining = taskMetrics.pending; // This includes both pending and in_progress
+    const remaining = taskMetrics.pending;
 
     return [
       { name: 'Completed', value: Math.round((completed / total) * 100) },
@@ -189,84 +187,124 @@ const Dashboard = () => {
 
         <NewCustomerForm onCheckInSuccess={refreshCustomers} />
 
-        <div className="bg-white rounded-lg p-6 shadow-lg">
+                <div className="bg-white rounded-lg p-6 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Task Progress</h2>
-          <div className="flex justify-center items-center mt-20">
-            <div className="relative w-48">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl -mt-8 font-bold">
-                  {Math.round((taskMetrics.completed / (taskMetrics.total || 1)) * 100)}%
-                </span>
-              </div>
-              <PieChart
-                series={[
-                  {
-                    data: [
-                      { id: 0, value: taskMetrics.completed, color: '#34D399' },
-                      { id: 1, value: taskMetrics.pending, color: '#facc15' }
-                    ],
-                    highlightScope: { faded: 'global', highlighted: 'item' },
-                    innerRadius: 40,
-                    outerRadius: 70,
-                    paddingAngle: 2,
-                    cornerRadius: 4,
-                  },
-                ]}
-                width={280}
-                height={192}
-                margin={{ bottom: 40 }}
-              />
+          {taskMetrics.total === 0 ? (
+            <div className="flex flex-col items-center justify-center  h-48 text-gray-500">
+              <svg 
+                className="w-16 h-16 mb-4" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" 
+                />
+              </svg>
+              <p className="text-lg font-medium">No tasks available</p>
+              <p className="text-sm">Tasks will appear here once created</p>
             </div>
-            <div className="flex flex-col -mt-16 justify-center">
-              <div>
-                <h3 className="text-xl">Pending Tasks</h3>
-                <p className="text-3xl font-bold text-blue-600">{taskMetrics.pending}</p>
+          ) : (
+            <div className="flex justify-center items-center mt-20">
+              <div className="relative w-48">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl -mt-8 font-bold">
+                    {Math.round((taskMetrics.completed / taskMetrics.total) * 100)}%
+                  </span>
+                </div>
+                <PieChart
+                  series={[
+                    {
+                      data: [
+                        { id: 0, value: taskMetrics.completed, color: '#34D399' },
+                        { id: 1, value: taskMetrics.pending, color: '#facc15' }
+                      ],
+                      highlightScope: { faded: 'global', highlighted: 'item' },
+                      innerRadius: 40,
+                      outerRadius: 70,
+                      paddingAngle: 2,
+                      cornerRadius: 4,
+                    },
+                  ]}
+                  width={280}
+                  height={192}
+                  margin={{ bottom: 40 }}
+                />
               </div>
-              <div>
-                <h3 className="text-xl">Completed Tasks</h3>
-                <p className="text-3xl font-bold text-[#34D399]">{taskMetrics.completed}</p>
+              <div className="flex flex-col -mt-16 justify-center">
+                <div>
+                  <h3 className="text-xl">Pending Tasks</h3>
+                  <p className="text-3xl font-bold text-blue-600">{taskMetrics.pending}</p>
+                </div>
+                <div>
+                  <h3 className="text-xl">Completed Tasks</h3>
+                  <p className="text-3xl font-bold text-[#34D399]">{taskMetrics.completed}</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
-        <div className="bg-white rounded-lg p-6 shadow-lg">
+               <div className="bg-white rounded-lg p-6 shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Attendance</h2>
-          <div className="flex justify-center items-center mt-20">
-            <div className="relative w-48">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl -mt-8 font-bold">{attendance.present}%</span>
-              </div>
-              <PieChart
-                series={[
-                  {
-                    data: [
-                      { id: 0, value: attendance.present, color: '#E6EEF9' },
-                      { id: 1, value: attendance.absent, color: '#252941' }
-                    ],
-                    highlightScope: { faded: 'global', highlighted: 'item' },
-                    innerRadius: 40,
-                    outerRadius: 70,
-                    paddingAngle: 2,
-                    cornerRadius: 4,
-                  },
-                ]}
-                width={280}
-                height={192}
-                margin={{ bottom: 40 }}
-              />
+          {(attendance.present === 0 && attendance.absent === 0) ? (
+            <div className="flex flex-col items-center justify-center h-48 text-gray-500">
+              <svg 
+                className="w-16 h-16 mb-4" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+                />
+              </svg>
+              <p className="text-lg font-medium">No attendance data</p>
+              <p className="text-sm">Attendance data will appear here</p>
             </div>
-            <div className="flex flex-col -mt-16 justify-center">
-              <div className="text-center">
-                <h3 className="text-xl">Present</h3>
-                <p className="text-3xl font-bold text-[#4338CA]">{attendance.present}%</p>
+          ) : (
+            <div className="flex justify-center items-center mt-20">
+              <div className="relative w-48">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl -mt-8 font-bold">{attendance.present}%</span>
+                </div>
+                <PieChart
+                  series={[
+                    {
+                      data: [
+                        { id: 0, value: attendance.present, color: '#E6EEF9' },
+                        { id: 1, value: attendance.absent, color: '#252941' }
+                      ],
+                      highlightScope: { faded: 'global', highlighted: 'item' },
+                      innerRadius: 40,
+                      outerRadius: 70,
+                      paddingAngle: 2,
+                      cornerRadius: 4,
+                    },
+                  ]}
+                  width={280}
+                  height={192}
+                  margin={{ bottom: 40 }}
+                />
               </div>
-              <div className="text-center">
-                <h3 className="text-xl">Absent</h3>
-                <p className="text-3xl font-bold text-[#252941]">{attendance.absent}%</p>
+              <div className="flex flex-col -mt-16 justify-center">
+                <div className="text-center">
+                  <h3 className="text-xl">Present</h3>
+                  <p className="text-3xl font-bold text-[#4338CA]">{attendance.present}%</p>
+                </div>
+                <div className="text-center">
+                  <h3 className="text-xl">Absent</h3>
+                  <p className="text-3xl font-bold text-[#252941]">{attendance.absent}%</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         <AnnouncementSection />

@@ -24,16 +24,16 @@ const Login = () => {
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.user);
 
-  const validateEmail = useCallback((email) => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(String(email).toLowerCase());
-  }, []);
+    // Replace existing validateEmail function with:
+  const validateEmail = (email) => {
+    return email && email.includes('@');
+  };
+    
 
-  const validatePassword = useCallback((password) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
-    const isValid = passwordRegex.test(password);
-    return isValid;
-  }, []);
+  const validatePassword = (password) => {
+    return password && !password.includes(' ');
+  };
+  
 
   const handleInputChange = useCallback(
     (set) => (e) => {
@@ -64,7 +64,7 @@ const Login = () => {
       }
 
       if (!validatePassword(password)) {
-        setErrorMsg("Invalid Password Format");
+        setErrorMsg("Password cannot contain spaces");
         return;
       }
 

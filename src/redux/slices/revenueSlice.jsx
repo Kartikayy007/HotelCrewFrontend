@@ -53,6 +53,7 @@ export const fetchRevenueStats = createAsyncThunk(
           'Content-Type': 'application/json'
         }
       });
+      console.log('API Response:', response.data);
        (response.data);
       return response.data;
     } catch (error) {

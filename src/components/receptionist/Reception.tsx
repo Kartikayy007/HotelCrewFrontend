@@ -37,7 +37,6 @@ const Reception: React.FC = () => {
           },
         }
       );
-      //  ('Device token registereddd:', response.data);
       return response.data;
     } catch (error) {
       console.error('Error registering device token:', error);
@@ -57,7 +56,6 @@ const Reception: React.FC = () => {
 
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-         ('ServiceWorker registered:', registration);
       }
 
       const fcmToken = await getToken(messaging, { vapidKey: 'BOqhVdEkOMB9fFPor6H_d1a8DPgeIh-yTgwcD8NL12Jpm2XfIW9Os6e_QLxvn35vDBL5XwaFeAbLPyEVHgibqNE' });
