@@ -12,7 +12,7 @@ import {
   selectLeaveLoading,
   selectLeaveError,
   selectUpdateStatus,
-} from "../../redux/slices/leaveSlice";
+} from "../../redux/slices/LeaveSlice";
 import { useMediaQuery } from "@mui/material";
 import Skeleton from '@mui/material/Skeleton';
 import {

@@ -46,15 +46,16 @@ export const getStaffProfile = createAsyncThunk(
 
 export const updateStaffProfile = createAsyncThunk(
   'staffProfile/updateStaffProfile', // Slice name
-  async (updatedDetails, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
       const token = getAuthToken(); // Retrieve auth token
       const response = await axios.put(
         'https://hotelcrew-1.onrender.com/api/edit/user_profile/', // API endpoint for updating staff profile
-        updatedDetails, // The updated user details
+        formData, // The updated user details
         {
           headers: {
             Authorization: `Bearer ${token}`, // Attach token in headers
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
@@ -77,10 +78,9 @@ export const updateStaffProfile = createAsyncThunk(
 );
 
 
-// First fix initial state structure
 const initialState = {
     profile: null,
-    user: null, // Add user field
+    user: null, 
     loading: false,
     error: null,
     successMessage: null

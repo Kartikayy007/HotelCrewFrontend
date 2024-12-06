@@ -4,15 +4,14 @@ import axios from "axios";
 const API_BASE_URL = "https://hotelcrew-1.onrender.com/api/attendance"; // Replace with your actual API base URL
 
 const getAuthHeaders = () => {
-    const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
-
+    const token = localStorage.getItem("accessToken") || sessionStorage.getItem("token");
 
     if (!token) {
       throw new Error("Authentication token not found");
     }
   
     return {
-      Authorization: `Bearer ${token}`, 
+      Authorization: `Bearer ${token}`, // Return the headers with the token
     };
   };
 // **Async Thunks**
@@ -25,7 +24,7 @@ export const fetchLeaveRequests = createAsyncThunk(
       const response = await axios.get(`https://hotelcrew-1.onrender.com/api/attendance/leave_list/`, {
         headers: getAuthHeaders(), // Correctly invoke the function and pass as headers
       });
-       (response.data.data)
+      console.log(response.data.data)
       return response.data.data; // Assuming "data" contains the leave requests
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching leave requests");
@@ -42,7 +41,7 @@ export const fetchLeaveCount = createAsyncThunk(
         params: { date },
         headers: getAuthHeaders(),
       });
-       ("leave",response.data.data)
+      console.log("leave",response.data.data)
       return response.data.data; // Assuming "data" contains the leave count
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching leave count");
@@ -55,7 +54,7 @@ export const updateLeaveStatus = createAsyncThunk(
   "leave/updateLeaveStatus",
   async ({ leaveId, status }, { rejectWithValue }) => {
     try {
-      const response = await axios.patch(`${API_BASE_URL}/leave_approve/${leaveId}/`,
+      const response = await axios.patch(`${API_BASE_URL}/leave_approve/${leaveId}`,
          { status },
          {
           headers: getAuthHeaders(), // Correctly invoke and pass headers
@@ -91,13 +90,12 @@ const leaveSlice = createSlice({
       // Fetch Leave Requests
       builder
         .addCase(fetchLeaveRequests.pending, (state) => {
-          state.leaveRequests = [];
           state.leaveLoading = true;
           state.leaveError = null;
         })
         .addCase(fetchLeaveRequests.fulfilled, (state, action) => {
           state.leaveLoading = false;
-           (action.payload);
+          console.log(action.payload);
           state.leaveRequests = action.payload;
         })
         .addCase(fetchLeaveRequests.rejected, (state, action) => {
@@ -113,7 +111,7 @@ const leaveSlice = createSlice({
         })
         .addCase(fetchLeaveCount.fulfilled, (state, action) => {
           state.leaveLoading = false;
-           ("P",action.payload.leave_count);
+          console.log("P",action.payload.leave_count);
           state.leaveCount = action.payload.leave_count;
         })
         .addCase(fetchLeaveCount.rejected, (state, action) => {
@@ -121,6 +119,7 @@ const leaveSlice = createSlice({
           state.leaveError = action.payload;
         });
   
+      // Update Leave Status
       builder
         .addCase(updateLeaveStatus.pending, (state) => {
           state.leaveLoading = true;
@@ -128,7 +127,7 @@ const leaveSlice = createSlice({
         })
         .addCase(updateLeaveStatus.fulfilled, (state, action) => {
           state.leaveLoading = false;
-           (action.payload.message);
+          console.log(action.payload.message);
           state.updateStatus = action.payload.message;
         })
         .addCase(updateLeaveStatus.rejected, (state, action) => {
