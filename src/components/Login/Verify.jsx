@@ -1,8 +1,6 @@
 import React, {useState, useRef, useEffect} from "react";
 import axios from "axios";
 import Lottie from "react-lottie";
-import { Snackbar, Alert } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 
 const eyeOpenAnimationDataUrl = "/eyeOpen.json";
 
@@ -21,14 +19,6 @@ const Verify = ({email}) => {
     useState(false);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
   const [showPasswords, setShowPasswords] = useState(false);
-  const [passwordError, setPasswordError] = useState('');
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success'
-  });
-  const [passwordMatchError, setPasswordMatchError] = useState(false);
-  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPasswords(!showPasswords);
@@ -43,27 +33,9 @@ const Verify = ({email}) => {
     }
   }, [timeLeft]);
 
-  const isOtpComplete = (otpArray) => {
-    return otpArray.every(digit => digit !== '');
-  };
-
   const handleKeyDown = (index, e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const isComplete = isOtpComplete(otp);
-      
-      if (!isComplete) {
-        setErrorMessage('Please enter complete OTP');
-        return;
-      }
-      
-      handleVerifyOtp();
-    } else if (e.key === 'Backspace') {
-      if (index > 0 && !otp[index]) {
-        setTimeout(() => {
-          inputRefs[index - 1].current?.focus();
-        }, 0);
-      }
+    if (e.key === "Backspace" && index > 0 && otp[index] === "") {
+      inputRefs[index - 1].current.focus();
     }
   };
 
@@ -81,15 +53,14 @@ const Verify = ({email}) => {
     }
   };
 
-  const handleVerifyOtp = async () => {
-    if (!isOtpComplete(otp)) {
-      setErrorMessage('Please enter complete OTP');
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if (otp.join("").length < 4) {
+      setErrorMessage("Please enter the complete OTP");
       return;
     }
 
     setLoading(true);
-    setErrorMessage('');
-    
     try {
       const response = await axios.post(
         "https://hotelcrew-1.onrender.com/api/auth/verify-otp/",
@@ -98,18 +69,15 @@ const Verify = ({email}) => {
           otp: otp.join(""),
         }
       );
+       ("OTP verified:", response);
       setShowOtpInput(false);
     } catch (err) {
-       ('Raw backend response:', err.response?.data);
-      
       if (!err.response) {
         setErrorMessage(
-          "Network error."
+          "Network error. Please check your internet connection and try again."
         );
       } else {
-        // Extract and display the exact error message from backend
-        const errorMessage = err.response.data.error?.[0] || err.response.data.error || "Verification failed";
-        setErrorMessage(errorMessage);
+        setErrorMessage("Invalid OTP. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -134,7 +102,7 @@ const Verify = ({email}) => {
     } catch (err) {
       if (!err.response) {
         setErrorMessage(
-          "Network error."
+          "Network error. Please check your internet connection and try again."
         );
       } else {
         setErrorMessage("Failed to resend OTP. Please try again.");
@@ -146,47 +114,38 @@ const Verify = ({email}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?#.&)(^!@#$%^&*()]{8,}$/;
 
-    if (!password || !confirmPassword) {
-      setErrorMessage('Please fill in all fields');
+    if (!passwordRegex.test(password)) {
+      setErrorMessage("Invalid password format");
       return;
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage('Passwords do not match');
+      setErrorMessage("Passwords do not match.");
       return;
     }
-
-    const passwordValidationError = validatePassword(password);
-    if (passwordValidationError) {
-      setPasswordError(passwordValidationError);
-      return;
-    }
-
+    setErrorMessage("");
     setLoading(true);
     try {
       const response = await axios.post(
-        'https://hotelcrew-1.onrender.com/api/auth/reset-password/',
+        "https://hotelcrew-1.onrender.com/api/auth/reset-password/",
         {
-          email,
+          email: email,
           new_password: password,
-          confirm_password: confirmPassword
+          confirm_password: confirmPassword,
         }
       );
-
-      setSnackbar({
-        open: true,
-        message: 'Password changed successfully! Redirecting...',
-        severity: 'success'
-      });
-
-      setTimeout(() => {
-        navigate('/login', { replace: true });
-        window.location.reload();
-      }, 2000);
-
-    } catch (error) {
-      setErrorMessage(error.response?.data?.message || 'Failed to reset password');
+       ("Response:", response);
+      window.location.reload();
+    } catch (err) {
+      if (!err.response) {
+        setErrorMessage(
+          "Network error. Please check your internet connection and try again."
+        );
+      } else {
+        setErrorMessage("An error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -201,60 +160,9 @@ const Verify = ({email}) => {
     },
   };
 
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-
-  const validatePassword = (password) => {
-    if (!passwordRegex.test(password)) {
-      if (password.length < 8) {
-        return 'Password must be at least 8 characters long';
-      }
-      if (!/(?=.*[a-z])/.test(password)) {
-        return 'Password must include at least one lowercase letter';
-      }
-      if (!/(?=.*[A-Z])/.test(password)) {
-        return 'Password must include at least one uppercase letter';
-      }
-      if (!/(?=.*\d)/.test(password)) {
-        return 'Password must include at least one number';
-      }
-    }
-    return '';
-  };
-
-  const handlePasswordChange = (e) => {
-    const newPassword = e.target.value;
-    setPassword(newPassword);
-    setPasswordError(validatePassword(newPassword));
-    
-    if (confirmPassword) {
-      setPasswordMatchError(newPassword !== confirmPassword);
-    }
-  };
-  
-  const handleConfirmPasswordChange = (e) => {
-    const newConfirmPassword = e.target.value;
-    setConfirmPassword(newConfirmPassword);
-    
-    if (password) {
-      setPasswordMatchError(password !== newConfirmPassword);
-    }
-  };
-  
-  const handlePasswordBlur = () => {
-    if (password && confirmPassword) {
-      setPasswordMatchError(password !== confirmPassword);
-    }
-  };
-  
-  const handleConfirmBlur = () => {
-    if (password && confirmPassword) {
-      setPasswordMatchError(password !== confirmPassword);
-    }
-  };
-
   return (
-    <div className="font-Montserrat lg:min-h-screen xl:w-full xl:flex xl:justify-center overflow-hidden">
-      <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] xl:hidden">
+    <div className="font-Montserrat lg:min-h-screen lg:w-full lg:flex lg:justify-center overflow-hidden">
+      <div className="w-full h-[45vh] justify-center items-center bg-[#8094D4] lg:hidden">
         <img
           className="w-full h-full object-fill"
           src=" /web2 1.svg"
@@ -262,16 +170,16 @@ const Verify = ({email}) => {
         />
       </div>
       {showOtpInput ? (
-        <div className="w-full xl:w-1/2 flex justify-center items-center">
+        <div className="w-full lg:w-1/2 flex justify-center items-center">
           <div className="space-y-6">
             <form
-              className="w-full xl:space-y-3 space-y-4 "
+              className="w-full lg:space-y-3 space-y-4 "
               onSubmit={handleVerifyOtp}
             >
-              <h2 className="text-4xl font-bold xl:mt-0 mt-5 text-center">
+              <h2 className="text-[40px] font-bold lg:mt-0 mt-5 text-center">
                 Verify E-mail
               </h2>
-              <div className="flex flex-col justify-center items-center gap-4 xl:gap-5">
+              <div className="flex flex-col justify-center items-center gap-4 lg:gap-5">
                 <div className="flex space-x-4">
                   {otp.map((digit, index) => (
                     <input
@@ -288,12 +196,12 @@ const Verify = ({email}) => {
                   ))}
                 </div>
 
-                <p className="text-sm lg:text-base font-normal leading-[16.34px] text-left">
+                <p className="text-base font-normal leading-[16.34px] text-left">
                   An OTP has been sent to your E-mail
                 </p>
                 <div className="text-center">
-                  <p className="text-sm lg:text-base">Didn't receive a mail? </p>
-                  <p className="text-sm lg:text-base">
+                  <p className="text-base">Didn't receive a mail? </p>
+                  <p className="text-base">
                     {isResendDisabled ? (
                       <span className="text-gray-600">
                         Resend in {timeLeft} seconds
@@ -310,7 +218,7 @@ const Verify = ({email}) => {
                 </div>
 
                 {errorMessage && (
-                  <p className="text-[#99182C] text-sm lg:text-base leading-[0.8rem]">{errorMessage}</p>
+                  <p className="text-[#99182C] text-base">{errorMessage}</p>
                 )}
                 {successMessage &&
                   !hasInteractedAfterResend &&
@@ -346,22 +254,18 @@ const Verify = ({email}) => {
               className="w-full lg:w-96 lg:space-y-7 space-y-8"
               onSubmit={handleSubmit}
             >
-              <h1 className="text-4xl font-bold lg:mt-0 mt-5 text-center lg:text-left">
+              <h1 className="text-[40px] font-bold lg:mt-0 mt-5 text-center lg:text-left">
                 Reset Password
               </h1>
               <div className="space-y-8">
                 <div className="relative">
                   <input
                     type={showPasswords ? "text" : "password"}
-                    value={password}
-                    onChange={handlePasswordChange}
-                    className={`w-full p-2 pl-4 text-xl placeholder:text-base border-b ${
-                      passwordError || passwordMatchError ? 'border-[#99182C]' : 'border-gray-700'
-                    } focus:outline-none`}
+                    className="w-full p-2 text-xl pl-4 border-b border-gray-700 focus:outline-none"
                     placeholder="New Password"
-                    autoComplete="new-password"
-                    maxLength={24}
-                    onBlur={handlePasswordBlur}
+                    value={password}
+                    maxLength={20}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                   <button
                     type="button"
@@ -375,20 +279,16 @@ const Verify = ({email}) => {
                     )}
                   </button>
                 </div>
-                
 
                 <div className="relative">
                   <input
                     type={showPasswords ? "text" : "password"}
                     value={confirmPassword}
-                    onChange={handleConfirmPasswordChange}
-                    className={`w-full p-2 pl-4 text-xl placeholder:text-base border-b ${
-                      passwordMatchError ? 'border-[#99182C]' : 'border-gray-700'
-                    } focus:outline-none`}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full p-2 pl-4 text-xl placeholder:text-base border-b border-gray-700 focus:outline-none"
                     placeholder="Confirm Password"
-                    autoComplete="new-password"
+                    autoComplete="current-password"
                     maxLength={24}
-                    onBlur={handleConfirmBlur}
                   />
                   <button
                     type="button"
@@ -404,10 +304,8 @@ const Verify = ({email}) => {
                 </div>
               </div>
 
-              {errorMessage && <p className="text-[#99182C] text-sm lg:text-base">{errorMessage}</p>}
-              {passwordError && (
-                  <p className="text-[#99182C] mt-1 text-sm lg:text-base">{passwordError}</p>
-                )}
+              {errorMessage && <p className="text-[#99182C]">{errorMessage}</p>}
+
               <div className="">
                 <button
                   type="submit"
@@ -428,18 +326,9 @@ const Verify = ({email}) => {
         </div>
       )}
 
-      <div className=" hidden xl:flex w-full xl:w-[95vw] items-center justify-center h-[380px] xl:h-auto bg-[#8094D4]">
+      <div className=" hidden lg:flex w-full lg:w-[95vw] items-center justify-center h-[380px] lg:h-auto bg-[#8094D4]">
         <img className="h-full" src="/web2 1.svg" alt="Login Hero" />
       </div>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={2000}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert severity={snackbar.severity} variant="filled">
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </div>
   );
 };
