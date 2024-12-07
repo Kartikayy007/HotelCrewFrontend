@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Calendar, Check, X, Clock } from 'lucide-react';
-import { fetchLeaveRequests, selectLeaveError, selectLeaveRequests, selectUpdateStatus, updateLeaveStatus } from '../../../redux/slices/leaveSlice';
+import { fetchLeaveRequests, selectLeaveError, selectLeaveRequests, selectUpdateStatus, updateLeaveStatus, selectLeaveLoading } from '../../../redux/slices/leaveSlice';
 import {
   Alert,
   Box,
@@ -89,12 +89,10 @@ const LeaveRequestSkeleton = ({ isMobile }) => {
 
 const AdminLeaveManagement = () => {
   const dispatch = useDispatch();
-  // const leaveRequests = useSelector((state) => state.leave.requests);
-  // const status = useSelector((state) => state.leave.status);
-  // const error = useSelector((state) => state.leave.error);
   const leaveRequests = useSelector(selectLeaveRequests);
   const status=useSelector(selectUpdateStatus);
   const error=useSelector(selectLeaveError);
+  const isLoading = useSelector(selectLeaveLoading);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -108,10 +106,16 @@ const AdminLeaveManagement = () => {
   });
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchLeaveRequests());
-    }
-  }, [status, dispatch]);
+    console.log('Fetching leave requests...');
+    dispatch(fetchLeaveRequests())
+      .unwrap()
+      .then(response => {
+        console.log('Leave requests fetched:', response);
+      })
+      .catch(error => {
+        console.error('Error fetching leave requests:', error);
+      });
+  }, [dispatch]);
 
   const handleOpenModal = (staff) => {
     setSelectedStaff(staff);
@@ -225,7 +229,7 @@ const AdminLeaveManagement = () => {
     }
   };
 
-  if (status === 'loading') {
+  if (isLoading) {
     return (
       <section className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">
         <h1 className="lg:text-3xl text-2xl font-semibold p-3 sm:p-4 lg:ml-8 ml-12">

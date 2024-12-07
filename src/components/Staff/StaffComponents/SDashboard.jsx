@@ -6,20 +6,15 @@ import { LineChart } from '@mui/x-charts/LineChart';
 import { getStaffLeaveHistory,selectLeaveHistory,selectFetchHistoryError,selectFetchHistoryLoading } from '../../../redux/slices/StaffLeaveSlice';
 import { getAttendanceStats,selectAttendanceStats,selectStatsLoading,selectStatsError } from '../../../redux/slices/StaffAttendanceSlice';
 import { fetchAnnouncements, selectAllAnnouncements, selectAnnouncementsError, selectAnnouncementsLoading,selectPagination,appendAnnouncements,setPagination } from '../../../redux/slices/AnnouncementSlice';
-import { 
-  selectDailyStats,
-  selectLoading as selectPerformanceLoading,
-  selectError as selectPerformanceError,
-  fetchStaffPerformance
-} from '../../../redux/slices/StaffPerformanceSlice';
+import { selectDailyStats,selectLoading,selectError,fetchStaffPerformance,selectStaffPerformance } from '../../../redux/slices/StaffPerformanceSlice';
 
 
 
 const SDashboard = () => {
   const dispatch = useDispatch();
-  const performanceStats = useSelector(selectDailyStats);
-  const performanceLoading = useSelector(selectPerformanceLoading);
-  const performanceError = useSelector(selectPerformanceError);
+  const performance = useSelector(selectDailyStats);
+  const performanceloading = useSelector(selectLoading);
+  const performanceError = useSelector(selectError);
   // Select announcements, loading, and error states from the store
   const announcements = useSelector(selectAllAnnouncements);
   const AnnLoading = useSelector(selectAnnouncementsLoading);
@@ -52,22 +47,51 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
     setSnackbarOpen(false);
   };
 
+  // const isOffline = useRef(false);
+  // useEffect(() => {
+  
+  // //   if (navigator.onLine==='false') {
+  // //     setSnackbarMessage('No internet connection. Please check your network.');
+  // //    setSnackbarSeverity('error');
+  // //   setSnackbarOpen(true);
+  // //      // Mark as offline
+  // //     return;
+  // //   }
+  // // else{
+    
+  
+  //   if (((AnnError || statsError))?.status === 429) {
+  //     setSnackbarMessage('Too many requests. Please try again later.');
+  //   }  if (AnnError) {
+  //     setSnackbarMessage(AnnError.message || 'Announcements failed to load.');
+  //   }  if (statsError ) {
+  //     setSnackbarMessage(statsError.message || 'Attendance Statistics failed to load.');
+  //   }
+  //   // else {
+  //   //   setSnackbarMessage('An unexpected error occurred.');
+  //   // }
+  
+  //   setSnackbarSeverity('error');
+  //   setSnackbarOpen(true);
+  // // }
+  // }, [AnnError, statsError]);
+
   useEffect(() => {
+    // Function to fetch announcements
     const fetchData = () => {
-      dispatch(fetchStaffPerformance()).unwrap()
-        .catch(error => {
-          setSnackbarMessage('Failed to fetch performance data');
-          setSnackbarSeverity('error');
-          setSnackbarOpen(true);
-        });
       dispatch(fetchAnnouncements());
       dispatch(fetchStaffPerformance());
       dispatch(getStaffLeaveHistory());
       dispatch(getAttendanceStats());
     };
 
+    // Initial fetch on render
     fetchData();
+
+    // Fetch every 2 minutes (120,000 ms)
     const interval = setInterval(fetchData, 120000);
+
+    // Cleanup interval on unmount
     return () => clearInterval(interval);
   }, [dispatch]);
 
@@ -293,9 +317,12 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
 
     }
   };
-  const formattedDates = performanceStats?.map(stat => stat.date) || [];
-  const dates = performanceStats?.map(stat => new Date(stat.date)) || [];
-  const performanceValues = performanceStats?.map(stat => stat.performance_percentage) || [];
+  const formattedDates = performance.map(stat => {
+    const date = new Date(stat.date);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); // Example: "Nov 26"
+  });
+  const dates = performance.map(stat => new Date(stat.date));
+  const performanceValues = performance.map(stat => stat.performance_percentage);
    ('Performance Data:', performance);
    ('Dates:', formattedDates);
    ('Performance Percentages:', performanceValues);
@@ -310,16 +337,62 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
 
           <div className="bg-white w-full pt-4 pb-1 pr-6 pl-6 rounded-lg shadow">
             <h2 className="text-lg sm:text-xl font-semibold text-left">Your Performance</h2>
-            {performanceLoading ? (
-              <Skeleton variant="rectangular" height={200} />
-            ) : performanceError ? (
-              <Alert severity="error">Failed to load performance data</Alert>
+            {performanceloading ? (
+              <div className='ml-4 mb-2'>
+                <Skeleton variant="rectangular"
+                  width="95%"
+                  height={380}
+                  {...skeletonProps}
+                />
+              </div>
             ) : (
-              <LineChart
-                xAxis={[{ data: dates }]}
-                series={[{ data: performanceValues }]}
-                height={300}
-              />
+
+              // <Card>
+      // <CardContent>
+       
+        <div style={{ width: '100%', height: 410 }}>
+          <LineChart
+            xAxis={[{
+              data: dates,
+              scaleType: 'time',
+              tickLabelStyle: {
+                angle: 45,
+                textAnchor: 'start',
+                fontSize: 12
+              },
+              // tickFormatter: (value) => {
+              //   const date = new Date(value);
+              //   return date.toLocaleDateString('en-US', { 
+              //     month: 'short', 
+              //     day: 'numeric'
+              //   });
+              // }
+            }]}
+            yAxis={[{
+              min: 0,
+              max: 100,
+              label: 'Performance (%)'
+            }]}
+            series={[
+              {
+                data: performanceValues,
+                label: 'Performance',
+                color: '#2196f3',
+                showInLegend: false
+                
+              }
+            ]}
+            height={400}
+            margin={{ top: 20, right: 30, bottom: 80, left: 60 }}
+            slotProps={{
+              legend: {
+                hidden: true
+              }}
+            }
+          />
+        </div>
+      // </CardContent>
+    // </Card>
             )}
           </div>
           <div className="flex lg:flex-row flex-col gap-4">

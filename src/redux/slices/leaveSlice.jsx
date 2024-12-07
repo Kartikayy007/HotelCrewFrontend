@@ -4,7 +4,7 @@ import axios from "axios";
 const API_BASE_URL = "https://hotelcrew-1.onrender.com/api/attendance"; // Replace with your actual API base URL
 
 const getAuthHeaders = () => {
-    const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM1NDU5MzUwLCJpYXQiOjE3MzI4NjczNTAsImp0aSI6ImYyZWIyMWIzZGVlZjQ0MWQ5YThlNzY2OWFmMWIxNGQ1IiwidXNlcl9pZCI6MTg1fQ.YkgvzmHmNKwR3bvQ9KiZvc1lZd_xf0ZgKmLg1KujQ4Y'
+    const token = localStorage.getItem("accessToken") || sessionStorage.getItem("token");
 
 
     if (!token) {
@@ -22,11 +22,11 @@ export const fetchLeaveRequests = createAsyncThunk(
   "leave/fetchLeaveRequests",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`https://hotelcrew-1.onrender.com/api/attendance/leave_list/`, {
-        headers: getAuthHeaders(), // Correctly invoke the function and pass as headers
-      });
-      console.log(response.data.data)
-      return response.data.data; // Assuming "data" contains the leave requests
+      const response = await axios.get(
+        'https://hotelcrew-1.onrender.com/api/attendance/leave_list/',
+        { headers: getAuthHeaders() }
+      );
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error fetching leave requests");
     }
@@ -53,16 +53,14 @@ export const fetchLeaveCount = createAsyncThunk(
 // Update leave status
 export const updateLeaveStatus = createAsyncThunk(
   "leave/updateLeaveStatus",
-  async ({ leaveId, status }, { rejectWithValue }) => {
+  async ({ id, status }, { rejectWithValue }) => {
     try {
-      const response = await axios.patch(`${API_BASE_URL}/leave_approve/${leaveId}`,
-         { status },
-         {
-          headers: getAuthHeaders(), // Correctly invoke and pass headers
-        }
-        );
-      
-      return response.data.leave_count; // Assuming success message is in response
+      const response = await axios.patch(
+        `https://hotelcrew-1.onrender.com/api/attendance/leave_approve/${id}/`,
+        { status }, // Send status as-is (capitalized)
+        { headers: getAuthHeaders() }
+      );
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Error updating leave status");
     }
@@ -96,12 +94,12 @@ const leaveSlice = createSlice({
         })
         .addCase(fetchLeaveRequests.fulfilled, (state, action) => {
           state.leaveLoading = false;
-          console.log(action.payload);
-          state.leaveRequests = action.payload;
+          state.leaveRequests = action.payload; // API returns array directly
+          console.log('Updated state:', state.leaveRequests);
         })
         .addCase(fetchLeaveRequests.rejected, (state, action) => {
           state.leaveLoading = false;
-          state.leaveError = action.payload;
+          state.leaveError = action.payload?.message || 'Failed to fetch leave requests';
         });
   
       // Fetch Leave Count
@@ -148,4 +146,53 @@ export const selectUpdateStatus = (state) => state.leave.updateStatus; // Status
   
   // Reducer
   export default leaveSlice.reducer;
-  
+
+const handleApprove = async (requestId) => {
+  try {
+    const result = await dispatch(updateLeaveStatus({ 
+      id: requestId, 
+      status: 'Approved'  // Keep capitalized
+    })).unwrap();
+    
+    setSnackbar({
+      open: true,
+      message: result.message,
+      severity: 'success',
+    });
+    
+    // Refresh leave requests after successful update
+    dispatch(fetchLeaveRequests());
+    handleCloseModal();
+  } catch (err) {
+    setSnackbar({
+      open: true,
+      message: err.message || 'Failed to approve leave request',
+      severity: 'error',
+    });
+  }
+};
+
+const handleReject = async (requestId) => {
+  try {
+    const result = await dispatch(updateLeaveStatus({ 
+      id: requestId, 
+      status: 'Rejected'  // Keep capitalized
+    })).unwrap();
+    
+    setSnackbar({
+      open: true,
+      message: result.message,
+      severity: 'error',
+    });
+
+    // Refresh leave requests after successful update
+    dispatch(fetchLeaveRequests());
+    handleCloseModal();
+  } catch (err) {
+    setSnackbar({
+      open: true,
+      message: err.message || 'Failed to reject leave request',
+      severity: 'error',
+    });
+  }
+};

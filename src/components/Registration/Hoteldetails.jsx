@@ -123,7 +123,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
             </label>
             <input
               type="text"
-              maxLength={120}
+              maxLength={10}
               id="hotel-name"
               value={hotelName}
               onChange={(e) => setHotelName(e.target.value)}
@@ -200,7 +200,7 @@ const Hoteldetails = ({ onNext, updateFormData, initialData }) => {
         <div>
           <div className="hidden xl:block xl:w-[512px] font-medium fixed top-0 right-0 xl:h-[100vh] bg-white shadow-2xl border-none rounded-lg">
             <div className="flex gap-7 text-[32px]">
-              {[1, 2, 3, 4, 5].map((num) => (
+              {[1, 2, 3, 4].map((num) => (
                 <div
                   key={num}
                   className={`top-20 left-20 relative w-12 h-12 flex items-center justify-center rounded-full border-solid border-[3.5px] ${

@@ -55,6 +55,24 @@ const Login = () => {
     []
   );
 
+  // Load saved credentials on mount
+  React.useEffect(() => {
+    const savedCredentials = localStorage.getItem('rememberedCredentials');
+    const sessionCredentials = sessionStorage.getItem('sessionCredentials');
+    
+    if (savedCredentials) {
+      const { email: savedEmail, password: savedPassword } = JSON.parse(savedCredentials);
+      setEmail(savedEmail);
+      setPassword(savedPassword);
+      setRememberMe(true);
+    } else if (sessionCredentials) {
+      const { email: savedEmail, password: savedPassword } = JSON.parse(sessionCredentials);
+      setEmail(savedEmail);
+      setPassword(savedPassword);
+      setRememberMe(false);
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -73,10 +91,10 @@ const Login = () => {
         return;
       }
 
-      if (!validatePassword(password)) {
-        setErrorMsg("Password cannot contain spaces");
-        return;
-      }
+      // if (!validatePassword(password)) {
+      //   setErrorMsg("Invalid credentials");
+      //   return;
+      // }
 
       const loginAttempts = JSON.parse(
         localStorage.getItem("loginAttempts") || '{"count": 0, "timestamp": 0}'
@@ -99,16 +117,32 @@ const Login = () => {
       const result = await dispatch(loginUser({ userCredentials, rememberMe }));
 
       if (loginUser.fulfilled.match(result)) {
+        // Handle remember me vs session storage
+        if (rememberMe) {
+          localStorage.setItem('rememberedCredentials', JSON.stringify({
+            email: email.toLowerCase(),
+            password: password
+          }));
+          sessionStorage.removeItem('sessionCredentials');
+        } else {
+          sessionStorage.setItem('sessionCredentials', JSON.stringify({
+            email: email.toLowerCase(),
+            password: password
+          }));
+          localStorage.removeItem('rememberedCredentials');
+        }
+
         localStorage.setItem(
           "loginAttempts",
           JSON.stringify({ count: 0, timestamp: Date.now() })
         );
 
+        // Use role from the response data
         const { role } = result.payload;
         const roleRoutes = {
           'Admin': '/admin/dashboard',
           'Manager': '/manager/dashboard',
-          'Receptionist': '/reception/dashboard',
+          'Reception': '/reception/dashboard',
           'Staff': '/staff/dashboard'
         };
 
@@ -211,6 +245,17 @@ const Login = () => {
       setResetLoading(false);
     }
   };
+
+  // Add cleanup for remembered credentials when component unmounts
+  React.useEffect(() => {
+    return () => {
+      if (!rememberMe) {
+        localStorage.removeItem('rememberedCredentials');
+      } else {
+        sessionStorage.removeItem('sessionCredentials');
+      }
+    };
+  }, [rememberMe]);
 
   React.useEffect(() => {
     return () => {
@@ -369,26 +414,19 @@ const Login = () => {
               )}
               </div>
 
-              <div className="flex justify-between flex-row  items-center lg:text-base text-sm">
+              <div className="flex justify-end flex-row items-center lg:text-base text-sm">
                 <button
                   type="button"
                   onClick={() => {
                     setShowForgotPassword(true);
                     setErrorMsg("");
                   }}
-                  className=" text-gray-500"
+                  className=" text-gray-500 -mt-12"
                 >
                   Forgot password?
                 </button>
 
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)} 
-                  />
-                  <label className=" text-gray-500">Remember me</label>
-                </div>
+                
               </div>
 
               <div className="">

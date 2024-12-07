@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import DataBase from '../../common/DataBase';
-import AdminPayRoll from './AdminPayRoll';
 import AdminAnalaytics from './AdminAnalaytics';
 import AdminLeaveManagment from './AdminLeaveManagment';
 import AdminSettings from './AdminSettings';
@@ -79,7 +78,6 @@ const AdminSidebar = ({ onMenuItemClick }) => {
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', component: AdminDashboard },
     { icon: <LineChart size={20} />, label: 'Analytics', component: AdminAnalaytics },
     { icon: <Database size={20} />, label: 'Database', component: DataBase },
-    { icon: <Receipt size={20} />, label: 'Payroll', component: AdminPayRoll },
     { icon: <Calendar size={20} />, label: 'Schedule status', component: MSchedule },
     { icon: <ClipboardCheck size={20} />, label: 'Leave management', component: AdminLeaveManagment },
     { icon: <Settings size={20} />, label: 'Settings', component: AdminSettings },

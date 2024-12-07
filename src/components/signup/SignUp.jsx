@@ -113,15 +113,15 @@ const SignUp = () => {
   };
 
 
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+// const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 const validatePassword = (password) => {
   if (!password) return "Password is required";
   if (password.length < 8) return "Password must be at least 8 characters";
-  if (!/[A-Z]/.test(password)) return "Password must include an uppercase letter";
-  if (!/[a-z]/.test(password)) return "Password must include a lowercase letter";
-  if (!/[0-9]/.test(password)) return "Password must include a number";
+  if (!/[A-Z]/.test(password)) return "Password must have uppercase letter";
+  if (!/[a-z]/.test(password)) return "Password must have a lowercase letter";
+  if (!/[0-9]/.test(password)) return "Password must have a number";
   // if (!/[!@#$%^&*]/.test(password)) return "Password must include a special character (!@#$%^&*)";
   return null;
 };
@@ -487,12 +487,12 @@ const handleVerifyOtp = (e) => {
 
                 <div className="flex justify-end items-center text-sm lg:text-base mt-2">
                   <div className="flex items-center gap-2">
-                    <input 
+                    {/* <input 
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)} 
                     />
-                    <label className=" text-gray-500 text-sm lg:text-base">Remember me</label>
+                    <label className=" text-gray-500 text-sm lg:text-base">Remember me</label> */}
                   </div>
                 </div>
                 <div className="text-center ">
@@ -503,7 +503,7 @@ const handleVerifyOtp = (e) => {
                     className="w-full h-9 bg-[#5663AC] text-white rounded-lg hover:bg-[#6773AC] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? (
-                      <div className="flex justify-center items-center">
+                      <div className="flex  justify-center items-center">
                         <img
                           className="w-6"
                           src="/bouncing-circles.svg"

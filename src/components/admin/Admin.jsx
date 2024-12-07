@@ -91,7 +91,7 @@ const Admin = () => {
     } catch (error) {
       console.error('Notification initialization failed:', error);
       setNotificationStatus('failed');
-      showNotification('Failed to enable notifications', 'error');
+      // showNotification('Failed to enable notifications', 'error');
     }
   }
 

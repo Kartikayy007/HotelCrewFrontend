@@ -1542,6 +1542,7 @@ const Profile = () => {
                   id="user_name"
                   value={formData.user_name}
                   onChange={handleInputChange}
+                  maxLength={15}
                   required
                   className="border border-gray-400 rounded-[4px] px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
@@ -1623,7 +1624,7 @@ const AdminSettings = () => {
 
       <div className="mb-6 mt-6">
         <div>
-          <nav className="flex overflow-x-auto w-screen   md:w-full">
+          <nav className="flex flex-wrap overflow-x-auto w-screen   md:w-full">
             {tabs.map((tab) => (
               <button
                 key={tab.id}

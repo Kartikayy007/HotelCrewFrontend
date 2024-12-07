@@ -63,49 +63,32 @@ const useCountAnimation = (end, duration = 500) => {
 };
 
 const StatsCard = ({ title, value, Icon, trend, previousValue, suffix = '', showTrend = true }) => {
-  const getGradient = () => {
-    if (title === "Total Staff") return "from-blue-400 to-blue-600";
-    if (!showTrend) return "from-blue-400 to-blue-600";
-    return trend > (previousValue || 0) 
-    ? "from-green-400 to-emerald-600" 
-    : "from-blue-400 to-blue-600";
-};
-
-  const getTrendIconColor = () => {
-    if (trend > (previousValue || 0)) {
-      return {
-        default: "text-emerald-500",
-        hover: "group-hover:text-emerald-50"
-      };
-    }
-    return {
-      default: "text-rose-500",
-      hover: "group-hover:text-rose-50"
-    };
+  const getStatusColor = () => {
+    if (title === "Total Staff") return "text-black";
+    if (!showTrend) return "text-black";
+    return trend > (previousValue || 0) ? "text-black" : "text-black";
   };
-
-  const iconColors = getTrendIconColor();
 
   return (
     <section className="w-full sm:w-1/2 xl:w-1/4 px-2 mb-4">
-      <div className="relative overflow-hidden group bg-white rounded-lg shadow-lg p-4 transform transition-all duration-300">
-        <div className={`absolute inset-0 bg-gradient-to-r ${getGradient()} translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300`} />
-        
-        <Icon className="absolute z-10 -top-0 -right-1 text-9xl text-slate-100 group-hover:text-white/30 group-hover:rotate-12 transition-transform duration-300" />
-        
-        <div className="relative z-10">
-          <h3 className="text-lg font-semibold group-hover:text-white transition-colors duration-300">
-            {title}
-          </h3>
-          <div className="flex items-center gap-2">
-            <p className="text-3xl font-semibold group-hover:text-white transition-colors duration-300">
-              {suffix}{value}
-            </p>
-            {showTrend && trend > (previousValue || 0) ? (
-              <TrendingUp className={`${iconColors.default} ${iconColors.hover} transition-colors duration-300`} size={24} />
-            ) : showTrend && (
-              <TrendingDown className={`${iconColors.default} ${iconColors.hover} transition-colors duration-300`} size={24} />
-            )}
+      <div className="bg-white rounded-lg shadow-lg p-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-700">
+              {title}
+            </h3>
+            <div className="flex items-center gap-2 mt-2">
+              <p className={`text-3xl font-semibold ${getStatusColor()}`}>
+                {suffix}{value}
+              </p>
+              {showTrend && (
+                trend > (previousValue || 0) ? (
+                  <TrendingUp className="text-emerald-500" size={24} />
+                ) : (
+                  <TrendingDown className="text-rose-500" size={24} />
+                )
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -289,7 +272,7 @@ const AdminAnalytics = () => {
   useEffect(() => {
     const generateTimeData = (hour) => {
       const performanceData = [];
-      for (let i = 0; i <= hour; i++) {
+      for (let i = 0;i <= hour; i++) {
         performanceData.push({
           hour: `${i}:00`,
           performance: Math.floor(Math.random() * (95 - 85 + 1)) + 85,
