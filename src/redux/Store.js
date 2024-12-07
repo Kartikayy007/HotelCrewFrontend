@@ -6,6 +6,7 @@ import { receptionReducer } from './slices/ReceptionSlice'
 import AdminStaffSlice from './slices/AdminStaffSlice'
 import ManagerReducer from './slices/ManagerSlice.jsx'
 import AdminAttendanceSlice from './slices/AdminAttendanceSlice'
+import managerAttendanceReducer from './slices/AttendanceSlice.jsx';
 import taskReducer from './slices/TaskSlice'
 import announcementReducer from './slices/AnnouncementSlice'
 import staffReducer from "./slices/StaffSlice"
@@ -37,6 +38,7 @@ const store = configureStore({
     manager: ManagerReducer,
     reception: receptionReducer,
     attendance: AdminAttendanceSlice,
+    managerAttendance: managerAttendanceReducer,
     tasks: taskReducer,
     announcements: announcementReducer,
     staff: AdminStaffSlice,

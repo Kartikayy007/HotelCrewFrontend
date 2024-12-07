@@ -512,7 +512,7 @@ const AdminAnalytics = () => {
                         </div>
                         <div className="h-64 w-full flex justify-center items-center">
                           {!isAllDataLoaded ? (
-                            <Skeleton variant="rectangular" width="100%" height={320} animation="wave" />
+                            <Skeleton variant="rectangular" width="100%" height={280} animation="wave" />
                           ) : (
                             <Box sx={{ width: "100%", mb: 0, mt: 0 }}>  
                             <LineChart
