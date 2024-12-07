@@ -90,7 +90,6 @@ const StatsCard = ({ title, value, Icon, trend, previousValue, suffix = '', show
               )}
             </div>
           </div>
-          <Icon className="text-gray-200" size={48} />
         </div>
       </div>
     </section>
