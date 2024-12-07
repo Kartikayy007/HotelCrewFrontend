@@ -112,18 +112,69 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   const { from_date, to_date, leave_type, reason } = leaveDetails;
 
-  // Validation checks
+  // Basic validation
   if (!from_date || !to_date || !leave_type || !reason) {
     setSnackbar({
       open: true,
-      message: `Please fill in all required fields`,
+      message: "Please fill in all required fields",
       severity: "error"
     });
     return;
   }
 
-  // Dispatch the leave application
-  await dispatch(staffLeaveApply(leaveDetails));
+  // Check if from_date and to_date are the same
+  if (from_date === to_date) {
+    // Check if dates are same, implement same day validation
+    try {
+      await dispatch(staffLeaveApply(leaveDetails)).unwrap();
+    } catch (error) {
+      if (error?.message?.includes("date range")) {
+        setSnackbar({
+          open: true,
+          message: "You already have leave applied for this date",
+          severity: "error"
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: error?.message || "Failed to submit leave request",
+          severity: "error"
+        });
+      }
+    }
+    return;
+  }
+
+  // Validate date range
+  const start = new Date(from_date);
+  const end = new Date(to_date);
+  
+  if (end < start) {
+    setSnackbar({
+      open: true,
+      message: "End date cannot be before start date",
+      severity: "error"
+    });
+    return;
+  }
+
+  try {
+    await dispatch(staffLeaveApply(leaveDetails)).unwrap();
+  } catch (error) {
+    if (error?.message?.includes("date range")) {
+      setSnackbar({
+        open: true,
+        message: "Leave already exists for one or more dates in this range",
+        severity: "error"
+      });
+    } else {
+      setSnackbar({
+        open: true,
+        message: error?.message || "Failed to submit leave request",
+        severity: "error"
+      });
+    }
+  }
 };
 
   const monthlyAttendance = useSelector((state) => state.staffAttendance.monthlyAttendance);
@@ -243,9 +294,10 @@ useEffect(() => {
   }
 }, [appliedLeave, applyLeaveError, dispatch]);
 
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
+  const handleCloseSnackbar = (event, reason) => {
+  if (reason === 'clickaway') return;
+  setSnackbar(prev => ({ ...prev, open: false }));
+};
   // Update shiftTime function for correct shift mapping
   const shiftTime = (shift) => {
     const shiftLower = shift?.toLowerCase();
@@ -570,17 +622,18 @@ useEffect(() => {
 <Snackbar
   open={snackbar.open}
   autoHideDuration={4000}
-  onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+  onClose={handleCloseSnackbar}
   anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+  sx={{ position: 'fixed', zIndex: 9999 }}
 >
-  <MuiAlert 
-    elevation={6}
-    variant="filled"
-    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+  <Alert 
+    onClose={handleCloseSnackbar}
     severity={snackbar.severity}
+    variant="filled"
+    sx={{ width: '100%' }}
   >
     {snackbar.message}
-  </MuiAlert>
+  </Alert>
 </Snackbar>
        
 

@@ -23,13 +23,20 @@ export const staffLeaveApply = createAsyncThunk(
         leaveData,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Include token in Authorization header
+            Authorization: `Bearer ${token}`,
           },
         }
       );
       return response.data; // Returns the response data on success
     } catch (error) {
-      return rejectWithValue(error.response.data); // Returns the error response on failure
+      if (error.response?.status === 400) {
+        return rejectWithValue({
+          message: error.response?.data?.message || "Leave already exists for these dates"
+        });
+      }
+      return rejectWithValue({
+        message: "Failed to submit leave request"
+      });
     }
   }
 );
