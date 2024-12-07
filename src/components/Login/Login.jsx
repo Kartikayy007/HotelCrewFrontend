@@ -87,7 +87,7 @@ const Login = () => {
       //   return;
       // }
       if (!validateEmail(email)) {
-        setErrorMsg("Please enter a valid email address");
+        setErrorMsg("Enter a valid Mail");
         return;
       }
 
@@ -314,7 +314,7 @@ const Login = () => {
                   autoComplete="email"
                 />
               </div>
-              <div className="mt-12">
+              <div className="relative">
               {errorMsg && (
                 <div
                   className="text-[#99182C] text-base text-center lg:text-left  lg:w-full"
@@ -406,7 +406,7 @@ const Login = () => {
                 <div className="h-2">
               {errorMsg && (
                 <div
-                  className="text-[#99182C] leading-[0.8rem] lg:text-base text-sm text-center lg:text-left lg:w-full"
+                  className="text-[#99182C] leading-[0.8rem] lg:text-base text-sm text-left lg:w-full"
                   role="alert"
                 >
                   {errorMsg}

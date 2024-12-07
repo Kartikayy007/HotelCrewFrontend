@@ -705,6 +705,7 @@ const MDashboard = () => {
 
   useEffect(() => {
     dispatch(fetchTodayAnnouncements());
+    
   }, [dispatch]);
 
   const handleCreateAnnouncement = async (announcementData) => {
