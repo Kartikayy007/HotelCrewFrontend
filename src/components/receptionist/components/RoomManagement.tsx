@@ -124,7 +124,7 @@ const RoomManagement = () => {
         <div className="flex-1 w-full mx-8 relative overflow-x-auto">
           <div className="scroll-container flex gap-2 overflow-x-auto hide-scrollbar w-full">
             <select
-              className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+              className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full"
               value={customerType}
               onChange={(e) => setCustomerType(e.target.value)}
             >
@@ -133,7 +133,7 @@ const RoomManagement = () => {
               <option value="VIP">VIP</option>
             </select>
             <select
-              className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+              className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full"
               value={roomType}
               onChange={(e) => setRoomType(e.target.value)}
             >
@@ -144,7 +144,7 @@ const RoomManagement = () => {
               ))}
             </select>
             <select
-              className="filter1 bg-[#F1F6FC] hover:bg-gray-300 text-[#5663AC] font-medium py-2 px-4 rounded-full"
+              className="filter1 bg-white hover:bg-gray-50 text-[#5663AC] font-medium py-2 px-4 rounded-full"
               value={stayDuration}
               onChange={(e) => setStayDuration(e.target.value)}
             >

@@ -203,46 +203,14 @@ const handleSubmit = async (e) => {
       return;
     }
     setEndDate(date);
-    // setLeaveDetails((prev) => ({
-    //   ...prev,
-    //   to_date: date ? date.toLocaleDateString() : "", // Set the formatted date
-    // }));
+   
     setLeaveDetails((prev) => ({
       ...prev,
-      to_date: date ? formatDate(date) : "", // Set the formatted date
+      to_date: date ? formatDate(date) : "",
     }));
-    setIsEndDropdownOpen(false); // Close the dropdown
-    // setIsCalendarOpen(null);
+    setIsEndDropdownOpen(false); 
+   
   };
-
-  // const handleFileButtonClick = () => {
-  //   fileInputRef.current.click(); // Trigger the hidden file input click
-  // };
-  // const handleRemoveFile = () => {
-  //   setFileName(''); // Clear the file name when "X" is clicked
-  // };
-
-  // const handleFileChange = (event) => {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     // Validate file type
-  //     const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
-  //     if (allowedTypes.includes(file.type)) {
-  //       setSelectedFile(file);
-  //       setSnackbar({ open: true, message: "File uploaded successfully.", severity: "success" });
-  //       setFileName(file.name);
-  //       setTimeout(() => {
-  //         handleCloseSnackbar(); // Close snackbar after 3 seconds
-  //       }, 3000);
-  //     } else {
-  //       setSnackbar({ open: true, message: "Invalid file type. Please upload a PDF, JPG, or PNG file.", severity: "error" });
-  //       event.target.value = ""; // Clear the input
-  //       setTimeout(() => {
-  //         handleCloseSnackbar(); // Close snackbar after 3 seconds
-  //       }, 3000);
-  //     }
-  //   }
-  // };
 
  
 
@@ -390,7 +358,7 @@ useEffect(() => {
           </div>
         </div>
         <div className='space-y-5 xl:w-[35%] gap-5 '>
-          <div className="bg-white w-full h-[700px]  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
+          <div className="bg-white w-full lg:h-[700px] h-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-2 text-left">Leave Request</h2>
             {loading ? (
               <div className='ml-4 mb-2'>
@@ -496,18 +464,9 @@ useEffect(() => {
 
                       {isEndDropdownOpen && (
                         <div className="absolute  z-50 pr-4 mr-5">
-                          {/* <DatePicker
-                            selected={endDate}
-                            onChange={handleEndDateChange}
-                            inline
-                            selectsEnd
-                            dateFormat="dd/MM/yyyy"
-                            startDate={startDate}
-                            endDate={endDate}
-                            minDate={startDate || today} // Prevent selection of dates before the start date
-                          /> */}
+                          
                           <Dialog
-                            // open={!!isCalendarOpen && isCalendarOpen === "endDate"}
+                            
                             open={isEndDropdownOpen}
                             // onClose={closeCalendar} // Close the calendar if clicked outside
                             onClose={toggleEndDropdown}

@@ -2,7 +2,13 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import { Ban, CircleCheck, CircleX, ClockAlert, Maximize2, X } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAttendance, updateAttendance, selectStaff, selectLoading, selectError, selectUpdateLoading } from '../../redux/slices/AttendanceSlice';
+import { fetchAttendance,
+   updateAttendance,
+    selectManagerAttendanceStaff,
+     selectManagerAttendanceLoading,
+      selectManagerAttendanceError,
+       selectManagerAttendanceUpdateLoading,
+      selectManagerAttendanceUpdateError } from '../../redux/slices/AttendanceSlice';
 import {
   fetchLeaveRequests,
   updateLeaveStatus,
@@ -91,15 +97,15 @@ const MAttendance = () => {
   }};
   const [approvedLeaves, setApprovedLeaves] = useState([]);
   const [rejectedLeaves, setRejectedLeaves] = useState([]);
-  const staff = useSelector(selectStaff);
-  console.log('staff:', staff);
+  const staff = useSelector(selectManagerAttendanceStaff);
+  // console.log('staff:', staff);
 
 
-  const loading = useSelector(selectLoading);
-  const error = useSelector(selectError);
-  const updateLoading = useSelector(selectUpdateLoading);
+  const loading = useSelector(selectManagerAttendanceLoading);
+  const error = useSelector(selectManagerAttendanceError);
+  const updateLoading = useSelector(selectManagerAttendanceUpdateLoading);
   useEffect(() => {
-    // console.log('Staff:', staff); 
+    console.log('Staff:', staff); 
   }, [staff]);
 
 

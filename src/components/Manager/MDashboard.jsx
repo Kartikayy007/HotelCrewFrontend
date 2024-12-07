@@ -14,9 +14,10 @@ import {
 } from "../../redux/slices/StaffSlice";
 import {
   fetchAttendanceStats,
-  selectError,
-  selectStats,
-  selectLoading,
+  selectManagerAttendanceStatsError,
+  selectManagerAttendanceStats,
+  selectManagerAttendanceLoading,
+  selectManagerAttendanceStatsLoading,
 } from "../../redux/slices/AttendanceSlice";
 import {
   Dialog,
@@ -196,6 +197,7 @@ const MDashboard = () => {
     dispatch(fetchGuestData());
     dispatch(fetchRoomStats());
     dispatch(fetchRevenueStats());
+    dispatch(fetchAttendanceStats());
     dispatch(fetchStaffData());
     dispatch(fetchTasks());
     const interval = setInterval(() => {
@@ -423,9 +425,9 @@ const MDashboard = () => {
   const [selected, setSelected] = useState({label: "Department", value: ""});
 
   // const {  error } = useSelector((state) => state.attendance);
-  const stats = useSelector(selectStats);
-  const statError = useSelector(selectError);
-  const statLoading = useSelector(selectLoading);
+  const stats = useSelector(selectManagerAttendanceStats);
+  const statError = useSelector(selectManagerAttendanceStatsError);
+  const statLoading = useSelector(selectManagerAttendanceStatsLoading);
   // const staffStatus = [
   //   { id: 0, value: 45, label: "Busy", color: "#252941" },
   //   { id: 1, value: 35, label: "Vacant", color: "#8094D4" },
@@ -463,14 +465,14 @@ const MDashboard = () => {
   const staffAttendanceData = [
     {
       id: 0,
-      value: stats.total_present,
-      label: `Present (${stats.total_present})`,
+      value: stats?.total_present,
+      label: `Present (${stats?.total_present})`,
       color: "#252941",
     },
     {
       id: 1,
-      value: stats.total_crew - stats.total_present,
-      label: `Absent (${stats.total_crew - stats.total_present})`,
+      value: stats?.total_crew - stats?.total_present,
+      label: `Absent (${stats?.total_crew - stats?.total_present})`,
       color: "#8094D4",
     },
   ];
