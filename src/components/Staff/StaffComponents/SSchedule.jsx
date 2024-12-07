@@ -220,46 +220,14 @@ const SSchedule = () => {
       return;
     }
     setEndDate(date);
-    // setLeaveDetails((prev) => ({
-    //   ...prev,
-    //   to_date: date ? date.toLocaleDateString() : "", // Set the formatted date
-    // }));
+   
     setLeaveDetails((prev) => ({
       ...prev,
-      to_date: date ? formatDate(date) : "", // Set the formatted date
+      to_date: date ? formatDate(date) : "",
     }));
-    setIsEndDropdownOpen(false); // Close the dropdown
-    // setIsCalendarOpen(null);
+    setIsEndDropdownOpen(false); 
+   
   };
-
-  // const handleFileButtonClick = () => {
-  //   fileInputRef.current.click(); // Trigger the hidden file input click
-  // };
-  // const handleRemoveFile = () => {
-  //   setFileName(''); // Clear the file name when "X" is clicked
-  // };
-
-  // const handleFileChange = (event) => {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     // Validate file type
-  //     const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
-  //     if (allowedTypes.includes(file.type)) {
-  //       setSelectedFile(file);
-  //       setSnackbar({ open: true, message: "File uploaded successfully.", severity: "success" });
-  //       setFileName(file.name);
-  //       setTimeout(() => {
-  //         handleCloseSnackbar(); // Close snackbar after 3 seconds
-  //       }, 3000);
-  //     } else {
-  //       setSnackbar({ open: true, message: "Invalid file type. Please upload a PDF, JPG, or PNG file.", severity: "error" });
-  //       event.target.value = ""; // Clear the input
-  //       setTimeout(() => {
-  //         handleCloseSnackbar(); // Close snackbar after 3 seconds
-  //       }, 3000);
-  //     }
-  //   }
-  // };
 
  
 
@@ -274,7 +242,7 @@ const SSchedule = () => {
         from_date: '',
         to_date: '',
         leave_type: '',
-        reason:'' // Reset any other form fields as needed
+        reason:''
       });
       setStartDate(null);
       setEndDate(null);
@@ -305,27 +273,11 @@ const SSchedule = () => {
     } else if (shift === "Night" || shift==="night") {
       return "09:00 PM to 05:00 AM";
     } else {
-      return "Invalid shift"; // Handle invalid inputs
+      return "Invalid shift"; 
     }
   };
-  // const attendance = [
-  //   { date: "24/11/24", current_attendance: "Absent" },
-  //   { date: "23/11/24", current_attendance: "Present" },
-  //   { date: "22/11/24", current_attendance: "Present" },
-  //   { date: "21/11/24", current_attendance: "Present" },
-  //   { date: "20/11/24", current_attendance: "Present" },
-  //   { date: "19/11/24", current_attendance: "Present" },
-  //   { date: "18/11/24", current_attendance: "Absent" },
-  //   { date: "17/11/24", current_attendance: "Present" },
-  //   { date: "16/11/24", current_attendance: "Present" },
-  //   { date: "15/11/24", current_attendance: "Present" },
-  //   { date: "14/11/24", current_attendance: "Present" },
-  //   { date: "13/11/24", current_attendance: "Present" },
-  //   { date: "12/11/24", current_attendance: "Present" },
-  //   { date: "11/11/24", current_attendance: "Present" },
-  // ]
   return (
-    <section className=" h-screen  font-Montserrat  overflow-y-auto ">
+    <section className=" bg-[#e6eef9] h-screen  font-Montserrat  overflow-y-auto ">
       <h2 className="text-[#252941] text-3xl mt-5 lg:text-center  my-3 pl-11 ml-5 font-semibold">Schedule Status</h2>
       {/* <div className="grid grid-cols-1  xl:grid-cols-[40%,35%,25%] gap-5 p-3 "> */}
       <div className="flex flex-col justify-center xl:flex-row xl:gap-5 gap-14 p-3 ">
@@ -408,7 +360,7 @@ const SSchedule = () => {
           </div>
         </div>
         <div className='space-y-5 xl:w-[35%] gap-5 '>
-          <div className="bg-white w-full h-[700px]  pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
+          <div className="bg-white w-full lg:h-[700px] h-auto pt-4 pb-1 pr-6 pl-6 rounded-lg shadow ">
             <h2 className="text-lg sm:text-xl font-semibold mb-2 text-left">Leave Request</h2>
             {loading ? (
               <div className='ml-4 mb-2'>
@@ -514,18 +466,9 @@ const SSchedule = () => {
 
                       {isEndDropdownOpen && (
                         <div className="absolute  z-50 pr-4 mr-5">
-                          {/* <DatePicker
-                            selected={endDate}
-                            onChange={handleEndDateChange}
-                            inline
-                            selectsEnd
-                            dateFormat="dd/MM/yyyy"
-                            startDate={startDate}
-                            endDate={endDate}
-                            minDate={startDate || today} // Prevent selection of dates before the start date
-                          /> */}
+                          
                           <Dialog
-                            // open={!!isCalendarOpen && isCalendarOpen === "endDate"}
+                            
                             open={isEndDropdownOpen}
                             // onClose={closeCalendar} // Close the calendar if clicked outside
                             onClose={toggleEndDropdown}

@@ -73,10 +73,10 @@ const Login = () => {
         return;
       }
 
-      // if (!validatePassword(password)) {
-      //   setErrorMsg("Invalid credentials");
-      //   return;
-      // }
+      if (!validatePassword(password)) {
+        setErrorMsg("Password cannot contain spaces");
+        return;
+      }
 
       const loginAttempts = JSON.parse(
         localStorage.getItem("loginAttempts") || '{"count": 0, "timestamp": 0}'
@@ -104,12 +104,11 @@ const Login = () => {
           JSON.stringify({ count: 0, timestamp: Date.now() })
         );
 
-        // Use role from the response data
         const { role } = result.payload;
         const roleRoutes = {
           'Admin': '/admin/dashboard',
           'Manager': '/manager/dashboard',
-          'Reception': '/reception/dashboard',
+          'Receptionist': '/reception/dashboard',
           'Staff': '/staff/dashboard'
         };
 
