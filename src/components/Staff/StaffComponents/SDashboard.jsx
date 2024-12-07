@@ -488,7 +488,7 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
                     // const durationInMillis = toDate - fromDate;
                     // const durationInDays = durationInMillis / (1000 * 3600 * 24) + 1;
                     return (
-                      <div key={leave.id} className='bg-[#e6efe9] font-sans my-4 p-3 rounded-lg flex flex-col '>
+                      <div key={leave.id} className='bg-[#e6eef9] font-sans my-4 p-3 rounded-lg flex flex-col '>
                         {/* <p className="text-md text-gray-500">{leave.created_at}</p> */}
                         <p className="text-md ">{leave.description}</p>
 
@@ -548,7 +548,7 @@ const fetchHistoryLoading=useSelector(selectFetchHistoryLoading);
                     hour12: true,
                   });
                   return (
-                    <div key={announcement.id} className='bg-[#e6efe9] my-4 p-3 rounded-lg flex flex-col '>
+                    <div key={announcement.id} className='bg-[#e6eef9] my-4 p-3 rounded-lg flex flex-col '>
                       <h2 className="text-lg font-semibold text-gray-800">{announcement.title}</h2>
                       <p className="text-gray-600 mt-2">{announcement.description}</p>
                       <p className="text-sm text-gray-500 mt-1">

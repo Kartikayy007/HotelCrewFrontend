@@ -20,6 +20,7 @@ export const fetchHotelDetails = createAsyncThunk(
           'Authorization': `Bearer ${token}`
         }
       });
+      console.log(response.data)
       return response.data.hotel_details;
     } catch (error) {
       return rejectWithValue(error.response.data);

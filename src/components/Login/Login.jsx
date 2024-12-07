@@ -127,7 +127,6 @@ const Login = () => {
         } else {
           sessionStorage.setItem('sessionCredentials', JSON.stringify({
             email: email.toLowerCase(),
-            password: password
           }));
           localStorage.removeItem('rememberedCredentials');
         }
@@ -315,6 +314,7 @@ const Login = () => {
                   autoComplete="email"
                 />
               </div>
+              <div className="mt-12">
               {errorMsg && (
                 <div
                   className="text-[#99182C] text-base text-center lg:text-left  lg:w-full"
@@ -323,6 +323,7 @@ const Login = () => {
                   {errorMsg}
                 </div>
               )}
+              </div>
 
               <div className="flex justify-end">
                 <button
@@ -413,7 +414,7 @@ const Login = () => {
               )}
               </div>
 
-              <div className="flex justify-end flex-row items-center lg:text-base text-sm">
+              <div className="flex mt-32 justify-end flex-row items-center lg:text-base text-sm">
                 <button
                   type="button"
                   onClick={() => {
