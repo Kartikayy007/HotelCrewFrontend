@@ -3,12 +3,8 @@ import Features from "./Features";
 import RevealLinks from "./RevealLinks";
 import {Link} from "react-router-dom";
 import {Menu, X} from "lucide-react";
-import Preloading from "./common/Preloading";
-import {gsap} from "gsap";
-import {ScrollTrigger} from "gsap/ScrollTrigger";
 import FloatingPhone from "./common/FloatingPhone";
 import { Helmet } from "react-helmet-async";
-gsap.registerPlugin(ScrollTrigger);
 
 const Onboarding = () => {
   const [rangeValue, setRangeValue] = useState(50);
@@ -37,65 +33,7 @@ const Onboarding = () => {
     setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    gsap.fromTo(
-      ".animate-on-scroll",
-      { y: 200, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        scrollTrigger: {
-          trigger: ".animate-on-scroll",
-          start: "top 130%",
-          end: "top 90%",
-          scrub: 1,
-        },
-      }
-    );
 
-    gsap.fromTo(
-      ".animate-on-scroll1",
-      { y: 200, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        scrollTrigger: {
-          trigger: ".animate-on-scroll1",
-          start: "top 130%",
-          end: "top 90%",
-          scrub: 1,
-        },
-      }
-    );
-
-    gsap.fromTo(
-      ".animation3",
-      { y: 100, opacity: 0.5 },
-      {
-        y: 0,
-        opacity: 1,
-        scrollTrigger: {
-          trigger: ".animation3",
-          start: "top 80%",
-          end: "top 50%",
-          scrub: 1,
-        }
-      }
-    )
-
-    gsap.to(".parallax", {
-      y: -50, 
-      ease: "none",
-      scrollTrigger: {
-        trigger: ".parallax",
-        start: "top 75%", 
-        end: "top 30%", 
-        scrub: 1,
-      },
-    });
-  }, []);
 
 
   return (
@@ -114,7 +52,6 @@ const Onboarding = () => {
       </Helmet>
 
 
-      <Preloading />
       <div className="font-Montserrat backdrop-blur-xl bg-white bg-opacity-75">
         <nav className="font-bold text-xl backdrop-blur-xl bg-white bg-opacity-75 sticky top-0 z-50">
           <div className="max-w-full mx-auto">

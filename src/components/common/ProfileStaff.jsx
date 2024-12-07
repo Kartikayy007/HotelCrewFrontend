@@ -497,13 +497,13 @@ const SProfile = () => {
             )}
         </div>
         <div className="absolute bottom-6 right-6">
-          <button
+          {/* <button
             onClick={() => setOpenLogoutDialog(true)}
             className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
           >
             <LogOut size={20} />
             Logout
-          </button>
+          </button> */}
         </div>
 
         {/* Logout Confirmation Dialog */}
