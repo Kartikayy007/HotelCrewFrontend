@@ -40,7 +40,7 @@ export const updateStaffTaskStatus = createAsyncThunk(
     async ({ id, status }, { rejectWithValue }) => {
         try {
             const response = await axios.patch(
-                `https://hotelcrew-1.onrender.com/api/taskassignment/tasks/update/${id}/`, // Task ID in the URL
+                `https://hotelcrew-1.onrender.com/api/taskassignment/tasks/status/${id}/`, // Task ID in the URL
                 { status }, // Send status in the request body
                 { headers: getAuthHeaders() } // Include Authorization header
             );
