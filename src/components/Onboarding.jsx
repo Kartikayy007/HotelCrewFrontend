@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import {Menu, X} from "lucide-react";
 import FloatingPhone from "./common/FloatingPhone";
 import { Helmet } from "react-helmet-async";
+import Preloading from "./common/Preloading";
 
 const Onboarding = () => {
   const [rangeValue, setRangeValue] = useState(50);
@@ -51,7 +52,8 @@ const Onboarding = () => {
         <meta name="robots" content="index, follow" />
       </Helmet>
 
-
+    <Preloading />
+  
       <div className="font-Montserrat backdrop-blur-xl bg-white bg-opacity-75">
         <nav className="font-bold text-xl backdrop-blur-xl bg-white bg-opacity-75 sticky top-0 z-50">
           <div className="max-w-full mx-auto">
