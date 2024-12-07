@@ -63,4 +63,4 @@ const Screen = () => {
   );
 };
 
-export default FloatingPhone;  // FloatingPhone
+export default FloatingPhone; 

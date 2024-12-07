@@ -73,7 +73,7 @@ const Admin = () => {
       const fcmToken = await getToken(messaging, { vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY });
       if (!fcmToken) {
         throw new Error('Failed to get FCM token.');
-      }
+      } //
 
       if (!token) {
         throw new Error('Access token not available.');
