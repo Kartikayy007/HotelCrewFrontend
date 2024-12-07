@@ -213,7 +213,7 @@ const TaskAssignment: React.FC = () => {
     if (isLoading) {
         return (
             <div className="w-full px-4 md:px-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 w-full max-w-[1400px] mx-auto gap-4">
+                <div className="grid grid-cols-1 xl:grid-cols-3 w-full max-w-[1400px] mx-auto gap-4">
                     {[1, 2, 3].map((column) => (
                         <div key={column} className="flex flex-col gap-4">
                             <div className="flex-1 bg-white rounded-xl shadow-lg p-4 space-y-4">
