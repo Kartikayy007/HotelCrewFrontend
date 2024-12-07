@@ -49,7 +49,7 @@ const Screen = () => {
   return (
     <div className="relative z-0 grid h-full w-full place-content-center overflow-hidden rounded-[20px] bg-white">
       <img
-        src="src/components/common/mobile cover.jpg"
+        src="/mobile cover.jpg"
         alt="Mobile Cover"
         className="absolute inset-0 h-full w-full object-cover rounded-[20px]"
       />
