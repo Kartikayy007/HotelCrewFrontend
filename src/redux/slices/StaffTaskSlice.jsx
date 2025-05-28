@@ -2,16 +2,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Define a function to get the authorization headers
+
 const getAuthHeaders = () => {
-    // Ideally, you fetch the token from localStorage or Redux store
     const token = localStorage.getItem('accessToken');
-    return {
-        Authorization: `Bearer ${token}`
+    if (!token) {
+        throw new Error('No access token found');
     }
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
 };
 
-// Define the initial state
 const initialState = { 
     tasks: [],
     count: 0,
@@ -19,40 +21,53 @@ const initialState = {
     error: null,
 };
 
-// Define the async thunk for fetching tasks
-export const fetchStaffTasks = createAsyncThunk(
-    'stafftasks/fetchStaffTasks', // Action name
-    async (_, { rejectWithValue }) => { // No staffId, just dispatch the request without a parameter
-        try {
-            const response = await axios.get(
-                `https://hotelcrew-1.onrender.com/api/taskassignment/tasks/staff/`,  // No staffId in the URL
-                { headers: getAuthHeaders() } // Pass Authorization header here
-            );
-             ("Fetched tasks:", response.data); // Log to check response data
-            return response.data; // Return the data
-        } catch (err) {
-            return rejectWithValue(err.response?.data || 'Failed to load tasks'); // Return error message
-        }
-    }
-);
+
 export const updateStaffTaskStatus = createAsyncThunk(
     'stafftasks/updateStaffTaskStatus',
-    async ({ id, status }, { rejectWithValue }) => {
+    async ({ id, status }, { rejectWithValue, dispatch }) => {
         try {
             const response = await axios.patch(
-                `https://hotelcrew-1.onrender.com/api/taskassignment/tasks/status/${id}/`, // Task ID in the URL
-                { status }, // Send status in the request body
-                { headers: getAuthHeaders() } // Include Authorization header
+                `https://hotelcrew-1.onrender.com/api/taskassignment/tasks/status/${id}/`, 
+                { status }, 
+                { headers: getAuthHeaders() } 
             );
-             ("Task status updated:", response.data); // Log to check response data
-            return response.data; // Return the success message and status
+            
+            // Wait for the update to complete then fetch fresh data
+            await dispatch(fetchStaffTasks()).unwrap();
+            return response.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || 'Failed to update task status'); // Return error message
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                // Handle token expiration
+                localStorage.removeItem('accessToken');
+                window.location.href = '/login';
+                return rejectWithValue('Session expired. Please login again.');
+            }
+            return rejectWithValue(err.response?.data || 'Failed to update task status');
         }
     }
 );
 
-// Create the slice
+export const fetchStaffTasks = createAsyncThunk(
+    'stafftasks/fetchStaffTasks',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(
+                `https://hotelcrew-1.onrender.com/api/taskassignment/tasks/staff/`,
+                { headers: getAuthHeaders() }
+            );
+            return response.data;
+        } catch (err) {
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                localStorage.removeItem('accessToken');
+                window.location.href = '/login';
+                return rejectWithValue('Session expired. Please login again.');
+            }
+            return rejectWithValue(err.response?.data || 'Failed to load tasks');
+        }
+    }
+);
+
+
 const taskSlice = createSlice({
     name: 'stafftasks',
     initialState,
@@ -78,21 +93,21 @@ const taskSlice = createSlice({
             })
             .addCase(updateStaffTaskStatus.fulfilled, (state, action) => {
                 state.loading = false;
-                // Update task status locally in the tasks array
-                 (updatedTask);
-                const updatedTask = action.payload;
+                console.log("Updated task status:", action.payload);
+                //  (updatedTask);
+                // const updatedTask = action.payload;
+                // // const index = state.tasks.findIndex((task) => task.id === updatedTask.id);
+                // // if (index !== -1) {
+                // //   state.tasks[index] = updatedTask;
+                // // }
                 // const index = state.tasks.findIndex((task) => task.id === updatedTask.id);
                 // if (index !== -1) {
-                //   state.tasks[index] = updatedTask;
+                    
+                //     state.tasks[index] = {
+                //         ...state.tasks[index], 
+                //         status: updatedTask.status 
+                //     };
                 // }
-                const index = state.tasks.findIndex((task) => task.id === updatedTask.id);
-                if (index !== -1) {
-                    // Merge the updated fields with the existing task
-                    state.tasks[index] = {
-                        ...state.tasks[index], // Existing task fields
-                        status: updatedTask.status // Updated field(s)
-                    };
-                }
             })
             .addCase(updateStaffTaskStatus.rejected, (state, action) => {
                 state.loading = false;
@@ -101,11 +116,13 @@ const taskSlice = createSlice({
     },
 });
 
-// Export selectors to access the state
+
+
+
 export const selectStaffTasks = (state) => state.stafftasks.tasks;
 export const selectStaffTaskCount = (state) => state.stafftasks.count;
 export const selectStaffTaskLoading = (state) => state.stafftasks.loading;
 export const selectStaffTaskError = (state) => state.stafftasks.error;
 
-// Export the reducer
+
 export default taskSlice.reducer;

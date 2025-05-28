@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Sidebar from './components/Sidebar';
 import { setActiveComponent } from '../../redux/slices/ReceptionSlice';
-import { messaging } from '../../config/firebase-init';
-import { getToken, onMessage } from '@firebase/messaging';
+// import { messaging } from '../../config/firebase-init';
+// import { getToken, onMessage } from '@firebase/messaging';
 import store from '../../redux/Store';
 import { Snackbar, Alert, AlertTitle } from '@mui/material';
 import axios from 'axios';
@@ -14,7 +14,7 @@ type RootState = ReturnType<typeof store.getState>;
 const Reception: React.FC = () => {
   const dispatch = useDispatch();
   const { activeComponent } = useSelector((state: RootState) => state.reception);
-  const [notificationStatus, setNotificationStatus] = useState<string>('');
+  // const [notificationStatus, setNotificationStatus] = useState<string>('');
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   const [open, setOpen] = useState(false);
@@ -44,65 +44,14 @@ const Reception: React.FC = () => {
     }
   };
 
-  async function initializeNotifications() {
-    try {
-      if (Notification.permission === 'default') {
-        await Notification.requestPermission();
-      }
-
-      if (Notification.permission !== 'granted') {
-        throw new Error('Notification permission not granted.');
-      }
-
-      if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-      }
-
-      const fcmToken = await getToken(messaging, { vapidKey: 'BOqhVdEkOMB9fFPor6H_d1a8DPgeIh-yTgwcD8NL12Jpm2XfIW9Os6e_QLxvn35vDBL5XwaFeAbLPyEVHgibqNE' });
-      if (!fcmToken) {
-        throw new Error('Failed to get FCM token.');
-      }
-       ('FCM Token:', fcmToken);
-
-      const accessToken = localStorage.getItem('accessToken'); 
-      if (!accessToken) {
-        throw new Error('Access token not available.');
-      }
-
-      const result = await registerDeviceToken(fcmToken, accessToken);
-      onMessage(messaging, (payload) => {
-         ('Received foreground message:', payload);
-        setSnackbarMessage(payload.notification?.body || 'New Notification');
-        setSnackbarOpen(true);
-        toast.info(payload.notification?.body, {
-          title: payload.notification?.title,
-          position: 'top-right',
-          autoClose: 5000,
-        });
-      });
-
-      setNotificationStatus('enabled');
-      toast.success('Notifications enabled successfully!');
-    } catch (error) {
-      console.error('Notification initialization failed:', error);
-      setNotificationStatus('failed');
-      toast.error('Failed to enable notifications. Please check browser settings.');
-    }
-  }
+ 
 
   const handleClose = () => {
     setOpen(false);
   };
 
-  const showNotification = (msg: string, sev: 'success' | 'error' | 'info' | 'warning') => {
-    setMessage(msg);
-    setSeverity(sev);
-    setOpen(true);
-  };
 
-  useEffect(() => {
-    initializeNotifications();
-  }, []);
+
 
   return (
     <div className="flex h-screen">
