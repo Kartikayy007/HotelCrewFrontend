@@ -424,14 +424,10 @@ const MDashboard = () => {
 
   const [selected, setSelected] = useState({label: "Department", value: ""});
 
-  // const {  error } = useSelector((state) => state.attendance);
   const stats = useSelector(selectManagerAttendanceStats);
   const statError = useSelector(selectManagerAttendanceStatsError);
   const statLoading = useSelector(selectManagerAttendanceStatsLoading);
-  // const staffStatus = [
-  //   { id: 0, value: 45, label: "Busy", color: "#252941" },
-  //   { id: 1, value: 35, label: "Vacant", color: "#8094D4" },
-  // ];
+ 
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [showTaskAssignment, setShowTaskAssignment] = useState(false);
@@ -440,7 +436,6 @@ const MDashboard = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // Add these handlers
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -513,34 +508,7 @@ const MDashboard = () => {
     },
   ];
 
-  const rotateWeeklyData = (data, todayIndex) => {
-    // Rotate the xAxis and series data to make todayIndex the last element
-    const {xAxis, series} = data;
-
-    const rotatedXAxis = [
-      ...xAxis[0].data.slice(todayIndex + 1),
-      ...xAxis[0].data.slice(0, todayIndex + 1),
-    ];
-
-    const rotatedSeries = series.map((s) => ({
-      ...s,
-      data: [
-        ...s.data.slice(todayIndex + 1),
-        ...s.data.slice(0, todayIndex + 1),
-      ],
-    }));
-
-    return {xAxis: [{...xAxis[0], data: rotatedXAxis}], series: rotatedSeries};
-  };
-
-  const getCurrentDayIndex = () => {
-    const currentDay = new Date().getDay();
-    return currentDay;
-  };
-
-  const getFilteredData = (range) => {
-    return timeData.slice(range[0], range[1] + 1);
-  };
+  
 
   const generateMarks = () => {
     const marks = [];
@@ -559,7 +527,10 @@ const MDashboard = () => {
 
     return marks;
   };
+
+
   const marks = generateMarks();
+
   useEffect(() => {
     const interval = setInterval(() => {
       const newHour = new Date().getHours();
@@ -590,7 +561,7 @@ const MDashboard = () => {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
 
-  // Modified handleAssign with capitalized department
+  
   const handleAssign = async (e) => {
     e.preventDefault();
 
@@ -607,7 +578,7 @@ const MDashboard = () => {
       return;
     }
 
-    // Create deadline timestamp
+    
     const today = new Date();
     today.setHours(parseInt(selectedHour, 10));
     today.setMinutes(parseInt(selectedMinute, 10));
@@ -618,7 +589,7 @@ const MDashboard = () => {
     const taskData = {
       title: taskTitle,
       description: taskDescription,
-      department: capitalizeFirstLetter(selected.value), // Capitalize department
+      department: capitalizeFirstLetter(selected.value), 
       deadline: formattedDeadline,
     };
 
@@ -629,7 +600,7 @@ const MDashboard = () => {
         message: "Task created successfully",
         severity: "success",
       });
-      // Reset form
+      
       setTaskTitle("");
       setTaskDescription("");
       setSelected({label: "Department", value: ""});
@@ -816,12 +787,10 @@ const MDashboard = () => {
     i.toString().padStart(2, "0")
   );
 
-  // Add these states at the top of MDashboard component
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const announcementContainerRef = useRef(null);
 
-  // Add this function to handle scroll
   const handleAnnouncementScroll = (e) => {
     const {scrollTop, scrollHeight, clientHeight} = e.target;
     if (
@@ -833,7 +802,7 @@ const MDashboard = () => {
     }
   };
 
-  // Add function to load more announcements
+  
   const loadMoreAnnouncements = async () => {
     try {
       const response = await dispatch(
@@ -1048,7 +1017,7 @@ const MDashboard = () => {
                       </h3>
 
                       {statLoading ? (
-                        <p>Loading...</p>
+                        <p className="w-full text-center">Loading...</p>
                       ) : statError ? (
                         <p className="text-red-500 text-center">
                           No Data Available
@@ -1530,7 +1499,7 @@ const MDashboard = () => {
                 <p className="text-2xl font-bold mt-2">{pendingLeavesCount}</p>
               </div>
               <div className="border rounded p-4">
-                <h3 className="font-medium">Approved Leaves</h3>
+                <h3 className="font-medium">Approved <br /> Leaves</h3>
                 <p className="text-2xl font-bold mt-2">{leaveCount}</p>
               </div>
             </div>

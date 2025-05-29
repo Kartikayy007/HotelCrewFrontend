@@ -2,13 +2,15 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import { Ban, CircleCheck, CircleX, ClockAlert, Maximize2, X } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchAttendance,
-   updateAttendance,
-    selectManagerAttendanceStaff,
-     selectManagerAttendanceLoading,
-      selectManagerAttendanceError,
-       selectManagerAttendanceUpdateLoading,
-      selectManagerAttendanceUpdateError } from '../../redux/slices/AttendanceSlice';
+import {
+  fetchAttendance,
+  updateAttendance,
+  selectManagerAttendanceStaff,
+  selectManagerAttendanceLoading,
+  selectManagerAttendanceError,
+  selectManagerAttendanceUpdateLoading,
+  selectManagerAttendanceUpdateError
+} from '../../redux/slices/AttendanceSlice';
 import {
   fetchLeaveRequests,
   updateLeaveStatus,
@@ -29,7 +31,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import { Calendar, Check, Clock,CircleAlert,BadgeCheck,BadgeX } from "lucide-react";
+import { Calendar, Check, Clock, CircleAlert, BadgeCheck, BadgeX } from "lucide-react";
 import LoadingAnimation from '../common/LoadingAnimation';
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
@@ -51,7 +53,7 @@ const MAttendance = () => {
   const leaveLoading = useSelector(selectLeaveLoading);
   const leaveError = useSelector(selectLeaveError);
   const updateStatus = useSelector(selectUpdateStatus);
-  
+
   // const leaveRequests = useSelector((state) => state.leave.leaveRequests || []);
 
   // const [leaveRequests, setLeaveRequests] = useState([
@@ -71,30 +73,31 @@ const MAttendance = () => {
   });
   const [selectedShift, setSelectedShift] = useState('All');
   const handleOpenModal = (staff) => {
-      setSelectedStaff(staff);
-      setOpenModal(true);
-    };
+    setSelectedStaff(staff);
+    setOpenModal(true);
+  };
 
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedStaff(null);
   };
 
-  const modalStyle =() => {
+  const modalStyle = () => {
     const isSmallScreen = useMediaQuery("(max-width: 430px)");
     return {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: isSmallScreen ? 340 : 420,
-    maxHeight: "auto",
-    overflowY: "auto",
-    bgcolor: "background.paper",
-    borderRadius: 2,
-    boxShadow: 24,
-    p: 4,
-  }};
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: isSmallScreen ? 340 : 420,
+      maxHeight: "auto",
+      overflowY: "auto",
+      bgcolor: "background.paper",
+      borderRadius: 2,
+      boxShadow: 24,
+      p: 4,
+    }
+  };
   const [approvedLeaves, setApprovedLeaves] = useState([]);
   const [rejectedLeaves, setRejectedLeaves] = useState([]);
   const staff = useSelector(selectManagerAttendanceStaff);
@@ -105,7 +108,7 @@ const MAttendance = () => {
   const error = useSelector(selectManagerAttendanceError);
   const updateLoading = useSelector(selectManagerAttendanceUpdateLoading);
   useEffect(() => {
-    console.log('Staff:', staff); 
+    console.log('Staff:', staff);
   }, [staff]);
 
 
@@ -126,51 +129,66 @@ const MAttendance = () => {
 
   useEffect(() => {
     if (staff && staff.length > 0) {
-      
-      const uniqueDepartments = [
-        ...new Set(staff.map((item) => item.department.toLowerCase()))
-      ];
-
-      setDepartment(uniqueDepartments);
+      const uniqueDepartments = [...new Set(staff.map(item =>
+        capitalizeFirstLetter(item.department)
+      ))];
+      setDepartment(['All', ...uniqueDepartments]);
       if (selectedDepartments.length === 0) {
-        setSelectedDepartments(["All"]); 
+        setSelectedDepartments(['All']);
       }
     }
   }, [staff]);
 
-  const [localloading,setLocalLoading]=useState(null);
+
+  const [updatingMemberId, setUpdatingMemberId] = useState(null);
+
   const handleToggleAttendance = async (id) => {
     try {
+      setUpdatingMemberId(id);
       await dispatch(updateAttendance(id)).unwrap();
     } catch (error) {
       console.error('Failed to update attendance:', error);
+    } finally {
+      setUpdatingMemberId(null);
     }
   };
 
-
   useEffect(() => {
-     ("Fetching leave requests on mount");
+    ("Fetching leave requests on mount");
     dispatch(fetchLeaveRequests());
 
-    
+
     const interval = setInterval(() => {
       dispatch(fetchLeaveRequests());
-    }, 10 * 60 * 1000); 
+    }, 10 * 60 * 1000);
 
-    
+
     return () => clearInterval(interval);
   }, [dispatch]);
 
+  // Update the handleLeaveAction function
   const handleLeaveAction = (id, action) => {
-   
-    dispatch(updateLeaveStatus({ leaveId: id, status: action }))
-      .unwrap() 
-      .then(() => {
-        
+    if (!id) {
+      setSnackbar({
+        open: true,
+        message: "Invalid leave request ID",
+        severity: "error",
+      });
+      return;
+    }
 
+    dispatch(updateLeaveStatus({
+      id: id,  // Make sure we're passing the correct ID
+      status: action
+    }))
+      .unwrap()
+      .then(() => {
+        // Update the local state based on action
         if (action === "Approved") {
           const approvedLeave = leaveRequests.find((request) => request.id === id);
-          setApprovedLeaves((prevApprovedLeaves) => [...prevApprovedLeaves, approvedLeave]);
+          if (approvedLeave) {
+            setApprovedLeaves((prev) => [...prev, approvedLeave]);
+          }
 
           setSnackbar({
             open: true,
@@ -179,7 +197,9 @@ const MAttendance = () => {
           });
         } else if (action === "Rejected") {
           const rejectedLeave = leaveRequests.find((request) => request.id === id);
-          setRejectedLeaves((prevRejectedLeaves) => [...prevRejectedLeaves, rejectedLeave]);
+          if (rejectedLeave) {
+            setRejectedLeaves((prev) => [...prev, rejectedLeave]);
+          }
 
           setSnackbar({
             open: true,
@@ -187,12 +207,14 @@ const MAttendance = () => {
             severity: "error",
           });
         }
+
+        // Refresh the leave requests
+        dispatch(fetchLeaveRequests());
       })
       .catch((error) => {
-        
         setSnackbar({
           open: true,
-          message: `Failed to ${action} leave request: ${error}`,
+          message: `Failed to ${action.toLowerCase()} leave request: ${error}`,
           severity: "error",
         });
       });
@@ -207,25 +229,32 @@ const MAttendance = () => {
 
   const filteredStaff = React.useMemo(() => {
     if (!staff || !Array.isArray(staff)) return [];
-  
+
     return staff.filter((member) => {
-      const departmentMatch = 
-        selectedDepartments.includes('All') || 
-        selectedDepartments.includes(capitalizeFirstLetter(member?.department));
-  
-      const shiftMatch = 
-        selectedShift === 'All' || 
-        member?.shift === selectedShift;
-  
+
+      const departmentMatch =
+        selectedDepartments.includes('All') ||
+        selectedDepartments.includes(capitalizeFirstLetter(member.department));
+
+
+      const shiftMatch =
+        selectedShift === 'All' ||
+        member.shift === selectedShift;
+
       return departmentMatch && shiftMatch;
     });
   }, [staff, selectedDepartments, selectedShift]);
-  
+
+
   const toggleDepartmentSelection = (department) => {
-    setSelectedDepartments([department]);
-
-
+    if (department === 'All') {
+      setSelectedDepartments(['All']);
+    } else {
+      setSelectedDepartments([department]);
+    }
   };
+
+
   const calculateDuration = (fromDate, toDate) => {
     const start = new Date(fromDate);
     const end = new Date(toDate);
@@ -236,6 +265,8 @@ const MAttendance = () => {
 
     return durationInDays + 1;
   };
+
+
   return (
     <section className=" h-screen p-2 mr-1 font-Montserrat">
       <h1 className="text-[#252941] text-3xl mt-6 mb-4 pl-16 font-semibold">
@@ -264,10 +295,10 @@ const MAttendance = () => {
             {['All', 'Morning', 'Evening', 'Night'].map((shift) => (
               <button
                 key={shift}
-                // onClick={() => setSelectedShift(shift)}
+                onClick={() => setSelectedShift(shift)}
                 className={`px-4 py-2 w-auto rounded-3xl border-none font-semibold ${selectedShift === shift
-                    ? 'bg-[#6675C5] text-white'
-                    : 'bg-[#E6EEF9] text-[#252941]'
+                  ? 'bg-[#6675C5] text-white'
+                  : 'bg-[#E6EEF9] text-[#252941]'
                   }`}
               >
                 {shift}
@@ -275,16 +306,7 @@ const MAttendance = () => {
             ))}
           </div>
           <h2 className="text-[#252941] text-lg sm:text-xl  pl-8 my-2 md:mt-4 mb-2 font-semibold">Select Department:</h2>
-          <div className=" flex mb-2 pl-4 mx-3 pb-4 mt-4  gap-4 rounded-3xl pr-9 overflow-x-auto scrollbar-none scrollbar-track-transparent scrollbar-thumb-neutral-50">
-
-            {/* <button
-              key="all"
-              onClick={() => toggleDepartmentSelection('All')}
-              className={`px-4 py-2 w-auto rounded-3xl font-semibold  border-none ${selectedDepartments.includes('All') ? "bg-[#6675C5] text-white" : "bg-[#E6EEF9] text-[#252941] font-semibold border border-gray-700"
-                }`}
-            >
-              All
-            </button> */}
+          <div className=" flex mb-2 pl-4 mx-3 pb-4 mt-4  gap-4 rounded-3xl pr-9 overflow-x-auto no-scrollbar">
 
 
             {department.map((dept) => (
@@ -303,16 +325,26 @@ const MAttendance = () => {
 
           <div
             className={` ${isTableExpanded ? "max-h-[calc(100%-280px)]" : "max-h-[190px]"
-              } md:ml-2 mr-5 ml-5 overflow-y-auto rounded-xl scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-50`}
+              } md:ml-2 mr-5 ml-5 overflow-y-auto rounded-xl no-scrollbar`}
           >
             {loading ? (
-              <LoadingAnimation />
-            ) : !staff?.length ? (
-              <div className="text-center p-4">No staff data available</div>
+              <>
+                <div className='m-auto w-full flex justify-center h-full items-center'>
+
+                  <LoadingAnimation />
+                </div>
+              </>
+            ) : !filteredStaff?.length ? (
+
+              <div className="text-center font-semibold text-gray-400 text-lg gap-4 h-full p-4 flex flex-col items-center justify center">
+                <img src="/noStaff.png" className='w-28 m-2' alt="" />
+                <p>No staff available</p>
+                
+                </div>
             ) : (
               <table className="w-[96%] px-3 ml-4 mx-auto border border-[#dcdcdc] rounded-2xl shadow-xl ">
-                {/* Table Headers */}
-                <thead className='sticky top-0'>
+
+                <thead className='sticky top-0 bg-[#3F4870] text-[#E6EEF9] rounded-xl'>
                   <tr className="bg-[#3F4870] text-[#E6EEF9] rounded-xl">
                     <th className="px-4 py-2 text-left">Name</th>
                     <th className="px-4 py-2 text-left">Email</th>
@@ -324,7 +356,7 @@ const MAttendance = () => {
 
 
                 <tbody>
-                  {staff.map((member, index) => (
+                  {filteredStaff.map((member, index) => (
                     <tr
                       key={member.id}
                       className={`px-4 py-2 ${index % 2 === 0 ? 'bg-[#F1F6FC]' : 'bg-[#DEE8FF]'
@@ -334,33 +366,24 @@ const MAttendance = () => {
                       <td className="px-4 py-2">{member.email}</td>
                       <td className="px-4 py-2">{member.department}</td>
                       <td className="px-4 py-2 text-center">
-                        {/* <button
-                          className={`px-4 py-1 rounded-full ${member.current_attendance === 'Present'
+
+                        <button
+                          className={`px-5 py-1 rounded-full ${member.current_attendance === 'Present'
                             ? 'bg-green-500 text-white'
                             : 'bg-red-500 text-white'
                             }`}
                           onClick={() => handleToggleAttendance(member.id)}
+                          disabled={updatingMemberId === member.id}
                         >
-                          {member.current_attendance}
-                        </button> */}
-                        
-              <button
-                className={`px-5 py-1 rounded-full ${member.current_attendance === 'Present'
-                  ? 'bg-green-500 text-white'
-                  : 'bg-red-500 text-white'
-                }`}
-                onClick={() => handleToggleAttendance(member.id)}
-                disabled={updateLoading}
-              >
-                {updateLoading ? (
-              <LoadingAnimation size={24} color="#ffffff" className='px-4 py-1 bg-white' />
-            ) : (
-                member.current_attendance
-              )}
-              </button>
-           
+                          {updatingMemberId === member.id ? (
+                            <LoadingAnimation size={21} color="#ffffff" className='px-4' />
+                          ) : (
+                            member.current_attendance
+                          )}
+                        </button>
+
                       </td>
-                      {/* <td className="px-4 py-2"></td> */}
+
                     </tr>
                   ))}
                 </tbody>
@@ -370,17 +393,17 @@ const MAttendance = () => {
         </div>
       </div>
       <div className='flex flex-col lg:flex-row gap-5 mb-1 mt-3 pb-5 px-3'>
-        {/* <div className="p-6 space-y-6"> */}
-        {/* Leave Requests */}
+
+
         <div className="bg-white w-full max-h-[375px] overflow-y-auto pb-7 py-2 rounded-xl shadow scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-200">
           <div className='flex gap-4 sticky top-0'>
-          <h2 className="text-lg sm:text-xl top-4 pl-6 mt-4 mb-0 font-semibold sticky ">Leave Requests</h2>
-          <CircleAlert className='text-yellow-500 mt-4 rounded-full ' size={30}/>
+            <h2 className="text-lg sm:text-xl top-4 pl-6 mt-4 mb-0 font-semibold sticky ">Leave Requests</h2>
+            <CircleAlert className='text-yellow-500 mt-4 rounded-full ' size={30} />
           </div>
           <div className="px-6 mt-4 space-y-4">
-            {/* Check if data is still loading */}
+
             {leaveLoading ? (
-              // Render skeletons when loading
+
               Array.from({ length: 5 }).map((_, index) => (
                 <div
                   key={index}
@@ -400,7 +423,7 @@ const MAttendance = () => {
                 </div>
               ))
             ) : (
-              // Render actual leave requests when data is loaded
+
               (leaveRequests || [])
                 .filter((request) => request?.status === "Pending")
                 .map((request) => (
@@ -412,52 +435,33 @@ const MAttendance = () => {
 
                     <div className="w-max">
                       <p className="font-semibold text-[#252941]">{request.user_name}</p>
-                      {/* <p className="font-semibold text-[#252941]">{request.department}</p> */}
                       <p className=" text-gray-600">{request.from_date} to {request.to_date}</p>
                       <p className=" text-gray-600">Type: {request.leave_type}</p>
                       <p className=" text-gray-600">Duration: {calculateDuration(request.from_date, request.to_date)} days</p>
-                      {/* <p className="text-sm text-gray-600">Date: {request.date}</p> */}
                     </div>
-                    {/* <div className="flex flex-col gap-2 "> 
-                      <button
-              className="px-4 w-full py-1 text-white bg-[#252941] rounded-full hover:bg-[#202338]"
-              onClick={() => {handleLeaveAction(request.id, "approved");
-                handleCloseModal();
-              }}
-            >
-              Approve
-            </button>
-            <button
-              className="md:px-4 px-2 ml-0 w-full py-1 text-gray-800 bg-[#fdfdfd] font-semibold border border-[#dcdcdc] rounded-full hover:bg-gray-300"
-              onClick={() => {handleLeaveAction(request.id, "rejected");
-                handleCloseModal();
-              }}
-            >
-              Reject
-            </button> 
-                    </div>*/}
+
                   </div>
                 ))
             )}
 
-            {/* Display a message when no leave requests are pending */}
-            {(leaveRequests || []).filter((request) => request?.status === 'Pending').length === 0 &&(
+
+            {(leaveRequests || []).filter((request) => request?.status === 'Pending').length === 0 && (
               <p className="text-gray-600 font-semibold">No leave requests pending.</p>
             )}
           </div>
         </div>
 
-        {/* Approved Leaves */}
-        <div className="bg-white w-full max-h-[375px] overflow-y-auto pb-7 py-2 rounded-xl shadow scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-50">
-          
-         
-            <div className='flex sticky top-0 gap-4'>
-            <h2 className="text-lg sm:text-xl pl-6 mt-4 font-semibold sticky top-0">Approved Leaves</h2>
-           <CircleCheck className='text-green-500 mt-4' size={30}/>
-            </div>
+
+        <div className="bg-white w-full max-h-[375px] overflow-y-auto pb-7 py-2 rounded-xl shadow no-scrollbar">
+
+
+          <div className='flex sticky w-full bg-white top-0 gap-4'>
+            <h2 className="text-lg sm:text-xl pl-6 pt-4 font-semibold sticky top-0">Approved Leaves</h2>
+            <CircleCheck className='text-green-500 mt-4' size={30} />
+          </div>
           <div className="m-6 h-[88%] rounded-xl bg-white mt-4 space-y-4">
             {leaveLoading ? (
-            
+
               Array.from({ length: 5 }).map((_, index) => (
                 <div
                   key={index}
@@ -477,26 +481,26 @@ const MAttendance = () => {
                   className="p-4 bg-[#E6EEF9] rounded-lg shadow-sm"
                 >
                   <p className="font-semibold text-[#252941]">{leave.user_name}</p>
-                  {/* <p className="text-sm text-gray-600">{leave.department}</p> */}
+
                   <p className="text-sm text-gray-600">Type: {leave.leave_type}</p>
                   <p className="text-sm text-gray-600">Duration: {leave.duration}</p>
                   <p className="text-sm text-gray-600">Date: {leave.from_date} to {leave.to_date}</p>
                 </div>
               ))
             ) : (
-              // Show when no data is available
-              <p className="text-gray-600 font-semibold fixed">No approved leaves yet.</p>
+
+              <p className="text-gray-600 font-semibold ">No approved leaves yet.</p>
             )}
           </div>
         </div>
-        <div className="bg-white w-full max-h-[375px] overflow-y-auto pb-7 py-2 rounded-xl shadow scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-50">
-        <div className='flex sticky top-0 gap-4'>
-          <h2 className="text-lg sm:text-xl pl-6 mt-4 font-semibold sticky top-0">Rejected Leaves</h2>
-          <CircleX className='text-red-500 mt-4 ' size={30}/>
+        <div className="bg-white w-full max-h-[375px] overflow-y-auto pb-7 py-2 rounded-xl shadow no-scrollbar">
+          <div className='flex bg-white sticky top-0 gap-4'>
+            <h2 className="text-lg sm:text-xl pl-6 pt-4 font-semibold sticky top-0">Rejected Leaves</h2>
+            <CircleX className='text-red-500 mt-4 ' size={30} />
           </div>
           <div className="m-6 h-[88%] rounded-xl bg-white mt-4 space-y-4">
             {leaveLoading ? (
-              // Show Skeletons while loading
+
               Array.from({ length: 5 }).map((_, index) => (
                 <div
                   key={index}
@@ -513,23 +517,23 @@ const MAttendance = () => {
               rejectedLeaves.map((leave) => (
                 <div
                   key={leave.id}
-                  className="p-4 bg-[#efefef] rounded-lg shadow-sm"
+                  className="p-4 bg-[#f5e8e8] rounded-lg shadow-sm"
                 >
                   <p className="font-semibold text-[#252941]">{leave.user_name}</p>
-                  {/* <p className="text-sm text-gray-600">{leave.department}</p> */}
+
                   <p className="text-sm text-gray-600">Type: {leave.leave_type}</p>
                   <p className="text-sm text-gray-600">Date: {leave.from_date} to {leave.to_date}</p>
                   <p className="text-sm text-gray-600">Duration: {leave.duration} days</p>
-                  {/* <p className="text-sm text-gray-600">Duration: {calculateDuration(leave.from_date, leave.to_date)}</p> */}
+
                 </div>
               ))
             ) : (
-              // Show when no data is available
+
               <p className="text-gray-600 font-semibold fixed ">No rejected leaves yet.</p>
             )}
           </div>
         </div>
-        {/* </div> */}
+
         <Modal
           open={openModal}
           onClose={handleCloseModal}
@@ -546,32 +550,17 @@ const MAttendance = () => {
               </Typography>
               <Divider className="my-4" />
               <div className="space-y-3">
-                {/* <div>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Department
-                  </Typography>
-                  <Typography variant="body1">
-                    {selectedStaff?.department}
-                  </Typography>
-                </div> */}
-                {/* <div>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Description
-                  </Typography>
-                  <Typography variant="body1">
-                    {selectedStaff?.description}
-                  </Typography>
-                </div> */}
+
                 <div>
-                  {/* <Typography variant="subtitle2" color="text.secondary">
-                    Current Leave Status
-                  </Typography> */}
+
                   <div className="flex items-center space-x-4 mt-2">
                     <button
                       className="px-3 w-full py-1 text-white bg-[#252941] text-lg rounded-full hover:bg-[#202338]"
                       onClick={() => {
-                        handleLeaveAction(selectedStaff.id, "Approved");
-                        handleCloseModal();
+                        if (selectedStaff && selectedStaff.id) {
+                          handleLeaveAction(selectedStaff.id, "Approved");
+                          handleCloseModal();
+                        };
                       }}
                     >
                       Approve
@@ -579,8 +568,10 @@ const MAttendance = () => {
                     <button
                       className="md:px-3  ml-0 w-full py-1 text-gray-800 bg-[#fdfdfd] text-lg font-semibold border border-[#dcdcdc] rounded-full hover:bg-gray-300"
                       onClick={() => {
-                        handleLeaveAction(selectedStaff.id, "Rejected");
-                        handleCloseModal();
+                        if (selectedStaff && selectedStaff.id) {
+                          handleLeaveAction(selectedStaff.id, "Rejected");
+                          handleCloseModal();
+                        }
                       }}
                     >
                       Reject
@@ -588,18 +579,18 @@ const MAttendance = () => {
                   </div>
                 </div>
                 <div>
-                <Typography variant="subtitle3" color="text.secondary">
-                   <p className='text-gray-700 font-bold text-lg '>Reason: </p> <p className='mb-3'>{selectedStaff?.reason}</p>
+                  <Typography variant="subtitle3" color="text.secondary">
+                    <p className='text-gray-700 font-bold text-lg '>Reason: </p> <p className='mb-3'>{selectedStaff?.reason}</p>
                   </Typography>
                   <Typography variant="subtitle2" color="text.secondary">
-                  <p className='text-gray-700 text-lg'><span className='font-bold'>Date :</span> {selectedStaff?.from_date} to {selectedStaff?.to_date} 
-                   </p>
+                    <p className='text-gray-700 text-lg'><span className='font-bold'>Date :</span> {selectedStaff?.from_date} to {selectedStaff?.to_date}
+                    </p>
                   </Typography>
-                  
+
                   <Typography variant="subtitle2">
-                  <p className='text-gray-700 text-lg'><span className='font-bold'>Duration : </span>{selectedStaff?.duration} days 
-                  </p>
-                    
+                    <p className='text-gray-700 text-lg'><span className='font-bold'>Duration : </span>{selectedStaff?.duration} days
+                    </p>
+
                   </Typography>
 
                 </div>
