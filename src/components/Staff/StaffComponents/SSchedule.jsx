@@ -1,13 +1,10 @@
 import { useState, React, useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaChevronDown, FaChevronUp, FaPaperclip, FaCalendarAlt } from "react-icons/fa";
 import { Snackbar, Skeleton, Alert } from "@mui/material";
-import { staffLeaveApply,resetLeaveStatus, resetApplyLeaveError } from '../../../redux/slices/StaffLeaveSlice'
-import { getMonthlyAttendance } from '../../../redux/slices/StaffAttendanceSlice';
-import MuiAlert from "@mui/material/Alert";
-// import InfoIcon from "@mui/icons-material/Info";
+import { staffLeaveApply, resetLeaveStatus, resetApplyLeaveError } from '../../../redux/slices/StaffLeaveSlice'
+import { getMonthlyAttendance } from '../../../redux/slices/StaffOnlyAttendanceSlice';
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { Dialog, Box } from "@mui/material";
@@ -28,13 +25,10 @@ const SSchedule = () => {
   const [isEndDropdownOpen, setIsEndDropdownOpen] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  // const [selectedFile, setSelectedFile] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-  // const fileInputRef = useRef(null);
-  const [fileName, setFileName] = useState("");
   const [loading, setLoading] = useState(true);
 
- 
+
   const appliedLeave = useSelector((state) => state.leave.leaveStatus);
   const applyLeaveError = useSelector((state) => state.leave.applyLeaveError);
   const leaveLoading = useSelector((state) => state.leave.applyLeaveLoading);
@@ -71,7 +65,7 @@ const SSchedule = () => {
   const [leaveDetails, setLeaveDetails] = useState({
     from_date: "",
     to_date: "",
-    reason:"",
+    reason: "",
     leave_type: "",
   });
 
@@ -90,136 +84,99 @@ const SSchedule = () => {
           message: "No internet connection. Please check your network.",
           severity: "error"
         });
-      }  if (error?.status === 429) {
-        setSnackbar({
-          open: true,
-          message: "Too Many Requests. Please try again later.",
-          severity: "error"
-        });
-      }
-      // } else {
-      //   setSnackbar({
-      //     open: true,
-      //     message: "From Date is required.",
-      //     severity: "error"
-      //   });
-      // }
-      dispatch(resetApplyLeaveError());
-    }
-    }, [applyLeaveError])
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const { from_date, to_date, leave_type, reason } = leaveDetails;
-
-  // Basic validation
-  if (!from_date || !to_date || !leave_type || !reason) {
-    setSnackbar({
-      open: true,
-      message: "Please fill in all required fields",
-      severity: "error"
-    });
-    return;
-  }
-
-  // Check if from_date and to_date are the same
-  if (from_date === to_date) {
-    // Check if dates are same, implement same day validation
-    try {
-      await dispatch(staffLeaveApply(leaveDetails)).unwrap();
-    } catch (error) {
-      if (error?.message?.includes("date range")) {
-        setSnackbar({
-          open: true,
-          message: "You already have leave applied for this date",
-          severity: "error"
-        });
       } else {
         setSnackbar({
           open: true,
-          message: error?.message || "Failed to submit leave request",
+          message: applyLeaveError || "Failed to submit leave request",
           severity: "error"
         });
       }
+      dispatch(resetApplyLeaveError());
     }
-    return;
-  }
+  }, [applyLeaveError, dispatch])
 
-  // Validate date range
-  const start = new Date(from_date);
-  const end = new Date(to_date);
-  
-  if (end < start) {
-    setSnackbar({
-      open: true,
-      message: "End date cannot be before start date",
-      severity: "error"
-    });
-    return;
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { from_date, to_date, leave_type, reason } = leaveDetails;
 
-  try {
-    await dispatch(staffLeaveApply(leaveDetails)).unwrap();
-  } catch (error) {
-    if (error?.message?.includes("date range")) {
+    if (!from_date || !to_date || !leave_type || !reason) {
       setSnackbar({
         open: true,
-        message: "Leave already exists for one or more dates in this range",
+        message: "Please fill in all fields",
         severity: "error"
       });
-    } else {
+      return;
+    }
+
+    const start = new Date(from_date);
+    const end = new Date(to_date);
+
+    if (end < start) {
+      setSnackbar({
+        open: true,
+        message: "End date cannot be before start date",
+        severity: "error"
+      });
+      return;
+    }
+
+    try {
+      await dispatch(staffLeaveApply(leaveDetails)).unwrap();
+
+      // Clear form after successful submission
+      setLeaveDetails({
+        from_date: "",
+        to_date: "",
+        reason: "",
+        leave_type: "",
+      });
+
+      // Reset date states
+      setStartDate(null);
+      setEndDate(null);
+
+      // Close dropdowns
+      setIsStartDropdownOpen(false);
+      setIsEndDropdownOpen(false);
+
+      setSnackbar({
+        open: true,
+        message: "Leave request submitted successfully",
+        severity: "success"
+      });
+    } catch (error) {
       setSnackbar({
         open: true,
         message: error?.message || "Failed to submit leave request",
         severity: "error"
       });
     }
-  }
-};
+  };
 
-  const monthlyAttendance = useSelector((state) => state.staffAttendance.monthlyAttendance);
-  const {
-
-    monthlyLoading,
-    monthlyError,
-  } = useSelector((state) => state.staffAttendance);
+  const monthlyAttendance = useSelector((state) => state.staffOnlyAttendance.monthlyAttendance);
 
   useEffect(() => {
     dispatch(getMonthlyAttendance());
 
   }, [dispatch]);
 
-  const [isCalendarOpen, setIsCalendarOpen] = useState(null);
 
 
   const toggleStartDropdown = () => {
     setIsStartDropdownOpen((prev) => !prev);
     if (!isStartDropdownOpen) {
-      setIsEndDropdownOpen(false); // Close end date if start is opened
-    }
-    // if (isCalendarOpen === "endDate") {
-    //   setIsCalendarOpen(null); // Close end date calendar
-    //   setIsEndDropdownOpen(false); // Close end date dropdown
-    // }
-    // // Toggle start date calendar
-    // setIsStartDropdownOpen((prev) => !prev);
-    // if (!isStartDropdownOpen) {
-    //   setIsCalendarOpen("startDate"); // Open the start date calendar
-    // } else {
-    //   setIsCalendarOpen(null); // Close the start date calendar
-    // }
-  };
+      setIsEndDropdownOpen(false);
 
-  // const toggleStartDropdown = () => {
-  //   setIsStartDropdownOpen(!isStartDropdownOpen);
-  // };
+    };
+
+  };
 
 
 
   const toggleEndDropdown = () => {
     setIsEndDropdownOpen((prev) => !prev);
     if (!isEndDropdownOpen) {
-      setIsStartDropdownOpen(false); // Close start date if end is opened
+      setIsStartDropdownOpen(false);
     }
   };
 
@@ -232,20 +189,14 @@ const handleSubmit = async (e) => {
     }
     setStartDate(date);
     if (endDate && dayjs(date).isAfter(endDate)) {
-      setEndDate(null); // Reset the end date if start date is after end date
+      setEndDate(null);
     }
-    // if (endDate && date > endDate) {
-    //   setEndDate(null); // Reset the end date if it's before the new start date
-    // }
-    // setLeaveDetails((prev) => ({
-    //   ...prev,
-    //   from_date: date ? date.toLocaleDateString() : "", // Set the formatted date
-    // }));
+
     setLeaveDetails((prev) => ({
       ...prev,
-      from_date: date ? formatDate(date) : "", // Set the formatted date
+      from_date: date ? formatDate(date) : "",
     }));
-    setIsStartDropdownOpen(false); // Close the dropdown
+    setIsStartDropdownOpen(false);
   };
 
   const handleEndDateChange = (date) => {
@@ -254,60 +205,65 @@ const handleSubmit = async (e) => {
       return;
     }
     setEndDate(date);
-   
+
     setLeaveDetails((prev) => ({
       ...prev,
       to_date: date ? formatDate(date) : "",
     }));
-    setIsEndDropdownOpen(false); 
-   
+    setIsEndDropdownOpen(false);
+
   };
 
- 
 
-useEffect(() => {
-  if (appliedLeave) {
-    setSnackbar({
-      open: true,
-      message: appliedLeave,
-      severity: 'success'
-    });
-    // Reset form
-    setLeaveDetails({
-      from_date: '',
-      to_date: '',
-      leave_type: '',
-      reason: ''
-    });
-    setStartDate(null);
-    setEndDate(null);
-    dispatch(resetLeaveStatus());
-  }
 
-  if (applyLeaveError) {
-    setSnackbar({
-      open: true,
-      message: applyLeaveError || 'Failed to submit leave request',
-      severity: 'error'
-    });
-    dispatch(resetApplyLeaveError());
-  }
-}, [appliedLeave, applyLeaveError, dispatch]);
+  useEffect(() => {
+    if (appliedLeave) {
+      // Clear form
+      setLeaveDetails({
+        from_date: '',
+        to_date: '',
+        leave_type: '',
+        reason: ''
+      });
+      // Reset date states
+      setStartDate(null);
+      setEndDate(null);
+      // Close dropdowns
+      setIsStartDropdownOpen(false);
+      setIsEndDropdownOpen(false);
+
+      setSnackbar({
+        open: true,
+        message: "Leave request submitted successfully",
+        severity: 'success'
+      });
+
+      dispatch(resetLeaveStatus());
+    }
+    if (applyLeaveError) {
+      setSnackbar({
+        open: true,
+        message: applyLeaveError || 'Failed to submit leave request',
+        severity: 'error'
+      });
+      dispatch(resetApplyLeaveError());
+    }
+  }, [appliedLeave, applyLeaveError, dispatch]);
 
   const handleCloseSnackbar = (event, reason) => {
-  if (reason === 'clickaway') return;
-  setSnackbar(prev => ({ ...prev, open: false }));
-};
-  // Update shiftTime function for correct shift mapping
+    if (reason === 'clickaway') return;
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
   const shiftTime = (shift) => {
     const shiftLower = shift?.toLowerCase();
-    
-    switch(shiftLower) {
+
+    switch (shiftLower) {
       case "morning":
         return "06:00 AM to 02:00 PM";
       case "evening":
-      case "day": // Handle both "evening" and "day" cases
-        return "02:00 PM to 10:00 PM"; 
+      case "day":
+        return "02:00 PM to 10:00 PM";
       case "night":
         return "10:00 PM to 06:00 AM";
       default:
@@ -363,7 +319,7 @@ useEffect(() => {
                 </div>
               ) : (
                 <table className="w-[96%]  px-1 mx-auto border border-[#dcdcdc] rounded-2xl shadow  ">
-                  
+
                   <thead>
                     <tr className="bg-[#3F4870] text-[#E6EEF9] rounded-xl">
 
@@ -378,7 +334,7 @@ useEffect(() => {
                     {monthlyAttendance && monthlyAttendance.length > 0 ? (
                       monthlyAttendance.map((member, index) => (
                         <tr
-                          // key={member.date}
+
                           key={index}
                           className={`px-4 py-2 ${index % 2 === 0 ? 'bg-[#F1F6FC]' : 'bg-[#DEE8FF]'
                             }`}
@@ -432,8 +388,6 @@ useEffect(() => {
                     value={leaveDetails.leave_type}
                     name="leave_type"
                     onChange={handleChange}
-                    // value={taskTitle}
-                    // onChange={(e) => setTaskTitle(e.target.value)}
                     className="border border-gray-200 rounded-xl bg-[#e6eef9] p-2 w-full focus:border-gray-300 focus:outline-none"
                   />
 
@@ -516,9 +470,9 @@ useEffect(() => {
 
                       {isEndDropdownOpen && (
                         <div className="absolute  z-50 pr-4 mr-5">
-                          
+
                           <Dialog
-                            
+
                             open={isEndDropdownOpen}
                             // onClose={closeCalendar} // Close the calendar if clicked outside
                             onClose={toggleEndDropdown}
@@ -583,12 +537,11 @@ useEffect(() => {
                   <div className='relative h-full'>
                     <textarea
                       value={leaveDetails.reason}
-                      name='reason'
+                      name="reason"
                       onChange={handleChange}
-                      // onChange={(e) => setTaskDescription(e.target.value)}
-                      placeholder="State reason for leave  ..."
+                      placeholder="State reason for leave..."
                       maxLength={400}
-                      className="border border-gray-200 w-full my-3 rounded-xl bg-[#e6eef9] p-2 xl:h-[400px] h-[150px]  resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
+                      className="border border-gray-200 w-full my-3 rounded-xl bg-[#e6eef9] p-2 xl:h-[400px] h-[150px] resize-none mb-2 overflow-y-auto focus:border-gray-300 focus:outline-none scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-100"
                     />
                   </div>
                   <div className="flex justify-end mb-2">
@@ -598,14 +551,14 @@ useEffect(() => {
                       className={`h-9 w-full font-Montserrat font-bold rounded-xl text-white shadow-xl
     ${leaveLoading ? 'bg-gray-400' : 'bg-[#3A426F]'}`}
                     >
-  {leaveLoading ? 
-    <div className="flex items-center justify-center gap-2">
-      <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"/>
-      Submitting...
-    </div> : 
-    'Submit'
-  }
-</button>
+                      {leaveLoading ?
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Submitting...
+                        </div> :
+                        'Submit'
+                      }
+                    </button>
                   </div>
                 </form>
               </div>
@@ -619,23 +572,23 @@ useEffect(() => {
           <button onClick={handleCloseSnackbar} className="absolute top-1 right-2 text-xl">×</button>
         </div>
       )} */}
-<Snackbar
-  open={snackbar.open}
-  autoHideDuration={4000}
-  onClose={handleCloseSnackbar}
-  anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-  sx={{ position: 'fixed', zIndex: 9999 }}
->
-  <Alert 
-    onClose={handleCloseSnackbar}
-    severity={snackbar.severity}
-    variant="filled"
-    sx={{ width: '100%' }}
-  >
-    {snackbar.message}
-  </Alert>
-</Snackbar>
-       
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={4000}
+            onClose={handleCloseSnackbar}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            sx={{ position: 'fixed', zIndex: 9999 }}
+          >
+            <Alert
+              onClose={handleCloseSnackbar}
+              severity={snackbar.severity}
+              variant="filled"
+              sx={{ width: '100%' }}
+            >
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
+
 
         </div>
       </div>

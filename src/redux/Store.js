@@ -20,6 +20,7 @@ import checkInReducer from './slices/CheckInSlice'
 import occupancyReducer from './slices/OcupancyRateSlice'
 import userProfileReducer from './slices/userProfileSlice'
 import staffAttendanceReducer from './slices/StaffAttendanceSlice'
+import staffOnlyAttendanceReducer from './slices/StaffOnlyAttendanceSlice.jsx'
 import checkoutReducer from './slices/checkoutSlice'
 import payrollReducer from './slices/PayrollSlice'
 import shiftsReducer from './slices/ShiftSlice'
@@ -60,7 +61,8 @@ const store = configureStore({
     staffDashboard: staffDashboardReducer,
     performance: staffPerformanceReducer,
     leavestaff: leaveStaffReducer,
-    stafftasks: staffTasksReducer
+    stafftasks: staffTasksReducer,
+    staffOnlyAttendance:staffOnlyAttendanceReducer
   },
 })
 
