@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip, Skeleton, Snackbar, Alert } from '@mui/material';
 import { Tooltip as MuiTooltip } from '@mui/material';
 import { format } from 'date-fns';
-import { AppDispatch } from '../../../Store';
+import { AppDispatch } from '../../../redux/Store';
 import { bookRoom } from '../../../redux/slices/CheckInSlice';
 import { fetchHotelDetails, selectHotelDetails } from '../../../redux/slices/HotelDetailsSlice';
 import LoadingAnimation from '../../common/LoadingAnimation';
-import { 
-  fetchRoomDetails, 
-  selectRoomDetails, 
-  selectRoomDetailsLoading 
+import {
+  fetchRoomDetails,
+  selectRoomDetails,
+  selectRoomDetailsLoading
 } from '../../../redux/slices/RoomDetailsSlice';
 
 interface FormData {
@@ -73,17 +73,28 @@ const validatePhoneNumber = (phone: string): string => {
   return '';
 };
 
+// Add email validation function
+const validateEmail = (email: string): string => {
+  if (!email) return '';
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) ? '' : 'Invalid email format';
+};
+
+// Update the validateForm function
 const validateForm = (data: FormData): boolean => {
   const phoneError = validatePhoneNumber(data.phoneNumber);
   const nameError = validateName(data.name);
+  const emailError = validateEmail(data.email);
+
   return Boolean(
-    data.name.trim() && 
-    data.email && 
-    data.phoneNumber && 
-    data.roomType && 
-    data.checkOutTime && 
+    data.name.trim() &&
+    data.email &&
+    data.phoneNumber &&
+    data.roomType &&
+    data.checkOutTime &&
     !phoneError &&
-    !nameError
+    !nameError &&
+    !emailError
   );
 };
 
@@ -92,7 +103,7 @@ const NewCustomerForm: React.FC<Props> = ({ onCheckInSuccess }) => {
   const hotelDetails = useSelector(selectHotelDetails);
   const roomDetails = useSelector(selectRoomDetails);
   const roomsLoading = useSelector(selectRoomDetailsLoading);
-  
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -125,18 +136,23 @@ const NewCustomerForm: React.FC<Props> = ({ onCheckInSuccess }) => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
     const { name, value } = e.target;
-    
+
     if (name === 'name') {
       const nameError = validateName(value);
       setErrors(prev => ({ ...prev, name: nameError }));
     }
-    
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+
+    if (name === 'email') {
+      const emailError = validateEmail(value);
+      setErrors(prev => ({ ...prev, email: emailError }));
+    }
+
     if (name === 'phoneNumber') {
       const phoneError = validatePhoneNumber(value);
       setErrors(prev => ({ ...prev, phoneNumber: phoneError }));
     }
+
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleBlur = (fieldName: keyof TouchedFields): void => {
@@ -152,10 +168,23 @@ const NewCustomerForm: React.FC<Props> = ({ onCheckInSuccess }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+
+    // Validate all fields
+    const nameError = validateName(formData.name);
+    const emailError = validateEmail(formData.email);
+    const phoneError = validatePhoneNumber(formData.phoneNumber);
+
+    setErrors({
+      name: nameError,
+      email: emailError,
+      phoneNumber: phoneError
+    });
+
     if (!validateForm(formData)) {
       setShowTooltips(true);
       return;
     }
+
     setIsSubmitting(true);
 
     try {
@@ -169,13 +198,8 @@ const NewCustomerForm: React.FC<Props> = ({ onCheckInSuccess }) => {
       };
 
       await dispatch(bookRoom(bookingData)).unwrap();
-      
-      setSnackbar({
-        open: true,
-        message: 'Customer checked in successfully!',
-        severity: 'success'
-      });
 
+      // Clear form and reset states
       setFormData({
         name: '',
         email: '',
@@ -185,14 +209,33 @@ const NewCustomerForm: React.FC<Props> = ({ onCheckInSuccess }) => {
         customerStatus: 'REGULAR'
       });
 
+      setErrors({
+        name: '',
+        email: '',
+        phoneNumber: ''
+      });
+
+      setTouched({
+        email: false,
+        phoneNumber: false
+      });
+
+      setShowTooltips(false);
+
+      setSnackbar({
+        open: true,
+        message: 'Customer checked in successfully!',
+        severity: 'success'
+      });
+
       onCheckInSuccess();
-      
+
     } catch (error: any) {
       const backendError = error.response?.data;
-      const errorMessage = backendError?.status === 'error' 
+      const errorMessage = backendError?.status === 'error'
         ? backendError.message
         : 'Booking failed';
-      
+
       setSnackbar({
         open: true,
         message: errorMessage,
@@ -314,9 +357,8 @@ const NewCustomerForm: React.FC<Props> = ({ onCheckInSuccess }) => {
                       setErrors(prev => ({ ...prev, phoneNumber: phoneError }));
                     }}
                     onBlur={() => handleBlur('phoneNumber')}
-                    className={`w-full p-2 border rounded-lg ${
-                      touched.phoneNumber && errors.phoneNumber ? 'border-red-500' : ''
-                    }`}
+                    className={`w-full p-2 border rounded-lg ${touched.phoneNumber && errors.phoneNumber ? 'border-red-500' : ''
+                      }`}
                     maxLength={10}
                     pattern="[0-9]*"
                   />
@@ -341,11 +383,11 @@ const NewCustomerForm: React.FC<Props> = ({ onCheckInSuccess }) => {
                   className="w-full p-2 border rounded-lg"
                 >
                   <option value="">Select Room Type</option>
-                  {roomDetails.map((room) => (
+                    {roomDetails.map((room: { room_type: string; price: number; count: number }) => (
                     <option key={room.room_type} value={room.room_type}>
                       {room.room_type} - ₹{room.price}/night ({room.count} available)
                     </option>
-                  ))}
+                    ))}
                 </select>
               </MuiTooltip>
               <MuiTooltip

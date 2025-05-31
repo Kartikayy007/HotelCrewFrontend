@@ -96,12 +96,12 @@ const StatsCard = ({ title, value, Icon, trend, previousValue, suffix = '', show
   );
 };
 
-// First, create LoadingState component
+
 const LoadingState = () => (
   <div className="bg-[#E6EEF9] min-h-screen p-4">
     <Skeleton variant="text" width={200} height={40} className="ml-12 mb-4" /> {/* Analytics heading */}
     
-    {/* Stats Cards Skeleton */}
+    
     <div className="flex flex-wrap -mx-2 p-3 sm:p-4">
       {[1, 2, 3, 4].map((i) => (
         <div key={i} className="w-full sm:w-1/2 xl:w-1/4 px-2 mb-4">
@@ -182,7 +182,7 @@ const LoadingState = () => (
   </div>
 );
 
-// Modify AdminAnalytics.jsx main component
+
 const AdminAnalytics = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
@@ -206,7 +206,7 @@ const AdminAnalytics = () => {
 
   const dispatch = useDispatch();
 
-  // Selectors
+  
   const staffList = useSelector(selectStaffList);
   const weeklyStats = useSelector((state) => state.attendance.weeklyStats);
   const loading = useSelector((state) => state.attendance.loading);
@@ -231,7 +231,7 @@ const AdminAnalytics = () => {
   const animatedCheckOuts = useCountAnimation(loading ? 0 : todaysCheckOuts);
   const animatedStaff = useCountAnimation(loading ? 0 : totalStaff);
 
-  // Check-ins Data
+  
   const checkinsData = {
     data: roomStats?.daily_checkins || [],
     labels: roomStats?.dates || []
@@ -333,7 +333,7 @@ const AdminAnalytics = () => {
     ];
   };
 
-  //  (animatedRevenue, animatedCheckIns, animatedCheckOuts, animatedStaff);
+  
 
   return (
     <div className="bg-[#E6EEF9] h-full w-full overflow-auto p-2 sm:p-4">

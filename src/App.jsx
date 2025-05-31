@@ -17,7 +17,7 @@ const RoleBasedRoute = ({ children, allowedRoles }) => {
   const { token, userData } = useSelector(state => state.user);
   const location = useLocation();
   
-  // Get token from both Redux state and localStorage
+
   const accessToken = token || localStorage.getItem('accessToken');
   const userRole = userData?.role || localStorage.getItem('role');
 

@@ -259,7 +259,7 @@ const GuestRequest: React.FC = () => {
               </div>
             </form>
 
-            <div className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg md:w-1/2 lg:w-1/2 xl:w-full">
+            {/* <div className="flex flex-col gap-6 bg-white p-6 rounded-xl shadow-lg md:w-1/2 lg:w-1/2 xl:w-full">
               <h2 className="text-lg sm:text-xl font-semibold">Task Progress</h2>
               <div className="flex justify-center items-center">
                 <div className="relative w-48">
@@ -296,7 +296,7 @@ const GuestRequest: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

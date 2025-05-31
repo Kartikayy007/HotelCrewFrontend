@@ -10,7 +10,7 @@ const Admin = () => {
   const dispatch = useDispatch();
   const { activeComponent } = useSelector(state => state.admin);
   const { token } = useSelector(state => state.user);
-  // const [notificationStatus, setNotificationStatus] = useState('');
+  
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [open, setOpen] = useState(false);
@@ -60,7 +60,7 @@ const Admin = () => {
 
 
   useEffect(() => {
-    // initializeNotifications();
+    
     
     const isHotelRegistered = localStorage.getItem('isHotelRegistered');
     const shouldShowOverlay = isHotelRegistered === 'false' || !isHotelRegistered;

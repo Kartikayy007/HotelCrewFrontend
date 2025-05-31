@@ -236,7 +236,7 @@ const TaskAssignment: React.FC = () => {
         <div className="w-full px-4 md:px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 w-full max-w-[1400px] h-[100%] mx-auto gap-4">
                 <div className="h-[80vh] bg-[#FFFFFF] rounded-xl shadow-lg flex flex-col overflow-hidden">
-                    <h2 className="text-base md:text-lg font-semibold sticky top-0 p-4 md:p-6 bg-[#FFFFFF] flex items-center z-10">
+                    <h2 className="text-base  border-b border-[#BDBDBD]  md:text-lg font-semibold sticky top-0 p-4 md:p-6 bg-[#FFFFFF] flex items-center z-10">
                         <div className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-full bg-yellow-400 mr-2"></div>
                         Pending
                     </h2>
