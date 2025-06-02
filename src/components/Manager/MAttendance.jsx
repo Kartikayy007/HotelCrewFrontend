@@ -396,7 +396,7 @@ const MAttendance = () => {
 
 
         <div className="bg-white w-full max-h-[375px] overflow-y-auto pb-7 py-2 rounded-xl shadow scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-200">
-          <div className='flex gap-4 sticky top-0'>
+          <div className='flex gap-4 sticky top-0 bg-white'>
             <h2 className="text-lg sm:text-xl top-4 pl-6 mt-4 mb-0 font-semibold sticky ">Leave Requests</h2>
             <CircleAlert className='text-yellow-500 mt-4 rounded-full ' size={30} />
           </div>
@@ -529,7 +529,7 @@ const MAttendance = () => {
               ))
             ) : (
 
-              <p className="text-gray-600 font-semibold fixed ">No rejected leaves yet.</p>
+              <p className="text-gray-600 font-semibold  ">No rejected leaves yet.</p>
             )}
           </div>
         </div>

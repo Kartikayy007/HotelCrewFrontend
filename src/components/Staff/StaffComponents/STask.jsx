@@ -166,7 +166,7 @@ const STask = () => {
       <div className="flex h-[97%] flex-col xl:flex-row gap-5 p-3">
         <div className='space-y-5 xl:w-[33%] xl:order-1 order-1'>
           <div className="bg-white w-full xl:min-h-[715px]  pb-1 pr-6 pl-6 rounded-lg shadow max-h-[700px] overflow-y-auto no-scrollbar">
-            <h2 className="text-lg sm:text-xl font-semibold pb-6 pt-6 sticky top-0 text-left">Pending Tasks</h2>
+            <h2 className="text-lg sm:text-xl bg-white font-semibold pb-6 pt-6 sticky top-0 text-left">Pending Tasks</h2>
             <div className='my-2'>
               {taskloading ? (
                 <div className='ml-4 mb-2'>
@@ -181,7 +181,7 @@ const STask = () => {
 
         <div className='space-y-5 xl:w-[33%] order-2'>
           <div className="bg-white w-full xl:min-h-[715px]  pb-1 pr-6 pl-6 rounded-lg shadow max-h-[700px] overflow-y-auto noo-scrollbar">
-            <h2 className="text-lg sm:text-xl font-semibold pb-6 sticky top-0 pt-6 text-left">Task in Progress</h2>
+            <h2 className="text-lg sm:text-xl bg-white font-semibold pb-6 sticky top-0 pt-6 text-left">Task in Progress</h2>
             <div className='my-2'>
               {taskloading ? (
                 <div className='ml-4 mb-2'>
