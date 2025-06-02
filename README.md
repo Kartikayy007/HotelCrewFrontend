@@ -1,8 +1,78 @@
-HotelCrew
+[HotelCrew
 
 # Overview
 
 HotelCrew is a comprehensive platform designed to enhance staff management, streamline hotel operations, and improve customer experience. It caters to various roles within the hotel industry, including administrators (Admin and Manager) and staff members.
+
+## Snapshots
+
+Below are screenshots demonstrating the user roles and their interfaces.
+
+###   Admin 
+
+<div style="display: flex; gap: 10px;">
+<img src="./assets/admin/ADashboard1.png" alt="Admin Dashboard" width="350" />
+<img src="./assets/admin/ADashboard2.png" alt="Admin Dashboard" width="350" />
+</div>
+<br/>
+<div style="display: flex; gap: 10px;">
+<img src="./assets/admin/AAnalytics.png" alt="Admin Analytics 1" width="350" />
+<img src="./assets/admin/AAnalytics2.png" alt="Admin Analytics 2" width="350" />
+<img src="./assets/admin/AAnalytics3.png" alt="Admin Analytics 3" width="350" />
+</div>
+<br/>
+<div style="display: flex; gap: 10px;">
+<img src="./assets/admin/ADatabase1.png" alt="Admin Database 1" width="350" />
+<img src="./assets/admin/ADatabase2.png" alt="Admin Database 2" width="350" />
+<img src="./assets/admin/ADatabase3.png" alt="Admin Database 3" width="350" />
+</div>
+<br/>
+<div style="display: flex; gap: 10px;">
+<img src="./assets/admin/ALeave.png" alt="Admin Leave" width="350" />
+<img src="./assets/admin/ASettings1.png" alt="Admin Settings 2" width="350" />
+<img src="./assets/admin/ASettings2.png" alt="Admin Settings 3" width="350" />
+</div>
+
+###  Manager 
+
+<div style="display: flex; gap: 10px;">
+<img src="./assets/manager/MDashboard1.png" alt="Manager Dashboard" width="350" />
+<img src="./assets/manager/MDashboard2.png" alt="Manager Dashboard" width="350" />
+<img src="./assets/manager/MSchedule.png" alt="Manager Schedule" width="350" />
+</div>
+<br/>
+<div style="display: flex; gap: 10px;">
+<img src="./assets/manager/MAnalytics.png" alt="Manager Analytics 1" width="350" />
+<img src="./assets/manager/MAttendance1.png" alt="Manager Attendance 2" width="350" />
+<img src="./assets/manager/MAttendance2.png" alt="Manager Attendance 2" width="350" />
+<img src="./assets/manager/MLeave.png" alt="Manager Leave" width="350" />
+</div>
+<br/>
+<div style="display: flex; gap: 10px;">
+<img src="./assets/manager/MDatabase1.png" alt="Manager Database 1" width="350" />
+<img src="./assets/manager/MDatabase2.png" alt="Manager Database 2" width="350" />
+<img src="./assets/manager/MProfile.png" alt="Manager Profile" width="350" />
+</div>
+
+### Receptionist 
+
+<div style="display: flex; gap: 10px;">
+  <img src="./assets/reception/RDashboard.png" alt="Receptionist Dashboard" width="350" />
+  <img src="./assets/reception/RDatabase.png" alt="Receptionist Database" width="350" />
+  <img src="./assets/reception/RTask.png" alt="Receptionist Task" width="350" />
+  <img src="./assets/reception/RSchedule.png" alt="Receptionist Schedule" width="350" />
+  <img src="./assets/reception/RProfile.png" alt="Receptionist Profile" width="350" />
+</div>  
+
+### Staff 
+
+<div style="display: flex; gap: 10px;">
+  <img src="./assets/staff/SDashboard.png" alt="Staff Dashboard" width="350" />
+  <img src="./assets/staff/STask.png" alt="Staff Task" width="350" />
+  <img src="./assets/staff/SSchedule.png" alt="Staff Schedule" width="350" />
+  <img src="./assets/staff/SProfile.png" alt="Staff Profile" width="350" />
+</div>  
+
 
 ## Features
 
@@ -61,3 +131,4 @@ HotelCrew is a comprehensive platform designed to enhance staff management, stre
 
 In upcoming updates, we plan to introduce additional features such as an automated attendance system that records staff check-ins when their devices connect to the hotel’s Wi-Fi network. We also envision integrating payroll management for admins, alongside a customer portal to handle customer-side operations efficiently.
 
+](https://hotelcrew-1.onrender.com/admin)
