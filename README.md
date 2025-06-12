@@ -4,7 +4,7 @@
 
 HotelCrew is a comprehensive platform designed to enhance staff management, streamline hotel operations, and improve customer experience. It caters to various roles within the hotel industry, including administrators (Admin and Manager) and staff members.
 
-## Snapshots
+## Screenshots
 
 Below are screenshots demonstrating the user roles and their interfaces.
 
@@ -73,6 +73,16 @@ Below are screenshots demonstrating the user roles and their interfaces.
   <img src="./assets/staff/SProfile.png" alt="Staff Profile" width="350" />
 </div>  
 
+## Videos
+
+[Admin Role](https://drive.google.com/file/d/13wfAIqNNxEoGWrOjLBGJpTt2NzmYCYvz/view?usp=drive_link)
+
+[Manager Role](https://www.loom.com/share/175edb8b18bd48a49238bd9db816e534?sid=8c7a89ef-9ef8-4311-8968-44955430228f)
+
+[Recetionist Role](https://drive.google.com/file/d/1RSHswu1HcgxCruuwTmkPpT2SWvm29ESx/view?usp=drive_link)
+
+[Staff Role](https://drive.google.com/file/d/1w8JXMlJLLbSPYkVCZtV1qnNqjbiqYTWu/view?usp=drive_link)
+
 
 ## Features
 
@@ -122,10 +132,16 @@ Below are screenshots demonstrating the user roles and their interfaces.
 
 - **Frontend: Flutter**
   - Flutter is a powerful framework that allows developers to create high-performance mobile apps for both iOS and Android.
+  - Flutter Developer: Srayansh Gupta [GitHub Repository](https://github.com/SRAYANSH-GUPTA/HotelCrew)
 - **Frontend: React**
   - React is a powerful JavaScript library whose component-driven architecture makes it suitable for developing interactive web applications.
+  - React Developers: Navya Gupta , Kartikay Singh Purindir
 - **Backend: Django**
   - Django is a powerful and versatile web framework for Python that streamlines the process of building secure, scalable applications.
+  - Backend Developer: Mrigank Raj  [GitHub Repository](https://github.com/Mrigank923/HotelCrew)
+
+
+
 
 ## Future Enhancement
 
